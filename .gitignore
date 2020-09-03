@@ -4,6 +4,21 @@
 # Log file
 *.log
 
+# idea
+target/
+*.iml
+.idea/
+
+# eclipse
+.project
+.settings/
+.classpath
+
+# maven
+.mvn/
+mvnw
+mvnw.cmd
+
 # BlueJ files
 *.ctxt
 
