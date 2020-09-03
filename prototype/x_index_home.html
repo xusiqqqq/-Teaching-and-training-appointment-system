@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>X+约课系统 - 首页面</title>
+    <meta name="keywords" content="后台bootstrap框架,会员中心主题,后台HTML,响应式后台">
+    <meta name="description" content="完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术">
+
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="css/animate.css" rel="stylesheet">
+    <link href="css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="css/plugins/datapicker/bootstrap-datepicker.css" rel="stylesheet">
+
+    <!-- ECharts -->
+    <script src="js/plugins/echarts/echarts-all.js"></script>
+
+
+    <style type="text/css">
+        .box{
+            background-color: white;
+            width: 330px;
+            height: 70px;
+            border: 1px solid pink;
+            float: left;
+            margin-top: 15px;
+        }
+        .selecttime{
+            width: 270px;
+            height: 30px;
+            float: left;
+            margin-top: 15px;
+            margin-left: 17px;
+            cursor: pointer;
+        }
+        /*.time:hover{*/
+        /*    cursor: pointer;*/
+        /*}*/
+        .left{
+            margin-left: 12px;
+        }
+    </style>
+</head>
+
+<body class="gray-bg">
+
+    <!--查询某一时间段内的约课用户信息-->
+    <div class="wrapper wrapper-content">
+        <div class="form-group ">
+            <div class="input-group date selecttime" >
+                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                <input type="text" class="form-control myDate" value="2019-11-11">
+                <script type="text/javascript">
+                    $("input").focus(function () {
+                        $("input").css("background-color","#FFFFCC");
+                    })
+                </script>
+            </div>
+        </div>
+        <div class="form-group " style="margin-top: -15px">
+            <div class="input-group date selecttime" >
+                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                <input type="text" class="form-control myDate" value="2020-5-11">
+            </div>
+            <button type="button" class="btn btn-info" style="margin-left: 15px;margin-top: 15px">查询</button>
+        </div>
+
+        <!--    体部信息-->
+        <div class="box" style="margin-left: 17px">
+            <span style="font-size: 25px;" class="left"><strong>72</strong></span>
+            <p class="left">会员总数</p>
+        </div>
+        <div class="box " style="margin-left: 30px">
+            <span style="font-size: 25px" class="left"><strong>2</strong></span>
+            <p class="left">活跃用户(近一个月有过约课的用户)</p>
+        </div>
+        <div class="box left" style="margin-left: 30px">
+            <span style="font-size: 25px" class="left"><strong>76</strong></span>
+            <p class="left">预约总数</p>
+        </div>
+
+        <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+        <div style="background-color: white;width: 1050px;margin-top: 130px;text-align: center;margin-left: 18px">
+            <div id="broken_line" style="width: 1000px;height:400px;"></div>
+            <script type="text/javascript">
+                // 基于准备好的dom，初始化echarts实例
+                var myChartLine = echarts.init(document.getElementById('broken_line'));
+
+                // 指定图表的配置项和数据
+                var option = {
+                    title: {
+                        text: '每日约课数量'
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: ['2019-10-24', '2019-10-25', '2019-10-26', '2019-10-27', '2019-10-28', '2019-10-29', '2019-10-30','2019-10-31']
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: [{
+                        data: [0, 0, 0, 0, 0,0, 1,1],
+                        type: 'line',
+                        // areaStyle: {
+                        //     color:'blue'
+                        // }
+                    }]
+                };
+
+                // 使用刚指定的配置项和数据显示图表。
+                myChartLine.setOption(option);
+            </script>
+        </div>
+
+<!--        第二幅图，填充颜色的折线图-->
+        <div style="background-color: white;width: 1050px;margin-top: 30px;text-align: center;margin-left: 18px">
+            <div id="ChartLine2" style="width: 1000px;height:400px;"></div>
+            <script type="text/javascript">
+                // 基于准备好的dom，初始化echarts实例
+                var myChartLine2 = echarts.init(document.getElementById('ChartLine2'));
+
+                var option = {
+                    title:{
+                      text: '每日新增会员数量',
+                    },
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: "{a} <br/>{b}: {c}"
+                    },
+
+                    xAxis: {
+                        type: 'category',
+                        data: ['2019-10-24', '2019-10-25', '2019-10-26', '2019-10-27', '2019-10-28', '2019-10-29', '2019-10-30','2019-10-31']
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series : [          // 系列列表,每个系列通过 type 决定自己的图表类型
+                        {
+                            name:'流量详情',
+                            type:'line',    //类型是线型的
+                            stack: '总量',
+                            areaStyle: {
+                               color:'blue'//填充区域颜色
+                            },
+                            itemStyle : {
+                                normal : {
+                                    color:'#275F82', //改变折线点的颜色
+
+                                }
+                            },
+                            data:[0,1,0,2,0,1,1,1]
+                        }
+                    ]
+                };
+                myChartLine2.setOption(option);
+            </script>
+        </div>
+
+
+<!--        第三幅图,饼状图-->
+        <div style="background-color: white;width: 1050px;text-align: center;margin-left: 18px;margin-top: 30px">
+            <div id="pie" style="width: 1000px;height:400px;"></div>
+            <script type="text/javascript">
+                // 基于准备好的dom，初始化echarts实例
+                var myChartPie = echarts.init(document.getElementById('pie'));
+
+                var option = {          //指定图表的配置项和数据
+                    title: {
+                        text: '会员卡统计',
+                        subtext: '绑定会员卡数量',
+                        x: 'center'
+                    },
+                    //提示框，鼠标悬浮交互时的信息提示，
+                    // 意思就是鼠标悬浮某块图片时，会出现这块图片的具体信息，如位置啊、大小比重啊...
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: '{a} <br/>{b} : {c} ({d}%)'
+                    },
+                    legend: {               //legend：这是设置图例数据的
+                        orient: 'vertical',//图例垂直
+                        x: '20px',//图表标题横向位置
+                        y:'50px',//图表标题纵向位置
+                        left:'70%',
+                        data: ['12课时', '24课时', '48课时', '96课时', '12课时一对一','12次大课']
+                    },
+                    series: [       // 系列列表,每个系列通过 type 决定自己的图表类型
+                        {
+                            name: '访问来源',       //点击图，显示某一块图的访问来源
+                            type: 'pie',
+                            radius: '55%',          //圆饼图的大小
+                            center: ['50%', '50%'], //设置图的位置，显示居中
+                            data: [
+                                {value: 335, name: '12课时'},
+                                {value: 310, name: '24课时'},
+                                {value: 234, name: '48课时'},
+                                {value: 135, name: '96课时'},
+                                {value: 255, name: '12课时一对一'},
+                                {value: 300, name: '12次大课'}
+                            ],
+                            emphasis: {
+                                itemStyle: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 5,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5,0.3)'
+                                }
+                            }
+                        }
+                    ]
+                };
+                myChartPie.setOption(option);
+            </script>
+        </div>
+
+
+</div>
+
+    <!-- 全局js -->
+    <script src="js/jquery.min.js?v=2.1.4"></script>
+    <script src="js/bootstrap.min.js?v=3.3.6"></script>
+
+<!--    bookstrap-->
+    <script src="js/plugins/datapicker/bootstrap-datepicker.js"></script>
+    <script src="js/plugins/datapicker/bootstrap-datepicker.zh-CN.min.js"></script>
+
+
+    <!-- 自定义js -->
+    <script src="js/content.js?v=1.0.0"></script>
+
+    <!-- Peity -->
+    <script src="js/plugins/peity/jquery.peity.min.js"></script>
+    <!-- Peity -->
+    <script src="js/demo/peity-demo.js"></script>
+    <script type="text/javascript" src="http://tajs.qq.com/stats?sId=9051096" charset="UTF-8"></script>
+    <!--统计代码，可删除-->
+
+    <script>
+        $('.myDate').datepicker({
+            language: "zh-CN",//中文版
+            clearBtn: true,//清除
+            autoclose: true,
+            todayHighlight: true,
+            format: 'yyyy-mm-dd',
+            todayBtn: false,//今日按钮
+            startDate: '1970-1-1', //与你自己设置的格式一致yyyy-mm-dd，未设置的话与默认格式一致mm/dd/yyyy
+            endDate: '2070-1-1'
+        });
+    </script>
+
+</body>
+
+</html>
