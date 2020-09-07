@@ -70,14 +70,6 @@
             <version>3.3.2</version>
         </dependency>
 
-        <!-- 利用此工具来生成Entity,Mapper, Service -->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-generator</artifactId>
-            <version>3.3.2</version>
-        </dependency>
-
-
         <!-- hutool工具：参考：https://hutool.cn/docs/#/  -->
         <dependency>
             <groupId>cn.hutool</groupId>

@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Profile;
  * @Description 自定义mybatis-plug 的配置[可选]
  */
 @Configuration
-@MapperScan("com.kclm.xsap.mapper")
+@MapperScan("com.kclm.xsap.mappers")
 @Slf4j
 public class MybatisPlusConfig {
 

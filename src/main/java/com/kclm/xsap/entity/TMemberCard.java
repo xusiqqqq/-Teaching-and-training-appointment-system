@@ -1,0 +1,59 @@
+package com.kclm.xsap.entity;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import lombok.Data;
+
+@Data
+public class TMemberCard extends BaseEntity {
+    private Long id;
+
+    private String name;
+
+    private BigDecimal price;
+
+    /**
+    * 描述信息
+    */
+    private String desc;
+
+    /**
+    * 备注信息
+    */
+    private String note;
+
+    /**
+    * 会员卡类型
+    */
+    private String type;
+
+    /**
+    * 总可用次数
+    */
+    private Integer totalCount;
+
+    /**
+    * 总可用天数
+    */
+    private Integer totalDay;
+
+    /**
+    * 激活状态，1激活，0非激活
+    */
+    private Boolean status;
+
+    /**
+    * 创建时间
+    */
+    private Date createTime;
+
+    /**
+    * 修改时间
+    */
+    private Date lastModifyTime;
+
+    /**
+    * 版本
+    */
+    private Integer version;
+}
