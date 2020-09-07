@@ -5,7 +5,6 @@ import lombok.Data;
 
 @Data
 public class TGlobalReservationSet extends BaseEntity {
-    private Long id;
 
     /**
     * 预约开始时间，按天算
@@ -22,18 +21,4 @@ public class TGlobalReservationSet extends BaseEntity {
     */
     private Date cancelTime;
 
-    /**
-    * 创建时间
-    */
-    private Date createTime;
-
-    /**
-    * 修改时间
-    */
-    private Date lastModifyTime;
-
-    /**
-    * 版本
-    */
-    private Integer version;
 }

@@ -5,7 +5,6 @@ import lombok.Data;
 
 @Data
 public class TScheduleRecord extends BaseEntity {
-    private Long id;
 
     /**
     * 课程号
@@ -37,18 +36,4 @@ public class TScheduleRecord extends BaseEntity {
     */
     private Integer limitAge;
 
-    /**
-    * 创建时间
-    */
-    private Date createTime;
-
-    /**
-    * 修改时间
-    */
-    private Date lastModifyTime;
-
-    /**
-    * 版本
-    */
-    private Integer version;
 }

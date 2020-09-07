@@ -5,7 +5,6 @@ import lombok.Data;
 
 @Data
 public class TMemberLog extends BaseEntity {
-    private Long id;
 
     /**
     * 操作类型
@@ -22,9 +21,4 @@ public class TMemberLog extends BaseEntity {
     */
     private Long memberId;
 
-    private Date createTime;
-
-    private Date lastModifyTime;
-
-    private Integer version;
 }

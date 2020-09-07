@@ -5,7 +5,6 @@ import lombok.Data;
 
 @Data
 public class TReservationRecord extends BaseEntity {
-    private Long id;
 
     /**
     * 预约人数
@@ -39,9 +38,4 @@ public class TReservationRecord extends BaseEntity {
     */
     private Long scheduleId;
 
-    private Date createTime;
-
-    private Date lastModifyTime;
-
-    private Integer version;
 }

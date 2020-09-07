@@ -6,7 +6,6 @@ import lombok.Data;
 
 @Data
 public class TMemberBindRecord extends BaseEntity {
-    private Long id;
 
     private Long memberId;
 
@@ -29,18 +28,4 @@ public class TMemberBindRecord extends BaseEntity {
 
     private String note;
 
-    /**
-    * 创建时间
-    */
-    private Date createTime;
-
-    /**
-    * 修改时间
-    */
-    private Date lastModifyTime;
-
-    /**
-    * 版本
-    */
-    private Integer version;
 }

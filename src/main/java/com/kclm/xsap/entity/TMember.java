@@ -5,7 +5,6 @@ import lombok.Data;
 
 @Data
 public class TMember extends BaseEntity {
-    private Long id;
 
     private String name;
 
@@ -30,18 +29,4 @@ public class TMember extends BaseEntity {
     */
     private Boolean isDeleted;
 
-    /**
-    * 创建时间
-    */
-    private Date createTime;
-
-    /**
-    * 修改时间
-    */
-    private Date lastModifyTime;
-
-    /**
-    * 版本
-    */
-    private Integer version;
 }

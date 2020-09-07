@@ -6,7 +6,6 @@ import lombok.Data;
 
 @Data
 public class TRechargeRecord extends BaseEntity {
-    private Long id;
 
     /**
     * 充值可用次数
@@ -30,9 +29,4 @@ public class TRechargeRecord extends BaseEntity {
     */
     private Long memberId;
 
-    private Date createTime;
-
-    private Date lastModifyTime;
-
-    private Integer version;
 }

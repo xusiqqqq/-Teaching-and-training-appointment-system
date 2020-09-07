@@ -5,7 +5,6 @@ import lombok.Data;
 
 @Data
 public class TCourse extends BaseEntity {
-    private Long id;
 
     private String name;
 
@@ -49,18 +48,4 @@ public class TCourse extends BaseEntity {
     */
     private Integer limitCounts;
 
-    /**
-    * 创建时间
-    */
-    private Date createTime;
-
-    /**
-    * 修改时间
-    */
-    private Date lastModifyTime;
-
-    /**
-    * 版本
-    */
-    private Integer version;
 }
