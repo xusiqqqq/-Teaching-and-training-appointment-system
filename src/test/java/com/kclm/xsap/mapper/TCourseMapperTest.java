@@ -6,6 +6,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.kclm.xsap.entity.TCourse;
 
+import java.util.List;
+
 @SpringBootTest
 public class TCourseMapperTest {
 
@@ -15,7 +17,7 @@ public class TCourseMapperTest {
 	@Test
 	public void testSave() {
 		TCourse course = new TCourse();
-		course.setName("语文");
+		course.setName("数学");
 		course.setDuration(45);
 		course.setColor("blue");
 		course.setContains(6);
@@ -27,5 +29,13 @@ public class TCourseMapperTest {
 		System.out.println(courseMapper);
 		courseMapper.insert(course);
 	}
-	
+
+	@Test
+	public void testSelectAll() {
+		final List<TCourse> tCourses = courseMapper.selectList(null);
+		//
+		if(tCourses != null) {
+			tCourses.forEach(System.out::println);
+		}
+	}
 }
