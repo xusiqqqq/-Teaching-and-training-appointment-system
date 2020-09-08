@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>X+培训机构约课系统 - 添加会员</title>
+    <meta name="keywords" content="后台bootstrap框架,会员中心主题,后台HTML,响应式后台">
+    <meta name="description" content="完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术">
+
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="css/animate.css" rel="stylesheet">
+    <link href="css/style.css?v=4.1.0" rel="stylesheet">
+
+    <!-- bootstrap-datepicker -->
+    <link href="css/plugins/datapicker/bootstrap-datepicker.css" rel="stylesheet">
+
+    <style type="text/css">
+        .img-circle {
+            height: 30px;
+            width: 30px;
+        }
+
+        .img_line {
+            width: 20%;
+        }
+
+        .input_style {
+            background-color: #FFFFFF;
+            border: 1px solid #e5e6e7;
+            border-radius: 1px;
+            padding: 6px 12px;
+            font-size: 14px;
+            transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+        }
+
+        .input_style:focus {
+            border-color: #1ab394 !important;
+        }
+    </style>
+
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content" style="height: 120px">
+                    <div class="col-md-12 col-md-offset-2" style="padding: 30px">
+                        <img src="img/x_member_add_1.png" alt="会员信息" class="img-circle">
+                        <label>会员信息</label>
+                        <img src="img/x_member_add_4_1.png" alt="线条" class="img_line">
+
+                        <img src="img/x_member_add_2_1.png" alt="绑定会员卡" class="img-circle">
+                        <label>绑定会员卡</label>
+                        <img src="img/x_member_add_4_1.png" alt="线条" class="img_line">
+
+                        <img src="img/x_member_add_3_1.png" alt="完成" class="img-circle">
+                        <label>完成</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content add" style="">
+                    <form method="get" class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">
+                                <span class="text-danger">*</span>
+                                会员姓名</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" placeholder="会员姓名">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">
+                                <span class="text-danger">*</span>
+                                手机号</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" placeholder="手机号">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">
+                                <span class="text-danger">*</span>
+                                性别</label>
+                            <div class="col-sm-8">
+                                <label class="control-label">
+                                    <input type="radio" checked="checked" value="option1" name="optionsRadios">
+                                    <span>男</span>
+                                </label>&nbsp;&nbsp;
+
+                                <label class="control-label">
+                                    <input type="radio" value="option2" name="optionsRadios">
+                                    <span>女</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">
+                                出生日期</label>
+                            <div class="col-sm-3">
+                                <input type="text" id="myDate" class="form-control"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">
+                                备注</label>
+                            <div class="col-sm-8">
+                                <textarea class="col-sm-12 form-control" rows="5" placeholder="会员备注信息..."></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-8 col-sm-offset-2">
+                                <p class="btn btn-success" type="" value="">保存,为该会员绑定会员卡</p>
+                                <p class="btn btn-white" type="" value="">保存会员信息,暂不绑定会员卡</p>
+                                <p class="btn btn-white" type="reset" value="">取消</p>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="ibox-content binding" style="display: none">
+                    <form class="form-horizontal">
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label" style="margin-bottom: 20px">会员</label>
+                            <div class="col-md-8">
+                                <input class="form-control" placeholder="输入名字或者手机号搜索" type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label" style="margin-bottom: 30px">选择会员卡</label>
+                            <div class="col-md-8">
+                                <select class="form-control">
+                                    <option>请选择绑定的会员卡</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                    <option>5</option>
+                                </select>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">充值次数</label>
+                            <div class="col-md-10">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="radio">
+                                            <label>
+                                                <input type="radio" name="count" value="50" class="radio">
+                                                50次
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="radio">
+                                            <label>
+                                                <input type="radio" name="count" value="50" class="radio"
+                                                       style="margin-top: 4px">自定义次数&nbsp;
+                                                <input type="number" class="input_style"
+                                                       name="customCount" value="0"
+                                                       min="0">
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">有效期</label>
+                            <div class="col-md-10">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="radio">
+                                            <label>
+                                                <input type="radio" name="validDate" value="30" class="radio">
+                                                30天
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-10">
+                                        <div class="radio">
+                                            <label>
+                                                <input type="radio" name="validDate" value="50" class="radio"
+                                                       style="margin-top: 4px">自定义有效天数&nbsp;
+                                                <input type="number" class="input_style" name="customCount" value="0"
+                                                       min="0">
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">实收金额</label>
+                            <div class="col-md-2">
+                                <div class="input-group">
+                                    <div class="input-group-addon">￥</div>
+                                    <input type="text" class="form-control"  placeholder="金额">
+                                    <div class="input-group-addon">元</div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">选择支付方式</label>
+                            <div class="col-md-8">
+                                <select class="form-control">
+                                    <option>在线</option>
+                                    <option>选项 2</option>
+                                    <option>选项 3</option>
+                                    <option>选项 4</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">备注</label>
+                            <div class="col-md-8">
+                                <textarea class="form-control" rows="3" name="remark"></textarea>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-danger col-md-offset-2 control-label">确认</button>
+                        <button type="button" class="btn btn-primary">取消</button>
+                    </form>
+                </div>
+                <div class="ibox-content complete" style="display: none">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <div class="col-md-8 col-md-offset-2">
+                                <div class="jumbotron">
+                                    <h1>会员注册成功！</h1>
+                                    <p></p>
+                                    <p><a class="btn btn-primary btn-lg" href="x_member_list.html" role="button">点我回到会员页</a></p>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 全局js -->
+<script src="js/jquery.min.js?v=2.1.4"></script>
+<script src="js/bootstrap.min.js?v=3.3.6"></script>
+
+<!-- 自定义js -->
+<script src="js/content.js?v=1.0.0"></script>
+
+<!-- Peity -->
+<script src="js/plugins/peity/jquery.peity.min.js"></script>
+
+
+<script type="text/javascript" src="http://tajs.qq.com/stats?sId=9051096" charset="UTF-8"></script>
+<!--统计代码，可删除-->
+
+<!-- Data picker -->
+<script src="js/plugins/datapicker/bootstrap-datepicker.js"></script>
+<script src="js/plugins/datapicker/bootstrap-datepicker.zh-CN.min.js"></script>
+<script>
+    $(function () {
+        /*时间控件配置*/
+        $('#myDate').datepicker({
+            language: "zh-CN",
+            clearBtn: true,//清除
+            autoclose: true,
+            todayHighlight: true,
+            format: 'yyyy-mm-dd',
+            todayBtn: false,//今日按钮
+            startDate: '1970-1-1', //与你自己设置的格式一致yyyy-mm-dd，未设置的话与默认格式一致mm/dd/yyyy
+            endDate: '2070-1-1'
+        });
+
+        $('.btn.btn-success').click(function () {
+            $('.ibox-content.add').css('display', 'none');
+            $('.ibox-content.binding').css('display', 'block');
+            $('.img_line:first').attr('src', 'img/x_member_add_4_2.png');
+            $('img:nth-child(4)').attr('src', 'img/x_member_add_2_2.png');
+        });
+        $('.btn.btn-white:nth-child(2)').click(function () {
+            $('.ibox-content.add').css('display', 'none');
+            $('.ibox-content.complete').css('display', 'block');
+            $('.img_line:first').attr('src', 'img/x_member_add_4_2.png');
+            $('img:nth-child(4)').attr('src', 'img/x_member_add_2_2.png');
+            $('img:nth-child(6)').attr('src', 'img/x_member_add_4_2.png');
+            $('img:nth-child(7)').attr('src', 'img/x_member_add_3_2.png');
+        });
+        $('.btn.btn-danger.col-md-offset-2.control-label').click(function () {
+            $('.ibox-content.binding').css('display', 'none');
+            $('.ibox-content.complete').css('display', 'block');
+            $('img:nth-child(6)').attr('src', 'img/x_member_add_4_2.png');
+            $('img:nth-child(7)').attr('src', 'img/x_member_add_3_2.png');
+        });
+    });
+</script>
+
+<!-- Image cropper -->
+<script src="js/plugins/cropper/cropper.min.js"></script>
+
+</body>
+
+</html>

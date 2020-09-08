@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X+约课系统 - 课程预约详情</title>
+    <meta name="keywords" content="后台bootstrap框架,会员中心主题,后台HTML,响应式后台">
+    <meta name="description" content="完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术">
+
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <!-- Morris -->
+    <link href="css/plugins/morris/morris-0.4.3.min.css" rel="stylesheet">
+    <link href="css/animate.css" rel="stylesheet">
+    <link href="css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+    <style>
+        /*样式重写*/
+        .ibox-content-2 {
+            background-color: #ffffff;
+            color: inherit;
+            padding: 15px 20px 20px 20px;
+            border-color: #e7eaec;
+            -webkit-border-image: none;
+            -o-border-image: none;
+            border-image: none;
+            border-style: solid solid none;
+            border-width: 1px 0px;
+            height: 270px;
+        }
+
+        .inmodal .modal-body {
+            background: none;
+        }
+
+        .inmodal .modal-title {
+            font-size: 17px;
+            font-weight: bold;
+        }
+
+        .inmodal .modal-header {
+            padding: 15px 15px;
+            text-align: left;
+        }
+
+    </style>
+</head>
+<!--排课详情页面  by qikran-->
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <!--上面内容-->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content-2 p-md">
+                    <div class="col-md-5">
+                        <div class="row">
+                            <div class="col-sm12">
+                                <h2><strong>钢琴专业课</strong></h2>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-sm-3 text-navy">开始时间:</label>
+                            <span class="col-sm-9 col-sm-pull-1" id="start_time">2020-05-31 15:32:05</span>
+                        </div>
+                        <div class="row">
+                            <label class="col-sm-3 text-navy">结束时间:</label>
+                            <span class="col-sm-9 col-sm-pull-1" id="end_titimeme">2020-06-31 15:32:05</span>
+                        </div>
+                        <div class="row">
+                            <label class="col-sm-3 text-navy">时长:</label>
+                            <span class="col-sm-9 col-sm-pull-1" id="">45<span>分钟</span></span>
+                        </div>
+                        <div class="row">
+                            <label class="col-sm-3 text-navy">限制性别:</label>
+                            <span class="col-sm-9 col-sm-pull-1" id="restrict_sex">全部</span>
+                        </div>
+                        <div class="row">
+                            <label class="col-sm-3 text-navy">限制年龄:</label>
+                            <span class="col-sm-9 col-sm-pull-1" id="restrict_age">不限</span>
+                        </div>
+                        <div class="row">
+                            <label class="col-sm-3 text-navy">支持会员卡:</label>
+                            <span class="col-sm-9 col-sm-pull-1" id="support_card">12课时一对一 96课时 24课时 48课时 12课时</span>
+                        </div>
+                        <div class="row">
+                            <label class="col-sm-3 text-navy">上课老师:</label>
+                            <span class="col-sm-9 col-sm-pull-1" id="teacher">上课老师</span>
+                        </div>
+                        <div class="row">
+                            <label class="col-sm-3 text-navy">上课人数:</label>
+                            <span class="col-sm-9 col-sm-pull-1" id="num">1/1<a data-toggle="modal"
+                                                                                data-target="#updateNum"
+                                                                                class="text-info">修改</a></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-md-push-1 text-right">
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#addReservation">添加会员预约
+                        </button>
+                        <button id="exportData" class="btn btn-success">导出预约数据</button>
+                        <!--<button id="delCourse" data-toggle="modal" data-target="#del" class="btn btn-danger">删除课程
+                        </button>-->
+                        <button id="delCourse" class="btn btn-danger  demo3">删除课程
+                    </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--上面内容结束-->
+    <!--标签栏-->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content p-md">
+                    <div class="tabs-container">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true">已预约</a>
+                            </li>
+                            <li class=""><a data-toggle="tab" href="#tab-2" aria-expanded="false">预约记录</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div id="tab-1" class="tab-pane active">
+                                <div class="panel-body">
+                                    <table class="table table-striped table-bordered table-hover dataTables-example">
+                                        <thead>
+                                        <tr>
+                                            <th>会员</th>
+                                            <th>手机号</th>
+                                            <th>使用会员卡</th>
+                                            <th>预约人数</th>
+                                            <th>使用次数</th>
+                                            <th>操作时间</th>
+                                            <th>操作人</th>
+                                            <th>预约备注</th>
+                                            <th>老师评分</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div id="tab-2" class="tab-pane">
+                                <div class="panel-body">
+                                    <table class="table table-striped table-bordered table-hover dataTables-example-2">
+                                        <thead>
+                                        <tr>
+                                            <th>会员</th>
+                                            <th>手机号</th>
+                                            <th>预约人数</th>
+                                            <th>使用次数</th>
+                                            <th>操作类型</th>
+                                            <th>操作时间</th>
+                                            <th>操作人</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+    <!--标签栏结束-->
+</div>
+
+<!--模态窗-->
+
+<!--修改人数模态窗-->
+<div class="modal inmodal" id="updateNum" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content animated fadeIn">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <p class="modal-title">修改上课人数</p>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" name="updateNumForm" role="form">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">上课人数</label>
+                        <div class="col-sm-5">
+                            <input type="number" name="number" class="form-control" value="1">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                <button type="button" name="btnUpdate" class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--添加会员预约窗-->
+<div class="modal inmodal" id="addReservation" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content animated fadeIn">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <p class="modal-title">添加会员预约</p>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" name="addReservation" role="form">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">选择会员</label>
+                        <div class="col-sm-8">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="choseMember" placeholder="输入手机号或名字搜索">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">使用会员卡</label>
+                        <div class="col-sm-8">
+                            <select name="useCard" class="form-control">
+                                <option value="">请选择绑定的会员卡</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">该会员卡</label>
+                        <p class="col-sm-8" style="margin-top:7px">剩余<span id="remained">0</span>次,每节课每人收取<span
+                                id="cost">0</span>次</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">预约人数</label>
+                        <div class="col-sm-5">
+                            <input type="number" name="reservationNum" class="form-control" value="1" required>
+                        </div>
+                        <span class="col-sm-3 text-left" style="margin-top:7px">总共使用<span id="spent">1</span>次</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">备注</label>
+                        <div class="col-sm-8">
+                            <textarea rows="3" name="description" class="form-control" placeholder="备注"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                <button type="button" name="btnAdd" class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--删除课程窗-->
+<!--<div class="modal inmodal" id="del" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content animated fadeIn">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <p class="modal-title">确认取消预约</p>
+            </div>
+            <div class="modal-body">
+                <h4 class="text-danger text-center">注意:取消预约后，消耗的次卡将退回至会员的会员卡</h4>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                <button type="button" name="delCourse" class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+</div>-->
+<!--模态窗结束-->
+
+<!-- 全局js -->
+<script src="js/jquery.min.js?v=2.1.4"></script>
+<script src="js/bootstrap.min.js?v=3.3.6"></script>
+<!-- 自定义js -->
+<script src="js/plugins/jeditable/jquery.jeditable.js"></script>
+<script src="js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="js/plugins/suggest/bootstrap-suggest.min.js"></script>
+
+<script src="js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="js/content.js?v=1.0.0"></script>
+<script src="js/plugins/sweetalert/sweetalert.min.js"></script>
+<!--事件监听-->
+<script>
+    $(function () {
+        $("button[name='btnUpdate']").click(function () {
+            alert("提交");
+            $("form[name='updateNumForm']").submit();
+        });
+        $("button[name='btnAdd']").click(function () {
+            alert("提交");
+            $("form[name='addReservation']").submit();
+        });
+        $("button[name='delCourse']").click(function () {
+            alert("删除");
+            $("#del").modal('toggle')
+        });
+
+        function getJsonData() {
+            return [{
+                "id": 1,
+                "cardType": "12课时一对一"
+            },
+                {
+                    "id": 2,
+                    "cardType": "24课时"
+                },
+                {
+                    "id": 3,
+                    "cardType": "72课时"
+                }
+            ];
+        }
+
+        $("#choseMember").blur(function () {
+            let val = $(this).val();
+            let datas=getJsonData();//TODO 绑卡的静态数据
+            let opHtml = "";
+            /*选择的数据不为空时遍历数据,待修改（根据绑定关系修改）*/
+            if (val!=null){
+            for (let i in datas){
+                opHtml += "<option value=\"" + datas[i].id + "\">" + datas[i].cardType + "</option>"
+            }}
+            
+            $("select[name='useCard']").html(opHtml);
+        });
+        $("#exportData").click(function () {
+            alert("导出数据");
+        });
+        var testdataBsSuggest = $("#choseMember").bsSuggest({
+            indexId: 0,
+            indexKey: 1,
+            /*添加会员时，下拉框动态匹配的值*/
+            //TODO 会员号的静态数据
+            data: {
+                'value': [
+                    {    'id': '0',
+                        'description': '1010250'
+                    },
+                    {     'id': '1',
+                        'description': '2050133'
+                    },
+                    {
+                        'id': '2',
+                        'description': '3612334'
+                    },
+                    {
+                        'id': '3',
+                        'description': '1412341'
+                    }
+                    ,
+                    {
+                        'id': '4',
+                        'description': '9652674'
+                    }
+                ]
+
+            }
+        });
+    })
+</script>
+<script>
+    /*标签一的表格*/
+    $(document).ready(function () {
+        $('.dataTables-example').dataTable({
+            //TODO 标签一数据
+            "data": [
+                {"id": 1, "username": "测试宝宝", "phone": 123123123, "userCard": "12课时一对一","orderNum": 1,
+                    "useTimes": 1,"operateTime": "2020-05-04 08:12:12","operateName": "qikran",
+                    "note": "null","score": 12
+                 },
+            ],
+            "columns":[
+                {"data": "username"},
+                {"data": "phone"},
+                {"data": "userCard"},
+                {"data": "orderNum"},
+                {"data": "useTimes"},
+                {"data": "operateTime"},
+                {"data": "operateName"},
+                {"data": "note"},
+                {"data": "score"},
+                {"data": null,"render": function (data,type,row) {
+                        var id = '"' + row.id + '"';
+                        var html= "<a href='#?id="+id+"'  class='btn btn-info '>取消预约</a>"
+                        return html;
+                    }},
+
+            ],
+            "bSort": false,
+            "searching": true,
+            "pagingType": "full_numbers",
+            "bLengthChange": false,
+            "info": false,
+        });
+    });
+    /*标签二的表格*/
+    $(document).ready(function () {
+        $('.dataTables-example-2').dataTable({
+            //TODO 标签二数据
+            "data": [
+                {"id": 1, "username": "测试宝宝", "phone": 123123123, "orderNum": 1,
+                    "useTimes": 1,"operateType": "已预约","operateTime": "2020-05-04 08:12:12","operateName": "qikran"
+                },
+            ],
+            "columns":[
+                {"data": "username"},
+                {"data": "phone"},
+                {"data": "orderNum"},
+                {"data": "useTimes"},
+                {"data": "operateType"},
+                {"data": "operateTime"},
+                {"data": "operateName"},
+            ],
+            "bSort": false,
+            "searching": true,
+            "pagingType": "full_numbers",
+            "bLengthChange": false,
+            "info": true,
+        });
+    });
+
+    $(function () {
+        $('.demo3').click(function () {
+            swal({
+                title: "您确定要删除该课程么",
+                text: "注意:删除课程后，预约的会员将全部取消，消耗的次卡将退回至会员的会员卡",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "删除",
+                closeOnConfirm: false
+            }, function () {
+                swal("删除成功！", "","success");
+            });
+        });
+        $('.demo3').click(function () {
+            swal({
+                title: "您确定要删除该课程么",
+                text: "注意:删除课程后，预约的会员将全部取消，消耗的次卡将退回至会员的会员卡",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "删除",
+                closeOnConfirm: false
+            }, function () {
+                swal("删除成功！", "","success");
+            });
+        });
+    })
+</script>
+
+</body>
+
+</html>
