@@ -4,6 +4,7 @@
 
 package com.kclm.xsap.config;
 
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /******************
@@ -12,6 +13,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @Create 2020-09-04 9:07
  * @Description TODO
  */
+
+@Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
     //todo ...

@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Profile;
  * @Description 自定义mybatis-plug 的配置[可选]
  */
 @Configuration
-@MapperScan("com.kclm.xsap.mappers")
+@MapperScan("com.kclm.xsap.mapper")
 public class MybatisPlusConfig {
 
 	private static final Logger log = LoggerFactory.getLogger(MybatisPlusConfig.class);
