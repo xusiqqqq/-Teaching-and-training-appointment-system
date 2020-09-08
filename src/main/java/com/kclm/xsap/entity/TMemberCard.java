@@ -1,14 +1,25 @@
 package com.kclm.xsap.entity;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.util.List;
+
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper=false)
 public class TMemberCard extends BaseEntity {
 
+	/**
+	 * 关联的课程
+	 */
+	private List<TCourse> courses;
+	
     private String name;
-
+    
+    /**
+     * 单价
+     */
     private BigDecimal price;
 
     /**

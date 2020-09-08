@@ -1,11 +1,19 @@
 package com.kclm.xsap.entity;
 
-import java.util.Date;
+import java.util.List;
+
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper=false)
 public class TConsumeRecord extends BaseEntity {
 
+	/**
+    * 关联的会员
+    */
+    private List<TMember> members;
+	
     /**
     * 操作类型
     */
@@ -27,10 +35,5 @@ public class TConsumeRecord extends BaseEntity {
     private String operator;
 
     private String note;
-
-    /**
-    * 会员id
-    */
-    private Long memberId;
 
 }

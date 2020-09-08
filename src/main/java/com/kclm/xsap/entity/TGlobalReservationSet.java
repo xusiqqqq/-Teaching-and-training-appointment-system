@@ -1,9 +1,11 @@
 package com.kclm.xsap.entity;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper=false)
 public class TGlobalReservationSet extends BaseEntity {
 
     /**
@@ -14,11 +16,11 @@ public class TGlobalReservationSet extends BaseEntity {
     /**
     * 预约截止时间
     */
-    private Date endTime;
+    private LocalDateTime endTime;
 
     /**
     * 预约取消时间
     */
-    private Date cancelTime;
+    private LocalDateTime cancelTime;
 
 }

@@ -1,11 +1,19 @@
 package com.kclm.xsap.entity;
 
-import java.util.Date;
+import java.util.List;
+
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper=false)
 public class TMemberLog extends BaseEntity {
 
+	/**
+    * 关联的会员
+    */
+    private List<TMember> members;
+	
     /**
     * 操作类型
     */
@@ -15,10 +23,5 @@ public class TMemberLog extends BaseEntity {
     * 操作员名称
     */
     private String operator;
-
-    /**
-    * 会员id
-    */
-    private Long memberId;
 
 }

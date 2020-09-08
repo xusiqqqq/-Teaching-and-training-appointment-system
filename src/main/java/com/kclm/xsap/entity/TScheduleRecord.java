@@ -1,30 +1,36 @@
 package com.kclm.xsap.entity;
 
-import java.util.Date;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper=false)
 public class TScheduleRecord extends BaseEntity {
 
     /**
-    * 课程号
+    * 关联的课程
     */
-    private Long courseId;
+    private List<TCourse> courses;
 
     /**
-    * 教师号
+    * 关联的教师
     */
-    private Long teacherId;
+    private List<TEmployee> employees;
 
     /**
     * 上课日期
     */
-    private Date startDate;
+    private LocalDate startDate;
 
     /**
     * 上课时间
     */
-    private Date classTime;
+    private LocalTime classTime;
 
     /**
     * 限制性别

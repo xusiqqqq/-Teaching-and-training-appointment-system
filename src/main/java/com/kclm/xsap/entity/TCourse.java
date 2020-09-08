@@ -1,11 +1,19 @@
 package com.kclm.xsap.entity;
 
-import java.util.Date;
+import java.util.List;
+
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper=false)
 public class TCourse extends BaseEntity {
 
+    /**
+     * 关联的会员卡
+     */
+    private List<TMemberCard> cards; 
+	
     private String name;
 
     /**

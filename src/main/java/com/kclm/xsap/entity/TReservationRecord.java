@@ -1,11 +1,24 @@
 package com.kclm.xsap.entity;
 
-import java.util.Date;
+import java.util.List;
+
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper=false)
 public class TReservationRecord extends BaseEntity {
 
+	/**
+    * 关联的排课记录
+    */
+    private List<TScheduleRecord> schedules;
+	
+    /**
+     * 关联的会员
+     */
+    private List<TMember> members;
+    
     /**
     * 预约人数
     */
@@ -27,15 +40,5 @@ public class TReservationRecord extends BaseEntity {
     * 操作员
     */
     private String operator;
-
-    /**
-    * 会员id
-    */
-    private Long memberId;
-
-    /**
-    * 排课记录id
-    */
-    private Long scheduleId;
 
 }

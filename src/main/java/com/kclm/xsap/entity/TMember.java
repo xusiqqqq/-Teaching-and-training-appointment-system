@@ -1,9 +1,11 @@
 package com.kclm.xsap.entity;
 
-import java.util.Date;
+import java.time.LocalDate;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper=false)
 public class TMember extends BaseEntity {
 
     private String name;
@@ -12,7 +14,7 @@ public class TMember extends BaseEntity {
 
     private String phone;
 
-    private Date birthday;
+    private LocalDate birthday;
 
     /**
     * 备注信息

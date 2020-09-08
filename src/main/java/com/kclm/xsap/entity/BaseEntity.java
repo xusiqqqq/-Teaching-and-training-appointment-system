@@ -4,11 +4,10 @@
 
 package com.kclm.xsap.entity;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /******************
  * @Author yejf
@@ -25,12 +24,12 @@ public class BaseEntity {
     /**
      * 创建时间
      */
-    private Date createTime;
+    private LocalDateTime createTime;
 
     /**
      * 修改时间
      */
-    private Date lastModifyTime;
+    private LocalDateTime lastModifyTime;
 
     /**
      * 版本
