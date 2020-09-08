@@ -17,7 +17,7 @@ public class TCourse extends BaseEntity {
     private String name;
 
     /**
-    * 课程时长
+    * 课程时长，单位：分钟
     */
     private Integer duration;
 

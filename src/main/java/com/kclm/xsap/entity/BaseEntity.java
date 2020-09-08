@@ -24,7 +24,7 @@ public class BaseEntity {
     /**
      * 创建时间
      */
-    private LocalDateTime createTime;
+    private LocalDateTime createTime = LocalDateTime.now();
 
     /**
      * 修改时间
@@ -34,6 +34,6 @@ public class BaseEntity {
     /**
      * 版本
      */
-    private Integer version;
+    private Integer version = 1;
 
 }
