@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kclm.xsap.mapper.TCourseMapper">
+  <resultMap id="BaseResultMap" type="com.kclm.xsap.entity.TCourse">
+    <!--@mbg.generated-->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="duration" jdbcType="INTEGER" property="duration" />
+    <result column="contains" jdbcType="INTEGER" property="contains" />
+    <result column="color" jdbcType="VARCHAR" property="color" />
+    <result column="introduce" jdbcType="VARCHAR" property="introduce" />
+    <result column="times_cost" jdbcType="INTEGER" property="timesCost" />
+    <result column="limit_sex" jdbcType="VARCHAR" property="limitSex" />
+    <result column="limit_age" jdbcType="INTEGER" property="limitAge" />
+    <result column="limit_counts" jdbcType="INTEGER" property="limitCounts" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
+    <result column="version" jdbcType="INTEGER" property="version" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, `name`, duration, `contains`, color, introduce, times_cost, limit_sex, limit_age, 
+    limit_counts, create_time, last_modify_time, version
+  </sql>
+  
+</mapper>

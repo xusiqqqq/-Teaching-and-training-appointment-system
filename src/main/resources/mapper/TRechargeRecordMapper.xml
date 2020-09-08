@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kclm.xsap.mapper.TRechargeRecordMapper">
+  <resultMap id="BaseResultMap" type="com.kclm.xsap.entity.TRechargeRecord">
+    <!--@mbg.generated-->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="add_count" jdbcType="INTEGER" property="addCount" />
+    <result column="add_day" jdbcType="INTEGER" property="addDay" />
+    <result column="received_money" jdbcType="DECIMAL" property="receivedMoney" />
+    <result column="note" jdbcType="VARCHAR" property="note" />
+    <result column="member_id" jdbcType="BIGINT" property="memberId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
+    <result column="version" jdbcType="INTEGER" property="version" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, add_count, add_day, received_money, note, member_id, create_time, last_modify_time, 
+    version
+  </sql>
+ 
+</mapper>

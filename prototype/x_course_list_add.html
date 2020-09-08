@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>X+约课系统 - 添加课程</title>
+    <meta name="keywords" content="后台bootstrap框架,会员中心主题,后台HTML,响应式后台">
+    <meta name="description" content="完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术">
+
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="css/plugins/colorpicker/css/bootstrap-colorpicker.min.css" rel="stylesheet">
+    <link href="css/plugins/cropper/cropper.min.css" rel="stylesheet">
+    <link href="css/plugins/datapicker/datepicker3.css" rel="stylesheet">
+    <link href="css/animate.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/plugins/simditor/simditor.css"/>
+    <link href="css/style.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        .input_width {
+            width: 50px;
+            height: 25px;
+            display: inline;
+        }
+    </style>
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>新增课程</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <form method="get" class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">课程名称</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" placeholder="请输入课程名称" name="add_courseName">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">时长(分钟)</label>
+                            <div class="col-sm-3 col-md-2">
+                                <input type="number" class="form-control" name="add_duration">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">上课人数</label>
+                            <div class="col-sm-3 col-md-2">
+                                <input type="number" class="form-control" name="add_peopleNum">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">课程颜色</label>
+                            <div class="col-sm-3 col-md-2">
+                                <div class="input-group">
+                                    <input type="text" value="" class="form-control" readonly id="color_picker_kc"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="support_program" class="col-sm-2 control-label input_margin_top">支持会员卡</label>
+                            <div class="col-sm-8 input_margin_top">
+
+                                <table class="table table-striped table-bordered table-hover dataTables-example"
+                                       id="support_program">
+                                    <thead>
+                                    <tr>
+                                        <th><input type="checkbox" name="input[]" id="check_all" class="i-checks"></th>
+                                        <th>会员卡</th>
+                                        <th>会员类型</th>
+                                        <th>收费情况(次卡)</th>
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">课程介绍</label>
+                            <div class="col-sm-10">
+                                <div class="ibox float-e-margins">
+                                    <div class="ibox-content">
+                                        <textarea id="editor" placeholder="这里输入内容" autofocus></textarea>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <h2 class="text-left" style="margin-left: 10%">高级功能(对预约会员的条件限制)</h2>
+                            <hr/>
+                            <label class="col-sm-2 control-label">限制性别</label>
+                            <div class="col-sm-3 col-md-2">
+                                <select class="form-control">
+                                    <option value="1">全部</option>
+                                    <option value="2">男</option>
+                                    <option value="3">女</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">限制年龄</label>
+                            <div class="col-sm-6">
+                                <label>
+                                    <input type="radio" name="options">&nbsp;&nbsp;<span class="font-noraml">不限制</span>
+                                </label>
+                                <br/>
+                                <label>
+                                    <input type="radio" name="options" style="float: left"> &nbsp;&nbsp;
+                                    <span class="input-daterange input-group right" style="float: right"
+                                          id="datepicker">
+                                    <input type="text" class="input-sm form-control input-s-sm" name="start" value=""/>
+                                    <span class="input-group-addon">到</span>
+                                    <input type="text" class="input-sm form-control input-s-sm" name="end" value=""/>
+                                </span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">限制预约次数</label>
+                            <div class="col-sm-6">
+                                <label>
+                                    <input type="radio" name="options">&nbsp;&nbsp;<span class="font-noraml">不限制</span>
+                                </label><br/>
+                                <label>
+                                    <input type="radio" name="options">&nbsp;&nbsp;<span class="font-noraml">每名会员最多可以预约本课程</span>&nbsp;<input
+                                        type="number" class="input-sm" value="0">&nbsp;<span
+                                        class="font-noraml">次</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-2 col-sm-offset-2">
+                                <button type="submit" class="btn btn-success">保存</button>
+                                <button type="submit" class="btn btn-white">取消</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 全局js -->
+<script src="js/jquery.min.js?v=2.1.4"></script>
+<script src="js/bootstrap.min.js?v=3.3.6"></script>
+
+<!-- 自定义js -->
+<script src="js/content.js?v=1.0.0"></script>
+
+<script src="js/plugins/jeditable/jquery.jeditable.js"></script>
+<!-- Input Mask-->
+<script src="js/plugins/jasny/jasny-bootstrap.min.js"></script>
+<!-- Data picker -->
+<script src="js/plugins/datapicker/bootstrap-datepicker.js"></script>
+<!-- Data Tables -->
+<script src="js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<!-- Switchery -->
+<script src="js/plugins/switchery/switchery.js"></script>
+<!-- simditor -->
+<script type="text/javascript" src="js/plugins/simditor/module.js"></script>
+<script type="text/javascript" src="js/plugins/simditor/uploader.js"></script>
+<script type="text/javascript" src="js/plugins/simditor/hotkeys.js"></script>
+<script type="text/javascript" src="js/plugins/simditor/simditor.js"></script>
+<!-- Color picker -->
+<script src="js/plugins/colorpicker/bootstrap-colorpicker.min.js"></script>
+<!-- Prettyfile -->
+<script src="js/plugins/prettyfile/bootstrap-prettyfile.js"></script>
+<!-- iCheck -->
+<script src="js/plugins/iCheck/icheck.min.js"></script>
+
+<!--<script src="js/demo/form-advanced-demo.js"></script>-->
+
+<script>
+    $(document).ready(function () {
+        $('.dataTables-example').dataTable({
+            //获取数据
+            /*TODO:此处为未来与后端进行交互的地方*/
+            "data": [
+                {"id": 1, "member_card": "12次大课", "member_card_type": "次卡(无限次)", "charge": 2},
+                {"id": 2, "member_card": "12课时一对一", "member_card_type": "次卡(无限次)", "charge": 1},
+                {"id": 3, "member_card": "96课时", "member_card_type": "次卡(无限次)", "charge": 3},
+                {"id": 4, "member_card": "48课时", "member_card_type": "次卡(无限次)", "charge": 1},
+                {"id": 5, "member_card": "12课时", "member_card_type": "次卡(无限次)", "charge": 0},
+                {"id": 6, "member_card": "包年", "member_card_type": "次卡(无限次)", "charge": 1}
+            ],
+            //行的定义
+            "columns": [
+                {
+                    "data": null, "render": function (data, type, row) {
+                        var id = '"' + row.id + '"';
+                        var html = "<input type='checkbox' name='input[]' id='check_all' class='i-checks'>";
+                        return html;
+                    }
+                },
+                {"data": "member_card"},
+                {"data": "member_card_type"},
+                {
+                    "data": null, "render": function (data, type, row) {
+                        var html = "<span class='pie'>每节课收取&nbsp;<input type='text' class='form-control input_width' value='" + row.charge + "'>次/人</span>";
+                        return html;
+                    }
+                }
+            ],
+            language: {
+                "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
+                "loadingRecords": "加载中...",//用来描述数据在加载中等待的提示字符串 - 当异步读取数据的时候显示
+                "processing": "处理中...",//用来描述加载进度的字符串
+                "sInfo": ""
+            },
+            searching: false,//是否开始本地搜索
+            lengthChange: false,//是否允许用户改变表格每页显示的记录数
+            paging: false,
+            columnDefs: [{
+                targets: 0,//编辑取消排序
+                "orderable": false
+            }]
+        })
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        var editor = new Simditor({
+            textarea: $('#editor'),
+            defaultImage: 'img/a9.jpg'
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $("#datepicker").datepicker({
+            language: "zh-CN"
+        });
+        $("#color_picker_kc").colorpicker({
+            fillcolor: true,
+            success: function (o,color) {
+                $(o).css("color",color);
+            }
+
+        });
+    })
+</script>
+<script>
+    $(document).ready(function () {
+        $('.i-checks').iCheck({
+            checkboxClass: 'icheckbox_square-green',
+            radioClass: 'iradio_square-green',
+        });
+        //复选框 全选
+        $('#check_all').on('ifChecked', function (event) {
+            $('input').iCheck('check');
+        });
+        //复选框 反选
+        $('#check_all').on('ifUnchecked', function (event) {
+            $('input').iCheck('uncheck');
+        });
+    });
+</script>
+<script type="text/javascript" src="http://tajs.qq.com/stats?sId=9051096" charset="UTF-8"></script>
+<!--统计代码，可删除-->
+
+</body>
+
+</html>
