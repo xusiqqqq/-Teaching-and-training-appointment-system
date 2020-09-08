@@ -2,6 +2,7 @@ package com.kclm.xsap.entity;
 
 import java.util.List;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -10,8 +11,9 @@ import lombok.EqualsAndHashCode;
 public class TCourse extends BaseEntity {
 
     /**
-     * 关联的会员卡
+     * 关联的会员卡, 不是数据库的列
      */
+    @TableField(exist = false)
     private List<TMemberCard> cards; 
 	
     private String name;
