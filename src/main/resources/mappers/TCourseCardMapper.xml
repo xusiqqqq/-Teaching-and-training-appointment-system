@@ -6,35 +6,5 @@
     <id column="card_id" jdbcType="BIGINT" property="cardId" />
     <id column="cid" jdbcType="BIGINT" property="cid" />
   </resultMap>
-  <delete id="deleteByPrimaryKey" parameterType="map">
-    <!--@mbg.generated-->
-    delete from t_course_card
-    where card_id = #{cardId,jdbcType=BIGINT}
-      and cid = #{cid,jdbcType=BIGINT}
-  </delete>
-  <insert id="insert" parameterType="com.kclm.xsap.entity.TCourseCard">
-    <!--@mbg.generated-->
-    insert into t_course_card (card_id, cid)
-    values (#{cardId,jdbcType=BIGINT}, #{cid,jdbcType=BIGINT})
-  </insert>
-  <insert id="insertSelective" parameterType="com.kclm.xsap.entity.TCourseCard">
-    <!--@mbg.generated-->
-    insert into t_course_card
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="cardId != null">
-        card_id,
-      </if>
-      <if test="cid != null">
-        cid,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="cardId != null">
-        #{cardId,jdbcType=BIGINT},
-      </if>
-      <if test="cid != null">
-        #{cid,jdbcType=BIGINT},
-      </if>
-    </trim>
-  </insert>
+  
 </mapper>
