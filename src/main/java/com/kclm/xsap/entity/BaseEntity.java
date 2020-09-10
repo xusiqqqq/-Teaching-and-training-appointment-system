@@ -9,6 +9,8 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+import com.baomidou.mybatisplus.annotation.Version;
+
 /******************
  * @Author yejf
  * @Version v1.0
@@ -34,6 +36,7 @@ public class BaseEntity {
     /**
      * 版本
      */
+    @Version
     private Integer version = 1;
 
 }

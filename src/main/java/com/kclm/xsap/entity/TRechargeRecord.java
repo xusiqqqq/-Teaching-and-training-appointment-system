@@ -1,19 +1,30 @@
 package com.kclm.xsap.entity;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.List;
+
+import com.baomidou.mybatisplus.annotation.TableField;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class TRechargeRecord extends BaseEntity {
+public class TRechargeRecord extends BaseEntity implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/**
     * 关联的会员
     */
-    private List<TMember> members;
+	private Integer memberId;
+	/**
+	 *  封装会员实体数据
+	 */
+	@TableField(exist = false)
+    private TMember member;
 	
     /**
     * 充值可用次数

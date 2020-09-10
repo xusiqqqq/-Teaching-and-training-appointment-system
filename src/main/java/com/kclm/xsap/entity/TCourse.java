@@ -1,20 +1,29 @@
 package com.kclm.xsap.entity;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class TCourse extends BaseEntity {
+@TableName(value = "t_course",resultMap = "TCourseMap")
+public class TCourse extends BaseEntity implements Serializable{
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
      * 关联的会员卡, 不是数据库的列
      */
     @TableField(exist = false)
-    private List<TMemberCard> cards; 
+    private List<TMemberCard> cardList; 
 	
     private String name;
 

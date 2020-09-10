@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
 
@@ -9,15 +9,15 @@
     <meta name="keywords" content="后台bootstrap框架,会员中心主题,后台HTML,响应式后台">
     <meta name="description" content="完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术">
 
-    <link rel="shortcut icon" href="favicon.ico">
-    <link href="css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
-    <link href="css/font-awesome.css?v=4.4.0" rel="stylesheet">
-    <link href="css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link rel="shortcut icon" href="favicon.ico" th:href="@{/static/favicon.ico}">
+    <link href="css/bootstrap.min.css?v=3.3.6" th:href="@{/static/css/bootstrap.min.css(v='3.3.6')}" rel="stylesheet">
+    <link href="css/font-awesome.css?v=4.4.0" th:href="@{/static/css/font-awesome.css(v='4.4.0')}" rel="stylesheet">
+    <link href="css/animate.css" th:href="@{/static/css/animate.css}" rel="stylesheet">
+    <link href="css/style.css?v=4.1.0" th:href="@{/static/css/style.css(v='4.1.0')}" rel="stylesheet">
+    <link href="css/plugins/dataTables/dataTables.bootstrap.css" th:href="@{/static/css/plugins/dataTables/dataTables.bootstrap.css}" rel="stylesheet">
     <!-- Morris -->
-    <link href="css/plugins/morris/morris-0.4.3.min.css" rel="stylesheet">
-    <link href="css/animate.css" rel="stylesheet">
-    <link href="css/style.css?v=4.1.0" rel="stylesheet">
-    <link href="css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+    <link href="css/plugins/morris/morris-0.4.3.min.css" th:href="@{/static/css/plugins/morris/morris-0.4.3.min.css}" rel="stylesheet">
+    <link href="css/plugins/sweetalert/sweetalert.css" th:href="@{/static/css/plugins/sweetalert/sweetalert.css}" rel="stylesheet">
     <style>
         /*样式重写*/
         .ibox-content-2 {
@@ -289,16 +289,16 @@
 <!--模态窗结束-->
 
 <!-- 全局js -->
-<script src="js/jquery.min.js?v=2.1.4"></script>
-<script src="js/bootstrap.min.js?v=3.3.6"></script>
+<script src="js/jquery.min.js?v=2.1.4" th:src="@{/static/js/jquery.min.js(v='2.1.4')}"></script>
+<script src="js/bootstrap.min.js?v=3.3.6" th:src="@{/static/js/bootstrap.min.js(v='3.3.6')"></script>
 <!-- 自定义js -->
-<script src="js/plugins/jeditable/jquery.jeditable.js"></script>
-<script src="js/plugins/dataTables/jquery.dataTables.js"></script>
-<script src="js/plugins/suggest/bootstrap-suggest.min.js"></script>
+<script src="js/plugins/jeditable/jquery.jeditable.js" th:src="@{/static/js/plugins/jeditable/jquery.jeditable.js}"></script>
+<script src="js/plugins/dataTables/jquery.dataTables.js" th:src="@{/static/js/plugins/dataTables/jquery.dataTables.js}"></script>
+<script src="js/plugins/suggest/bootstrap-suggest.min.js" th:src="@{/static/js/plugins/suggest/bootstrap-suggest.min.js}"></script>
 
-<script src="js/plugins/dataTables/dataTables.bootstrap.js"></script>
-<script src="js/content.js?v=1.0.0"></script>
-<script src="js/plugins/sweetalert/sweetalert.min.js"></script>
+<script src="js/plugins/dataTables/dataTables.bootstrap.js" th:src="@{/static/js/plugins/dataTables/dataTables.bootstrap.js}"></script>
+<script src="js/content.js?v=1.0.0" th:src="@{/static/js/content.js(v='1.0.0')}"></script>
+<script src="js/plugins/sweetalert/sweetalert.min.js" th:src="@{/static/js/plugins/sweetalert/sweetalert.min.js}"></script>
 <!--事件监听-->
 <script>
     $(function () {

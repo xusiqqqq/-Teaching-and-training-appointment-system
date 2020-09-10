@@ -14,7 +14,7 @@ public class TCourseMapperTest {
 	@Autowired
 	private TCourseMapper courseMapper;
 	
-	@Test
+//	@Test
 	public void testSave() {
 		TCourse course = new TCourse();
 		course.setName("数学");
@@ -32,10 +32,15 @@ public class TCourseMapperTest {
 
 	@Test
 	public void testSelectAll() {
-		final List<TCourse> tCourses = courseMapper.selectList(null);
-		//
-		if(tCourses != null) {
-			tCourses.forEach(System.out::println);
+		List<TCourse> list = courseMapper.findAll();
+		for (TCourse tCourse : list) {
+			System.out.println("---"+ tCourse +"----");
 		}
+//		TCourse selectById = courseMapper.selectById(1);
+//		System.out.println("根据id查课程："+selectById);
+		//
+//		if(tCourses != null) {
+//			tCourses.forEach(System.out::println);
+//		}
 	}
 }

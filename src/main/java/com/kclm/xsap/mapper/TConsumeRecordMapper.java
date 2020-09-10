@@ -7,5 +7,6 @@ import com.kclm.xsap.entity.TConsumeRecord;
 
 @Mapper
 public interface TConsumeRecordMapper extends BaseMapper<TConsumeRecord> {
-
+	
+	
 }

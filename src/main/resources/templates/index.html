@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="utf-8">
@@ -14,11 +14,11 @@
     <meta http-equiv="refresh" content="0;ie.html" />
     <![endif]-->
 
-    <link rel="shortcut icon" href="favicon.ico">
-    <link href="css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
-    <link href="css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
-    <link href="css/animate.css" rel="stylesheet">
-    <link href="css/style.css?v=5.0" rel="stylesheet">
+    <link rel="shortcut icon" href="favicon.ico"  th:href="@{/static/ico/favicon.ico}">
+    <link href="css/bootstrap.min.css?v=3.3.6" th:href="@{/static/css/bootstrap.min.css(v='3.3.6')}" rel="stylesheet">
+    <link href="css/font-awesome.min.css?v=4.4.0" th:href="@{/static/css/font-awesome.min.css(v='4.4.0')}" rel="stylesheet">
+    <link href="css/animate.css" th:href="@{/static/css/animate.css}" rel="stylesheet">
+    <link href="css/style.css?v=5.0" th:href="@{/static/css/style.css(v='5.0')}" rel="stylesheet">
 
 </head>
 
@@ -32,11 +32,14 @@
                 <ul class="nav" id="side-menu">
                     <li class="nav-header">
                         <div class="dropdown profile-element">
-                            <span><img alt="image" class="img-circle" src="img/profile_small.jpg" /></span>
+                            <span>
+                            <img alt="image" class="img-circle" src="img/profile_small.jpg" th:src="@{/static/img/profile_small.jpg}"/>
+                            </span>
                             <a data-toggle="dropdown" class="dropdown-toggle" href="#">
                                 <span class="clear">
-                               <span class="block m-t-xs"><strong class="font-bold">admin</strong></span>
-                                <span class="text-muted text-xs block">超级管理员<b class="caret"></b></span>
+                               <span class="block m-t-xs"><strong class="font-bold" th:text="${userInfo.roleName}">admin</strong></span>
+                                <span class="text-muted text-xs block"  th:if="${userInfo.roleType}">超级管理员<b class="caret"></b></span>
+                                <span class="text-muted text-xs block"  th:if="!${userInfo.roleType}">普通管理员<b class="caret"></b></span>
                                 </span>
                             </a>
                             <ul class="dropdown-menu animated fadeInRight m-t-xs">
@@ -45,7 +48,7 @@
                                 <li><a class="J_menuItem" href="x_profile.html">个人资料</a>
                                 </li>
                                 <li class="divider"></li>
-                                <li><a href="x_login.html">安全退出</a>
+                                <li><a href="x_login.html" th:href="@{/user/logout.do}">安全退出</a>
                                 </li>
                             </ul>
                         </div>
@@ -53,7 +56,7 @@
                         </div>
                     </li>
                     <li>
-                        <a class="J_menuItem" href="x_index_home.html">
+                        <a class="J_menuItem" href="x_index_home.html" >
                             <i class="fa fa-home"></i>
                             <span class="nav-label">首页</span>
                         </a>
@@ -217,12 +220,12 @@
                         </li>
                     </ul>
                 </div>
-                <a href="x_login.html" class="roll-nav roll-right J_tabExit"><i class="fa fa fa-sign-out"></i> 退出</a>
+                <a href="x_login.html" class="roll-nav roll-right J_tabExit"  th:href="@{/user/logout.do}"><i class="fa fa fa-sign-out"></i> 退出</a>
             </div>
 
             <!-- 我们要添加内容的区域 TODO  -->
             <div class="row J_mainContent" id="content-main">
-                <iframe class="J_iframe" name="iframe0" width="100%" height="100%" src="x_index_home.html?v=4.0" frameborder="0" data-id="x_index_home.html" seamless></iframe>
+                <iframe class="J_iframe" name="iframe0" width="100%" height="100%" src="x_index_home.html?v=4.0"  frameborder="0" data-id="x_index_home.html" seamless></iframe>
             </div>
 
             <div class="footer">
@@ -342,15 +345,15 @@
     </div>
 
     <!-- 全局js -->
-    <script src="js/jquery.min.js?v=2.1.4"></script>
-    <script src="js/bootstrap.min.js?v=3.3.6"></script>
-    <script src="js/plugins/metisMenu/jquery.metisMenu.js"></script>
-    <script src="js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
-    <script src="js/plugins/layer/layer.min.js"></script>
+    <script src="js/jquery.min.js?v=2.1.4" th:src="@{/static/js/jquery.min.js(v='2.1.4')}"></script>
+    <script src="js/bootstrap.min.js?v=3.3.6" th:src="@{/static/js/bootstrap.min.js(v='3.3.6')}"></script>
+    <script src="js/plugins/metisMenu/jquery.metisMenu.js" th:src="@{/static/js/plugins/metisMenu/jquery.metisMenu.js}"></script>
+    <script src="js/plugins/slimscroll/jquery.slimscroll.min.js" th:src="@{/static/js/plugins/slimscroll/jquery.slimscroll.min.js}"></script>
+    <script src="js/plugins/layer/layer.min.js" th:src="@{/static/js/plugins/layer/layer.min.js}"></script>
 
     <!-- 自定义js -->
-    <script src="js/hplus.js?v=4.1.0"></script>
-    <script type="text/javascript" src="js/contabs.js"></script>
+    <script src="js/hplus.js?v=4.1.0" th:src="@{/static/js/hplus.js(v='4.1.0')}"></script>
+    <script type="text/javascript" src="js/contabs.js" th:src="@{/static/js/contabs.js}"></script>
 
 </body>
 

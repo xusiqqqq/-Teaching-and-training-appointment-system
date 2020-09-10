@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kclm.xsap.mapper.TScheduleRecordMapper">
-  <resultMap id="BaseResultMap" type="com.kclm.xsap.entity.TScheduleRecord">
+  <resultMap id="TScheduleRecordMap" type="com.kclm.xsap.entity.TScheduleRecord">
     <!--@mbg.generated-->
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="course_id" jdbcType="BIGINT" property="courseId" />
@@ -13,11 +13,52 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
     <result column="version" jdbcType="INTEGER" property="version" />
+    <!-- 关联课程 -->
+    <association property="course" javaType="TCourse">
+    	<id column="course_id" jdbcType="BIGINT" property="id" />
+	    <result column="course_name" jdbcType="VARCHAR" property="name" />
+	    <result column="duration" jdbcType="INTEGER" property="duration" />
+	    <result column="contains" jdbcType="INTEGER" property="contains" />
+	    <result column="color" jdbcType="VARCHAR" property="color" />
+	    <result column="introduce" jdbcType="VARCHAR" property="introduce" />
+	    <result column="times_cost" jdbcType="INTEGER" property="timesCost" />
+	    <result column="limit_sex" jdbcType="VARCHAR" property="limitSex" />
+	    <result column="limit_age" jdbcType="INTEGER" property="limitAge" />
+	    <result column="limit_counts" jdbcType="INTEGER" property="limitCounts" />
+	    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+	    <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
+	    <result column="version" jdbcType="INTEGER" property="version" />
+    </association>
+    <!-- 关联教师 -->
+    <association property="employee" javaType="TEmployee">
+    	<id column="employee_id" jdbcType="BIGINT" property="id" />
+	    <result column="employee_name" jdbcType="VARCHAR" property="name" />
+	    <result column="phone" jdbcType="VARCHAR" property="phone" />
+	    <result column="sex" jdbcType="VARCHAR" property="sex" />
+	    <result column="birthday" jdbcType="DATE" property="birthday" />
+	    <result column="introduce" jdbcType="VARCHAR" property="introduce" />
+	    <result column="note" jdbcType="VARCHAR" property="note" />
+	    <result column="role_name" jdbcType="VARCHAR" property="roleName" />
+	    <result column="role_password" jdbcType="VARCHAR" property="rolePassword" />
+	    <result column="role_type" jdbcType="BOOLEAN" property="roleType" />
+	    <result column="is_deleted" jdbcType="BOOLEAN" property="isDeleted" />
+	    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+	    <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
+	    <result column="version" jdbcType="INTEGER" property="version" />
+    </association>
   </resultMap>
-  <sql id="Base_Column_List">
+  <sql id="TScheduleRecord_Column_List">
     <!--@mbg.generated-->
     id, course_id, teacher_id, start_date, class_time, limit_sex, limit_age, create_time, 
     last_modify_time, version
+  </sql>
+  <sql id="course_sql">
+  	id, `name`, duration, `contains`, color, introduce, times_cost, limit_sex, limit_age, 
+    limit_counts, create_time, last_modify_time, version
+  </sql>
+  <sql id="employee_sql">
+  	id, `name`, phone, sex, birthday, introduce, note, role_name, role_password, role_type, 
+    is_deleted, create_time, last_modify_time, version
   </sql>
   
 </mapper>
