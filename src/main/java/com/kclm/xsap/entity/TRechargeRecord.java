@@ -4,12 +4,14 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
+@TableName(value = "t_recharge_record",resultMap = "TRechargeRecordMap")
 public class TRechargeRecord extends BaseEntity implements Serializable{
 
 	/**

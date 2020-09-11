@@ -4,12 +4,14 @@ package com.kclm.xsap.entity;
 import java.io.Serializable;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
+@TableName(value = "t_member_log",resultMap = "TMemberLogMap")
 public class TMemberLog extends BaseEntity implements Serializable{
 
 	/**

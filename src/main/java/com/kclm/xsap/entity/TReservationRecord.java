@@ -4,12 +4,14 @@ package com.kclm.xsap.entity;
 import java.io.Serializable;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
+@TableName(value = "t_reservation_record",resultMap = "TReservationRecordMap")
 public class TReservationRecord extends BaseEntity implements Serializable{
 
 	/**

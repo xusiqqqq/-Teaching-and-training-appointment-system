@@ -1,11 +1,16 @@
 package com.kclm.xsap.entity;
 
 import java.time.LocalDate;
+
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableName;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
+@TableName(value = "t_employee",resultMap = "TEmployeeMap")
 public class TEmployee extends BaseEntity {
 
     private String name;
@@ -36,11 +41,12 @@ public class TEmployee extends BaseEntity {
     /**
     * 操作角色类型，1，超级管理员；0，普通管理员
     */
-    private Boolean roleType;
+    private Integer roleType;
 
     /**
     * 逻辑删除，1有效，0无效
     */
-    private Boolean isDeleted;
+    @TableLogic
+    private Integer isDeleted;
 
 }

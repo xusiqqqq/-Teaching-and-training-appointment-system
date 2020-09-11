@@ -5,12 +5,14 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
+@TableName(value = "t_member_card",resultMap = "TMemberCardMap")
 public class TMemberCard extends BaseEntity implements Serializable{
 
 	/**
@@ -59,6 +61,6 @@ public class TMemberCard extends BaseEntity implements Serializable{
     /**
     * 激活状态，1激活，0非激活
     */
-    private Boolean status;
+    private Integer status;
 
 }

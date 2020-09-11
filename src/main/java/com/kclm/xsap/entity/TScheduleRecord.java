@@ -6,12 +6,14 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
+@TableName(value = "t_schedule_record",resultMap = "TScheduleRecordMap")
 public class TScheduleRecord extends BaseEntity implements Serializable{
 
     /**

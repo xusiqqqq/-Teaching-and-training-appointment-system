@@ -11,17 +11,17 @@
     <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
     <result column="version" jdbcType="INTEGER" property="version" />
      <association property="member" javaType="TMember">
-    	<id property="member_id" column="id"/>
-    	<result property="member_name" column="name"/>
-    	<result property="sex" column="sex"/>
-    	<result property="phone" column="phone"/>
-    	<result property="birthday" column="birthday"/>
-    	<result property="member_note" column="note"/>
-    	<result property="avatarUrl" column="avatar_url"/>
-    	<result property="isDeleted" column="is_deleted"/>
-    	<result property="createTime"  jdbcType="TIMESTAMP" column="create_time" />
-	    <result property="lastModifyTime" jdbcType="TIMESTAMP" column="last_modify_time" />
-	    <result property="version" jdbcType="INTEGER"  column="version"/>
+    	 <id column="member_id" jdbcType="BIGINT" property="id" />
+	    <result column="member_name" jdbcType="VARCHAR" property="name" />
+	    <result column="sex" jdbcType="VARCHAR" property="sex" />
+	    <result column="phone" jdbcType="VARCHAR" property="phone" />
+	    <result column="birthday" jdbcType="DATE" property="birthday" />
+	    <result column="member_note" jdbcType="VARCHAR" property="note" />
+	    <result column="avatar_url" jdbcType="VARCHAR" property="avatarUrl" />
+	    <result column="is_deleted" jdbcType="BOOLEAN" property="isDeleted" />
+	    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+	    <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
+	    <result column="version" jdbcType="INTEGER" property="version" />
     </association>
   </resultMap>
   <sql id="TMemberLog_Column_List">
