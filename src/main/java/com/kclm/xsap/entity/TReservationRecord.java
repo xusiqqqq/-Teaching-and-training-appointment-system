@@ -49,7 +49,7 @@ public class TReservationRecord extends BaseEntity implements Serializable{
     /**
     * 预约状态，1有效，0无效
     */
-    private Boolean status;
+    private Integer status;
 
     /**
     * 教师评语
