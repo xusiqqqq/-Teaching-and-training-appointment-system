@@ -77,7 +77,7 @@ public class TConsumeRecordMapperTest {
 		@Test
 		public void selectOne() {
 			//根据id查询
-			consumeMapper.selectById(3);
+			consume = consumeMapper.selectById(3);
 			toPrint("查询", 1, consume);
 		}
 	//查询多条数据
