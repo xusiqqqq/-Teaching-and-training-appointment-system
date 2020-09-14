@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kclm.xsap.mapper.TMemberLogMapper">
-  <resultMap id="BaseResultMap" type="com.kclm.xsap.entity.TMemberLog">
+  <resultMap id="TMemberLogMap" type="com.kclm.xsap.entity.TMemberLog">
     <!--@mbg.generated-->
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="type" jdbcType="VARCHAR" property="type" />
@@ -10,8 +10,21 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
     <result column="version" jdbcType="INTEGER" property="version" />
+     <association property="member" javaType="TMember">
+    	 <id column="member_id" jdbcType="BIGINT" property="id" />
+	    <result column="member_name" jdbcType="VARCHAR" property="name" />
+	    <result column="sex" jdbcType="VARCHAR" property="sex" />
+	    <result column="phone" jdbcType="VARCHAR" property="phone" />
+	    <result column="birthday" jdbcType="DATE" property="birthday" />
+	    <result column="member_note" jdbcType="VARCHAR" property="note" />
+	    <result column="avatar_url" jdbcType="VARCHAR" property="avatarUrl" />
+	    <result column="is_deleted" jdbcType="BOOLEAN" property="isDeleted" />
+	    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+	    <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
+	    <result column="version" jdbcType="INTEGER" property="version" />
+    </association>
   </resultMap>
-  <sql id="Base_Column_List">
+  <sql id="TMemberLog_Column_List">
     <!--@mbg.generated-->
     id, `type`, `operator`, member_id, create_time, last_modify_time, version
   </sql>

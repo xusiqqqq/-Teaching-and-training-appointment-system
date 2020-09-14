@@ -1,23 +1,45 @@
 package com.kclm.xsap.entity;
 
-import java.util.List;
+
+import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class TReservationRecord extends BaseEntity {
+@TableName(value = "t_reservation_record",resultMap = "TReservationRecordMap")
+public class TReservationRecord extends BaseEntity implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	/**
     * 关联的排课记录
     */
-    private List<TScheduleRecord> schedules;
+    private Integer scheduleId;
+	
+    /**
+	 *  封装排课计划实体数据 
+	 */
+    @TableField(exist = false)
+	private TScheduleRecord schedule;
 	
     /**
      * 关联的会员
      */
-    private List<TMember> members;
+	private Integer memberId;
+	
+	/**
+	 *  封装会员实体数据
+	 */
+	@TableField(exist = false)
+    private TMember member;
     
     /**
     * 预约人数
@@ -27,7 +49,7 @@ public class TReservationRecord extends BaseEntity {
     /**
     * 预约状态，1有效，0无效
     */
-    private Boolean status;
+    private Integer status;
 
     /**
     * 教师评语

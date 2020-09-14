@@ -5,6 +5,7 @@
 package com.kclm.xsap.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.extension.plugins.OptimisticLockerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.dialects.MySqlDialect;
 import org.mybatis.spring.annotation.MapperScan;
@@ -47,5 +48,16 @@ public class MybatisPlusConfig {
         log.debug("创建SQL执行效率监视插件...");
         PerformanceMonitorInterceptor pmi = new PerformanceMonitorInterceptor();
         return pmi;
+    }
+    
+    /**
+     *	乐观锁配置
+     * @return
+     */
+    @Bean
+    public OptimisticLockerInterceptor optimisticLockerInterceptor() {
+    	log.debug("create OptimisticLockerInterceptor....");
+    	OptimisticLockerInterceptor oli = new OptimisticLockerInterceptor();
+    	return oli;
     }
 }

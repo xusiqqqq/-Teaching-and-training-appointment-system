@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kclm.xsap.mapper.TEmployeeMapper">
-  <resultMap id="BaseResultMap" type="com.kclm.xsap.entity.TEmployee">
+  <resultMap id="TEmployeeMap" type="com.kclm.xsap.entity.TEmployee">
     <!--@mbg.generated-->
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="name" jdbcType="VARCHAR" property="name" />
@@ -18,10 +18,30 @@
     <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
     <result column="version" jdbcType="INTEGER" property="version" />
   </resultMap>
-  <sql id="Base_Column_List">
+  <sql id="TEmployee_Column_List">
     <!--@mbg.generated-->
     id, `name`, phone, sex, birthday, introduce, note, role_name, role_password, role_type, 
     is_deleted, create_time, last_modify_time, version
   </sql>
+  <!--新增用户  -->
+  <insert id="save" parameterType="com.kclm.xsap.entity.TEmployee">
+  	insert into t_employee(role_name,role_password) values(#{roleName},#{rolePassword});
+  </insert>
+  <!--查询所有用户  -->
+	<select id="findAll" resultMap="TEmployeeMap">
+		select * from t_employee;
+	</select>
+	<!-- 根据id查询用户 -->
+	<select id="findById" parameterType="int" resultMap="TEmployeeMap">
+		select * from t_employee where id=#{id};
+	</select>
+	<!-- 根据用户名查询用户 -->
+	<select id="findByUserName" parameterType="String" resultMap="TEmployeeMap">
+		select * from t_employee where role_name like #{roleName};
+	</select>
+	<!-- 根据用户名和密码查询用户 -->
+	<select id="findByNameAndPwd" parameterType="String" resultMap="TEmployeeMap">
+		select * from t_employee where role_name = #{roleName} and role_password = #{rolePassword};
+	</select>
   
 </mapper>

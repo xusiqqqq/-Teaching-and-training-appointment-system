@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kclm.xsap.mapper.TCourseMapper">
-  <resultMap id="BaseResultMap" type="com.kclm.xsap.entity.TCourse">
+  <resultMap id="TCourseMap" type="com.kclm.xsap.entity.TCourse">
     <!--@mbg.generated-->
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="name" jdbcType="VARCHAR" property="name" />
@@ -16,11 +16,28 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
     <result column="version" jdbcType="INTEGER" property="version" />
+  	<collection property="cardList" ofType="TMemberCard" >
+  		<id column="card_id" jdbcType="BIGINT" property="id" />
+	    <result column="card_name" jdbcType="VARCHAR" property="name" />
+	    <result column="price" jdbcType="DECIMAL" property="price" />
+	    <result column="desc" jdbcType="VARCHAR" property="desc" />
+	    <result column="note" jdbcType="VARCHAR" property="note" />
+	    <result column="type" jdbcType="VARCHAR" property="type" />
+	    <result column="total_count" jdbcType="INTEGER" property="totalCount" />
+	    <result column="total_day" jdbcType="INTEGER" property="totalDay" />
+	    <result column="status" jdbcType="BOOLEAN" property="status" />
+	    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+	    <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
+	    <result column="version" jdbcType="INTEGER" property="version" />
+  	</collection>
   </resultMap>
-  <sql id="Base_Column_List">
+  <sql id="TCourse_Column_List">
     <!--@mbg.generated-->
     id, `name`, duration, `contains`, color, introduce, times_cost, limit_sex, limit_age, 
     limit_counts, create_time, last_modify_time, version
   </sql>
-  
+  <select id="findAll" resultMap="TCourseMap">
+  	select c.*,mc.id as card_id,mc.name as card_name,mc.price,mc.type from t_course c 
+  	 left outer join t_course_card cc on c.id = cc.course_id left outer join t_member_card mc on cc.card_id = mc.id;
+  </select>
 </mapper>

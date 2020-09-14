@@ -1,18 +1,30 @@
 package com.kclm.xsap.entity;
 
-import java.util.List;
+import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class TConsumeRecord extends BaseEntity {
+@TableName(value = "t_consume_record",resultMap = "TConsumeRecordMap")
+public class TConsumeRecord extends BaseEntity implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 
 	/**
-    * 关联的会员
+	 *	用来封装会员实体
+	 */
+	@TableField(exist = false)
+    private TMember member;
+	
+	/**
+	 * 	关联的会员
     */
-    private List<TMember> members;
+	private Integer memberId;
 	
     /**
     * 操作类型

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kclm.xsap.mapper.TMemberCardMapper">
-  <resultMap id="BaseResultMap" type="com.kclm.xsap.entity.TMemberCard">
+  <resultMap id="TMemberCardMap" type="com.kclm.xsap.entity.TMemberCard">
     <!--@mbg.generated-->
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="name" jdbcType="VARCHAR" property="name" />
@@ -15,11 +15,36 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
     <result column="version" jdbcType="INTEGER" property="version" />
+    <collection property="courseList" ofType="TCourse">
+    	<id column="course_id" jdbcType="BIGINT" property="id" />
+	    <result column="course_name" jdbcType="VARCHAR" property="name" />
+	    <result column="duration" jdbcType="INTEGER" property="duration" />
+	    <result column="contains" jdbcType="INTEGER" property="contains" />
+	    <result column="color" jdbcType="VARCHAR" property="color" />
+	    <result column="introduce" jdbcType="VARCHAR" property="introduce" />
+	    <result column="times_cost" jdbcType="INTEGER" property="timesCost" />
+	    <result column="limit_sex" jdbcType="VARCHAR" property="limitSex" />
+	    <result column="limit_age" jdbcType="INTEGER" property="limitAge" />
+	    <result column="limit_counts" jdbcType="INTEGER" property="limitCounts" />
+	    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+	    <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
+	    <result column="version" jdbcType="INTEGER" property="version" />
+    </collection>
   </resultMap>
-  <sql id="Base_Column_List">
+  <sql id="TMemberCard_Column_List">
     <!--@mbg.generated-->
     id, `name`, price, `desc`, note, `type`, total_count, total_day, `status`, create_time, 
     last_modify_time, version
   </sql>
-  
+  <sql id="course_sql">
+  	c.id as course_id, c.name as course_name, duration, contains, color, introduce, times_cost, limit_sex, limit_age, 
+    limit_counts
+  </sql>
+  <select id="findById" resultType="TMemberCard">
+  	select * from t_member_card where id = #{id};
+  </select>
+  <select id="findAll" resultMap="TMemberCardMap">
+  	select mc.*,<include refid="course_sql" /> from t_course c 
+  	 right outer join t_course_card cc on c.id = cc.course_id right outer join t_member_card mc on cc.card_id = mc.id;
+  </select>
 </mapper>

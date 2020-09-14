@@ -1,19 +1,30 @@
 package com.kclm.xsap.entity;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class TMemberCard extends BaseEntity {
+@TableName(value = "t_member_card",resultMap = "TMemberCardMap")
+public class TMemberCard extends BaseEntity implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * 关联的课程
 	 */
-	private List<TCourse> courses;
+	@TableField(exist = false)
+	private List<TCourse> courseList;
 	
     private String name;
     
@@ -50,6 +61,6 @@ public class TMemberCard extends BaseEntity {
     /**
     * 激活状态，1激活，0非激活
     */
-    private Boolean status;
+    private Integer status;
 
 }
