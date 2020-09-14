@@ -6,7 +6,7 @@
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="price" jdbcType="DECIMAL" property="price" />
-    <result column="desc" jdbcType="VARCHAR" property="desc" />
+    <result column="description" jdbcType="VARCHAR" property="desc" />
     <result column="note" jdbcType="VARCHAR" property="note" />
     <result column="type" jdbcType="VARCHAR" property="type" />
     <result column="total_count" jdbcType="INTEGER" property="totalCount" />
@@ -33,7 +33,7 @@
   </resultMap>
   <sql id="TMemberCard_Column_List">
     <!--@mbg.generated-->
-    id, `name`, price, `desc`, note, `type`, total_count, total_day, `status`, create_time, 
+    id, `name`, price, `describe`, note, `type`, total_count, total_day, `status`, create_time, 
     last_modify_time, version
   </sql>
   <sql id="course_sql">
