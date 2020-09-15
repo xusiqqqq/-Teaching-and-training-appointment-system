@@ -17,7 +17,7 @@ public interface TeacherService {
 
 	boolean save(TEmployee emp);
 
-	boolean remove(Integer id);
+	boolean deleteById(Integer id);
 	
 	boolean update(TEmployee emp);
 	

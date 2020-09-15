@@ -19,7 +19,7 @@ public interface MemberService {
 	
 	boolean save(TMember member);
 	
-	boolean remove(Integer id);
+	boolean deleteById(Integer id);
 	
 	boolean update(TMember member);
 	

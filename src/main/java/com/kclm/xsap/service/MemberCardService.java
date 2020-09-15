@@ -19,7 +19,7 @@ public interface MemberCardService {
 
 	boolean save(TMemberCard card);
 	
-	boolean remove(Integer id);
+	boolean deleteById(Integer id);
 	
 	boolean update(TMemberCard card);
 	
@@ -39,24 +39,27 @@ public interface MemberCardService {
 	
 	/**
 	 *  会员卡充值操作
+	 * @param cardId
 	 * @param recharge
 	 * @return boolean。true：充值成功；false：充值失败
 	 */
-	boolean recharge(TRechargeRecord recharge);
+	boolean recharge(Integer cardId,TRechargeRecord recharge);
 	
 	/**
 	 *  会员卡消费操作
+	 * @param cardId
 	 * @param consume
 	 * @return boolean。true：消费完成；false：消费异常
 	 */
-	boolean consume(TConsumeRecord consume);
+	boolean consume(Integer cardId,TConsumeRecord consume);
 	
 	/**
 	 * 分页查询。获取当前会员卡的所有操作记录
+	 * @param cardId
 	 * @param currentPage
 	 * @param pageSize
 	 * @return List<TMemberLog>。会员卡操作记录结果集
 	 */
-	List<TMemberLog> getOperateLog(Integer currentPage,Integer pageSize);
+	List<TMemberLog> getOperateLog(Integer cardId,Integer currentPage,Integer pageSize);
 	
 }
