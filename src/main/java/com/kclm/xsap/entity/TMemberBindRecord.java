@@ -46,7 +46,7 @@ public class TMemberBindRecord extends BaseEntity implements Serializable{
     private Integer addCount;
 
     /**
-    * 有效期，按天算
+    * 充值有效期，按天算
     */
     private Integer validDay;
 

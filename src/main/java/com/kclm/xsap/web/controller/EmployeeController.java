@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.kclm.xsap.entity.TEmployee;
+import com.kclm.xsap.service.EmployeeService;
 import com.kclm.xsap.service.UserService;
 
 /******************
@@ -24,10 +25,10 @@ import com.kclm.xsap.service.UserService;
 @Controller
 @RequestMapping("/user")
 public class EmployeeController {
-
+	
 	//调用service层
 	@Autowired
-	private UserService userService;
+	private EmployeeService userService;
 	
 	@RequestMapping("/toLogin")
 	public String welcome() {
