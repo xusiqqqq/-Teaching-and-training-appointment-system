@@ -16,9 +16,9 @@ import com.kclm.xsap.entity.BaseEntity;
 public interface IndexService {
 	
 	/**
-	 * 查询首页的报表
-	 * @param start
-	 * @param end
+	 * 查询首页的报表数据
+	 * @param start 起始日期
+	 * @param end 结束日期
 	 * @return List<ReportDto>。
 	 */
 	List<BaseEntity> queryByDate(LocalDate start,LocalDate end);

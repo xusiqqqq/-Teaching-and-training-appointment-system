@@ -37,7 +37,7 @@
                             </span>
                             <a data-toggle="dropdown" class="dropdown-toggle" href="#">
                                 <span class="clear">
-                               <span class="block m-t-xs"><strong class="font-bold" th:text="${userInfo.roleName}">admin</strong></span>
+                               <span class="block m-t-xs"><strong class="font-bold" th:text="${userInfo.name}">admin</strong></span>
                                 <span class="text-muted text-xs block"  th:if="${userInfo.roleType}">超级管理员<b class="caret"></b></span>
                                 <span class="text-muted text-xs block"  th:if="!${userInfo.roleType}">普通管理员<b class="caret"></b></span>
                                 </span>

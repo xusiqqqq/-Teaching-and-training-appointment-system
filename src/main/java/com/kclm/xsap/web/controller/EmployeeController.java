@@ -10,11 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.kclm.xsap.entity.TEmployee;
 import com.kclm.xsap.service.EmployeeService;
-import com.kclm.xsap.service.UserService;
 
 /******************
  * @Author yejf
@@ -28,7 +26,7 @@ public class EmployeeController {
 	
 	//调用service层
 	@Autowired
-	private EmployeeService userService;
+	private EmployeeService employeeService;
 	
 	@RequestMapping("/toLogin")
 	public String welcome() {
@@ -45,7 +43,7 @@ public class EmployeeController {
 	 */
 	@RequestMapping("/login.do")
 	public String login(String username,String password,Model model,HttpSession session) {
-		TEmployee loginUser = userService.login(username, password);
+		TEmployee loginUser = employeeService.login(username, password);
 		model.addAttribute("USER_NOT_EXIST", false);					
 		if(loginUser == null) {
 			model.addAttribute("USER_NOT_EXIST", true);			
@@ -84,7 +82,7 @@ public class EmployeeController {
 		emp.setRolePassword(password);
 		//设置默认真实姓名
 		emp.setName("user");
-		userService.register(emp);
+		employeeService.register(emp);
 		return "x_login";
 	}
 	
