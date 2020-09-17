@@ -21,15 +21,15 @@ public interface CourseScheduleService {
 
 	/**
 	 * 获取所有的排课记录
-	 * @param startDate
-	 * @param endDate
+	 * @param startDate 起始日期
+	 * @param endDate 结束日期
 	 * @return List<TScheduleRecord>。团课排课记录结果集
 	 */
-	List<TScheduleRecord> getScheduleList(LocalDate startDate,LocalDate endDate);
+	List<TScheduleRecord> listSchedule(LocalDate startDate,LocalDate endDate);
 	
 	/**
 	 * 根据id查询到匹配的排课记录
-	 * @param scheduleId
+	 * @param scheduleId 排课记录id
 	 * @return TScheduleRecord。排课记录
 	 */
 	TScheduleRecord findById(Integer scheduleId);

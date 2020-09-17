@@ -9,6 +9,7 @@
     <result column="sex" jdbcType="VARCHAR" property="sex" />
     <result column="birthday" jdbcType="DATE" property="birthday" />
     <result column="introduce" jdbcType="VARCHAR" property="introduce" />
+    <result column="avatar_url" jdbcType="VARCHAR" property="avatarUrl"/>
     <result column="note" jdbcType="VARCHAR" property="note" />
     <result column="role_name" jdbcType="VARCHAR" property="roleName" />
     <result column="role_password" jdbcType="VARCHAR" property="rolePassword" />
@@ -20,7 +21,7 @@
   </resultMap>
   <sql id="TEmployee_Column_List">
     <!--@mbg.generated-->
-    id, `name`, phone, sex, birthday, introduce, note, role_name, role_password, role_type, 
+    id, `name`, phone, sex, birthday, introduce, avatar_url, note, role_name, role_password, role_type, 
     is_deleted, create_time, last_modify_time, version
   </sql>
   <!--新增用户  -->

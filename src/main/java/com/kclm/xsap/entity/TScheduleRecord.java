@@ -59,7 +59,7 @@ public class TScheduleRecord extends BaseEntity implements Serializable{
     private String limitSex;
 
     /**
-    * 限制年龄
+    * 限制年龄，-1 表示不限制
     */
     private Integer limitAge;
 
