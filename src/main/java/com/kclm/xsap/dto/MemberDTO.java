@@ -51,16 +51,16 @@ public class MemberDTO extends BaseDTO{
 	/**
 	 * 上课记录
 	 */
-	private List<ClassDTO> classRecord;
+	private List<ClassRecordDTO> classRecord;
 	
 	/**
 	 * 预约记录
 	 */
-	private List<ReserveDTO> reserveRecord;
+	private List<ReserveRecordDTO> reserveRecord;
 	
 	/**
 	 * 消费记录
 	 */
-	private List<ConsumeDTO> consumeRecord;
+	private List<ConsumeRecordDTO> consumeRecord;
 	
 }

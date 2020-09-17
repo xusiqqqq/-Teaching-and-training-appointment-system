@@ -1,6 +1,7 @@
 package com.kclm.xsap.dto;
 
 import java.util.List;
+import java.util.Map;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,13 +29,8 @@ public class ReportDTO extends BaseDTO{
 	private Integer dailyNewMembers;
 	
 	/**
-	 * 会员卡种类名称
+	 * 会员卡种类名称+会员卡绑定数量
 	 */
-	private List<String> memberCardName;
-	
-	/**
-	 * 各种会员卡绑定数量
-	 */
-	private List<Integer> cardBindNummers;
+	private Map<String,Integer> memberCardBindingMap;
 	
 }

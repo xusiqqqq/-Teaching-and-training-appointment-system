@@ -3,8 +3,6 @@ package com.kclm.xsap.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.kclm.xsap.entity.TMemberCard;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -51,9 +49,9 @@ public class CourseScheduleDTO extends BaseDTO{
 	private Integer limitAge;
 	
 	/**
-	 * 支持的会员卡
+	 * 支持的会员卡，多张会员卡名字之间以 | 隔开
 	 */
-	private List<String> supportCard;
+	private String supportCard;
 	
 	/**
 	 * 上课老师
@@ -68,5 +66,5 @@ public class CourseScheduleDTO extends BaseDTO{
 	/**
 	 * 预约记录
 	 */
-	private List<ReserveDTO> reserveRecord;
+	private List<ReserveRecordDTO> reserveRecord;
 }

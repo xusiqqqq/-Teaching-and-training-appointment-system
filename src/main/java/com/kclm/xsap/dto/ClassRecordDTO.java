@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class ClassDTO extends BaseDTO{
+public class ClassRecordDTO extends BaseDTO{
 
 	/**
 	 * 课程名
