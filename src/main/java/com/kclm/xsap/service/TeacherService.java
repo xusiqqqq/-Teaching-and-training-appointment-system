@@ -29,23 +29,23 @@ public interface TeacherService {
 	
 	/**
 	 *  分页查询。获取所有教师信息
-	 * @param currentPage
-	 * @param pageSize
+	 * @param currentPage 当前页码
+	 * @param pageSize 每页展示数据个数
 	 * @return List<TEmployee>。教师信息结果集
 	 */
 	List<TEmployee> findAllByPage(Integer currentPage,Integer pageSize);
 	
 	/**
 	 *  当前教师的分析信息
-	 * @param id
+	 * @param id 教职员工id
 	 * @return TEmployee。教师信息
 	 */
-	TEmployee analyze(Integer id);
+	TEmployee getAnalysis(Integer id);
 	
 	/**
 	 *  当前教师的上课记录
-	 * @param id
+	 * @param id 上课记录id
 	 * @return List<TReservationRecord>。上课记录结果集
 	 */
-	List<TReservationRecord> classRecord(Integer id);
+	List<TReservationRecord> listClassRecord(Integer id);
 }

@@ -26,6 +26,11 @@ public class TEmployee extends BaseEntity {
     */
     private String introduce;
 
+    /**
+     * 员工头像路径
+     */
+    private String avatarUrl;
+    
     private String note;
 
     /**

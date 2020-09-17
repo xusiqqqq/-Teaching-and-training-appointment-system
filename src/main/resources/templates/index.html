@@ -14,11 +14,11 @@
     <meta http-equiv="refresh" content="0;ie.html" />
     <![endif]-->
 
-    <link rel="shortcut icon" href="favicon.ico"  th:href="@{/static/ico/favicon.ico}">
-    <link href="css/bootstrap.min.css?v=3.3.6" th:href="@{/static/css/bootstrap.min.css(v='3.3.6')}" rel="stylesheet">
-    <link href="css/font-awesome.min.css?v=4.4.0" th:href="@{/static/css/font-awesome.min.css(v='4.4.0')}" rel="stylesheet">
-    <link href="css/animate.css" th:href="@{/static/css/animate.css}" rel="stylesheet">
-    <link href="css/style.css?v=5.0" th:href="@{/static/css/style.css(v='5.0')}" rel="stylesheet">
+    <link rel="shortcut icon" href="../static/favicon.ico"  th:href="@{/static/ico/favicon.ico}">
+    <link href="../static/css/bootstrap.min.css?v=3.3.6" th:href="@{/static/css/bootstrap.min.css(v='3.3.6')}" rel="stylesheet">
+    <link href="../static/css/font-awesome.min.css?v=4.4.0" th:href="@{/static/css/font-awesome.min.css(v='4.4.0')}" rel="stylesheet">
+    <link href="../static/css/animate.css" th:href="@{/static/css/animate.css}" rel="stylesheet">
+    <link href="../static/css/style.css?v=5.0" th:href="@{/static/css/style.css(v='5.0')}" rel="stylesheet">
 
 </head>
 
@@ -33,13 +33,12 @@
                     <li class="nav-header">
                         <div class="dropdown profile-element">
                             <span>
-                            <img alt="image" class="img-circle" src="img/profile_small.jpg" th:src="@{/static/img/profile_small.jpg}"/>
+                            <img alt="image" class="img-circle" src="../static/img/profile_small.jpg" th:src="@{/static/img/profile_small.jpg}"/>
                             </span>
                             <a data-toggle="dropdown" class="dropdown-toggle" href="#">
                                 <span class="clear">
-                               <span class="block m-t-xs"><strong class="font-bold" th:text="${userInfo.roleName}">admin</strong></span>
-                                <span class="text-muted text-xs block"  th:if="${userInfo.roleType}">超级管理员<b class="caret"></b></span>
-                                <span class="text-muted text-xs block"  th:if="!${userInfo.roleType}">普通管理员<b class="caret"></b></span>
+                               <span class="block m-t-xs"><strong class="font-bold" th:text="${userInfo.name}">admin</strong></span>
+                                <span class="text-muted text-xs block" th:text="${user_roleType}">超级管理员<b class="caret" ></b></span>
                                 </span>
                             </a>
                             <ul class="dropdown-menu animated fadeInRight m-t-xs">
@@ -70,13 +69,13 @@
                         <ul class="nav nav-second-level">
                             <li>
 
-                                <a class="J_menuItem" href="x_member_list.html"><i class="fa fa-circle-o"></i>会员</a>
+                                <a class="J_menuItem" href="member/x_member_list.html"><i class="fa fa-circle-o"></i>会员</a>
                             </li>
                             <li>
-                                <a class="J_menuItem" href="x_member_card.html"><i class="fa fa-circle-o"></i>会员卡</a>
+                                <a class="J_menuItem" href="member/x_member_card.html"><i class="fa fa-circle-o"></i>会员卡</a>
                             </li>
                             <li>
-                                <a class="J_menuItem" href="x_member_card_bind.html"><i class="fa fa-circle-o"></i>会员绑定</a>
+                                <a class="J_menuItem" href="member/x_member_card_bind.html"><i class="fa fa-circle-o"></i>会员绑定</a>
                             </li>
                         </ul>
                     </li>
@@ -90,19 +89,19 @@
                         <ul class="nav nav-second-level">
                             <li>
 
-                                <a class="J_menuItem" href="x_course_list.html"><i class="fa fa-circle-o"></i>团课课程</a>
+                                <a class="J_menuItem" href="course/x_course_list.html"><i class="fa fa-circle-o"></i>团课课程</a>
                             </li>
                             <li>
-                                <a class="J_menuItem" href="x_course_schedule.html"><i class="fa fa-circle-o"></i>团课课程表</a>
+                                <a class="J_menuItem" href="course/x_course_schedule.html"><i class="fa fa-circle-o"></i>团课课程表</a>
                             </li>
                             <li>
-                                <a class="J_menuItem" href="x_course_reservation.html"><i class="fa fa-circle-o"></i>团课预约设置</a>
+                                <a class="J_menuItem" href="course/x_course_reservation.html"><i class="fa fa-circle-o"></i>团课预约设置</a>
                             </li>
                         </ul>
                     </li>
 
                     <li>
-                        <a class="J_menuItem" href="x_teacher_list.html">
+                        <a class="J_menuItem" href="employee/x_teacher_list.html">
                             <i class="fa fa-user"></i>
                             <span class="nav-label">老师管理</span>
                         </a>
@@ -345,15 +344,15 @@
     </div>
 
     <!-- 全局js -->
-    <script src="js/jquery.min.js?v=2.1.4" th:src="@{/static/js/jquery.min.js(v='2.1.4')}"></script>
-    <script src="js/bootstrap.min.js?v=3.3.6" th:src="@{/static/js/bootstrap.min.js(v='3.3.6')}"></script>
-    <script src="js/plugins/metisMenu/jquery.metisMenu.js" th:src="@{/static/js/plugins/metisMenu/jquery.metisMenu.js}"></script>
-    <script src="js/plugins/slimscroll/jquery.slimscroll.min.js" th:src="@{/static/js/plugins/slimscroll/jquery.slimscroll.min.js}"></script>
-    <script src="js/plugins/layer/layer.min.js" th:src="@{/static/js/plugins/layer/layer.min.js}"></script>
+    <script src="../static/js/jquery.min.js?v=2.1.4" th:src="@{/static/js/jquery.min.js(v='2.1.4')}"></script>
+    <script src="../static/js/bootstrap.min.js?v=3.3.6" th:src="@{/static/js/bootstrap.min.js(v='3.3.6')}"></script>
+    <script src="../static/js/plugins/metisMenu/jquery.metisMenu.js" th:src="@{/static/js/plugins/metisMenu/jquery.metisMenu.js}"></script>
+    <script src="../static/js/plugins/slimscroll/jquery.slimscroll.min.js" th:src="@{/static/js/plugins/slimscroll/jquery.slimscroll.min.js}"></script>
+    <script src="../static/js/plugins/layer/layer.min.js" th:src="@{/static/js/plugins/layer/layer.min.js}"></script>
 
     <!-- 自定义js -->
-    <script src="js/hplus.js?v=4.1.0" th:src="@{/static/js/hplus.js(v='4.1.0')}"></script>
-    <script type="text/javascript" src="js/contabs.js" th:src="@{/static/js/contabs.js}"></script>
+    <script src="../static/js/hplus.js?v=4.1.0" th:src="@{/static/js/hplus.js(v='4.1.0')}"></script>
+    <script type="text/javascript" src="../static/js/contabs.js" th:src="@{/static/js/contabs.js}"></script>
 
 </body>
 
