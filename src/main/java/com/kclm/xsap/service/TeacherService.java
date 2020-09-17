@@ -40,12 +40,12 @@ public interface TeacherService {
 	 * @param id 教职员工id
 	 * @return TEmployee。教师信息
 	 */
-	TEmployee analyze(Integer id);
+	TEmployee getAnalysis(Integer id);
 	
 	/**
 	 *  当前教师的上课记录
 	 * @param id 上课记录id
 	 * @return List<TReservationRecord>。上课记录结果集
 	 */
-	List<TReservationRecord> classRecord(Integer id);
+	List<TReservationRecord> listClassRecord(Integer id);
 }

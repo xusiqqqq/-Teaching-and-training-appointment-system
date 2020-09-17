@@ -24,14 +24,14 @@ public interface ReserveService {
 	 * @param pageSize 每页展示数据个数
 	 * @return List<TReservationRecord>。预约记录结果集
 	 */
-	List<TReservationRecord> getReserveRecords(Integer scheduleId,Integer currentPage,Integer pageSize);
+	List<TReservationRecord> listReserveRecords(Integer scheduleId,Integer currentPage,Integer pageSize);
 	
 	/**
 	 * 获取当前排课的预约记录
 	 * @param scheduleId 排课记录id
 	 * @return List<TReservationRecord>。预约记录结果集
 	 */
-	List<TReservationRecord> exportRecord(Integer scheduleId);
+	List<TReservationRecord> listExportRecord(Integer scheduleId);
 
 	/**
 	 * 获取指定时间段的预约记录
@@ -39,6 +39,6 @@ public interface ReserveService {
 	 * @param endDate 结束日期
 	 * @return List<TReservationRecord>。预约记录结果集
 	 */
-	List<TReservationRecord> exportRecordList(LocalDate startDate,LocalDate endDate);
+	List<TReservationRecord> listExportRecordRange(LocalDate startDate,LocalDate endDate);
 	
 }

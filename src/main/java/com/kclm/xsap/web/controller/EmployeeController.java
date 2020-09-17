@@ -50,6 +50,7 @@ public class EmployeeController {
 			return "x_login";
 		}
 		model.addAttribute("userInfo", loginUser);
+		model.addAttribute("user_roleType", loginUser.getRoleType() == 1 ? "超级管理员":"普通管理员");
 		session.setAttribute("LOGIN_USER", loginUser);
 		return "index";
 	}

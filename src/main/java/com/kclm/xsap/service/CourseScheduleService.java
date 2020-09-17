@@ -25,7 +25,7 @@ public interface CourseScheduleService {
 	 * @param endDate 结束日期
 	 * @return List<TScheduleRecord>。团课排课记录结果集
 	 */
-	List<TScheduleRecord> getScheduleList(LocalDate startDate,LocalDate endDate);
+	List<TScheduleRecord> listSchedule(LocalDate startDate,LocalDate endDate);
 	
 	/**
 	 * 根据id查询到匹配的排课记录

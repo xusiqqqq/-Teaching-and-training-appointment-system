@@ -60,6 +60,6 @@ public interface MemberCardService {
 	 * @param pageSize 每页展示数据个数
 	 * @return List<TMemberLog>。会员卡操作记录结果集
 	 */
-	List<TMemberLog> getOperateLog(Integer cardId,Integer currentPage,Integer pageSize);
+	List<TMemberLog> listOperateLog(Integer cardId,Integer currentPage,Integer pageSize);
 	
 }

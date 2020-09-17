@@ -136,15 +136,15 @@ CREATE TABLE `t_employee` (
 /*Data for the table `t_employee` */
 
 insert  into `t_employee`(`id`,`name`,`phone`,`sex`,`birthday`,`introduce`,`avatar_url`,`note`,`role_name`,`role_password`,`role_type`,`is_deleted`,`create_time`,`last_modify_time`,`version`) values 
-(1,'张老师','12345123','女','2020-09-07','教数学',NULL,'。。。','admin','123',1,NULL,NULL,NULL,NULL),
-(2,'李老','467453','男','2020-09-09','地理',NULL,'，，，','user','123',0,NULL,NULL,NULL,NULL),
-(3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'test','111',NULL,NULL,NULL,NULL,NULL),
-(4,'魏老','53459445','男',NULL,'教体育',NULL,'note-2','user','123',0,0,NULL,NULL,1),
-(5,'魏老','53459445','男',NULL,'教体育',NULL,'note-3','user','123',0,0,NULL,NULL,1),
-(6,'魏老','53459445','男',NULL,'教体育',NULL,'note-6','user','123',0,0,NULL,NULL,1),
-(7,'魏老','53459445','男',NULL,'教体育',NULL,'note-7','user','123',0,0,NULL,NULL,1),
-(8,'魏老','53459445','男',NULL,'教体育',NULL,'note-8','user','123',0,0,NULL,NULL,1),
-(9,'魏老','53459445','男',NULL,'教体育',NULL,'note-9','user','123',0,0,NULL,NULL,1);
+(1,'张老师','12345123','女','2020-09-07','教数学',NULL,'。。。','admin','123',1,0,NULL,NULL,NULL),
+(2,'李老','467453','男','2020-09-09','地理',NULL,'，，，','user','123',0,0,NULL,NULL,NULL),
+(3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'test','111',0,0,NULL,NULL,NULL),
+(4,'魏老','53459445','男',NULL,'教体育',NULL,'note-2','user1','123',0,0,NULL,NULL,1),
+(5,'魏老','53459445','男',NULL,'教体育',NULL,'note-3','user2','123',0,0,NULL,NULL,1),
+(6,'魏老','53459445','男',NULL,'教体育',NULL,'note-6','user3','123',0,0,NULL,NULL,1),
+(7,'魏老','53459445','男',NULL,'教体育',NULL,'note-7','user4','123',0,0,NULL,NULL,1),
+(8,'魏老','53459445','男',NULL,'教体育',NULL,'note-8','user5','123',0,0,NULL,NULL,1),
+(9,'魏老','53459445','男',NULL,'教体育',NULL,'note-9','user6','123',0,0,NULL,NULL,1);
 
 /*Table structure for table `t_global_reservation_set` */
 
@@ -359,7 +359,7 @@ CREATE TABLE `t_reservation_record` (
 
 insert  into `t_reservation_record`(`id`,`order_nums`,`status`,`comment`,`note`,`operator`,`member_id`,`schedule_id`,`create_time`,`last_modify_time`,`version`) values 
 (1,12,1,NULL,NULL,'海豚',1,1,NULL,NULL,NULL),
-(2,11,0,NULL,NULL,'企鹅',1,2,NULL,NULL,NULL),
+(2,11,1,NULL,NULL,'企鹅',1,2,NULL,NULL,NULL),
 (3,7,1,NULL,NULL,'企鹅',2,3,NULL,NULL,NULL),
 (4,4,0,NULL,NULL,'海豚',3,1,NULL,NULL,NULL),
 (5,5,0,'不错','note-5','海鸥',NULL,NULL,NULL,NULL,1),

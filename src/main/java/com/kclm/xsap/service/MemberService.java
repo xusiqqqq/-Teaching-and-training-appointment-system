@@ -81,7 +81,7 @@ public interface MemberService {
 	 * @param pageSize 每页展示数据个数
 	 * @return List<TReservationRecord>。上课记录结果集
 	 */
-	List<TReservationRecord> getClassRecords(Integer id,Integer currentPage,Integer pageSize);
+	List<TReservationRecord> listClassRecords(Integer id,Integer currentPage,Integer pageSize);
 	
 	/**
 	 * 分页查询。当前会员的预约记录
@@ -90,7 +90,7 @@ public interface MemberService {
 	 * @param pageSize 每页展示数据个数
 	 * @return List<TReservationRecord>。预约记录结果集
 	 */
-	List<TReservationRecord> getReserveRecords(Integer id,Integer currentPage,Integer pageSize);
+	List<TReservationRecord> listReserveRecords(Integer id,Integer currentPage,Integer pageSize);
 	
 	/**
 	 * 分页查询。当前会员的消费记录
@@ -99,7 +99,7 @@ public interface MemberService {
 	 * @param pageSize 每页展示数据个数
 	 * @return List<TConsumeRecord>。消费记录结果集
 	 */
-	List<TConsumeRecord> getConsumeRecord(Integer id,Integer currentPage,Integer pageSize);
+	List<TConsumeRecord> listConsumeRecord(Integer id,Integer currentPage,Integer pageSize);
 	
 	
 }
