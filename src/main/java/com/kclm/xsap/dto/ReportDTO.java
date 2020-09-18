@@ -19,16 +19,6 @@ import lombok.EqualsAndHashCode;
 public class ReportDTO extends BaseDTO{
 
 	/**
-	 * 每日约课数量
-	 */
-	private Integer dailyReservations;
-	
-	/**
-	 * 每日新增会员数量
-	 */
-	private Integer dailyNewMembers;
-	
-	/**
 	 * 会员卡种类名称+会员卡绑定数量
 	 */
 	private Map<String,Integer> memberCardBindingMap;

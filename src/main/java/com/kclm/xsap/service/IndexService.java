@@ -11,6 +11,8 @@ package com.kclm.xsap.service;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.kclm.xsap.dto.HomePageDTO;
+import com.kclm.xsap.dto.ReportDTO;
 import com.kclm.xsap.entity.BaseEntity;
 
 public interface IndexService {
@@ -19,13 +21,13 @@ public interface IndexService {
 	 * 查询首页的报表数据
 	 * @param start 起始日期
 	 * @param end 结束日期
-	 * @return List<ReportDto>。
+	 * @return List<HomePageDTO>。
 	 */
-	List<BaseEntity> queryByDate(LocalDate start,LocalDate end);
+	List<HomePageDTO> queryByDate(LocalDate start,LocalDate end);
 	
 	/**
 	 *  会员卡统计
-	 * @return MemberCardStatisticDto。
+	 * @return ReportDTO。
 	 */
-	BaseEntity statistic();
+	ReportDTO statistic();
 }

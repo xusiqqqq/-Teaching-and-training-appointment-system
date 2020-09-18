@@ -2,10 +2,13 @@ package com.kclm.xsap.service;
 
 import java.util.List;
 
-import com.kclm.xsap.entity.TConsumeRecord;
+import com.kclm.xsap.dto.ClassRecordDTO;
+import com.kclm.xsap.dto.ConsumeRecordDTO;
+import com.kclm.xsap.dto.MemberCardDTO;
+import com.kclm.xsap.dto.MemberDTO;
+import com.kclm.xsap.dto.ReserveRecordDTO;
 import com.kclm.xsap.entity.TMember;
 import com.kclm.xsap.entity.TMemberBindRecord;
-import com.kclm.xsap.entity.TReservationRecord;
 
 /**
  * 
@@ -22,6 +25,14 @@ public interface MemberService {
 	boolean deleteById(Integer id);
 	
 	boolean update(TMember member);
+	
+	/**
+	 * 保存查询出的会员详情信息
+	 * @param id
+	 * @return MemberDTO
+	 */
+	MemberDTO getMemberDetailById(Integer id);
+	
 	
 	/**
 	 *  获取所有会员信息
@@ -70,36 +81,36 @@ public interface MemberService {
 	 * @param id 会员绑定记录id
 	 * @param currentPage 当前页码
 	 * @param pageSize 每页展示数据个数
-	 * @return List<TMemberBindRecord>。会员绑定记录结果集
+	 * @return List<MemberCardDTO>。会员绑定记录结果集
 	 */
-	List<TMemberBindRecord> findAllCardByPage(Integer id,Integer currentPage,Integer pageSize);
+	List<MemberCardDTO> findAllCardByPage(Integer id,Integer currentPage,Integer pageSize);
 
 	/**
 	 * 分页查询。当前会员的上课记录
 	 * @param id 预约记录id。当预约状态为“已预约”时，则此预约记录表示上课记录
 	 * @param currentPage 当前页码
 	 * @param pageSize 每页展示数据个数
-	 * @return List<TReservationRecord>。上课记录结果集
+	 * @return List<ClassRecordDTO>。上课记录结果集
 	 */
-	List<TReservationRecord> listClassRecords(Integer id,Integer currentPage,Integer pageSize);
+	List<ClassRecordDTO> listClassRecords(Integer id,Integer currentPage,Integer pageSize);
 	
 	/**
 	 * 分页查询。当前会员的预约记录
 	 * @param id 预约记录id
 	 * @param currentPage 当前页码
 	 * @param pageSize 每页展示数据个数
-	 * @return List<TReservationRecord>。预约记录结果集
+	 * @return List<ReserveRecordDTO>。预约记录结果集
 	 */
-	List<TReservationRecord> listReserveRecords(Integer id,Integer currentPage,Integer pageSize);
+	List<ReserveRecordDTO> listReserveRecords(Integer id,Integer currentPage,Integer pageSize);
 	
 	/**
 	 * 分页查询。当前会员的消费记录
 	 * @param id 消费记录id
 	 * @param currentPage 当前页码
 	 * @param pageSize 每页展示数据个数
-	 * @return List<TConsumeRecord>。消费记录结果集
+	 * @return List<ConsumeRecordDTO>。消费记录结果集
 	 */
-	List<TConsumeRecord> listConsumeRecord(Integer id,Integer currentPage,Integer pageSize);
+	List<ConsumeRecordDTO> listConsumeRecord(Integer id,Integer currentPage,Integer pageSize);
 	
 	
 }

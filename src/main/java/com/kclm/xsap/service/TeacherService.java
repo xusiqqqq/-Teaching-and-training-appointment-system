@@ -2,6 +2,7 @@ package com.kclm.xsap.service;
 
 import java.util.List;
 
+import com.kclm.xsap.dto.ReserveRecordDTO;
 import com.kclm.xsap.entity.TEmployee;
 import com.kclm.xsap.entity.TReservationRecord;
 
@@ -45,7 +46,7 @@ public interface TeacherService {
 	/**
 	 *  当前教师的上课记录
 	 * @param id 上课记录id
-	 * @return List<TReservationRecord>。上课记录结果集
+	 * @return List<ReserveRecordDTO>。上课记录结果集
 	 */
-	List<TReservationRecord> listClassRecord(Integer id);
+	List<ReserveRecordDTO> listClassRecord(Integer id);
 }

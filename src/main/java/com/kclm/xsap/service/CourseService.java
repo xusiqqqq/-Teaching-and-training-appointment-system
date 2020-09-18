@@ -2,6 +2,7 @@ package com.kclm.xsap.service;
 
 import java.util.List;
 
+import com.kclm.xsap.dto.CourseDTO;
 import com.kclm.xsap.entity.TCourse;
 
 /**
@@ -24,13 +25,13 @@ public interface CourseService {
 	 * 分页查询。获取所有的课程信息
 	 * @param currentPage 当前页码
 	 * @param pageSize 每页展示数据个数
-	 * @return List<TCourse>。课程信息结果集
+	 * @return List<CourseDTO>。课程信息结果集
 	 */
-	List<TCourse> findAllByPage(Integer currentPage,Integer pageSize);
+	List<CourseDTO> findAllByPage(Integer currentPage,Integer pageSize);
 	
 	/**
 	 * 获取所有的课程信息
 	 * @return List<TCourse>。课程信息结果集
 	 */
-	List<TCourse> findAll();
+	List<CourseDTO> findAll();
 }

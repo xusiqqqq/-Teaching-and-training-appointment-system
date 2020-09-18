@@ -1,6 +1,7 @@
 package com.kclm.xsap.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -42,5 +43,15 @@ public class HomePageDTO extends BaseDTO{
 	 * 预约总数
 	 */
 	private Integer totalReservations;
+	
+	/**
+	 * 每日约课数量
+	 */
+	private List<Integer> dailyReservations;
+	
+	/**
+	 * 每日新增会员数量
+	 */
+	private List<Integer> dailyNewMembers;
 	
 }
