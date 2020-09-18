@@ -5,6 +5,7 @@ import java.util.List;
 import com.kclm.xsap.dto.ClassRecordDTO;
 import com.kclm.xsap.dto.ConsumeRecordDTO;
 import com.kclm.xsap.dto.MemberCardDTO;
+import com.kclm.xsap.dto.MemberDTO;
 import com.kclm.xsap.dto.ReserveRecordDTO;
 import com.kclm.xsap.entity.TMember;
 import com.kclm.xsap.entity.TMemberBindRecord;
@@ -24,6 +25,14 @@ public interface MemberService {
 	boolean deleteById(Integer id);
 	
 	boolean update(TMember member);
+	
+	/**
+	 * 保存查询出的会员详情信息
+	 * @param id
+	 * @return MemberDTO
+	 */
+	MemberDTO getMemberDetailById(Integer id);
+	
 	
 	/**
 	 *  获取所有会员信息
