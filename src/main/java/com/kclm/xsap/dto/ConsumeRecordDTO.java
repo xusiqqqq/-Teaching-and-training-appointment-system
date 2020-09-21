@@ -49,7 +49,7 @@ public class ConsumeRecordDTO extends BaseDTO{
 	private BigDecimal price;
 	
 	/**
-	 * 操作人
+	 * 操作员
 	 */
 	private String operator;
 	

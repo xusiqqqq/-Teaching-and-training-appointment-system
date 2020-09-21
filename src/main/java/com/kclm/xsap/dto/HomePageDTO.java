@@ -45,12 +45,12 @@ public class HomePageDTO extends BaseDTO{
 	private Integer totalReservations;
 	
 	/**
-	 * 每日约课数量
+	 * 每日约课数量，用区间展示
 	 */
 	private List<Integer> dailyReservations;
 	
 	/**
-	 * 每日新增会员数量
+	 * 每日新增会员数量，用区间展示
 	 */
 	private List<Integer> dailyNewMembers;
 	
