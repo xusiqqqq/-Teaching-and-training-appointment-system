@@ -1,5 +1,7 @@
 package com.kclm.xsap.dto.convert;
 
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -7,7 +9,6 @@ import org.mapstruct.factory.Mappers;
 import com.kclm.xsap.dto.CourseScheduleDTO;
 import com.kclm.xsap.dto.ReserveRecordDTO;
 import com.kclm.xsap.entity.TCourse;
-import com.kclm.xsap.entity.TEmployee;
 import com.kclm.xsap.entity.TScheduleRecord;
 
 /**
@@ -25,16 +26,8 @@ public interface CourseScheduleConvert {
 	
 	/**
 	 * 
-	 * @param schedule	对应排课计划记录
-	 * @param course	对应课程实体类
-	 * @param emp	对应员工实体类
-	 * @param reserveDTO	对应预约记录
 	 * @return	CourseScheduleDTO。要展示的排课计划信息
 	 */
-	@Mapping(source = "course.name",target = "courseName")
-	@Mapping(source = "course.contains",target = "classNumbers")
-	@Mapping(source = "emp.name",target = "teacher")
-	@Mapping(target = "startTime",expression = "java (LocalDateTime.of(schedule.getStartDate(), schedule.getClassTime()))")
-	CourseScheduleDTO entity2Dto(TScheduleRecord schedule,TCourse course,TEmployee emp,ReserveRecordDTO reserveDTO);
+	CourseScheduleDTO entity2Dto();
 	
 }

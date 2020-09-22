@@ -19,7 +19,8 @@ public class EmployeeServiceImpl implements EmployeeService{
 	public TEmployee login(String userName, String pwd) {
 		return employeeMapper.findByNameAndPwd(userName,pwd);
 	}
-	//
+	
+	
 	@Override
 	public boolean register(TEmployee emp) {
 		//判断用户名是否已存在
@@ -30,10 +31,11 @@ public class EmployeeServiceImpl implements EmployeeService{
 			return false;
 		}
 		//新增用户信息
-		employeeMapper.save(emp);
+		employeeMapper.insert(emp);
 		return true;
 	}
 	
+	/* 待实现 */
 	@Override
 	public boolean forgetPassword(String phone) {
 		

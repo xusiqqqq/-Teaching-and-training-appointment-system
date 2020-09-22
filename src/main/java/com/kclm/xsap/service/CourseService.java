@@ -15,9 +15,9 @@ import com.kclm.xsap.entity.TCourse;
  */
 public interface CourseService {
 
-	boolean save(TCourse card);
+	boolean save(TCourse course);
 	
-	boolean deleteById(Integer id);
+	boolean deleteById(Long id);
 	
 	boolean update(TCourse course);
 	

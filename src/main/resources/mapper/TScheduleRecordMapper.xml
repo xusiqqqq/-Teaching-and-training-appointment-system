@@ -6,6 +6,7 @@
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="course_id" jdbcType="BIGINT" property="courseId" />
     <result column="teacher_id" jdbcType="BIGINT" property="teacherId" />
+    <result column="order_nums" jdbcType="INTEGER" property="orderNums" />
     <result column="start_date" jdbcType="DATE" property="startDate" />
     <result column="class_time" jdbcType="TIME" property="classTime" />
     <result column="limit_sex" jdbcType="VARCHAR" property="limitSex" />
@@ -37,6 +38,7 @@
 	    <result column="sex" jdbcType="VARCHAR" property="sex" />
 	    <result column="birthday" jdbcType="DATE" property="birthday" />
 	    <result column="introduce" jdbcType="VARCHAR" property="introduce" />
+	    <result column="avatar_url" jdbcType="VARCHAR" property="avatarUrl" />
 	    <result column="note" jdbcType="VARCHAR" property="note" />
 	    <result column="role_name" jdbcType="VARCHAR" property="roleName" />
 	    <result column="role_password" jdbcType="VARCHAR" property="rolePassword" />
@@ -49,7 +51,7 @@
   </resultMap>
   <sql id="TScheduleRecord_Column_List">
     <!--@mbg.generated-->
-    id, course_id, teacher_id, start_date, class_time, limit_sex, limit_age, create_time, 
+    id, course_id, teacher_id, order_nums, start_date, class_time, limit_sex, limit_age, create_time, 
     last_modify_time, version
   </sql>
   <sql id="course_sql">
@@ -57,7 +59,7 @@
     limit_counts, create_time, last_modify_time, version
   </sql>
   <sql id="employee_sql">
-  	id, `name`, phone, sex, birthday, introduce, note, role_name, role_password, role_type, 
+  	id, `name`, phone, sex, birthday, introduce, avatar_url, note, role_name, role_password, role_type, 
     is_deleted, create_time, last_modify_time, version
   </sql>
   

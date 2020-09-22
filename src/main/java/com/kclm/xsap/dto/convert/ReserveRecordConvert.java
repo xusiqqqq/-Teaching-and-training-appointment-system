@@ -29,18 +29,16 @@ public interface ReserveRecordConvert {
 	 * @param course	对应课程实体类
 	 * @param schedule	对应排课计划记录
 	 * @param member	对应会员实体类
-	 * @param card	对应会员卡实体类
 	 * @param reserve	对应预约记录
 	 * @return	ReserveRecordDTO。显示预约记录的信息
 	 */
 	@Mapping(source = "course.name",target = "courseName")
 	@Mapping(target = "classTime",expression = "java (LocalDateTime.of(schedule.getStartDate(), schedule.getClassTime()))")
 	@Mapping(source = "member.name",target = "memberName")
-	@Mapping(source = "card.name",target = "cardName")	
-	@Mapping(source = "reserve.orderNums",target = "reserveNumbers")
+	@Mapping(source = "schedule.orderNums",target = "reserveNumbers")
 	@Mapping(source = "reserve.createTime",target = "operateTime")
 	@Mapping(source = "reserve.note",target = "reserveNote")	
 	@Mapping(source = "reserve.status",target = "reserveStatus")	
-	ReserveRecordDTO entity2Dto(TCourse course,TScheduleRecord schedule,TMember member,TMemberCard card,TReservationRecord reserve);
+	ReserveRecordDTO entity2Dto(TCourse course,TScheduleRecord schedule,TMember member,TReservationRecord reserve);
 	
 }

@@ -18,10 +18,10 @@ public interface CourseScheduleService {
 
 	boolean save(TScheduleRecord schedule);
 	
-	boolean deleteById(Integer id);
+	boolean deleteById(Long id);
 
 	/**
-	 * 获取所有的排课记录
+	 * 获取给定的日期范围内所有的排课记录
 	 * @param startDate 起始日期
 	 * @param endDate 结束日期
 	 * @return List<TScheduleRecord>。团课排课记录结果集
@@ -33,6 +33,6 @@ public interface CourseScheduleService {
 	 * @param scheduleId 排课记录id
 	 * @return TScheduleRecord。排课记录
 	 */
-	CourseScheduleDTO findById(Integer scheduleId);
+	CourseScheduleDTO findById(Long scheduleId);
 	
 }

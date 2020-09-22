@@ -22,10 +22,8 @@ public interface HomePageConvert {
 	
 	/**
 	 * 
-	 * @param member	对应会员实体类
-	 * @param reserve	对应预约记录
 	 * @return	HomePageDTO。显示首页的统计数据
 	 */
-	HomePageDTO entity2Dto(TMember member,TReservationRecord reserve);
+	HomePageDTO entity2Dto();
 	
 }

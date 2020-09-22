@@ -9,7 +9,6 @@ import com.kclm.xsap.entity.TCourse;
 import com.kclm.xsap.targetdto.CourseConvert;
 import com.kclm.xsap.targetdto.CourseDTO;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /******************

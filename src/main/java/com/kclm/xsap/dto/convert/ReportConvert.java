@@ -22,10 +22,8 @@ public interface ReportConvert {
 	
 	/**
 	 * 
-	 * @param card	对应会员卡实体类
-	 * @param bindRecord	对应会员卡绑定记录
 	 * @return	ReportDTO。显示的报表信息
 	 */
-	ReportDTO entity2Dto(TMemberCard card,TMemberBindRecord bindRecord);
+	ReportDTO entity2Dto();
 	
 }

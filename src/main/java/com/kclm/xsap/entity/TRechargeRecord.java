@@ -21,12 +21,23 @@ public class TRechargeRecord extends BaseEntity implements Serializable{
 	/**
     * 关联的会员
     */
-	private Integer memberId;
+	private Long memberId;
 	/**
 	 *  封装会员实体数据
 	 */
 	@TableField(exist = false)
     private TMember member;
+	
+	/**
+	 *  用来封装会员卡实体
+	 */
+	@TableField(exist = false)
+	private TMemberCard card;
+	
+	/**
+	 * 关联的会员卡
+	 */
+	private Long cardId;
 	
     /**
     * 充值可用次数
@@ -43,6 +54,11 @@ public class TRechargeRecord extends BaseEntity implements Serializable{
     */
     private BigDecimal receivedMoney;
 
+    /**
+     * 操作员
+     */
+    private String operator;
+    
     private String note;
 
 }

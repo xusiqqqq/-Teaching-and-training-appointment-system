@@ -28,7 +28,6 @@ public interface ConsumeRecordConvert {
 	 */
 	@Mapping(source = "card.name",target = "cardName")
 	@Mapping(source = "consume.createTime",target = "operateTime")
-	@Mapping(source = "consume.createTime",target = "operateTime")	
 	ConsumeRecordDTO entity2Dto(TConsumeRecord consume,TMemberCard card);
 	
 }

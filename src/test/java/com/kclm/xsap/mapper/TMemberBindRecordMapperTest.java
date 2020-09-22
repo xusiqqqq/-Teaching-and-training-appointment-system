@@ -26,7 +26,7 @@ public class TMemberBindRecordMapperTest {
 	//增加一条记录
 		@Test
 		public void save() {
-		memberBind.setAddCount(2);
+		memberBind.setValidCount(2);
 		memberBind.setValidDay(2);
 		memberBind.setReceivedMoney(new BigDecimal(22.2));
 		memberBind.setNote("绑定++");
@@ -38,7 +38,7 @@ public class TMemberBindRecordMapperTest {
 		@Test
 		public void updateOne() {
 		memberBind = findById(1);
-		memberBind.setAddCount(33);
+		memberBind.setValidCount(33);
 		memberBind.setValidDay(33);
 		bindMapper.updateById(memberBind);
 		toPrint("更新", 1,null);

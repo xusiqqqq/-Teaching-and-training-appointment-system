@@ -22,7 +22,7 @@ public class TReservationRecord extends BaseEntity implements Serializable{
 	/**
     * 关联的排课记录
     */
-    private Integer scheduleId;
+    private Long scheduleId;
 	
     /**
 	 *  封装排课计划实体数据 
@@ -33,7 +33,7 @@ public class TReservationRecord extends BaseEntity implements Serializable{
     /**
      * 关联的会员
      */
-	private Integer memberId;
+	private Long memberId;
 	
 	/**
 	 *  封装会员实体数据
@@ -41,11 +41,11 @@ public class TReservationRecord extends BaseEntity implements Serializable{
 	@TableField(exist = false)
     private TMember member;
     
-    /**
-    * 预约人数
-    */
-    private Integer orderNums;
-
+	/**
+	 * 	由会员指定的会员卡进行预约
+	 */
+	private String cardName;
+	
     /**
     * 预约状态，1有效，0无效
     */

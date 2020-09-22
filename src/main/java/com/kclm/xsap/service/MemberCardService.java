@@ -2,6 +2,7 @@ package com.kclm.xsap.service;
 
 import java.util.List;
 
+import com.kclm.xsap.dto.MemberLogDTO;
 import com.kclm.xsap.entity.TConsumeRecord;
 import com.kclm.xsap.entity.TMemberCard;
 import com.kclm.xsap.entity.TMemberLog;
@@ -19,7 +20,7 @@ public interface MemberCardService {
 
 	boolean save(TMemberCard card);
 	
-	boolean deleteById(Integer id);
+	boolean deleteById(Long id);
 	
 	boolean update(TMemberCard card);
 	
@@ -39,27 +40,25 @@ public interface MemberCardService {
 	
 	/**
 	 *  会员卡充值操作
-	 * @param cardId 会员卡id
 	 * @param recharge 充值记录实体类
 	 * @return boolean。true：充值成功；false：充值失败
 	 */
-	boolean recharge(Integer cardId,TRechargeRecord recharge);
+	boolean recharge(TRechargeRecord recharge);
+	
 	
 	/**
 	 *  会员卡消费操作
-	 * @param cardId 会员卡id
 	 * @param consume 消费记录实体类
 	 * @return boolean。true：消费完成；false：消费异常
 	 */
-	boolean consume(Integer cardId,TConsumeRecord consume);
+	boolean consume(TConsumeRecord consume);
 	
 	/**
 	 * 分页查询。获取当前会员卡的所有操作记录
+	 * @param memberId 会员id
 	 * @param cardId 会员卡id
-	 * @param currentPage 当前页码
-	 * @param pageSize 每页展示数据个数
 	 * @return List<TMemberLog>。会员卡操作记录结果集
 	 */
-	List<TMemberLog> listOperateLog(Integer cardId,Integer currentPage,Integer pageSize);
+	List<MemberLogDTO> listOperateLog(Long memberId,Long cardId);
 	
 }

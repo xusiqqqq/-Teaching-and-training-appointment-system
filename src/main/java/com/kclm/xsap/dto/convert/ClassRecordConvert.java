@@ -32,7 +32,7 @@ public interface ClassRecordConvert {
 	 * @return ClassRecordDTO。上课记录要展示的信息
 	 */
 	@Mapping(source = "card.name",target = "cardName")
-	@Mapping(source = "classRecord.orderNums",target = "reserveNumbers")
+	@Mapping(source = "schedule.orderNums",target = "reserveNumbers")
 	@Mapping(source = "classRecord.note",target = "reserveNote")
 	@Mapping(target = "classTime",expression = "java (LocalDateTime.of(schedule.getStartDate(),schedule.getClassTime() ))")
 	ClassRecordDTO entity2Dto(TReservationRecord classRecord,TCourse course,TScheduleRecord schedule,TMemberCard card);

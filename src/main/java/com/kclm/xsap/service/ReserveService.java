@@ -19,20 +19,18 @@ public interface ReserveService {
 	boolean save(TReservationRecord reserve);
 	
 	/**
-	 * 分页查询。获取当前排课的预约记录
+	 * 获取当前排课的预约记录
 	 * @param scheduleId 排课记录id
-	 * @param currentPage 当前页码
-	 * @param pageSize 每页展示数据个数
 	 * @return List<ReserveRecordDTO>。预约记录结果集
 	 */
-	List<ReserveRecordDTO> listReserveRecords(Integer scheduleId,Integer currentPage,Integer pageSize);
+	List<ReserveRecordDTO> listReserveRecords(Long scheduleId);
 	
 	/**
 	 * 导出当前排课的预约记录
 	 * @param scheduleId 排课记录id
 	 * @return List<ReserveRecordDTO>。预约记录结果集
 	 */
-	List<ReserveRecordDTO> listExportRecord(Integer scheduleId);
+	List<ReserveRecordDTO> listExportRecord(Long scheduleId);
 
 	/**
 	 * 获取指定时间段的预约记录

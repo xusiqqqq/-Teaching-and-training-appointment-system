@@ -2,9 +2,8 @@ package com.kclm.xsap.service;
 
 import java.util.List;
 
-import com.kclm.xsap.dto.ReserveRecordDTO;
+import com.kclm.xsap.dto.ClassRecordDTO;
 import com.kclm.xsap.entity.TEmployee;
-import com.kclm.xsap.entity.TReservationRecord;
 
 /**
  * 
@@ -18,7 +17,7 @@ public interface TeacherService {
 
 	boolean save(TEmployee emp);
 
-	boolean deleteById(Integer id);
+	boolean deleteById(Long id);
 	
 	boolean update(TEmployee emp);
 	
@@ -41,12 +40,12 @@ public interface TeacherService {
 	 * @param id 教职员工id
 	 * @return TEmployee。教师信息
 	 */
-	TEmployee getAnalysis(Integer id);
+	TEmployee getAnalysis(Long id);
 	
 	/**
 	 *  当前教师的上课记录
-	 * @param id 上课记录id
-	 * @return List<ReserveRecordDTO>。上课记录结果集
+	 * @param id 教职员工id
+	 * @return List<ClassRecordDTO>。上课记录结果集
 	 */
-	List<ReserveRecordDTO> listClassRecord(Integer id);
+	List<ClassRecordDTO> listClassRecord(Long id);
 }

@@ -6,7 +6,7 @@
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="member_id" jdbcType="BIGINT" property="memberId" />
     <result column="card_id" jdbcType="BIGINT" property="cardId" />
-    <result column="add_count" jdbcType="INTEGER" property="addCount" />
+    <result column="valid_count" jdbcType="INTEGER" property="validCount" />
     <result column="valid_day" jdbcType="INTEGER" property="validDay" />
     <result column="received_money" jdbcType="DECIMAL" property="receivedMoney" />
     <result column="note" jdbcType="VARCHAR" property="note" />
@@ -49,7 +49,7 @@
   </resultMap>
   <sql id="TMemberBindRecord_Column_List">
     <!--@mbg.generated-->
-    id, member_id, card_id, add_count, valid_day, received_money, note, create_time, 
+    id, member_id, card_id, valid_count, valid_day, received_money, note, create_time, 
     last_modify_time, version
   </sql>
   <sql id="member_sql">
