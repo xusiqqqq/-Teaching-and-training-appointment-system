@@ -28,26 +28,29 @@ CREATE TABLE `t_consume_record` (
   `operator` varchar(50) DEFAULT NULL COMMENT '操作员',
   `note` varchar(255) DEFAULT NULL,
   `member_id` bigint(20) unsigned DEFAULT NULL COMMENT '会员id',
+  `card_id` bigint(20) unsigned DEFAULT NULL COMMENT '会员卡id',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
   `last_modify_time` datetime DEFAULT NULL COMMENT '修改时间',
   `version` int(10) unsigned DEFAULT '1' COMMENT '版本',
   PRIMARY KEY (`id`),
+  KEY `fk_consume_card_id` (`card_id`),
   KEY `fk_consume_member_id` (`member_id`),
-  CONSTRAINT `fk_consume_member_id` FOREIGN KEY (`member_id`) REFERENCES `t_member` (`id`)
+  CONSTRAINT `fk_consume_card_id` FOREIGN KEY (`card_id`) REFERENCES `t_member_bind_record` (`card_id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `fk_consume_member_id` FOREIGN KEY (`member_id`) REFERENCES `t_member_bind_record` (`member_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 COMMENT='消费记录';
 
 /*Data for the table `t_consume_record` */
 
-insert  into `t_consume_record`(`id`,`operate_type`,`card_count_change`,`card_day_change`,`operator`,`note`,`member_id`,`create_time`,`last_modify_time`,`version`) values 
-(1,'首次绑卡',10,2,'企鹅',NULL,1,NULL,NULL,NULL),
-(2,'扣款',5,3,'海鸥',NULL,1,NULL,NULL,NULL),
-(3,'扣款',3,3,'海豚',NULL,2,NULL,NULL,NULL),
-(4,'扣款',4,4,'海豚',NULL,NULL,NULL,NULL,1),
-(5,'扣款',5,5,'海鸥',NULL,NULL,NULL,NULL,1),
-(6,'扣款',6,6,'企鹅',NULL,NULL,NULL,NULL,1),
-(7,'扣款',7,7,'海鸥',NULL,NULL,NULL,NULL,1),
-(8,'扣款',8,8,'企鹅',NULL,NULL,NULL,NULL,1),
-(9,'扣款',9,9,'企鹅',NULL,NULL,NULL,NULL,1);
+insert  into `t_consume_record`(`id`,`operate_type`,`card_count_change`,`card_day_change`,`operator`,`note`,`member_id`,`card_id`,`create_time`,`last_modify_time`,`version`) values 
+(1,'首次绑卡',10,2,'企鹅',NULL,1,NULL,NULL,NULL,NULL),
+(2,'扣款',5,3,'海鸥',NULL,1,NULL,NULL,NULL,NULL),
+(3,'扣款',3,3,'海豚',NULL,2,NULL,NULL,NULL,NULL),
+(4,'扣款',4,4,'海豚',NULL,NULL,NULL,NULL,NULL,1),
+(5,'扣款',5,5,'海鸥',NULL,NULL,NULL,NULL,NULL,1),
+(6,'扣款',6,6,'企鹅',NULL,NULL,NULL,NULL,NULL,1),
+(7,'扣款',7,7,'海鸥',NULL,NULL,NULL,NULL,NULL,1),
+(8,'扣款',8,8,'企鹅',NULL,NULL,NULL,NULL,NULL,1),
+(9,'扣款',9,9,'企鹅',NULL,NULL,NULL,NULL,NULL,1);
 
 /*Table structure for table `t_course` */
 
@@ -208,7 +211,7 @@ CREATE TABLE `t_member_bind_record` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `member_id` bigint(20) unsigned DEFAULT NULL,
   `card_id` bigint(20) unsigned DEFAULT NULL,
-  `add_count` int(10) unsigned DEFAULT NULL COMMENT '充值可使用次数',
+  `valid_count` int(10) unsigned DEFAULT NULL COMMENT '可使用次数',
   `valid_day` int(10) unsigned DEFAULT NULL COMMENT '有效期，按天算',
   `received_money` decimal(10,2) unsigned DEFAULT NULL COMMENT '实收金额',
   `note` varchar(255) DEFAULT NULL,
@@ -224,7 +227,7 @@ CREATE TABLE `t_member_bind_record` (
 
 /*Data for the table `t_member_bind_record` */
 
-insert  into `t_member_bind_record`(`id`,`member_id`,`card_id`,`add_count`,`valid_day`,`received_money`,`note`,`create_time`,`last_modify_time`,`version`) values 
+insert  into `t_member_bind_record`(`id`,`member_id`,`card_id`,`valid_count`,`valid_day`,`received_money`,`note`,`create_time`,`last_modify_time`,`version`) values 
 (1,1,1,33,33,500.00,'绑定1',NULL,NULL,NULL),
 (2,1,3,5,5,400.00,'绑定2',NULL,NULL,NULL),
 (3,2,1,65,6,300.00,'绑定3',NULL,NULL,NULL),
@@ -245,7 +248,7 @@ CREATE TABLE `t_member_card` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(50) DEFAULT NULL,
   `price` decimal(10,2) unsigned DEFAULT NULL,
-  `describe` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '描述信息',
+  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '描述信息',
   `note` varchar(255) DEFAULT NULL COMMENT '备注信息',
   `type` varchar(10) DEFAULT NULL COMMENT '会员卡类型',
   `total_count` int(10) unsigned DEFAULT NULL COMMENT '总可用次数',
@@ -259,8 +262,8 @@ CREATE TABLE `t_member_card` (
 
 /*Data for the table `t_member_card` */
 
-insert  into `t_member_card`(`id`,`name`,`price`,`describe`,`note`,`type`,`total_count`,`total_day`,`status`,`create_time`,`last_modify_time`,`version`) values 
-(1,'一对一',240.00,'12课时','卡1','无限次',10,2,1,NULL,NULL,NULL),
+insert  into `t_member_card`(`id`,`name`,`price`,`description`,`note`,`type`,`total_count`,`total_day`,`status`,`create_time`,`last_modify_time`,`version`) values 
+(1,'12课时一对一',240.00,'网课','卡1','无限次',10,2,1,NULL,NULL,NULL),
 (2,'6人小班',100.00,'30课时','卡2','100次',14,4,0,NULL,NULL,NULL),
 (3,'15人大班',99.00,'32课时','卡3','99次',32,4,1,NULL,NULL,NULL),
 (4,'12人',333.33,'18课时','note-4','无限次',NULL,NULL,0,NULL,NULL,1),
@@ -277,28 +280,32 @@ DROP TABLE IF EXISTS `t_member_log`;
 CREATE TABLE `t_member_log` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `type` varchar(10) DEFAULT NULL COMMENT '操作类型',
+  `involve_money` decimal(10,2) DEFAULT NULL COMMENT '影响的金额',
   `operator` varchar(50) DEFAULT NULL COMMENT '操作员名称',
   `member_id` bigint(20) unsigned DEFAULT NULL COMMENT '会员id',
+  `card_id` bigint(20) unsigned DEFAULT NULL COMMENT '会员卡id',
   `create_time` datetime DEFAULT NULL,
   `last_modify_time` datetime DEFAULT NULL,
   `version` int(10) unsigned DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `fk_log_member_id` (`member_id`),
-  CONSTRAINT `fk_log_member_id` FOREIGN KEY (`member_id`) REFERENCES `t_member` (`id`)
+  KEY `fk_log_card_id` (`card_id`),
+  CONSTRAINT `fk_log_card_id` FOREIGN KEY (`card_id`) REFERENCES `t_member_bind_record` (`card_id`),
+  CONSTRAINT `fk_log_member_id` FOREIGN KEY (`member_id`) REFERENCES `t_member_bind_record` (`member_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 COMMENT='操作记录';
 
 /*Data for the table `t_member_log` */
 
-insert  into `t_member_log`(`id`,`type`,`operator`,`member_id`,`create_time`,`last_modify_time`,`version`) values 
-(1,'充值','企鹅',1,NULL,NULL,NULL),
-(2,'充值','企鹅',1,NULL,NULL,NULL),
-(3,'充值','海豚',2,NULL,NULL,NULL),
-(4,'扣费','企鹅',3,NULL,NULL,NULL),
-(5,'扣费','海鸥',NULL,NULL,NULL,1),
-(6,'扣费','海鸥',NULL,NULL,NULL,1),
-(7,'扣费','海鸥',NULL,NULL,NULL,1),
-(8,'扣费','海鸥',NULL,NULL,NULL,1),
-(9,'充值','海豚',NULL,NULL,NULL,1);
+insert  into `t_member_log`(`id`,`type`,`involve_money`,`operator`,`member_id`,`card_id`,`create_time`,`last_modify_time`,`version`) values 
+(1,'充值',NULL,'企鹅',1,NULL,NULL,NULL,NULL),
+(2,'充值',NULL,'企鹅',1,NULL,NULL,NULL,NULL),
+(3,'充值',NULL,'海豚',2,NULL,NULL,NULL,NULL),
+(4,'扣费',NULL,'企鹅',3,NULL,NULL,NULL,NULL),
+(5,'扣费',NULL,'海鸥',NULL,NULL,NULL,NULL,1),
+(6,'扣费',NULL,'海鸥',NULL,NULL,NULL,NULL,1),
+(7,'扣费',NULL,'海鸥',NULL,NULL,NULL,NULL,1),
+(8,'扣费',NULL,'海鸥',NULL,NULL,NULL,NULL,1),
+(9,'充值',NULL,'海豚',NULL,NULL,NULL,NULL,1);
 
 /*Table structure for table `t_recharge_record` */
 
@@ -309,28 +316,32 @@ CREATE TABLE `t_recharge_record` (
   `add_count` int(10) unsigned DEFAULT NULL COMMENT '充值可用次数',
   `add_day` int(10) unsigned DEFAULT NULL COMMENT '延长有效天数',
   `received_money` decimal(10,2) unsigned DEFAULT NULL COMMENT '实收金额',
+  `operator` varchar(50) DEFAULT NULL COMMENT '操作员',
   `note` varchar(255) DEFAULT NULL,
   `member_id` bigint(20) unsigned DEFAULT NULL COMMENT '会员id',
+  `card_id` bigint(20) unsigned DEFAULT NULL COMMENT '会员卡id',
   `create_time` datetime DEFAULT NULL,
   `last_modify_time` datetime DEFAULT NULL,
   `version` int(10) unsigned DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `fk_charge_member_id` (`member_id`),
-  CONSTRAINT `fk_charge_member_id` FOREIGN KEY (`member_id`) REFERENCES `t_member` (`id`)
+  KEY `fk_charge_card_id` (`card_id`),
+  CONSTRAINT `fk_charge_card_id` FOREIGN KEY (`card_id`) REFERENCES `t_member_bind_record` (`card_id`),
+  CONSTRAINT `fk_charge_member_id` FOREIGN KEY (`member_id`) REFERENCES `t_member_bind_record` (`member_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 COMMENT='充值记录';
 
 /*Data for the table `t_recharge_record` */
 
-insert  into `t_recharge_record`(`id`,`add_count`,`add_day`,`received_money`,`note`,`member_id`,`create_time`,`last_modify_time`,`version`) values 
-(1,3,3,33.00,NULL,1,NULL,NULL,NULL),
-(2,2,2,22.00,NULL,2,NULL,NULL,NULL),
-(3,1,1,11.00,NULL,3,NULL,NULL,NULL),
-(4,4,4,44.00,NULL,2,NULL,NULL,NULL),
-(5,5,5,55.00,'note-5',NULL,NULL,NULL,1),
-(6,6,6,66.00,'note-6',NULL,NULL,NULL,1),
-(7,7,7,77.00,'note-7',NULL,NULL,NULL,1),
-(8,8,8,88.00,'note-8',NULL,NULL,NULL,1),
-(9,9,9,99.00,'note-9',NULL,NULL,NULL,1);
+insert  into `t_recharge_record`(`id`,`add_count`,`add_day`,`received_money`,`operator`,`note`,`member_id`,`card_id`,`create_time`,`last_modify_time`,`version`) values 
+(1,3,3,33.00,NULL,NULL,1,NULL,NULL,NULL,NULL),
+(2,2,2,22.00,NULL,NULL,2,NULL,NULL,NULL,NULL),
+(3,1,1,11.00,NULL,NULL,3,NULL,NULL,NULL,NULL),
+(4,4,4,44.00,NULL,NULL,2,NULL,NULL,NULL,NULL),
+(5,5,5,55.00,NULL,'note-5',NULL,NULL,NULL,NULL,1),
+(6,6,6,66.00,NULL,'note-6',NULL,NULL,NULL,NULL,1),
+(7,7,7,77.00,NULL,'note-7',NULL,NULL,NULL,NULL,1),
+(8,8,8,88.00,NULL,'note-8',NULL,NULL,NULL,NULL,1),
+(9,9,9,99.00,NULL,'note-9',NULL,NULL,NULL,NULL,1);
 
 /*Table structure for table `t_reservation_record` */
 
@@ -338,12 +349,12 @@ DROP TABLE IF EXISTS `t_reservation_record`;
 
 CREATE TABLE `t_reservation_record` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `order_nums` int(10) unsigned DEFAULT NULL COMMENT '预约人数',
   `status` tinyint(1) unsigned DEFAULT '0' COMMENT '预约状态，1有效，0无效',
   `comment` varchar(255) DEFAULT NULL COMMENT '教师评语',
   `note` varchar(255) DEFAULT NULL,
   `operator` varchar(50) DEFAULT NULL COMMENT '操作员',
   `member_id` bigint(20) unsigned DEFAULT NULL COMMENT '会员id',
+  `card_name` varchar(50) DEFAULT NULL COMMENT '会员指定的会员卡来预约',
   `schedule_id` bigint(20) unsigned DEFAULT NULL COMMENT '排课记录id',
   `create_time` datetime DEFAULT NULL,
   `last_modify_time` datetime DEFAULT NULL,
@@ -357,16 +368,16 @@ CREATE TABLE `t_reservation_record` (
 
 /*Data for the table `t_reservation_record` */
 
-insert  into `t_reservation_record`(`id`,`order_nums`,`status`,`comment`,`note`,`operator`,`member_id`,`schedule_id`,`create_time`,`last_modify_time`,`version`) values 
-(1,12,1,NULL,NULL,'海豚',1,1,NULL,NULL,NULL),
-(2,11,1,NULL,NULL,'企鹅',1,2,NULL,NULL,NULL),
-(3,7,1,NULL,NULL,'企鹅',2,3,NULL,NULL,NULL),
-(4,4,0,NULL,NULL,'海豚',3,1,NULL,NULL,NULL),
-(5,5,0,'不错','note-5','海鸥',NULL,NULL,NULL,NULL,1),
-(6,6,0,'不错','note-6','海鸥',NULL,NULL,NULL,NULL,1),
-(7,7,0,'不错','note-7','海鸥',NULL,NULL,NULL,NULL,1),
-(8,8,0,'不错','note-8','海鸥',NULL,NULL,NULL,NULL,1),
-(9,9,0,'不错','note-9','海鸥',NULL,NULL,NULL,NULL,1);
+insert  into `t_reservation_record`(`id`,`status`,`comment`,`note`,`operator`,`member_id`,`card_name`,`schedule_id`,`create_time`,`last_modify_time`,`version`) values 
+(1,1,NULL,NULL,'海豚',1,NULL,1,'2020-09-22 03:27:17',NULL,NULL),
+(2,1,NULL,NULL,'企鹅',1,NULL,2,'2020-09-22 03:27:29',NULL,NULL),
+(3,1,NULL,NULL,'企鹅',2,NULL,3,'2020-09-22 03:27:33',NULL,NULL),
+(4,0,NULL,NULL,'海豚',3,NULL,1,NULL,NULL,NULL),
+(5,0,'不错','note-5','海鸥',NULL,NULL,NULL,NULL,NULL,1),
+(6,0,'不错','note-6','海鸥',NULL,NULL,NULL,NULL,NULL,1),
+(7,0,'不错','note-7','海鸥',NULL,NULL,NULL,NULL,NULL,1),
+(8,0,'不错','note-8','海鸥',NULL,NULL,NULL,NULL,NULL,1),
+(9,0,'不错','note-9','海鸥',NULL,NULL,NULL,NULL,NULL,1);
 
 /*Table structure for table `t_schedule_record` */
 
@@ -376,6 +387,7 @@ CREATE TABLE `t_schedule_record` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `course_id` bigint(20) unsigned DEFAULT NULL COMMENT '课程号',
   `teacher_id` bigint(20) unsigned DEFAULT NULL COMMENT '教师号',
+  `order_nums` int(10) unsigned DEFAULT '0' COMMENT '此项排课的预约人数',
   `start_date` date DEFAULT NULL COMMENT '上课日期',
   `class_time` time DEFAULT NULL COMMENT '上课时间',
   `limit_sex` varchar(6) DEFAULT NULL COMMENT '限制性别',
@@ -392,16 +404,16 @@ CREATE TABLE `t_schedule_record` (
 
 /*Data for the table `t_schedule_record` */
 
-insert  into `t_schedule_record`(`id`,`course_id`,`teacher_id`,`start_date`,`class_time`,`limit_sex`,`limit_age`,`create_time`,`last_modify_time`,`version`) values 
-(1,1,1,'2020-09-08','09:00:45',NULL,NULL,NULL,NULL,NULL),
-(2,3,1,'2020-09-04','09:00:33',NULL,NULL,NULL,NULL,NULL),
-(3,2,2,'2020-09-08','09:00:44',NULL,NULL,NULL,NULL,NULL),
-(4,1,2,'2020-09-09','14:00:55',NULL,NULL,NULL,NULL,NULL),
-(5,1,2,'2020-09-09','15:30:00',NULL,NULL,NULL,NULL,NULL),
-(6,NULL,NULL,'2020-09-11','14:40:00','男',8,NULL,NULL,1),
-(7,NULL,NULL,'2020-09-02','14:30:00','男',7,NULL,NULL,1),
-(8,NULL,NULL,'2020-09-12','14:10:00','男',6,NULL,NULL,1),
-(9,NULL,NULL,'2020-09-14','11:40:00','女',9,NULL,NULL,1);
+insert  into `t_schedule_record`(`id`,`course_id`,`teacher_id`,`order_nums`,`start_date`,`class_time`,`limit_sex`,`limit_age`,`create_time`,`last_modify_time`,`version`) values 
+(1,1,1,34,'2020-09-08','09:00:45',NULL,NULL,NULL,NULL,NULL),
+(2,3,1,28,'2020-09-04','09:00:33',NULL,NULL,NULL,NULL,NULL),
+(3,2,2,45,'2020-09-08','09:00:44',NULL,NULL,NULL,NULL,NULL),
+(4,1,2,21,'2020-09-09','14:00:55',NULL,NULL,NULL,NULL,NULL),
+(5,1,2,7,'2020-09-09','15:30:00',NULL,NULL,NULL,NULL,NULL),
+(6,NULL,NULL,5,'2020-09-11','14:40:00','男',8,NULL,NULL,1),
+(7,NULL,NULL,3,'2020-09-02','14:30:00','男',7,NULL,NULL,1),
+(8,NULL,NULL,43,'2020-09-12','14:10:00','男',6,NULL,NULL,1),
+(9,NULL,NULL,8,'2020-09-14','11:40:00','女',9,NULL,NULL,1);
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
