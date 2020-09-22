@@ -22,7 +22,7 @@ public interface MemberService {
 	
 	boolean save(TMember member);
 	
-	boolean deleteById(Integer id);
+	boolean deleteById(Long id);
 	
 	boolean update(TMember member);
 	
@@ -31,7 +31,7 @@ public interface MemberService {
 	 * @param id
 	 * @return MemberDTO
 	 */
-	MemberDTO getMemberDetailById(Integer id);
+	MemberDTO getMemberDetailById(Long id);
 	
 	
 	/**
@@ -77,40 +77,32 @@ public interface MemberService {
 	boolean bindByBunble(String filePath);
 	
 	/**
-	 * 分页查询。当前会员绑定的所有会员卡信息
+	 * 当前会员绑定的所有会员卡信息
 	 * @param id 会员绑定记录id
-	 * @param currentPage 当前页码
-	 * @param pageSize 每页展示数据个数
 	 * @return List<MemberCardDTO>。会员绑定记录结果集
 	 */
-	List<MemberCardDTO> findAllCardByPage(Integer id,Integer currentPage,Integer pageSize);
+	List<MemberCardDTO> findAllCardByPage(Long id);
 
 	/**
-	 * 分页查询。当前会员的上课记录
+	 * 当前会员的上课记录
 	 * @param id 预约记录id。当预约状态为“已预约”时，则此预约记录表示上课记录
-	 * @param currentPage 当前页码
-	 * @param pageSize 每页展示数据个数
 	 * @return List<ClassRecordDTO>。上课记录结果集
 	 */
-	List<ClassRecordDTO> listClassRecords(Integer id,Integer currentPage,Integer pageSize);
+	List<ClassRecordDTO> listClassRecords(Long id);
 	
 	/**
-	 * 分页查询。当前会员的预约记录
+	 * 当前会员的预约记录
 	 * @param id 预约记录id
-	 * @param currentPage 当前页码
-	 * @param pageSize 每页展示数据个数
 	 * @return List<ReserveRecordDTO>。预约记录结果集
 	 */
-	List<ReserveRecordDTO> listReserveRecords(Integer id,Integer currentPage,Integer pageSize);
+	List<ReserveRecordDTO> listReserveRecords(Long id);
 	
 	/**
-	 * 分页查询。当前会员的消费记录
+	 * 当前会员的消费记录
 	 * @param id 消费记录id
-	 * @param currentPage 当前页码
-	 * @param pageSize 每页展示数据个数
 	 * @return List<ConsumeRecordDTO>。消费记录结果集
 	 */
-	List<ConsumeRecordDTO> listConsumeRecord(Integer id,Integer currentPage,Integer pageSize);
+	List<ConsumeRecordDTO> listConsumeRecord(Long id);
 	
 	
 }

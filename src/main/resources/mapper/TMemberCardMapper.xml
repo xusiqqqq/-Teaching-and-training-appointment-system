@@ -15,6 +15,7 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
     <result column="version" jdbcType="INTEGER" property="version" />
+    <!-- 关联的课程 -->
     <collection property="courseList" ofType="TCourse">
     	<id column="course_id" jdbcType="BIGINT" property="id" />
 	    <result column="course_name" jdbcType="VARCHAR" property="name" />

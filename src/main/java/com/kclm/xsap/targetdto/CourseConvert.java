@@ -4,11 +4,14 @@
 
 package com.kclm.xsap.targetdto;
 
-import com.kclm.xsap.entity.TCourse;
+import org.apache.logging.log4j.core.pattern.ConverterKeys;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
+import org.springframework.stereotype.Component;
+
+import com.kclm.xsap.entity.TCourse;
 
 /******************
  * @Author yejf
@@ -19,7 +22,7 @@ import org.mapstruct.factory.Mappers;
 @Mapper
 public interface CourseConvert {
 
-    CourseConvert INSTANCE = Mappers.getMapper(CourseConvert.class);
+	CourseConvert INSTANCE = Mappers.getMapper(CourseConvert.class);
 
     @Mapping(source = "name", target = "courseName")
     CourseDTO entity2Dto(TCourse course);

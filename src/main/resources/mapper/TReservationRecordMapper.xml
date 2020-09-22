@@ -4,12 +4,12 @@
   <resultMap id="TReservationRecordMap" type="com.kclm.xsap.entity.TReservationRecord">
     <!--@mbg.generated-->
     <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="order_nums" jdbcType="INTEGER" property="orderNums" />
     <result column="status" jdbcType="BOOLEAN" property="status" />
     <result column="comment" jdbcType="VARCHAR" property="comment" />
     <result column="note" jdbcType="VARCHAR" property="note" />
     <result column="operator" jdbcType="VARCHAR" property="operator" />
     <result column="member_id" jdbcType="BIGINT" property="memberId" />
+    <result column="card_name" jdbcType="VARCHAR" property="cardName" />
     <result column="schedule_id" jdbcType="BIGINT" property="scheduleId" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
@@ -33,6 +33,7 @@
     	<id column="schedule_id" jdbcType="BIGINT" property="id" />
 	    <result column="course_id" jdbcType="BIGINT" property="courseId" />
 	    <result column="teacher_id" jdbcType="BIGINT" property="teacherId" />
+	    <result column="order_nums" jdbcType="INTEGER" property="orderNums" />
 	    <result column="start_date" jdbcType="DATE" property="startDate" />
 	    <result column="class_time" jdbcType="TIME" property="classTime" />
 	    <result column="limit_sex" jdbcType="VARCHAR" property="limitSex" />
@@ -44,7 +45,7 @@
   </resultMap>
   <sql id="TReservationRecord_Column_List">
     <!--@mbg.generated-->
-    id, order_nums, `status`, `comment`, note, `operator`, member_id, schedule_id, create_time, 
+    id,  `status`, `comment`, note, `operator`, member_id, card_name, schedule_id, create_time, 
     last_modify_time, version
   </sql>
   <sql id="member_sql">
@@ -52,7 +53,7 @@
     version
   </sql>
   <sql id="schedule_sql">
-  	id, course_id, teacher_id, start_date, class_time, limit_sex, limit_age, create_time, 
+  	id, course_id, teacher_id, order_nums, start_date, class_time, limit_sex, limit_age, create_time, 
     last_modify_time, version
   </sql>
   

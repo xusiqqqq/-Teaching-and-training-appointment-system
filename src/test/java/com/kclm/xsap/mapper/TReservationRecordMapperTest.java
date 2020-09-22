@@ -25,7 +25,6 @@ public class TReservationRecordMapperTest {
 	//增加一条记录
 		@Test
 		public void save() {
-		reserve.setOrderNums(5);
 		reserve.setComment("优秀");
 		reserve.setOperator("北极熊");
 		reserve.setNote("note-1");
@@ -37,7 +36,6 @@ public class TReservationRecordMapperTest {
 		@Test
 		public void updateOne() {
 		reserve = findById(1);
-		reserve.setOrderNums(2);
 		reserve.setComment("杰出");
 		reserve.setOperator("北极熊");
 		reserve.setNote("note-2");

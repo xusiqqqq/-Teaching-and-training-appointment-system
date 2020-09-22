@@ -30,7 +30,7 @@ public class ReserveRecordDTO extends BaseDTO{
 	/**
 	 * 会员名
 	 */
-	private String member;
+	private String memberName;
 	
 	/**
 	 * 手机号

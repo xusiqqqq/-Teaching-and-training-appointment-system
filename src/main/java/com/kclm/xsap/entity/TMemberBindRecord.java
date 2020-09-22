@@ -22,7 +22,7 @@ public class TMemberBindRecord extends BaseEntity implements Serializable{
 	/**
 	 * 关联的会员
 	 */
-	private Integer memberId;
+	private Long memberId;
 	/**
 	 *  用来封装会员的实体数据
 	 */
@@ -32,7 +32,7 @@ public class TMemberBindRecord extends BaseEntity implements Serializable{
     /**
      * 关联的会员卡
      */
-	private Integer cardId;
+	private Long cardId;
 	/**
 	 *  用来封装会员卡的实体数据
 	 */
@@ -41,9 +41,9 @@ public class TMemberBindRecord extends BaseEntity implements Serializable{
 
 	
     /**
-    * 充值可使用次数
+    * 可使用次数
     */
-    private Integer addCount;
+    private Integer validCount;
 
     /**
     * 充值有效期，按天算

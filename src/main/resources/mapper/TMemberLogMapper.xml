@@ -5,8 +5,10 @@
     <!--@mbg.generated-->
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="involve_money" jdbcType="DECIMAL" property="involveMoney" />
     <result column="operator" jdbcType="VARCHAR" property="operator" />
     <result column="member_id" jdbcType="BIGINT" property="memberId" />
+    <result column="card_id" jdbcType="BIGINT" property="cardId" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
     <result column="version" jdbcType="INTEGER" property="version" />
@@ -23,10 +25,25 @@
 	    <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
 	    <result column="version" jdbcType="INTEGER" property="version" />
     </association>
+    
+    <association property="card" javaType="TMemberCard">
+	    <id column="card_id" jdbcType="BIGINT" property="id" />
+	    <result column="card_name" jdbcType="VARCHAR" property="name" />
+	    <result column="price" jdbcType="DECIMAL" property="price" />
+	    <result column="description" jdbcType="VARCHAR" property="desc" />
+	    <result column="card_note" jdbcType="VARCHAR" property="note" />
+	    <result column="type" jdbcType="VARCHAR" property="type" />
+	    <result column="total_count" jdbcType="INTEGER" property="totalCount" />
+	    <result column="total_day" jdbcType="INTEGER" property="totalDay" />
+	    <result column="status" jdbcType="BOOLEAN" property="status" />
+	    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+	    <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
+	    <result column="version" jdbcType="INTEGER" property="version" />
+    </association>
   </resultMap>
   <sql id="TMemberLog_Column_List">
     <!--@mbg.generated-->
-    id, `type`, `operator`, member_id, create_time, last_modify_time, version
+    id, `type`,involve_money, `operator`, member_id, create_time, last_modify_time, version
   </sql>
   
 </mapper>

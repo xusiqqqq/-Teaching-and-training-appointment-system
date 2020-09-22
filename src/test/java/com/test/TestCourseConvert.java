@@ -20,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest(classes = XsapApplication.class)
 public class TestCourseConvert {
 
+	
     @Test
     public void testConvert() {
         //create Entity

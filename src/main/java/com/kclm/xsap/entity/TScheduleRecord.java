@@ -24,7 +24,7 @@ public class TScheduleRecord extends BaseEntity implements Serializable{
 	/**
     * 关联的课程
     */
-	private Integer courseId;
+	private Long courseId;
 	
 	/**
 	 *  封装课程实体数据
@@ -35,7 +35,7 @@ public class TScheduleRecord extends BaseEntity implements Serializable{
     /**
     * 关联的教师
     */
-    private Integer teacherId;
+    private Long teacherId;
     
     /**
      *  封装教师实体数据
@@ -43,6 +43,11 @@ public class TScheduleRecord extends BaseEntity implements Serializable{
     @TableField(exist = false)
     private TEmployee employee;
 
+    /**
+     * 预约人数
+     */
+     private Integer orderNums;
+    
     /**
     * 上课日期
     */

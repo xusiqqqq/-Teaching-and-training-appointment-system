@@ -10,19 +10,14 @@ import lombok.EqualsAndHashCode;
  * 
  * @author harima
  * @since JDK11.0
- * @CreateDate 2020年9月17日 下午4:21:42 
- * @description 此类用来描述了消费记录
+ * @CreateDate 2020年9月22日 上午4:33:37 
+ * @description 此类用来描述了会员卡对应的操作信息
  *
  */
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class ConsumeRecordDTO extends BaseDTO{
+public class MemberLogDTO extends BaseDTO {
 
-	/**
-	 * 会员卡名
-	 */
-	private String cardName;
-	
 	/**
 	 * 操作时间
 	 */
@@ -34,32 +29,32 @@ public class ConsumeRecordDTO extends BaseDTO{
 	private String operateType;
 	
 	/**
-	 * 卡次变化
+	 * 剩余可用次数
 	 */
-	private Integer cardCountChange;
+	private Integer validTimes;
 	
 	/**
-	 * 有效天数变化
+	 * 卡到期日
 	 */
-	private Integer cardDayChange;
+	private LocalDateTime endToDate; 
 	
 	/**
-	 * 单价
+	 * 金额
 	 */
-	private BigDecimal price;
+	private BigDecimal involveMoney;
 	
 	/**
-	 * 操作员
+	 * 操作人
 	 */
 	private String operator;
 	
 	/**
-	 * 备注
+	 * 会员卡备注信息
 	 */
-	private String note;
+	private String cardNote;
 	
 	/**
-	 * 激活状态。1，已激活；0，未激活
+	 * 会员卡激活状态
 	 */
 	private Integer status;
 	
