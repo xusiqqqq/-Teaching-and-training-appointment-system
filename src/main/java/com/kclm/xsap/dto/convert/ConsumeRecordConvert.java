@@ -33,4 +33,6 @@ public interface ConsumeRecordConvert {
 	})
 	ConsumeRecordDTO entity2Dto(TConsumeRecord consume,TMemberCard card);
 	
+	
+	
 }

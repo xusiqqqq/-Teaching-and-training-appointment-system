@@ -49,6 +49,11 @@ public class TEmployee extends BaseEntity {
     private Integer roleType;
 
     /**
+     *  操作角色邮箱
+     */
+    private String roleEmail;
+    
+    /**
     * 逻辑删除，1代表已删，无效；0代表未删，有效
     */
     @TableLogic
