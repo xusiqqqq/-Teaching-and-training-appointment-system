@@ -7890,3 +7890,9 @@ body.skin-3 {
         font-size: 12px
     }
 }
+/**  add by yejf  */
+.red {
+    color: red;
+    font-weight: bolder;
+    margin-right: 5px;
+}
