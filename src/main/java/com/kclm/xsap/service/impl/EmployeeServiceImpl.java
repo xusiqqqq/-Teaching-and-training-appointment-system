@@ -38,13 +38,21 @@ public class EmployeeServiceImpl implements EmployeeService{
 	/* 待处理  - begin*/
 	/* 忘记密码，发送短信验证码 */
 	@Override
-	public boolean forgetPassword(String phone) {
+	public boolean resetPwdByPhone(String phone) {
 		
 		return false;
 	}
 	/* 待处理  - end*/
 	
 	
+	@Override
+	public boolean resetPwdByEmail(String email) {
+		
+		
+		return false;
+	}
+
+
 	@Override
 	public boolean updatePassword(String username, String oldPwd, String newPwd) {
 		TEmployee employee = employeeMapper.findByNameAndPwd(username, oldPwd);

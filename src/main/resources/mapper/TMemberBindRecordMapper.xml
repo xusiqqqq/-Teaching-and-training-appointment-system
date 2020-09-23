@@ -9,6 +9,7 @@
     <result column="valid_count" jdbcType="INTEGER" property="validCount" />
     <result column="valid_day" jdbcType="INTEGER" property="validDay" />
     <result column="received_money" jdbcType="DECIMAL" property="receivedMoney" />
+    <result column="pay_mode" jdbcType="VARCHAR" property="payMode" />
     <result column="note" jdbcType="VARCHAR" property="note" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
@@ -36,7 +37,7 @@
 	     <id column="card_id" jdbcType="BIGINT" property="id" />
 	    <result column="card_name" jdbcType="VARCHAR" property="name" />
 	    <result column="price" jdbcType="DECIMAL" property="price" />
-	    <result column="desc" jdbcType="VARCHAR" property="desc" />
+	    <result column="description" jdbcType="VARCHAR" property="desc" />
 	    <result column="card_note" jdbcType="VARCHAR" property="note" />
 	    <result column="type" jdbcType="VARCHAR" property="type" />
 	    <result column="total_count" jdbcType="INTEGER" property="totalCount" />
@@ -49,14 +50,14 @@
   </resultMap>
   <sql id="TMemberBindRecord_Column_List">
     <!--@mbg.generated-->
-    id, member_id, card_id, valid_count, valid_day, received_money, note, create_time, 
+    id, member_id, card_id, valid_count, valid_day, received_money,pay_mode, note, create_time, 
     last_modify_time, version
   </sql>
   <sql id="member_sql">
   	m.id as member_id,m.name as member_name,m.sex,m.phone,m.birthday,m.note as member_note,m.avatar_url,m.is_deleted
   </sql>
   <sql id="card_sql">
-   c.id as card_id,c.name as card_name,c.price,c.desc,c.note as card_note,c.type,c.total_count,c.total_day,c.status
+   c.id as card_id,c.name as card_name,c.price,c.description,c.note as card_note,c.type,c.total_count,c.total_day,c.status
   </sql>
   <select id="findAll" resultMap="TMemberBindRecordMap">
   		SELECT bind.*,<include refid="member_sql" />,<include refid="card_sql" /> 

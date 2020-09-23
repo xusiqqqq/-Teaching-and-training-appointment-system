@@ -55,6 +55,11 @@ public class TMemberBindRecord extends BaseEntity implements Serializable{
     */
     private BigDecimal receivedMoney;
 
+    /**
+     * 支付方式
+     */
+    private String payMode;
+    
     private String note;
 
 }

@@ -32,7 +32,14 @@ public interface EmployeeService {
 	 * @param phone 手机号
 	 * @return boolean。true：发送验证码成功；false：发送验证码失败
 	 */
-	boolean forgetPassword(String phone);
+	boolean resetPwdByPhone(String phone);
+	
+	/**
+	 *  通过邮箱重置密码
+	 * @param email 邮箱
+	 * @return boolean。true：发送邮件成功；false：发送邮件失败
+	 */
+	boolean resetPwdByEmail(String email);
 	
 	/**
 	 *  更新密码

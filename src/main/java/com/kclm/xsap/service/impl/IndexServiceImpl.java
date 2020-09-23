@@ -69,7 +69,7 @@ public class IndexServiceImpl implements IndexService{
 		
 		/* 待处理  - begin*/
 		//计算输入日期的间隔天数endDate - startDate
-		int getDays = 1;
+		Long getDays = endDate.toEpochDay() - startDate.toEpochDay();
 		/* 待处理  - end*/
 		
 		for(int i = 0; i< getDays; i++) {

@@ -64,24 +64,13 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 		CourseScheduleDTO scheduleDto = new CourseScheduleDTO();
 		//获取当前选中的排课记录信息
 		TScheduleRecord schedule = scheduleMapper.selectById(scheduleId);
-		//获取上课时间
-		LocalTime classTime = schedule.getClassTime();
-		LocalDateTime startTime = LocalDateTime.of(schedule.getStartDate(),classTime);
-		
-		scheduleDto.setStartTime(startTime);
-		scheduleDto.setLimitSex(schedule.getLimitSex());
-		scheduleDto.setLimitAge(schedule.getLimitAge());
 		
 		//根据排课记录获取到对应的课程信息
 		TCourse course = courseMapper.selectById(schedule.getCourseId());
-		Integer duration = course.getDuration();
-		LocalTime plusClassTime = classTime.plusMinutes(duration);
-		LocalDateTime endTime = LocalDateTime.of(schedule.getStartDate(),plusClassTime);
+//		LocalTime plusClassTime = classTime.plusMinutes(duration);
+//		LocalDateTime endTime = LocalDateTime.of(schedule.getStartDate(),plusClassTime);
 		
-		scheduleDto.setCourseName(course.getName());
-		scheduleDto.setEndTime(endTime);
-		scheduleDto.setDuration(duration);
-		scheduleDto.setClassNumbers(course.getContains());
+//		scheduleDto.setEndTime(endTime);
 		
 		//根据课程id获取到支持的会员卡信息
 		/*

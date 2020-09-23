@@ -55,6 +55,11 @@ public class TRechargeRecord extends BaseEntity implements Serializable{
     private BigDecimal receivedMoney;
 
     /**
+     * 支付方式
+     */
+    private String payMode;
+    
+    /**
      * 操作员
      */
     private String operator;
