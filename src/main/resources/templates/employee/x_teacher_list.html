@@ -37,7 +37,7 @@
                 </div>
 
                 <div class="ibox-content">
-                    <table class="table table-striped table-bordered table-hover dataTables-example">
+                    <table class="table table-striped table-bordered table-hover teacherTable">
                         <thead>
                         <tr>
                             <th>老师</th>
@@ -78,58 +78,58 @@
 
 <script>
     $(document).ready(function () {
-        $('.dataTables-example').dataTable({
+        $('.teacherTable').dataTable({
             //TODO json获取数据
             "data": [
                 {
                     "id":1,
-                    "teacher_name": "小鹿老师",
-                    "teacher_gender": "女",
-                    "teacher_phone": "13659853625",
-                    "teacher_remark": "备注信息"
+                    "name": "小鹿老师",
+                    "sex": "女",
+                    "phone": "13659853625",
+                    "introduce": "备注信息"
                 },
                 {
                     "id":2,
-                    "teacher_name": "张老师",
-                    "teacher_gender": "男",
-                    "teacher_phone": "13659853625",
-                    "teacher_remark": "备注信息"
+                    "name": "张老师",
+                    "sex": "男",
+                    "phone": "13659853625",
+                    "introduce": "备注信息"
                 },
                 {
                     "id":3,
-                    "teacher_name": "陈老师",
-                    "teacher_gender": "女",
-                    "teacher_phone": "13659853625",
-                    "teacher_remark": "备注信息"
+                    "name": "陈老师",
+                    "sex": "女",
+                    "phone": "13659853625",
+                    "introduce": "备注信息"
                 },
                 {
                     "id":4,
-                    "teacher_name": "谢老师",
-                    "teacher_gender": "女",
-                    "teacher_phone": "13659853625",
-                    "teacher_remark": "备注信息"
+                    "name": "谢老师",
+                    "sex": "女",
+                    "phone": "13659853625",
+                    "introduce": "备注信息"
                 },
                 {
                     "id":5,
-                    "teacher_name": "龙老师",
-                    "teacher_gender": "男",
-                    "teacher_phone": "13659853625",
-                    "teacher_remark": "备注信息"
+                    "name": "龙老师",
+                    "sex": "男",
+                    "phone": "13659853625",
+                    "introduce": "备注信息"
                 },
                 {
                     "id":6,
-                    "teacher_name": "peter老师",
-                    "teacher_gender": "男",
-                    "teacher_phone": "13659853625",
-                    "teacher_remark": "备注信息"
+                    "name": "peter老师",
+                    "sex": "男",
+                    "phone": "13659853625",
+                    "introduce": "备注信息"
                 }
             ],
             //行的定义
             "columns": [
-                {"data": "teacher_name", bAutoWidth: "false", sWidth: "15%"},
-                {"data": "teacher_gender", sWidth: "10%"},
-                {"data": "teacher_phone", sWidth: "15%"},
-                {"data": "teacher_remark", sWidth: "30%"},
+                {"data": "name", bAutoWidth: "false", sWidth: "15%"},
+                {"data": "sex", sWidth: "10%"},
+                {"data": "phone", sWidth: "15%"},
+                {"data": "introduce", sWidth: "30%"},
                 {
                     "data": null, "orderable": false, "render": function (data, type, row) {
                         var id = '"' + row.id + '"';
@@ -163,36 +163,12 @@
                 }
             }
         });
-        $("#add_teacher_btn").click(function () {
-            console.log("hehe");
-        })
     });
 </script>
 
 <!-- Page-Level Scripts -->
 <script>
     $(document).ready(function () {
-  /*      $('.dataTables-example').dataTable();
-
-        /!* Init DataTables *!/
-        var oTable = $('#editable').dataTable();
-
-        /!* Apply the jEditable handlers to the table *!/
-        oTable.$('td').editable('../example_ajax.php', {
-            "callback": function (sValue, y) {
-                var aPos = oTable.fnGetPosition(this);
-                oTable.fnUpdate(sValue, aPos[0], aPos[1]);
-            },
-            "submitdata": function (value, settings) {
-                return {
-                    "row_id": this.parentNode.getAttribute('id'),
-                    "column": oTable.fnGetPosition(this)[2]
-                };
-            },
-            "width": "90%",
-            "height": "100%"
-        });*/
-
         <!-- datepicker -->
         $(".datepicker").datepicker({
             language: "zh-CN",
@@ -212,6 +188,7 @@
                 confirmButtonText: "删除",
                 closeOnConfirm: false
             }, function () {
+                //todo ...
                 swal("删除成功！", "您已经永久删除了这条信息。", "success");
             });
         });

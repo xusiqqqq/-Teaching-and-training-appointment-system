@@ -58,7 +58,7 @@
                     <div>
                         <div class="m">
                             <h4><strong>说明</strong></h4>
-                            <p>1.点击下载导入会员导入模板<a href="#">会员导入模板xIsx</a></p>
+                            <p>1.点击下载导入会员导入模板<a href="../../static/download/会员导入模板.xlsx" th:href="@{/static/download/会员导入模板.xlsx}">会员导入模板xIsx</a></p>
                             <p>2.请按照模板中的格式上传</p>
                             <p>3.若导入表中有手机号在当前系统中已存在，则会跳过(不会覆盖原来的信息)</p>
                             <p>4.如果怕误操作,请联系客服人员帮您,当然是免费的哟~</p>
@@ -67,7 +67,8 @@
                     <table class="table table-striped table-bordered table-hover dataTables-example">
                         <thead>
                         <tr>
-                            <th>手机号</th>
+                            <th>会员名</th>
+                            <th>会员手机号</th>
                             <th>失败原因</th>
                         </tr>
                         </thead>
@@ -103,11 +104,12 @@
     $('.dataTables-example').dataTable({
         //TODO json获取数据
         "data": [
-            {"id":10, "memberPhone": "14977665522", "causeFailure": "未知"},
-            {"id":10, "memberPhone": "14977895522", "causeFailure": "未知"}
+            {"id":10, "memberName" : "张小宝", "memberPhone": "14977665522", "causeFailure": "未知"},
+            {"id":11, "memberName" : "周心怡", "memberPhone": "14977895522", "causeFailure": "未知"}
         ],
         //行的定义
         "columns": [
+            {"data": "memberName"},
             {"data": "memberPhone"},
             {"data": "causeFailure"}],
         //去掉搜索
@@ -136,9 +138,9 @@
     });
 
 </script>
-<script src="../../static/js/plugins/webuploader/webuploader.min.js"></script>
+<script src="../../static/js/plugins/webuploader/webuploader.min.js" th:src="@{/static/js/plugins/webuploader/webuploader.min.js}"></script>
 
-<script src="../../static/js/webuploader_menber_improt.js"></script>
+<script src="../../static/js/webuploader_menber_improt.js" th:src="@{/static/js/webuploader_menber_improt.js}"></script>
 
 </body>
 
