@@ -29,11 +29,13 @@ public interface CourseScheduleConvert {
 	 * 未使用
 	 * @return	CourseScheduleDTO。要展示的排课计划信息
 	 */
-	@Mappings({
-		@Mapping(source = "",target = ""),
-		@Mapping(target = "startTime",expression = "java (LocalDateTime.of(schedule.getStartDate(),schedule.getClassTime() ))")		
-
-	})
-	CourseScheduleDTO entity2Dto();
+//	@Mappings({
+//		@Mapping(source = "course.name",target = "courseName"),
+//		@Mapping(target = "startTime",expression = "java (LocalDateTime.of(schedule.getStartDate(),schedule.getClassTime() ))")		
+//
+//	})
+//	default CourseScheduleDTO entity2Dto(TScheduleRecord schedule,TCourse course) {
+//		
+//	}
 	
 }
