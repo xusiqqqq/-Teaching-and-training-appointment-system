@@ -35,12 +35,15 @@ public class EmployeeServiceImpl implements EmployeeService{
 		return true;
 	}
 	
-	/* 待实现 */
+	/* 待处理  - begin*/
+	/* 忘记密码，发送短信验证码 */
 	@Override
 	public boolean forgetPassword(String phone) {
 		
 		return false;
 	}
+	/* 待处理  - end*/
+	
 	
 	@Override
 	public boolean updatePassword(String username, String oldPwd, String newPwd) {

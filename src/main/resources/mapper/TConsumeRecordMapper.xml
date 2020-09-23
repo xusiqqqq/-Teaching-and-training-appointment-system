@@ -7,6 +7,7 @@
     <result column="operate_type" jdbcType="VARCHAR" property="operateType" />
     <result column="card_count_change" jdbcType="INTEGER" property="cardCountChange" />
     <result column="card_day_change" jdbcType="INTEGER" property="cardDayChange" />
+    <result column="money_cost" jdbcType="DECIMAL" property="moneyCost" />
     <result column="operator" jdbcType="VARCHAR" property="operator" />
     <result column="note" jdbcType="VARCHAR" property="note" />
     <result column="member_id" jdbcType="BIGINT" property="memberId" />
@@ -46,7 +47,7 @@
   </resultMap>
   <sql id="TConsumeRecord_Column_List">
     <!--@mbg.generated-->
-    id, operate_type, card_count_change, card_day_change, `operator`, note, member_id, card_id
+    id, operate_type, card_count_change, card_day_change,money_cost, `operator`, note, member_id, card_id
     create_time, last_modify_time, version
   </sql>
   

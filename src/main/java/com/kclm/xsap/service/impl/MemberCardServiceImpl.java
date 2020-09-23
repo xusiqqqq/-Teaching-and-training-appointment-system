@@ -100,6 +100,7 @@ public class MemberCardServiceImpl implements MemberCardService{
 		memberLog.setMemberId(consume.getMemberId());
 		memberLog.setCardId(consume.getCardId());
 		memberLog.setType("消费");
+		memberLog.setInvolveMoney(consume.getMoneyCost());
 		memberLog.setOperator(consume.getOperator());
 		logMapper.insert(memberLog);
 		//消费操作
@@ -123,11 +124,13 @@ public class MemberCardServiceImpl implements MemberCardService{
 		String note = memberCard.getNote();
 		
 		//会员卡可用次数
-		Integer validTimes = memberCard.getTotalCount();
+		TMemberBindRecord bindRecord = bindMapper.selectOne(new QueryWrapper<TMemberBindRecord>()
+				.eq("member_id", memberId).eq("card_id", cardId));
+		Integer validTimes = bindRecord.getValidCount();
 		
 		//会员卡到期日
-		LocalDateTime createTime = memberCard.getCreateTime();
-		createTime = createTime.plusDays(memberCard.getTotalDay());
+		LocalDateTime createTime = bindRecord.getCreateTime();
+		createTime = createTime.plusDays(bindRecord.getValidDay());
 		
 		//获取到会员指定的会员卡的操作记录
 		List<TMemberLog> logList = logMapper.selectList(new QueryWrapper<TMemberLog>()

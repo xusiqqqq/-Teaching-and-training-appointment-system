@@ -46,18 +46,4 @@ public class MemberCardDTO extends BaseDTO{
 	 */
 	private Integer status;
 	
-    /**
-          * 卡操作记录
-     */
-    private List<TMemberLog> memberLog;
-	
-    /**
-	 * 单价
-	 */
-	private BigDecimal price;
-	
-	/**
-            * 总可用天数
-	*/
-	private Integer totalDay;
 }

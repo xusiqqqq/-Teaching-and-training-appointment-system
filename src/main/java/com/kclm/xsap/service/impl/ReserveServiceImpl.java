@@ -43,7 +43,8 @@ public class ReserveServiceImpl implements ReserveService{
 		Map<String,Long> params = new HashMap<String, Long>();
 		params.put("member_id", reserve.getMemberId());
 		params.put("schedule_id", reserve.getScheduleId());
-		TReservationRecord checkResult = reserveMapper.selectOne(new QueryWrapper<TReservationRecord>().allEq(params));
+		TReservationRecord checkResult = reserveMapper.selectOne(new QueryWrapper<TReservationRecord>()
+				.allEq(params));
 		if(checkResult.getStatus() == 1) {
 			System.out.println("已经用会员卡预约过当前课程，无法再次预约！");
 			return false;
@@ -99,7 +100,12 @@ public class ReserveServiceImpl implements ReserveService{
 
 	@Override
 	public List<ReserveRecordDTO> listExportRecordRange(LocalDate startDate, LocalDate endDate) {
-		List<TReservationRecord> reserveList = reserveMapper.selectList(new QueryWrapper<TReservationRecord>().between("create_time", startDate, endDate));
+		//对日期区间做LocalDateTime类型转换
+		LocalDateTime startDateTime = LocalDateTime.of(startDate, LocalTime.MIN);
+		LocalDateTime endDateTime = LocalDateTime.of(endDate, LocalTime.MAX);
+		//查找日期区间的预约记录
+		List<TReservationRecord> reserveList = reserveMapper.selectList(new QueryWrapper<TReservationRecord>()
+				.between("create_time", startDateTime, endDateTime));
 		List<ReserveRecordDTO> reserveDtoList = new ArrayList<>();
 		for(int i = 0; i < reserveList.size(); i++) {
 			Long id = reserveList.get(i).getScheduleId();

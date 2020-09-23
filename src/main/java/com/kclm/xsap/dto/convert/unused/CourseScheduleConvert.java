@@ -1,4 +1,4 @@
-package com.kclm.xsap.dto.convert;
+package com.kclm.xsap.dto.convert.unused;
 
 import java.util.List;
 
@@ -25,9 +25,9 @@ public interface CourseScheduleConvert {
 	CourseScheduleConvert INSTANCE = Mappers.getMapper(CourseScheduleConvert.class);
 	
 	/**
-	 * 
+	 * 未使用
 	 * @return	CourseScheduleDTO。要展示的排课计划信息
 	 */
-	CourseScheduleDTO entity2Dto();
+//	CourseScheduleDTO entity2Dto();
 	
 }

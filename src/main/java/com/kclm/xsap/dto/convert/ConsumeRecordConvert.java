@@ -2,6 +2,7 @@ package com.kclm.xsap.dto.convert;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
 import com.kclm.xsap.dto.ConsumeRecordDTO;
@@ -26,8 +27,10 @@ public interface ConsumeRecordConvert {
 	 * @param card	对应会员卡实体类
 	 * @return	ConsumeRecordDTO。消费记录要展示的信息
 	 */
-	@Mapping(source = "card.name",target = "cardName")
-	@Mapping(source = "consume.createTime",target = "operateTime")
+	@Mappings({
+		@Mapping(source = "card.name",target = "cardName"),
+		@Mapping(source = "consume.createTime",target = "operateTime")		
+	})
 	ConsumeRecordDTO entity2Dto(TConsumeRecord consume,TMemberCard card);
 	
 }

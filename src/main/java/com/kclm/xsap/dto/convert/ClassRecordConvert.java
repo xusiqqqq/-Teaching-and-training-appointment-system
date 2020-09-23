@@ -2,6 +2,7 @@ package com.kclm.xsap.dto.convert;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
 import com.kclm.xsap.dto.ClassRecordDTO;
@@ -31,10 +32,12 @@ public interface ClassRecordConvert {
 	 * @param card	对应会员卡实体类
 	 * @return ClassRecordDTO。上课记录要展示的信息
 	 */
-	@Mapping(source = "card.name",target = "cardName")
-	@Mapping(source = "schedule.orderNums",target = "reserveNumbers")
-	@Mapping(source = "classRecord.note",target = "reserveNote")
-	@Mapping(target = "classTime",expression = "java (LocalDateTime.of(schedule.getStartDate(),schedule.getClassTime() ))")
+	@Mappings({
+		@Mapping(source = "card.name",target = "cardName"),
+		@Mapping(source = "schedule.orderNums",target = "reserveNumbers"),
+		@Mapping(source = "classRecord.note",target = "reserveNote"),
+		@Mapping(target = "classTime",expression = "java (LocalDateTime.of(schedule.getStartDate(),schedule.getClassTime() ))")		
+	})
 	ClassRecordDTO entity2Dto(TReservationRecord classRecord,TCourse course,TScheduleRecord schedule,TMemberCard card);
 	
 	

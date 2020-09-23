@@ -1,6 +1,7 @@
 package com.kclm.xsap.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -51,6 +52,11 @@ public class TConsumeRecord extends BaseEntity implements Serializable{
     * 有效天数变化
     */
     private Integer cardDayChange;
+    
+    /**
+     *  花费的金额
+     */
+    private BigDecimal moneyCost;
 
     /**
     * 操作员

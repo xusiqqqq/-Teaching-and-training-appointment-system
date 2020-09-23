@@ -1,4 +1,4 @@
-package com.kclm.xsap.dto.convert;
+package com.kclm.xsap.dto.convert.unused;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -22,12 +22,10 @@ public interface MemberCardConvert {
 	MemberCardConvert INSTANCE = Mappers.getMapper(MemberCardConvert.class);
 	
 	/**
-	 * 
-	 * @param card	对应会员卡实体类
-	 * @param log	对应操作记录
+	 * 	未使用
 	 * @return	MemberCardDTO。显示会员卡的信息
 	 */
-	MemberCardDTO entity2Dto(TMemberCard card,TMemberLog log);
+//	MemberCardDTO entity2Dto();
 
 }
 

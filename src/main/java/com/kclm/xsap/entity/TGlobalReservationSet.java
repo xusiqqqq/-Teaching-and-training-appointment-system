@@ -13,17 +13,17 @@ import lombok.EqualsAndHashCode;
 public class TGlobalReservationSet extends BaseEntity {
 
     /**
-    * 预约开始时间，按天算
+    * 可提前预约的天数
     */
     private Integer startTime;
 
     /**
-    * 预约截止时间
+    * 提前预约的截止时间，上课前
     */
     private LocalDateTime endTime;
 
     /**
-    * 预约取消时间
+    * 提前预约取消的限制时间
     */
     private LocalDateTime cancelTime;
 

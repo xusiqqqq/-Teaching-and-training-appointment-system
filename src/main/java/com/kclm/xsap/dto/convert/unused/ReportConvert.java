@@ -1,4 +1,4 @@
-package com.kclm.xsap.dto.convert;
+package com.kclm.xsap.dto.convert.unused;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -21,9 +21,9 @@ public interface ReportConvert {
 	ReportConvert INSTANCE = Mappers.getMapper(ReportConvert.class);
 	
 	/**
-	 * 
+	 * 未使用
 	 * @return	ReportDTO。显示的报表信息
 	 */
-	ReportDTO entity2Dto();
+//	ReportDTO entity2Dto();
 	
 }

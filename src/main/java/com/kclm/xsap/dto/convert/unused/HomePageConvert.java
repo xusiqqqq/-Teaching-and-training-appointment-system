@@ -1,4 +1,4 @@
-package com.kclm.xsap.dto.convert;
+package com.kclm.xsap.dto.convert.unused;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -21,9 +21,9 @@ public interface HomePageConvert {
 	HomePageConvert INSTANCE = Mappers.getMapper(HomePageConvert.class);
 	
 	/**
-	 * 
+	 * 未使用
 	 * @return	HomePageDTO。显示首页的统计数据
 	 */
-	HomePageDTO entity2Dto();
+//	HomePageDTO entity2Dto();
 	
 }

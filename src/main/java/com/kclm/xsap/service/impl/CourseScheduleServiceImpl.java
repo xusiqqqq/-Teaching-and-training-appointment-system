@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kclm.xsap.dto.CourseScheduleDTO;
 import com.kclm.xsap.dto.ReserveRecordDTO;
-import com.kclm.xsap.dto.convert.CourseScheduleConvert;
 import com.kclm.xsap.entity.TCourse;
 import com.kclm.xsap.entity.TMemberCard;
 import com.kclm.xsap.entity.TScheduleRecord;
@@ -40,7 +39,8 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 
 	@Override
 	public List<CourseScheduleDTO> listSchedule(LocalDate startDate, LocalDate endDate) {
-		List<TScheduleRecord> scheduleList = scheduleMapper.selectList(new QueryWrapper<TScheduleRecord>().between("start_date", startDate, endDate));
+		List<TScheduleRecord> scheduleList = scheduleMapper.selectList(new QueryWrapper<TScheduleRecord>()
+				.between("start_date", startDate, endDate));
 		List<CourseScheduleDTO> courseScheduleDtoList = new ArrayList<>();
 		for(int i = 0; i < scheduleList.size(); i++) {
 			Long id = scheduleList.get(i).getId();

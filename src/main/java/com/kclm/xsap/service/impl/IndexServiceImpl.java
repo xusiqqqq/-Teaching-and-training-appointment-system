@@ -2,6 +2,7 @@ package com.kclm.xsap.service.impl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,7 +48,8 @@ public class IndexServiceImpl implements IndexService{
 		//活跃用户(近一个月内预约过的)
 		LocalDateTime nowTime = LocalDateTime.now();
 		LocalDateTime inOneMonth = nowTime.minusMonths(1);
-		reserveList = reserveMapper.selectList(new QueryWrapper<TReservationRecord>().between("create_time",inOneMonth , nowTime));
+		reserveList = reserveMapper.selectList(new QueryWrapper<TReservationRecord>()
+				.between("create_time",inOneMonth , nowTime));
 		List<Long> idList = new ArrayList<>();
 		for(int i = 0 ;i < reserveList.size(); i++) {
 			 Long memberId = reserveList.get(i).getMemberId();
@@ -59,25 +61,38 @@ public class IndexServiceImpl implements IndexService{
 		
 		//每日约课数量
 		List<Integer> numberList = new ArrayList<>();
-		LocalDate changeDate = startDate;
+		//对日期区间做LocalDateTime类型转换
+		LocalDateTime startDateTime = LocalDateTime.of(startDate, LocalTime.MIN);
+		LocalDateTime endDateTime = LocalDateTime.of(endDate, LocalTime.MAX);
+		//用来日期自增，从指定的开始日期开始
+		LocalDateTime changeDateTime = startDateTime;
+		
+		/* 待处理  - begin*/
 		//计算输入日期的间隔天数endDate - startDate
 		int getDays = 1;
+		/* 待处理  - end*/
+		
 		for(int i = 0; i< getDays; i++) {
 			reserveList = reserveMapper.selectList(new QueryWrapper<TReservationRecord>()
-					.eq("status", 1).eq("create_time",changeDate));
+					.eq("status", 1).between("create_time", changeDateTime, endDateTime));
+			//存入当天的预约数量
 			numberList.add(reserveList.size());
-			changeDate = changeDate.plusDays(1); 
+			//自增一天
+			changeDateTime = changeDateTime.plusDays(1); 
 		}
 		
 		homePageDto.setDailyReservations(numberList);
 		
 		//每日新增会员数量
-		changeDate = startDate;
+		changeDateTime = startDateTime;
 		List<Integer> memberNumslist = new ArrayList<>();
 		for(int i = 0; i< getDays; i++) {
-			List<TMember> memberNums = memberMapper.selectList(new QueryWrapper<TMember>().eq("create_time",changeDate));
+			List<TMember> memberNums = memberMapper.selectList(new QueryWrapper<TMember>()
+					.between("create_time", changeDateTime, endDateTime));
+			//存入当天新增会员的数量
 			memberNumslist.add(memberNums.size());
-			changeDate = changeDate.plusDays(1); 
+			//自增一天
+			changeDateTime = changeDateTime.plusDays(1);
 		}
 		
 		homePageDto.setDailyNewMembers(memberNumslist);
