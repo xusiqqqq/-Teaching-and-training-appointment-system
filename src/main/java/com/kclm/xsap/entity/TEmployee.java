@@ -15,6 +15,9 @@ public class TEmployee extends BaseEntity {
 
     private String name;
 
+    /**
+     *  手机号，登录用作用户名
+     */
     private String phone;
 
     private String sex;

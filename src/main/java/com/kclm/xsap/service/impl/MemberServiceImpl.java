@@ -103,13 +103,13 @@ public class MemberServiceImpl implements MemberService{
 
 	/* 待处理  - begin*/
 	
-	//文件上传
+	//文件读取，存库
 	@Override
 	public boolean saveByBundle(String filePath) {
 		return false;
 	}
 	
-	//文件上传
+	//文件读取，存库
 	@Override
 	public boolean bindByBunble(String filePath) {
 		return false;

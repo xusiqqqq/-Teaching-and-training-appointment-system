@@ -39,11 +39,11 @@
 	</select>
 	<!-- 根据用户名查询用户 -->
 	<select id="findByUserName" parameterType="String" resultMap="TEmployeeMap">
-		select * from t_employee where role_name like #{roleName};
+		select * from t_employee where phone like #{phone};
 	</select>
-	<!-- 根据用户名和密码查询用户 -->
+	<!-- 根据用户名(手机号)和密码查询用户 -->
 	<select id="findByNameAndPwd" parameterType="String" resultMap="TEmployeeMap">
-		select * from t_employee where role_name = #{roleName} and role_password = #{rolePassword};
+		select * from t_employee where phone = #{phone} and role_password = #{rolePassword};
 	</select>
   
 </mapper>
