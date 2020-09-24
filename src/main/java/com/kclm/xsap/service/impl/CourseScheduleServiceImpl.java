@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kclm.xsap.dto.CourseScheduleDTO;
 import com.kclm.xsap.dto.ReserveRecordDTO;
+import com.kclm.xsap.dto.convert.CourseScheduleConvert;
 import com.kclm.xsap.entity.TCourse;
 import com.kclm.xsap.entity.TMemberCard;
 import com.kclm.xsap.entity.TScheduleRecord;
@@ -61,16 +62,11 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 	
 	@Override
 	public CourseScheduleDTO findById(Long scheduleId) {
-		CourseScheduleDTO scheduleDto = new CourseScheduleDTO();
 		//获取当前选中的排课记录信息
 		TScheduleRecord schedule = scheduleMapper.selectById(scheduleId);
 		
 		//根据排课记录获取到对应的课程信息
 		TCourse course = courseMapper.selectById(schedule.getCourseId());
-//		LocalTime plusClassTime = classTime.plusMinutes(duration);
-//		LocalDateTime endTime = LocalDateTime.of(schedule.getStartDate(),plusClassTime);
-		
-//		scheduleDto.setEndTime(endTime);
 		
 		//根据课程id获取到支持的会员卡信息
 		/*
@@ -89,18 +85,20 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 			}
 			sb.append(card.getName());
 		}
-		scheduleDto.setSupportCard(sb.toString());
+		String supportCards = sb.toString();
 		
 		//根据排课记录获取对应的老师信息
 		String teacherName = employeeMapper.selectById(schedule.getTeacherId()).getName();
 		
-		scheduleDto.setTeacher(teacherName);
-		
 		//获取当前课程对应的预约记录
 		ReserveServiceImpl reserveService = new ReserveServiceImpl();
 		List<ReserveRecordDTO> reserveDTO = reserveService.listReserveRecords(scheduleId);
-		scheduleDto.setReserveRecord(reserveDTO);
-		
+		CourseScheduleDTO scheduleDto = CourseScheduleConvert.INSTANCE.entity2Dto(schedule, course, supportCards, teacherName, reserveDTO);
+		//计算下课时间
+		LocalTime plusClassTime = schedule.getClassTime().plusMinutes(course.getDuration());
+		LocalDateTime endTime = LocalDateTime.of(schedule.getStartDate(),plusClassTime);
+		scheduleDto.setEndTime(endTime);
+				
 		return scheduleDto;
 	}
 

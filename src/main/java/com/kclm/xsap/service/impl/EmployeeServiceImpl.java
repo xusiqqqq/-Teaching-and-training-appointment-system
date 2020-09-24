@@ -8,6 +8,8 @@ import com.kclm.xsap.entity.TEmployee;
 import com.kclm.xsap.mapper.TEmployeeMapper;
 import com.kclm.xsap.service.EmployeeService;
 
+import cn.hutool.extra.mail.MailUtil;
+
 @Service
 @Transactional
 public class EmployeeServiceImpl implements EmployeeService{
@@ -23,8 +25,8 @@ public class EmployeeServiceImpl implements EmployeeService{
 	
 	@Override
 	public boolean register(TEmployee emp) {
-		//判断用户名是否已存在
-		TEmployee userName = employeeMapper.findByUserName(emp.getRoleName());
+		//判断用户名（手机号）是否已存在
+		TEmployee userName = employeeMapper.findByUserName(emp.getPhone());
 		if(userName != null) {
 			//用户名已存在
 			System.out.println("用户名已存在！");
@@ -46,9 +48,9 @@ public class EmployeeServiceImpl implements EmployeeService{
 	
 	
 	@Override
-	public boolean resetPwdByEmail(String email) {
+	public boolean resetPwdByEmail(String email,String content,Boolean isHtml) {
 		
-		
+		MailUtil.send(email, "测试", content, isHtml);
 		return false;
 	}
 

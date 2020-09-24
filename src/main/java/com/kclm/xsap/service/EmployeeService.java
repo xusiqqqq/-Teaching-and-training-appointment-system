@@ -36,10 +36,12 @@ public interface EmployeeService {
 	
 	/**
 	 *  通过邮箱重置密码
-	 * @param email 邮箱
-	 * @return boolean。true：发送邮件成功；false：发送邮件失败
+	 * @param email	邮箱
+	 * @param content	发送的内容
+	 * @param isHtml	content部分是否表现为html格式
+	 * @return	boolean。true：发送邮件成功；false：发送邮件失败
 	 */
-	boolean resetPwdByEmail(String email);
+	boolean resetPwdByEmail(String email,String content,Boolean isHtml);
 	
 	/**
 	 *  更新密码

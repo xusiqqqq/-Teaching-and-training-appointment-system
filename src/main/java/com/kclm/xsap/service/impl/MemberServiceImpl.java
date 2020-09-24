@@ -18,6 +18,7 @@ import com.kclm.xsap.dto.convert.ClassRecordConvert;
 import com.kclm.xsap.dto.convert.ConsumeRecordConvert;
 import com.kclm.xsap.dto.convert.MemberConvert;
 import com.kclm.xsap.dto.convert.ReserveRecordConvert;
+import com.kclm.xsap.dto.convert.MemberCardConvert;
 import com.kclm.xsap.entity.TConsumeRecord;
 import com.kclm.xsap.entity.TCourse;
 import com.kclm.xsap.entity.TMember;
@@ -141,8 +142,9 @@ public class MemberServiceImpl implements MemberService{
 	@Override
 	public List<MemberCardDTO> findAllCardRecords(Long id) {
 		List<MemberCardDTO> cardDtoList = new ArrayList<>();
-		MemberCardDTO cardDto = new MemberCardDTO();
+		MemberCardDTO cardDto;
 		
+		//查询到当前会员绑定的所有会员卡
 		List<TMemberBindRecord> bindList = bindMapper.selectList(new QueryWrapper<TMemberBindRecord>()
 				.eq("member_id", id));
 		TMemberBindRecord bindRecord;
@@ -153,25 +155,15 @@ public class MemberServiceImpl implements MemberService{
 					.eq("member_id", id).eq("card_id", bindRecord.getCardId()));
 			Integer validTimes = bind.getValidCount();
 			
-			//组合会员卡可用次数
-			cardDto.setTotalCount(validTimes);
-			
 			//会员卡到期日
 			LocalDateTime createTime = bind.getCreateTime();
-			createTime = createTime.plusDays(bind.getValidDay());
-			
-			//组合卡到期日
-			cardDto.setDueTime(createTime);
+			LocalDateTime endTime = createTime.plusDays(bind.getValidDay());
 			
 			//获取每张会员卡信息
 			TMemberCard memberCard = cardMapper.selectById(bindRecord.getCardId());
-			//dto组合会员卡名
-			cardDto.setName(memberCard.getName());
-			//dto组合会员卡类型
-			cardDto.setType(memberCard.getType());
-			//dto组合会员卡状态
-			cardDto.setStatus(memberCard.getStatus());
-			//组成一条会员卡信息
+			
+			//组成一条会员卡信息DTO
+			cardDto = MemberCardConvert.INSTANCE.entity2Dto(validTimes, endTime, memberCard);
 			cardDtoList.add(cardDto);
 		}
 		return cardDtoList;
