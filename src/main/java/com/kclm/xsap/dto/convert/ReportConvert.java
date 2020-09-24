@@ -1,5 +1,7 @@
 package com.kclm.xsap.dto.convert;
 
+import java.util.Map;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -22,8 +24,9 @@ public interface ReportConvert {
 	
 	/**
 	 * 
+	 * @param data	图表数据
 	 * @return	ReportDTO。显示的报表信息
 	 */
-	ReportDTO entity2Dto();
+	ReportDTO entity2Dto(Map<String,Integer> data);
 	
 }

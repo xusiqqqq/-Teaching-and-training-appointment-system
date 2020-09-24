@@ -119,6 +119,13 @@
         	<groupId>org.projectlombok</groupId>
         	<artifactId>lombok</artifactId>
         </dependency>
+        
+        <!-- javaMail依赖 -->
+		<dependency>
+		    <groupId>javax.mail</groupId>
+		    <artifactId>mail</artifactId>
+		    <version>1.4.7</version>
+		</dependency>
 
         <!-- 用来在DO和DTO之间进行类型转换的组件 -->
         <dependency>

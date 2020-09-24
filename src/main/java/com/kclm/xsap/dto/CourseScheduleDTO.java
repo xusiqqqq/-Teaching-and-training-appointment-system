@@ -51,12 +51,12 @@ public class CourseScheduleDTO extends BaseDTO{
 	/**
 	 * 支持的会员卡，多张会员卡名字之间以 | 隔开
 	 */
-	private String supportCard;
+	private String supportCards;
 	
 	/**
 	 * 上课老师
 	 */
-	private String teacher;
+	private String teacherName;
 	
 	/**
 	 * 上课人数

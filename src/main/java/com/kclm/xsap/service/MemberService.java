@@ -49,11 +49,11 @@ public interface MemberService {
 	List<TMember> findAllByPage(Integer currentPage,Integer pageSize);
 	
 	/**
-	 * 根据条件搜索匹配的会员id
+	 * 根据条件搜索匹配的会员
 	 * @param condition 搜索条件
-	 * @return Integer。会员id
+	 * @return List<TMember>。匹配到的会员集合
 	 */
-	Integer findByKeyword(String condition);
+	List<TMember> findByKeyword(String condition);
 	
 	/**
 	 *  绑定会员卡
@@ -78,31 +78,31 @@ public interface MemberService {
 	
 	/**
 	 * 当前会员绑定的所有会员卡信息
-	 * @param id 会员绑定记录id
+	 * @param id 会员id
 	 * @return List<MemberCardDTO>。会员绑定记录结果集
 	 */
-	List<MemberCardDTO> findAllCardByPage(Long id);
+	List<MemberCardDTO> findAllCardRecords(Long id);
 
 	/**
-	 * 当前会员的上课记录
-	 * @param id 预约记录id。当预约状态为“已预约”时，则此预约记录表示上课记录
+	 * 当前会员的上课记录(当预约状态为“已预约”时，则此预约记录表示上课记录)
+	 * @param id 会员id
 	 * @return List<ClassRecordDTO>。上课记录结果集
 	 */
 	List<ClassRecordDTO> listClassRecords(Long id);
 	
 	/**
 	 * 当前会员的预约记录
-	 * @param id 预约记录id
+	 * @param id 会员id
 	 * @return List<ReserveRecordDTO>。预约记录结果集
 	 */
 	List<ReserveRecordDTO> listReserveRecords(Long id);
 	
 	/**
 	 * 当前会员的消费记录
-	 * @param id 消费记录id
+	 * @param id 会员id
 	 * @return List<ConsumeRecordDTO>。消费记录结果集
 	 */
-	List<ConsumeRecordDTO> listConsumeRecord(Long id);
+	List<ConsumeRecordDTO> listConsumeRecords(Long id);
 	
 	
 }

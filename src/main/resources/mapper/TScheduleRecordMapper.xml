@@ -43,6 +43,7 @@
 	    <result column="role_name" jdbcType="VARCHAR" property="roleName" />
 	    <result column="role_password" jdbcType="VARCHAR" property="rolePassword" />
 	    <result column="role_type" jdbcType="BOOLEAN" property="roleType" />
+	    <result column="role_email" jdbcType="VARCHAR" property="roleEmail" />
 	    <result column="is_deleted" jdbcType="BOOLEAN" property="isDeleted" />
 	    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
 	    <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
@@ -60,7 +61,7 @@
   </sql>
   <sql id="employee_sql">
   	id, `name`, phone, sex, birthday, introduce, avatar_url, note, role_name, role_password, role_type, 
-    is_deleted, create_time, last_modify_time, version
+    role_email, is_deleted, create_time, last_modify_time, version
   </sql>
   
 </mapper>

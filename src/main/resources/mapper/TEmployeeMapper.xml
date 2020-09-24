@@ -14,6 +14,7 @@
     <result column="role_name" jdbcType="VARCHAR" property="roleName" />
     <result column="role_password" jdbcType="VARCHAR" property="rolePassword" />
     <result column="role_type" jdbcType="BOOLEAN" property="roleType" />
+    <result column="role_email" jdbcType="VARCHAR" property="roleEmail" />
     <result column="is_deleted" jdbcType="BOOLEAN" property="isDeleted" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
@@ -22,7 +23,7 @@
   <sql id="TEmployee_Column_List">
     <!--@mbg.generated-->
     id, `name`, phone, sex, birthday, introduce, avatar_url, note, role_name, role_password, role_type, 
-    is_deleted, create_time, last_modify_time, version
+    role_email, is_deleted, create_time, last_modify_time, version
   </sql>
   <!--新增用户  -->
   <insert id="save" parameterType="com.kclm.xsap.entity.TEmployee">
@@ -38,11 +39,11 @@
 	</select>
 	<!-- 根据用户名查询用户 -->
 	<select id="findByUserName" parameterType="String" resultMap="TEmployeeMap">
-		select * from t_employee where role_name like #{roleName};
+		select * from t_employee where phone like #{phone};
 	</select>
-	<!-- 根据用户名和密码查询用户 -->
+	<!-- 根据用户名(手机号)和密码查询用户 -->
 	<select id="findByNameAndPwd" parameterType="String" resultMap="TEmployeeMap">
-		select * from t_employee where role_name = #{roleName} and role_password = #{rolePassword};
+		select * from t_employee where phone = #{phone} and role_password = #{rolePassword};
 	</select>
   
 </mapper>

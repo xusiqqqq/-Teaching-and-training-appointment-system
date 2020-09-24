@@ -54,7 +54,7 @@ public interface MemberCardService {
 	boolean consume(TConsumeRecord consume);
 	
 	/**
-	 * 分页查询。获取当前会员卡的所有操作记录
+	 * 获取当前会员卡的所有操作记录
 	 * @param memberId 会员id
 	 * @param cardId 会员卡id
 	 * @return List<TMemberLog>。会员卡操作记录结果集

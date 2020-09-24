@@ -44,9 +44,9 @@ public class ConsumeRecordDTO extends BaseDTO{
 	private Integer cardDayChange;
 	
 	/**
-	 * 单价
+	 * 花费的金额
 	 */
-	private BigDecimal price;
+	private BigDecimal moneyCost;
 	
 	/**
 	 * 操作员

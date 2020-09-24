@@ -27,12 +27,8 @@ public interface MemberConvert {
 	/**
 	 * 
 	 * @param member	对应会员实体类
-	 * @param card	对应会员卡DTO数据
-	 * @param classData	对应上课记录DTO数据
-	 * @param reverse	对应预约记录DTO数据
-	 * @param consume	对应消费记录DTO数据
 	 * @return	MemberDTO。显示的会员信息
 	 */
 	@Mapping(source = "member.sex",target = "gender")
-	MemberDTO entity2Dto(TMember member,MemberCardDTO card,ClassRecordDTO classData,ReserveRecordDTO reverse,ConsumeRecordDTO consume);
+	MemberDTO entity2Dto(TMember member);
 }

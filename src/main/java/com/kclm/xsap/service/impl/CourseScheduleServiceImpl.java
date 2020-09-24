@@ -40,7 +40,8 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 
 	@Override
 	public List<CourseScheduleDTO> listSchedule(LocalDate startDate, LocalDate endDate) {
-		List<TScheduleRecord> scheduleList = scheduleMapper.selectList(new QueryWrapper<TScheduleRecord>().between("start_date", startDate, endDate));
+		List<TScheduleRecord> scheduleList = scheduleMapper.selectList(new QueryWrapper<TScheduleRecord>()
+				.between("start_date", startDate, endDate));
 		List<CourseScheduleDTO> courseScheduleDtoList = new ArrayList<>();
 		for(int i = 0; i < scheduleList.size(); i++) {
 			Long id = scheduleList.get(i).getId();
@@ -61,27 +62,11 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 	
 	@Override
 	public CourseScheduleDTO findById(Long scheduleId) {
-		CourseScheduleDTO scheduleDto = new CourseScheduleDTO();
 		//获取当前选中的排课记录信息
 		TScheduleRecord schedule = scheduleMapper.selectById(scheduleId);
-		//获取上课时间
-		LocalTime classTime = schedule.getClassTime();
-		LocalDateTime startTime = LocalDateTime.of(schedule.getStartDate(),classTime);
-		
-		scheduleDto.setStartTime(startTime);
-		scheduleDto.setLimitSex(schedule.getLimitSex());
-		scheduleDto.setLimitAge(schedule.getLimitAge());
 		
 		//根据排课记录获取到对应的课程信息
 		TCourse course = courseMapper.selectById(schedule.getCourseId());
-		Integer duration = course.getDuration();
-		LocalTime plusClassTime = classTime.plusMinutes(duration);
-		LocalDateTime endTime = LocalDateTime.of(schedule.getStartDate(),plusClassTime);
-		
-		scheduleDto.setCourseName(course.getName());
-		scheduleDto.setEndTime(endTime);
-		scheduleDto.setDuration(duration);
-		scheduleDto.setClassNumbers(course.getContains());
 		
 		//根据课程id获取到支持的会员卡信息
 		/*
@@ -100,18 +85,20 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 			}
 			sb.append(card.getName());
 		}
-		scheduleDto.setSupportCard(sb.toString());
+		String supportCards = sb.toString();
 		
 		//根据排课记录获取对应的老师信息
 		String teacherName = employeeMapper.selectById(schedule.getTeacherId()).getName();
 		
-		scheduleDto.setTeacher(teacherName);
-		
 		//获取当前课程对应的预约记录
 		ReserveServiceImpl reserveService = new ReserveServiceImpl();
 		List<ReserveRecordDTO> reserveDTO = reserveService.listReserveRecords(scheduleId);
-		scheduleDto.setReserveRecord(reserveDTO);
-		
+		CourseScheduleDTO scheduleDto = CourseScheduleConvert.INSTANCE.entity2Dto(schedule, course, supportCards, teacherName, reserveDTO);
+		//计算下课时间
+		LocalTime plusClassTime = schedule.getClassTime().plusMinutes(course.getDuration());
+		LocalDateTime endTime = LocalDateTime.of(schedule.getStartDate(),plusClassTime);
+		scheduleDto.setEndTime(endTime);
+				
 		return scheduleDto;
 	}
 

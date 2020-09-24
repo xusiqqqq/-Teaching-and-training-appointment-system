@@ -23,8 +23,9 @@ DROP TABLE IF EXISTS `t_consume_record`;
 CREATE TABLE `t_consume_record` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `operate_type` varchar(10) DEFAULT NULL COMMENT '操作类型',
-  `card_count_change` int(10) unsigned DEFAULT NULL COMMENT '卡次变化',
-  `card_day_change` int(10) unsigned DEFAULT NULL COMMENT '有效天数变化',
+  `card_count_change` int(10) unsigned DEFAULT '0' COMMENT '卡次变化',
+  `card_day_change` int(10) unsigned DEFAULT '0' COMMENT '有效天数变化',
+  `money_cost` decimal(10,2) unsigned DEFAULT '0.00' COMMENT '花费的金额',
   `operator` varchar(50) DEFAULT NULL COMMENT '操作员',
   `note` varchar(255) DEFAULT NULL,
   `member_id` bigint(20) unsigned DEFAULT NULL COMMENT '会员id',
@@ -41,16 +42,16 @@ CREATE TABLE `t_consume_record` (
 
 /*Data for the table `t_consume_record` */
 
-insert  into `t_consume_record`(`id`,`operate_type`,`card_count_change`,`card_day_change`,`operator`,`note`,`member_id`,`card_id`,`create_time`,`last_modify_time`,`version`) values 
-(1,'首次绑卡',10,2,'企鹅',NULL,1,NULL,NULL,NULL,NULL),
-(2,'扣款',5,3,'海鸥',NULL,1,NULL,NULL,NULL,NULL),
-(3,'扣款',3,3,'海豚',NULL,2,NULL,NULL,NULL,NULL),
-(4,'扣款',4,4,'海豚',NULL,NULL,NULL,NULL,NULL,1),
-(5,'扣款',5,5,'海鸥',NULL,NULL,NULL,NULL,NULL,1),
-(6,'扣款',6,6,'企鹅',NULL,NULL,NULL,NULL,NULL,1),
-(7,'扣款',7,7,'海鸥',NULL,NULL,NULL,NULL,NULL,1),
-(8,'扣款',8,8,'企鹅',NULL,NULL,NULL,NULL,NULL,1),
-(9,'扣款',9,9,'企鹅',NULL,NULL,NULL,NULL,NULL,1);
+insert  into `t_consume_record`(`id`,`operate_type`,`card_count_change`,`card_day_change`,`money_cost`,`operator`,`note`,`member_id`,`card_id`,`create_time`,`last_modify_time`,`version`) values 
+(1,'首次绑卡',10,2,NULL,'企鹅',NULL,1,NULL,NULL,NULL,NULL),
+(2,'扣款',5,3,NULL,'海鸥',NULL,1,NULL,NULL,NULL,NULL),
+(3,'扣款',3,3,NULL,'海豚',NULL,2,NULL,NULL,NULL,NULL),
+(4,'扣款',4,4,NULL,'海豚',NULL,NULL,NULL,NULL,NULL,1),
+(5,'扣款',5,5,NULL,'海鸥',NULL,NULL,NULL,NULL,NULL,1),
+(6,'扣款',6,6,NULL,'企鹅',NULL,NULL,NULL,NULL,NULL,1),
+(7,'扣款',7,7,NULL,'海鸥',NULL,NULL,NULL,NULL,NULL,1),
+(8,'扣款',8,8,NULL,'企鹅',NULL,NULL,NULL,NULL,NULL,1),
+(9,'扣款',9,9,NULL,'企鹅',NULL,NULL,NULL,NULL,NULL,1);
 
 /*Table structure for table `t_course` */
 
@@ -59,11 +60,11 @@ DROP TABLE IF EXISTS `t_course`;
 CREATE TABLE `t_course` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(50) DEFAULT NULL,
-  `duration` int(10) unsigned DEFAULT NULL COMMENT '课程时长',
-  `contains` int(10) unsigned DEFAULT NULL COMMENT '上课人数',
+  `duration` int(10) unsigned DEFAULT '0' COMMENT '课程时长',
+  `contains` int(10) unsigned DEFAULT '0' COMMENT '上课人数',
   `color` varchar(10) DEFAULT NULL COMMENT '卡片颜色',
   `introduce` varchar(255) DEFAULT NULL COMMENT '课程介绍',
-  `times_cost` int(10) unsigned DEFAULT NULL COMMENT '每节课程需花费的次数',
+  `times_cost` int(10) unsigned DEFAULT '0' COMMENT '每节课程需花费的次数',
   `limit_sex` varchar(6) DEFAULT NULL COMMENT '限制性别',
   `limit_age` int(10) unsigned DEFAULT NULL COMMENT '限制年龄',
   `limit_counts` int(10) unsigned DEFAULT NULL COMMENT '限制预约次数',
@@ -155,9 +156,9 @@ DROP TABLE IF EXISTS `t_global_reservation_set`;
 
 CREATE TABLE `t_global_reservation_set` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `start_time` int(10) unsigned DEFAULT NULL COMMENT '预约开始时间，按天算',
-  `end_time` datetime DEFAULT NULL COMMENT '预约截止时间',
-  `cancel_time` datetime DEFAULT NULL COMMENT '预约取消时间',
+  `start_time` int(10) unsigned DEFAULT NULL COMMENT '可提前预约的天数',
+  `end_time` datetime DEFAULT NULL COMMENT '提前预约截止时间，上课前',
+  `cancel_time` datetime DEFAULT NULL COMMENT '提前预约取消的时间限制',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
   `last_modify_time` datetime DEFAULT NULL COMMENT '修改时间',
   `version` int(10) unsigned DEFAULT '1' COMMENT '版本',
@@ -251,8 +252,8 @@ CREATE TABLE `t_member_card` (
   `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '描述信息',
   `note` varchar(255) DEFAULT NULL COMMENT '备注信息',
   `type` varchar(10) DEFAULT NULL COMMENT '会员卡类型',
-  `total_count` int(10) unsigned DEFAULT NULL COMMENT '总可用次数',
-  `total_day` int(10) unsigned DEFAULT NULL COMMENT '总可用天数',
+  `total_count` int(10) unsigned DEFAULT '24' COMMENT '默认可用次数',
+  `total_day` int(10) unsigned DEFAULT '7' COMMENT '默认可用天数',
   `status` tinyint(1) unsigned DEFAULT '0' COMMENT '激活状态，1激活，0非激活',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
   `last_modify_time` datetime DEFAULT NULL COMMENT '修改时间',
@@ -280,7 +281,7 @@ DROP TABLE IF EXISTS `t_member_log`;
 CREATE TABLE `t_member_log` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `type` varchar(10) DEFAULT NULL COMMENT '操作类型',
-  `involve_money` decimal(10,2) DEFAULT NULL COMMENT '影响的金额',
+  `involve_money` decimal(10,2) DEFAULT '0.00' COMMENT '影响的金额',
   `operator` varchar(50) DEFAULT NULL COMMENT '操作员名称',
   `member_id` bigint(20) unsigned DEFAULT NULL COMMENT '会员id',
   `card_id` bigint(20) unsigned DEFAULT NULL COMMENT '会员卡id',
@@ -313,9 +314,9 @@ DROP TABLE IF EXISTS `t_recharge_record`;
 
 CREATE TABLE `t_recharge_record` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `add_count` int(10) unsigned DEFAULT NULL COMMENT '充值可用次数',
-  `add_day` int(10) unsigned DEFAULT NULL COMMENT '延长有效天数',
-  `received_money` decimal(10,2) unsigned DEFAULT NULL COMMENT '实收金额',
+  `add_count` int(10) unsigned DEFAULT '0' COMMENT '充值可用次数',
+  `add_day` int(10) unsigned DEFAULT '0' COMMENT '延长有效天数',
+  `received_money` decimal(10,2) unsigned DEFAULT '0.00' COMMENT '实收金额',
   `operator` varchar(50) DEFAULT NULL COMMENT '操作员',
   `note` varchar(255) DEFAULT NULL,
   `member_id` bigint(20) unsigned DEFAULT NULL COMMENT '会员id',

@@ -7,6 +7,7 @@
     <result column="add_count" jdbcType="INTEGER" property="addCount" />
     <result column="add_day" jdbcType="INTEGER" property="addDay" />
     <result column="received_money" jdbcType="DECIMAL" property="receivedMoney" />
+    <result column="pay_mode" jdbcType="VARCHAR" property="payMode" />
     <result column="operator" jdbcType="VARCHAR" property="operator" />
     <result column="note" jdbcType="VARCHAR" property="note" />
     <result column="member_id" jdbcType="BIGINT" property="memberId" />
