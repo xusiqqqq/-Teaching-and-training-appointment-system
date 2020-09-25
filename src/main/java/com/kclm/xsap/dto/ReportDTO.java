@@ -16,7 +16,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class ReportDTO extends BaseDTO{
+public class ReportDTO {
 
 	/**
 	 * 会员卡种类名称+会员卡绑定数量

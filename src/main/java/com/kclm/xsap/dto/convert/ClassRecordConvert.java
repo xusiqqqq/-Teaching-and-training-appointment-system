@@ -34,9 +34,14 @@ public interface ClassRecordConvert {
 	 */
 	@Mappings({
 		@Mapping(source = "card.name",target = "cardName"),
+		@Mapping(source = "course.name",target = "courseName"),
 		@Mapping(source = "schedule.orderNums",target = "reserveNumbers"),
 		@Mapping(source = "classRecord.note",target = "reserveNote"),
-		@Mapping(target = "classTime",expression = "java (LocalDateTime.of(schedule.getStartDate(),schedule.getClassTime() ))")		
+		@Mapping(source = "classRecord.id",target = "classRecordId"),
+		@Mapping(source = "course.id",target = "courseId"),
+		@Mapping(source = "schedule.id",target = "scheduleId"),
+		@Mapping(source = "card.id",target = "cardId"),
+		@Mapping(target = "classTime",expression = "java(LocalDateTime.of(schedule.getStartDate(),schedule.getClassTime() ))")
 	})
 	ClassRecordDTO entity2Dto(TReservationRecord classRecord,TCourse course,TScheduleRecord schedule,TMemberCard card);
 	

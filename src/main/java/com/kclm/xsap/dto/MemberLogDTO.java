@@ -16,8 +16,9 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class MemberLogDTO extends BaseDTO {
+public class MemberLogDTO {
 
+	private Long id;
 	/**
 	 * 操作时间
 	 */
@@ -29,32 +30,32 @@ public class MemberLogDTO extends BaseDTO {
 	private String operateType;
 	
 	/**
-	 * 剩余可用次数
+	 * 剩余可用次数,
 	 */
 	private Integer validTimes;
 	
 	/**
-	 * 卡到期日
+	 * 卡到期日: 来自于 会员绑卡记录 实体， 它的值由 日期 createTime 加上 validDay【有效期，天】 得到
 	 */
 	private LocalDateTime endToDate; 
 	
 	/**
-	 * 金额
+	 * 涉及金额， 来自于会员绑卡记录 实体， 它的值由 实收金额[receivedMoney] 除以 可使用次数【validCount】 得到
 	 */
 	private BigDecimal involveMoney;
 	
 	/**
-	 * 操作人
+	 * 操作人： 也就是当前的登录用户
 	 */
 	private String operator;
 	
 	/**
-	 * 会员卡备注信息
+	 * 会员卡备注信息， 来自于会员卡 实体类
 	 */
 	private String cardNote;
 	
 	/**
-	 * 会员卡激活状态
+	 * 会员卡激活状态， 来自于会员卡 实体类
 	 */
 	private Integer status;
 	

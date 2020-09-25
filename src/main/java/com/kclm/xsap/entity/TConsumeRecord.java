@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
@@ -31,6 +32,7 @@ public class TConsumeRecord extends BaseEntity implements Serializable{
 	 *  用来封装会员卡实体
 	 */
 	@TableField(exist = false)
+	@ToString.Exclude
 	private TMemberCard card;
 	
 	/**

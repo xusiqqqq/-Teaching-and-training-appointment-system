@@ -13,8 +13,9 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class CourseDTO extends BaseDTO{
-	
+public class CourseDTO {
+
+	private Long id;
 	/**
 	 * 课程名
 	 */

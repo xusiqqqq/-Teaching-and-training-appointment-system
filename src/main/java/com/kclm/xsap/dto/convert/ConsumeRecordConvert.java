@@ -28,6 +28,8 @@ public interface ConsumeRecordConvert {
 	 * @return	ConsumeRecordDTO。消费记录要展示的信息
 	 */
 	@Mappings({
+		@Mapping(source = "consume.id", target = "consumeId"),
+		@Mapping(source = "card.id", target = "cardId"),
 		@Mapping(source = "card.name",target = "cardName"),
 		@Mapping(source = "consume.createTime",target = "operateTime")		
 	})

@@ -14,13 +14,24 @@ import lombok.EqualsAndHashCode;
  *
  */
 @Data
-@EqualsAndHashCode(callSuper=false)
-public class ClassRecordDTO extends BaseDTO{
+@EqualsAndHashCode
+public class ClassRecordDTO{
 
+	/****
+	 * 添加各自对应的id
+	 * add by yejf
+	 */
+	private Long classRecordId;
+
+	private Long courseId;
+
+	private Long scheduleId;
+
+	private Long cardId;
 	/**
 	 * 课程名
 	 */
-	private String name;
+	private String courseName;
 	
 	/**
 	 * 上课时间
