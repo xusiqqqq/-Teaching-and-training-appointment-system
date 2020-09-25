@@ -33,7 +33,8 @@ public interface MemberCardConvert {
 	 */
 	@Mappings({
 		@Mapping(source = "validTimes",target = "totalCount"),
-		@Mapping(source = "endTime",target = "dueTime")
+		@Mapping(source = "endTime",target = "dueTime"),
+		@Mapping(source = "memberCard.id", target = "memberCardId")
 	})
 	MemberCardDTO entity2Dto(Integer validTimes,LocalDateTime endTime,TMemberCard memberCard);
 

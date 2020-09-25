@@ -17,7 +17,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class HomePageDTO extends BaseDTO{
+public class HomePageDTO {
 
 	/**
 	 *  起始日期

@@ -40,7 +40,11 @@ public interface CourseScheduleConvert {
 	@Mappings({
 		@Mapping(source = "course.name",target = "courseName"),
 		@Mapping(source = "course.contains",target = "classNumbers"),
-		@Mapping(target = "startTime",expression = "java (LocalDateTime.of(schedule.getStartDate(),schedule.getClassTime() ))")		
+		@Mapping(source = "course.limitSex",target = "limitSex"),
+		@Mapping(source = "course.limitAge",target = "limitAge"),
+		@Mapping(source = "schedule.id", target = "scheduleId"),
+		@Mapping(source = "course.id", target = "courseId"),
+		@Mapping(target = "startTime",expression = "java(LocalDateTime.of(schedule.getStartDate(),schedule.getClassTime() ))")
 	})
 	CourseScheduleDTO entity2Dto(TScheduleRecord schedule,TCourse course,
 			String supportCards,String teacherName,List<ReserveRecordDTO> reserveDTO); 

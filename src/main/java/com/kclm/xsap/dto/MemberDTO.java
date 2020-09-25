@@ -16,8 +16,9 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class MemberDTO extends BaseDTO{
-	
+public class MemberDTO{
+
+	private Long id;
 	/**
 	 *  会员名称
 	 */

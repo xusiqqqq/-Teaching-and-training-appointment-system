@@ -16,7 +16,11 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class CourseScheduleDTO extends BaseDTO{
+public class CourseScheduleDTO {
+
+	private Long scheduleId;
+
+	private Long courseId;
 
 	/**
 	 * 课程名
@@ -39,12 +43,12 @@ public class CourseScheduleDTO extends BaseDTO{
 	private Integer duration;
 	
 	/**
-	 * 限制性别
+	 * 限制性别 【同课程中的一样，以课程中的为准，此处仅做为冗余字段】
 	 */
 	private String limitSex;
 	
 	/**
-	 * 限制年龄
+	 * 限制年龄 【同课程中的一样，以课程中的为准，此处仅做为冗余字段】
 	 */
 	private Integer limitAge;
 	

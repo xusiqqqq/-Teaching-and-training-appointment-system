@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
@@ -28,6 +29,7 @@ public class TReservationRecord extends BaseEntity implements Serializable{
 	 *  封装排课计划实体数据 
 	 */
     @TableField(exist = false)
+	@ToString.Exclude
 	private TScheduleRecord schedule;
 	
     /**
@@ -39,6 +41,7 @@ public class TReservationRecord extends BaseEntity implements Serializable{
 	 *  封装会员实体数据
 	 */
 	@TableField(exist = false)
+	@ToString.Exclude
     private TMember member;
     
 	/**

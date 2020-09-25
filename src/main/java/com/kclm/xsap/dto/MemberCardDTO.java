@@ -19,8 +19,9 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class MemberCardDTO extends BaseDTO{
+public class MemberCardDTO{
 
+	private Long memberCardId;
 	/**
 	 * 会员卡名称
 	 */

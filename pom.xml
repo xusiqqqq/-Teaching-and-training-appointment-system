@@ -134,20 +134,22 @@
             <version>${mapstruct.version}</version>
         </dependency>
         <!-- 用来在DO和DTO之间进行类型转换的组件 -->
-        <!-- <dependency>
+         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>
             <version>${mapstruct.version}</version>
-        </dependency> -->
+        </dependency>
 
 
     </dependencies>
 
     <build>
         <plugins>
-           <!--  <plugin>
+
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+<<<<<<< HEAD
             </plugin> -->
           
             <plugin>
@@ -179,6 +181,10 @@
 				</compilerArgs>
             </configuration>
         </plugin>
+=======
+            </plugin>
+
+>>>>>>> develop
         </plugins>
     </build>
 

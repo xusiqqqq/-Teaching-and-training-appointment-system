@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
@@ -24,6 +25,7 @@ public class TMemberCard extends BaseEntity implements Serializable{
 	 * 关联的课程
 	 */
 	@TableField(exist = false)
+    @ToString.Exclude
 	private List<TCourse> courseList;
 	
     private String name;

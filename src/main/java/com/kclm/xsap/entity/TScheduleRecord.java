@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
@@ -30,6 +31,7 @@ public class TScheduleRecord extends BaseEntity implements Serializable{
 	 *  封装课程实体数据
 	 */
 	@TableField(exist = false)
+    @ToString.Exclude
     private TCourse course;
 
     /**
@@ -41,6 +43,7 @@ public class TScheduleRecord extends BaseEntity implements Serializable{
      *  封装教师实体数据
      */
     @TableField(exist = false)
+    @ToString.Exclude
     private TEmployee employee;
 
     /**
