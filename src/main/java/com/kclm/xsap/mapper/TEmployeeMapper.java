@@ -15,7 +15,7 @@ public interface TEmployeeMapper extends BaseMapper<TEmployee> {
 	 * @param rolePassword	管理员密码
 	 * @return	TEmployee。员工信息
 	 */
-	TEmployee findByNameAndPwd(@Param("roleName")String roleName,@Param("rolePassword") String rolePassword);
+	TEmployee findByNameAndPwd(@Param("phone")String roleName,@Param("rolePassword") String rolePassword);
 
 	/**
 	 * 根据用户名查询员工信息

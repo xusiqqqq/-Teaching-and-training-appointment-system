@@ -3,6 +3,7 @@ package com.kclm.xsap.dto.convert;
 import java.util.Map;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import com.kclm.xsap.dto.ReportDTO;
@@ -27,6 +28,7 @@ public interface ReportConvert {
 	 * @param data	图表数据
 	 * @return	ReportDTO。显示的报表信息
 	 */
+	@Mapping(source = "data",target = "memberCardBindingMap")
 	ReportDTO entity2Dto(Map<String,Integer> data);
 	
 }

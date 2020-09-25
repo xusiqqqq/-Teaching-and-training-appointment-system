@@ -121,15 +121,16 @@ DROP TABLE IF EXISTS `t_employee`;
 CREATE TABLE `t_employee` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(50) DEFAULT NULL,
-  `phone` varchar(20) DEFAULT NULL,
+  `phone` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '用来登录',
   `sex` varchar(6) DEFAULT NULL,
   `birthday` date DEFAULT NULL,
   `introduce` varchar(255) DEFAULT NULL COMMENT '介绍',
   `avatar_url` varchar(255) DEFAULT NULL COMMENT '头像文件路径',
   `note` varchar(255) DEFAULT NULL,
-  `role_name` varchar(50) DEFAULT NULL COMMENT '操作角色名',
+  `role_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '操作角色名，暂不使用',
   `role_password` varchar(100) DEFAULT NULL COMMENT '操作角色密码',
   `role_type` tinyint(1) unsigned DEFAULT '0' COMMENT '操作角色类型，1，超级管理员；0，普通管理员',
+  `role_email` varchar(50) DEFAULT NULL COMMENT '操作角色邮箱',
   `is_deleted` tinyint(1) unsigned DEFAULT '0' COMMENT '逻辑删除，1有效，0无效',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
   `last_modify_time` datetime DEFAULT NULL COMMENT '修改时间',
@@ -139,16 +140,16 @@ CREATE TABLE `t_employee` (
 
 /*Data for the table `t_employee` */
 
-insert  into `t_employee`(`id`,`name`,`phone`,`sex`,`birthday`,`introduce`,`avatar_url`,`note`,`role_name`,`role_password`,`role_type`,`is_deleted`,`create_time`,`last_modify_time`,`version`) values 
-(1,'张老师','12345123','女','2020-09-07','教数学',NULL,'。。。','admin','123',1,0,NULL,NULL,NULL),
-(2,'李老','467453','男','2020-09-09','地理',NULL,'，，，','user','123',0,0,NULL,NULL,NULL),
-(3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'test','111',0,0,NULL,NULL,NULL),
-(4,'魏老','53459445','男',NULL,'教体育',NULL,'note-2','user1','123',0,0,NULL,NULL,1),
-(5,'魏老','53459445','男',NULL,'教体育',NULL,'note-3','user2','123',0,0,NULL,NULL,1),
-(6,'魏老','53459445','男',NULL,'教体育',NULL,'note-6','user3','123',0,0,NULL,NULL,1),
-(7,'魏老','53459445','男',NULL,'教体育',NULL,'note-7','user4','123',0,0,NULL,NULL,1),
-(8,'魏老','53459445','男',NULL,'教体育',NULL,'note-8','user5','123',0,0,NULL,NULL,1),
-(9,'魏老','53459445','男',NULL,'教体育',NULL,'note-9','user6','123',0,0,NULL,NULL,1);
+insert  into `t_employee`(`id`,`name`,`phone`,`sex`,`birthday`,`introduce`,`avatar_url`,`note`,`role_name`,`role_password`,`role_type`,`role_email`,`is_deleted`,`create_time`,`last_modify_time`,`version`) values 
+(1,'张老师','12345123','女','2020-09-07','教数学',NULL,'。。。','admin','123',1,NULL,0,NULL,NULL,NULL),
+(2,'李老','467453','男','2020-09-09','地理',NULL,'，，，','user','123',0,NULL,0,NULL,NULL,NULL),
+(3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'test','111',0,NULL,0,NULL,NULL,NULL),
+(4,'魏老','53459445','男',NULL,'教体育',NULL,'note-2','user1','123',0,NULL,0,NULL,NULL,1),
+(5,'魏老','53459445','男',NULL,'教体育',NULL,'note-3','user2','123',0,NULL,0,NULL,NULL,1),
+(6,'魏老','53459445','男',NULL,'教体育',NULL,'note-6','user3','123',0,NULL,0,NULL,NULL,1),
+(7,'魏老','53459445','男',NULL,'教体育',NULL,'note-7','user4','123',0,NULL,0,NULL,NULL,1),
+(8,'魏老','53459445','男',NULL,'教体育',NULL,'note-8','user5','123',0,NULL,0,NULL,NULL,1),
+(9,'魏老','53459445','男',NULL,'教体育',NULL,'note-9','user6','123',0,NULL,0,NULL,NULL,1);
 
 /*Table structure for table `t_global_reservation_set` */
 
@@ -215,6 +216,7 @@ CREATE TABLE `t_member_bind_record` (
   `valid_count` int(10) unsigned DEFAULT NULL COMMENT '可使用次数',
   `valid_day` int(10) unsigned DEFAULT NULL COMMENT '有效期，按天算',
   `received_money` decimal(10,2) unsigned DEFAULT NULL COMMENT '实收金额',
+  `pay_mode` varchar(20) DEFAULT NULL COMMENT '支付方式',
   `note` varchar(255) DEFAULT NULL,
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
   `last_modify_time` datetime DEFAULT NULL COMMENT '修改时间',
@@ -228,18 +230,18 @@ CREATE TABLE `t_member_bind_record` (
 
 /*Data for the table `t_member_bind_record` */
 
-insert  into `t_member_bind_record`(`id`,`member_id`,`card_id`,`valid_count`,`valid_day`,`received_money`,`note`,`create_time`,`last_modify_time`,`version`) values 
-(1,1,1,33,33,500.00,'绑定1',NULL,NULL,NULL),
-(2,1,3,5,5,400.00,'绑定2',NULL,NULL,NULL),
-(3,2,1,65,6,300.00,'绑定3',NULL,NULL,NULL),
-(4,3,2,55,55,329.00,'绑定4',NULL,NULL,NULL),
-(5,NULL,NULL,5,5,55.00,'bind-5',NULL,NULL,1),
-(7,NULL,NULL,7,7,77.00,'bind-7',NULL,NULL,1),
-(8,NULL,NULL,8,8,88.00,'bind-8',NULL,NULL,1),
-(9,NULL,NULL,9,9,99.00,'绑定9',NULL,NULL,NULL),
-(10,NULL,NULL,10,10,100.00,'绑定10',NULL,NULL,NULL),
-(11,NULL,NULL,11,11,111.00,'绑定11',NULL,NULL,NULL),
-(12,NULL,NULL,2,2,22.20,'绑定++','2020-09-11 17:22:24',NULL,1);
+insert  into `t_member_bind_record`(`id`,`member_id`,`card_id`,`valid_count`,`valid_day`,`received_money`,`pay_mode`,`note`,`create_time`,`last_modify_time`,`version`) values 
+(1,1,1,33,33,500.00,NULL,'绑定1',NULL,NULL,NULL),
+(2,1,3,5,5,400.00,NULL,'绑定2',NULL,NULL,NULL),
+(3,2,1,65,6,300.00,NULL,'绑定3',NULL,NULL,NULL),
+(4,3,2,55,55,329.00,NULL,'绑定4',NULL,NULL,NULL),
+(5,NULL,NULL,5,5,55.00,NULL,'bind-5',NULL,NULL,1),
+(7,NULL,NULL,7,7,77.00,NULL,'bind-7',NULL,NULL,1),
+(8,NULL,NULL,8,8,88.00,NULL,'bind-8',NULL,NULL,1),
+(9,NULL,NULL,9,9,99.00,NULL,'绑定9',NULL,NULL,NULL),
+(10,NULL,NULL,10,10,100.00,NULL,'绑定10',NULL,NULL,NULL),
+(11,NULL,NULL,11,11,111.00,NULL,'绑定11',NULL,NULL,NULL),
+(12,NULL,NULL,2,2,22.20,NULL,'绑定++','2020-09-11 17:22:24',NULL,1);
 
 /*Table structure for table `t_member_card` */
 
@@ -317,6 +319,7 @@ CREATE TABLE `t_recharge_record` (
   `add_count` int(10) unsigned DEFAULT '0' COMMENT '充值可用次数',
   `add_day` int(10) unsigned DEFAULT '0' COMMENT '延长有效天数',
   `received_money` decimal(10,2) unsigned DEFAULT '0.00' COMMENT '实收金额',
+  `pay_mode` varchar(20) DEFAULT NULL COMMENT '支付方式',
   `operator` varchar(50) DEFAULT NULL COMMENT '操作员',
   `note` varchar(255) DEFAULT NULL,
   `member_id` bigint(20) unsigned DEFAULT NULL COMMENT '会员id',
@@ -333,16 +336,16 @@ CREATE TABLE `t_recharge_record` (
 
 /*Data for the table `t_recharge_record` */
 
-insert  into `t_recharge_record`(`id`,`add_count`,`add_day`,`received_money`,`operator`,`note`,`member_id`,`card_id`,`create_time`,`last_modify_time`,`version`) values 
-(1,3,3,33.00,NULL,NULL,1,NULL,NULL,NULL,NULL),
-(2,2,2,22.00,NULL,NULL,2,NULL,NULL,NULL,NULL),
-(3,1,1,11.00,NULL,NULL,3,NULL,NULL,NULL,NULL),
-(4,4,4,44.00,NULL,NULL,2,NULL,NULL,NULL,NULL),
-(5,5,5,55.00,NULL,'note-5',NULL,NULL,NULL,NULL,1),
-(6,6,6,66.00,NULL,'note-6',NULL,NULL,NULL,NULL,1),
-(7,7,7,77.00,NULL,'note-7',NULL,NULL,NULL,NULL,1),
-(8,8,8,88.00,NULL,'note-8',NULL,NULL,NULL,NULL,1),
-(9,9,9,99.00,NULL,'note-9',NULL,NULL,NULL,NULL,1);
+insert  into `t_recharge_record`(`id`,`add_count`,`add_day`,`received_money`,`pay_mode`,`operator`,`note`,`member_id`,`card_id`,`create_time`,`last_modify_time`,`version`) values 
+(1,3,3,33.00,NULL,NULL,NULL,1,NULL,NULL,NULL,NULL),
+(2,2,2,22.00,NULL,NULL,NULL,2,NULL,NULL,NULL,NULL),
+(3,1,1,11.00,NULL,NULL,NULL,3,NULL,NULL,NULL,NULL),
+(4,4,4,44.00,NULL,NULL,NULL,2,NULL,NULL,NULL,NULL),
+(5,5,5,55.00,NULL,NULL,'note-5',NULL,NULL,NULL,NULL,1),
+(6,6,6,66.00,NULL,NULL,'note-6',NULL,NULL,NULL,NULL,1),
+(7,7,7,77.00,NULL,NULL,'note-7',NULL,NULL,NULL,NULL,1),
+(8,8,8,88.00,NULL,NULL,'note-8',NULL,NULL,NULL,NULL,1),
+(9,9,9,99.00,NULL,NULL,'note-9',NULL,NULL,NULL,NULL,1);
 
 /*Table structure for table `t_reservation_record` */
 
