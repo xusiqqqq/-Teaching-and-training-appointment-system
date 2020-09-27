@@ -28,6 +28,7 @@ public interface ReportConvert {
 	 * @param data	图表数据
 	 * @return	ReportDTO。显示的报表信息
 	 */
+
 	@Mapping(source = "data", target = "memberCardBindingMap")
 	ReportDTO entity2Dto(Map<String,Integer> data);
 	

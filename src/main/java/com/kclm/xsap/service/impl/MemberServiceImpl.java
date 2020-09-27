@@ -1,5 +1,7 @@
 package com.kclm.xsap.service.impl;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,7 @@ import com.kclm.xsap.dto.convert.ConsumeRecordConvert;
 import com.kclm.xsap.dto.convert.MemberConvert;
 import com.kclm.xsap.dto.convert.ReserveRecordConvert;
 import com.kclm.xsap.dto.convert.MemberCardConvert;
+import com.kclm.xsap.entity.TClassRecord;
 import com.kclm.xsap.entity.TConsumeRecord;
 import com.kclm.xsap.entity.TCourse;
 import com.kclm.xsap.entity.TMember;
@@ -26,6 +29,7 @@ import com.kclm.xsap.entity.TMemberBindRecord;
 import com.kclm.xsap.entity.TMemberCard;
 import com.kclm.xsap.entity.TReservationRecord;
 import com.kclm.xsap.entity.TScheduleRecord;
+import com.kclm.xsap.mapper.TClassRecordMapper;
 import com.kclm.xsap.mapper.TConsumeRecordMapper;
 import com.kclm.xsap.mapper.TCourseMapper;
 import com.kclm.xsap.mapper.TMemberBindRecordMapper;
@@ -50,6 +54,9 @@ public class MemberServiceImpl implements MemberService{
 	private TReservationRecordMapper reserveMapper;
 	
 	@Autowired
+	private TClassRecordMapper classMapper;
+
+	@Autowired
 	private TConsumeRecordMapper consumeMapper;
 	
 	@Autowired
@@ -57,6 +64,7 @@ public class MemberServiceImpl implements MemberService{
 	
 	@Autowired
 	private TCourseMapper courseMapper;
+	
 	
 	@Override
 	public boolean save(TMember member) {
@@ -138,7 +146,7 @@ public class MemberServiceImpl implements MemberService{
 		return memberDto;
 	}
 	
-	
+	//会员卡信息
 	@Override
 	public List<MemberCardDTO> findAllCardRecords(Long id) {
 		List<MemberCardDTO> cardDtoList = new ArrayList<>();
@@ -169,15 +177,16 @@ public class MemberServiceImpl implements MemberService{
 		return cardDtoList;
 	}
 
+	//上课记录
 	@Override
 	public List<ClassRecordDTO> listClassRecords(Long id) {
 		//获取上课记录。这里获取的是会员的上课记录
-		List<TReservationRecord> reserveList = reserveMapper.selectList(new QueryWrapper<TReservationRecord>()
-				.eq("status", 1).eq("member_id", id));
+		List<TClassRecord> classList = classMapper.selectList(new QueryWrapper<TClassRecord>()
+				.eq("member_id", id));
 		//获取排课计划
 		List<Long> idList = new ArrayList<>();
-		for (int i = 0; i < reserveList.size(); i++) {
-			 idList.add(reserveList.get(i).getScheduleId());
+		for (int i = 0; i < classList.size(); i++) {
+			 idList.add(classList.get(i).getScheduleId());
 		}
 		List<TScheduleRecord> scheduleList = scheduleMapper.selectBatchIds(idList);
 		//清空idList数据，以供下面复用
@@ -199,19 +208,19 @@ public class MemberServiceImpl implements MemberService{
 		//5、组合成DTO数据信息
 		//5.1 sql结果对应关系
 		//1条 上课记录 =》 1条 排课记录（1 条 会员记录） =》1条 课程记录 =》  n条 会员卡记录
-		TReservationRecord reserve ;
+		TClassRecord classed ;
 		TScheduleRecord schedule;
 		TCourse course;
 		TMemberCard card;
 		List<ClassRecordDTO> classDtoList = new ArrayList<>();
-		for(int i = 0; i < reserveList.size(); i++) {
-			reserve = reserveList.get(i);
+		for(int i = 0; i < classList.size(); i++) {
+			classed = classList.get(i);
 			schedule = scheduleList.get(i);
 			course = courseList.get(i);
 			for(int j = 0; j < cardList.size() ; j++) {
 				card = cardList.get(j);
 				//DTO转换
-				ClassRecordDTO classRecordDTO = ClassRecordConvert.INSTANCE.entity2Dto(reserve, course, schedule, card);
+				ClassRecordDTO classRecordDTO = ClassRecordConvert.INSTANCE.entity2Dto(classed, course, schedule, card);
 				//转换完成一条记录，就存放一条记录
 				classDtoList.add(classRecordDTO);
 			}
@@ -219,6 +228,7 @@ public class MemberServiceImpl implements MemberService{
 		return classDtoList;
 	}
 
+	//预约记录
 	//跟上课记录不同的地方在于，预约状态不限制，预约的会员卡仅能一次预约一门课，一门课在被预约的状态下，同一个会员不能二次预约
 	@Override
 	public List<ReserveRecordDTO> listReserveRecords(Long id) {
@@ -253,15 +263,54 @@ public class MemberServiceImpl implements MemberService{
 			schedule = scheduleList.get(i);
 			course = courseList.get(i);			
 			//DTO转换
-			ReserveRecordDTO reserveDto = ReserveRecordConvert.INSTANCE.entity2Dto(course, schedule, reserve);
+			ReserveRecordDTO reserveDto = ReserveRecordConvert.INSTANCE.entity2Dto(course, schedule, reserve,null);
 			//转换完成一条记录，就存放一条记录
 			reserveDtoList.add(reserveDto);
 		}
 		return reserveDtoList;
 	}
 
+	//消费记录
 	@Override
 	public List<ConsumeRecordDTO> listConsumeRecords(Long id) {
+		/* 查询前，先对上课记录进行消费录入 */
+		
+		//查出所有确认已上课事务记录，进行消费记录的录入
+		List<TClassRecord> classList = classMapper.selectList(
+				new QueryWrapper<TClassRecord>().eq("check_status", 1));
+		TConsumeRecord consume = new TConsumeRecord();
+		for (TClassRecord classed : classList) {
+			consume.setMemberId(classed.getMemberId());
+			//查出卡号
+			Long cardId = cardMapper.selectOne(new QueryWrapper<TMemberCard>()
+					.eq("name", classed.getCardName())).getId();
+			consume.setCardId(cardId);
+			//查询出某课程单词课需花费的次数
+			TScheduleRecord scheduleRecord = scheduleMapper.selectById(classed.getScheduleId());
+			TCourse course = courseMapper.selectById(scheduleRecord.getCourseId());
+			consume.setCardCountChange(course.getTimesCost());
+			
+			//为系统自动处理时，天数不进行消耗处理
+			consume.setCardDayChange(0);
+			
+			consume.setOperateType("上课支出");
+			consume.setOperator("系统自动处理");
+			
+			//查出会员卡的次数单价，取值四舍五入
+			TMemberCard card = cardMapper.selectById(consume.getCardId());
+			BigDecimal price = new BigDecimal(card.getPrice().toString());
+			BigDecimal count = new BigDecimal(card.getTotalCount().toString());
+			BigDecimal unitPrice = price.divide(count, 2, RoundingMode.HALF_UP);
+			//消费的次数
+			BigDecimal countCost = new BigDecimal(course.getTimesCost().toString());
+			consume.setMoneyCost(unitPrice.multiply(countCost));
+			
+			//录入一条消费记录
+			consumeMapper.insert(consume);
+		}
+		
+		/* 以下是查询 */
+		
 		List<TConsumeRecord> consumeList = consumeMapper.selectList(new QueryWrapper<TConsumeRecord>()
 				.eq("member_id", id));
 		List<Long> idList = new ArrayList<>();
