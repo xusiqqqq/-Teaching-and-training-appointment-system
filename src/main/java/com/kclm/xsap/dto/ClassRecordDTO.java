@@ -44,9 +44,9 @@ public class ClassRecordDTO{
 	private String cardName;
 	
 	/**
-	 * 预约人数
+	 * 上课人数
 	 */
-	private Integer reserveNumbers;
+	private Integer classNumbers;
 	
 	/**
 	 * 消耗卡次/节
@@ -54,13 +54,18 @@ public class ClassRecordDTO{
 	private Integer timesCost;
 	
 	/**
-	 * 预约备注
+	 * 上课备注
 	 */
-	private String reserveNote;
+	private String classNote;
 	
 	/**
 	 * 教师评语
 	 */
 	private String comment;
+	
+	/**
+	 * 上课状态检定。1，已上课；0，未上课
+	 */
+	private Integer checkStatus;
 	
 }

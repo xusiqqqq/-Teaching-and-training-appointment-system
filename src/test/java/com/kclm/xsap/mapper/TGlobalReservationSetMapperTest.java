@@ -27,8 +27,6 @@ public class TGlobalReservationSetMapperTest {
 		@Test
 		public void save() {
 		global.setStartTime(1);
-		global.setEndTime(LocalDateTime.now());
-		global.setCancelTime(LocalDateTime.now());
 		globalMapper.insert(global);
 		toPrint("增加", 1,null);
 		}
@@ -38,8 +36,6 @@ public class TGlobalReservationSetMapperTest {
 		public void updateOne() {
 		global = findById(1);
 		global.setStartTime(11);
-		global.setEndTime(LocalDateTime.now());
-		global.setCancelTime(LocalDateTime.now());
 		globalMapper.updateById(global);
 		toPrint("更新", 1,null);
 		}

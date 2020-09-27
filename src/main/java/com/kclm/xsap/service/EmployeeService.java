@@ -13,6 +13,13 @@ import com.kclm.xsap.entity.TEmployee;
 public interface EmployeeService {
 
 	/**
+	 * 	通过手机号/邮箱找到用户信息
+	 * @param username username 操作员用户名
+	 * @return TEmployee。员工信息
+	 */
+	TEmployee findByUser(String username);
+	
+	/**
 	 *  账户登录
 	 * @param username 操作员用户名
 	 * @param pwd 操作员密码
@@ -51,6 +58,14 @@ public interface EmployeeService {
 	 * @return boolean。true：更新密码成功；false：更新密码失败
 	 */
 	boolean updatePassword(String username,String oldPwd,String newPwd);
+	
+	/**
+	 * 
+	 * @param username 操作员用户名
+	 * @param newPwd 新密码
+	 * @return boolean。true：重置密码成功；false：重置密码失败
+	 */
+	boolean resetPassward(String username,String newPwd);
 	
 	/**
 	 *  更新个人信息。包含头像，不含密码

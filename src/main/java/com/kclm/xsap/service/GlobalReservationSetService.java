@@ -14,7 +14,7 @@ import com.kclm.xsap.entity.TGlobalReservationSet;
  */
 public interface GlobalReservationSetService {
 
-	boolean save(TGlobalReservationSet global);
+	boolean update(TGlobalReservationSet glogal);
 	
 	/**
 	 * 获取所有的全局预约设置信息

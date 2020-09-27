@@ -62,6 +62,11 @@ public class TReservationRecord extends BaseEntity implements Serializable{
     private String note;
 
     /**
+     * 上课备注，放在这里方便上课记录的录入
+     */
+    private String classNote;
+    
+    /**
     * 操作员
     */
     private String operator;

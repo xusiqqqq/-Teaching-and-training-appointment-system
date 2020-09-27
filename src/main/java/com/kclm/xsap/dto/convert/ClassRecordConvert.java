@@ -6,9 +6,9 @@ import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
 import com.kclm.xsap.dto.ClassRecordDTO;
+import com.kclm.xsap.entity.TClassRecord;
 import com.kclm.xsap.entity.TCourse;
 import com.kclm.xsap.entity.TMemberCard;
-import com.kclm.xsap.entity.TReservationRecord;
 import com.kclm.xsap.entity.TScheduleRecord;
 
 /**
@@ -26,7 +26,7 @@ public interface ClassRecordConvert {
 	
 	/**
 	 * 
-	 * @param classRecord 对应预约记录实体类。status = 1，表示上课记录
+	 * @param classRecord 对应上课记录实体类
 	 * @param course	对应课程表实体类
 	 * @param schedule	对应排课计划实体类
 	 * @param card	对应会员卡实体类
@@ -35,15 +35,15 @@ public interface ClassRecordConvert {
 	@Mappings({
 		@Mapping(source = "card.name",target = "cardName"),
 		@Mapping(source = "course.name",target = "courseName"),
-		@Mapping(source = "schedule.orderNums",target = "reserveNumbers"),
-		@Mapping(source = "classRecord.note",target = "reserveNote"),
+		@Mapping(source = "schedule.orderNums",target = "classNumbers"),
+		@Mapping(source = "classRecord.note",target = "classNote"),
 		@Mapping(source = "classRecord.id",target = "classRecordId"),
 		@Mapping(source = "course.id",target = "courseId"),
 		@Mapping(source = "schedule.id",target = "scheduleId"),
 		@Mapping(source = "card.id",target = "cardId"),
 		@Mapping(target = "classTime",expression = "java(LocalDateTime.of(schedule.getStartDate(),schedule.getClassTime() ))")
 	})
-	ClassRecordDTO entity2Dto(TReservationRecord classRecord,TCourse course,TScheduleRecord schedule,TMemberCard card);
+	ClassRecordDTO entity2Dto(TClassRecord classRecord,TCourse course,TScheduleRecord schedule,TMemberCard card);
 	
 	
 }

@@ -1,5 +1,6 @@
 package com.kclm.xsap.entity;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 import com.baomidou.mybatisplus.annotation.TableLogic;
@@ -11,9 +12,14 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper=false)
 @TableName(value = "t_member",resultMap = "TMemberMap")
-public class TMember extends BaseEntity {
+public class TMember extends BaseEntity implements Serializable{
 
-    private String name;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private String name;
 
     private String sex;
 

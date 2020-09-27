@@ -14,8 +14,8 @@ public class GlobalReservationSetServiceImpl implements GlobalReservationSetServ
 	TGlobalReservationSetMapper globalMapper;
 	
 	@Override
-	public boolean save(TGlobalReservationSet global) {
-		globalMapper.insert(global);
+	public boolean update(TGlobalReservationSet glogal) {
+		globalMapper.updateById(glogal);
 		return true;
 	}
 
@@ -24,5 +24,6 @@ public class GlobalReservationSetServiceImpl implements GlobalReservationSetServ
 		List<TGlobalReservationSet> globalList = globalMapper.selectList(null);
 		return globalList;
 	}
+
 
 }
