@@ -78,6 +78,11 @@ public class EmployeeController {
 		return "x_modify_password";
 	}
 	
+	//首页
+	@RequestMapping("/toIndex.do")
+	public String toIndex() {
+		return "index";
+	}
 	/* =============用作页面数据处理=========== */
 	
 	//登录界面
@@ -89,6 +94,9 @@ public class EmployeeController {
 			model.addAttribute("USER_NOT_EXIST", true);			
 			return "x_login";
 		}
+		//拿到当前用户名，供其它方法使用
+		global_username=loginUser.getPhone();
+		
 		loginUser.setRoleName(loginUser.getRoleType() == 1 ? "超级管理员":"普通管理员");
 		loginUser.setLastModifyTime(LocalDateTime.now());
 		model.addAttribute("userInfo", loginUser);
@@ -102,7 +110,7 @@ public class EmployeeController {
 	@RequestMapping("/logout.do")
 	public String logout(HttpSession session) {
 		session.invalidate();
-		return "x_login";
+		return "redirect:toLogin";
 	}
 
 	//注册界面
@@ -170,8 +178,8 @@ public class EmployeeController {
 	//修改用户信息
 	//在响应数据回浏览器时，指定json类型
 //	@RequestMapping(value = "/modifyUser.do",produces = "application/json")
-	@RequestMapping(value = "/modifyUser.do",produces = {"application/json;charset=UTF-8"})
-	@ResponseBody
+	@RequestMapping(value = "/modifyUser.do",produces = {"application/json"})
+//	@ResponseBody
 	public String modifyUser(@RequestBody TEmployee emp,HttpSession session) {
 		//销毁上一次的Session内容，将更新后的结果重新存入session
 		session.invalidate();
@@ -189,14 +197,16 @@ public class EmployeeController {
 			model.addAttribute("CHECK_PWD_ERROR",1);
 			return "x_modify_password";
 		}
+		System.out.println("运行了1次--------------");
 		boolean isOk = employeeService.updatePassword(global_username, oldPwd, newPwd);
+		System.out.println(isOk +"  :-----------");
 		if(!isOk) {
 			//原密码不正确
 			model.addAttribute("CHECK_PWD_ERROR",0);
 			return "x_modify_password";
 		}
 		//密码修改完，重新登录
-		return "x_login";
+		return "redirect:logout.do";
 	}
 	
 }

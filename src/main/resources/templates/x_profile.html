@@ -77,10 +77,10 @@
                                     <label class="col-sm-3 control-label">性别</label>
                                     <div class="col-sm-8">
                                         <label class="checkbox-inline">
-                                            <input type="radio" name="gender" value="option1" > 男
+                                            <input type="radio" name="sex" th:attr="checked =  ${session.LOGIN_USER.sex} eq '男'" > 男
                                         </label>
                                         <label class="checkbox-inline">
-                                            <input type="radio" name="gender" value="option2" checked="checked"> 女
+                                            <input type="radio" name="sex"  th:attr="checked = ${session.LOGIN_USER.sex }eq '女' " > 女
                                         </label>
                                     </div>
                                 </div>

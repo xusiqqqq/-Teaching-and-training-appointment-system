@@ -1,5 +1,7 @@
 package com.kclm.xsap.service.impl;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,9 +73,11 @@ public class MemberCardServiceImpl implements MemberCardService{
 	@Autowired
 	TMemberBindRecordMapper bindMapper;
 	
+	//进行充值
 	@Override
 	public boolean recharge(TRechargeRecord recharge) {
 		rechargeMapper.insert(recharge);
+		
 		//把充值记录存入到操作记录表
 		TMemberLog memberLog = new TMemberLog();
 		memberLog.setMemberId(recharge.getMemberId());
@@ -92,9 +96,20 @@ public class MemberCardServiceImpl implements MemberCardService{
 		return true;
 	}
 
+	//进行消费
 	@Override
 	public boolean consume(TConsumeRecord consume) {
+		//查出会员卡的次数单价，取值四舍五入
+		TMemberCard card = cardMapper.selectById(consume.getCardId());
+		BigDecimal price = new BigDecimal(card.getPrice().toString());
+		BigDecimal count = new BigDecimal(card.getTotalCount().toString());
+		BigDecimal unitPrice = price.divide(count, 2, RoundingMode.HALF_UP);
+		//消费的次数
+		BigDecimal countCost = new BigDecimal(consume.getCardCountChange().toString());
+		
+		consume.setMoneyCost(unitPrice.multiply(countCost));
 		consumeMapper.insert(consume);
+		
 		//把消费记录存入到操作记录表
 		TMemberLog memberLog = new TMemberLog();
 		memberLog.setMemberId(consume.getMemberId());
@@ -108,10 +123,12 @@ public class MemberCardServiceImpl implements MemberCardService{
 				.eq("card_id", consume.getCardId()).eq("member_id", consume.getMemberId()));
 		bindRecord.setValidCount(bindRecord.getValidCount() + consume.getCardCountChange());
 		bindRecord.setValidDay(bindRecord.getValidDay() + consume.getCardDayChange());
+		bindRecord.setReceivedMoney(consume.getMoneyCost());
 		bindMapper.update(bindRecord, null);
 		return true;
 	}
 
+	//查询操作记录
 	@Override
 	public List<MemberLogDTO> listOperateLog(Long memberId,Long cardId) {
 		MemberLogDTO logDto = new MemberLogDTO();

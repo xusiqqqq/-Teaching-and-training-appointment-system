@@ -5,15 +5,19 @@
     <!--@mbg.generated-->
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="start_time" jdbcType="INTEGER" property="startTime" />
-    <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
-    <result column="cancel_time" jdbcType="TIMESTAMP" property="cancelTime" />
+    <result column="end_day" jdbcType="INTEGER" property="endDay" />
+    <result column="end_time" jdbcType="TIME" property="endTime" />
+    <result column="end_hour" jdbcType="INTEGER" property="endHour" />
+    <result column="cancel_day" jdbcType="INTEGER" property="cancelDay" />
+    <result column="cancel_time" jdbcType="TIME" property="cancelTime" />
+    <result column="cancel_hour" jdbcType="INTEGER" property="cancelHour" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
     <result column="version" jdbcType="INTEGER" property="version" />
   </resultMap>
   <sql id="TGlobalReservationSet_Column_List">
     <!--@mbg.generated-->
-    id, start_time, end_time, cancel_time, create_time, last_modify_time, version
+    id, start_time, end_day, end_time, end_hour, cancel_day, cancel_time, cancel_hour, create_time, last_modify_time, version
   </sql>
   
 </mapper>

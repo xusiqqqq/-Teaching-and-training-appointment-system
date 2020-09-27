@@ -10,15 +10,15 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.kclm.xsap.dto.ClassRecordDTO;
 import com.kclm.xsap.dto.convert.ClassRecordConvert;
+import com.kclm.xsap.entity.TClassRecord;
 import com.kclm.xsap.entity.TCourse;
 import com.kclm.xsap.entity.TEmployee;
 import com.kclm.xsap.entity.TMemberCard;
-import com.kclm.xsap.entity.TReservationRecord;
 import com.kclm.xsap.entity.TScheduleRecord;
+import com.kclm.xsap.mapper.TClassRecordMapper;
 import com.kclm.xsap.mapper.TCourseMapper;
 import com.kclm.xsap.mapper.TEmployeeMapper;
 import com.kclm.xsap.mapper.TMemberCardMapper;
-import com.kclm.xsap.mapper.TReservationRecordMapper;
 import com.kclm.xsap.mapper.TScheduleRecordMapper;
 import com.kclm.xsap.service.TeacherService;
 
@@ -69,7 +69,7 @@ public class TeacherServiceImpl implements TeacherService{
 	}
 
 	@Autowired
-	TReservationRecordMapper reserveMapper;
+	TClassRecordMapper classMapper;
 	
 	@Autowired
 	TCourseMapper courseMapper;
@@ -86,15 +86,15 @@ public class TeacherServiceImpl implements TeacherService{
 		 SELECT * FROM t_reservation_record WHERE STATUS = 1 AND schedule_id IN 
 	 	(SELECT id FROM t_schedule_record WHERE teacher_id = 1); 
 		 */
-		//1、获取上课记录。找到预约状态为“1  已预约”的记录，即可表示为上课记录，此处查找的是老师的上课记录
-		List<TReservationRecord> reserveList = reserveMapper.selectList(new QueryWrapper<TReservationRecord>()
-				.eq("status", 1).inSql("schedule_id",
+		//1、获取上课记录，当用户确认已上课时，老师关于此位用户的上课记录才会产生。此处查找的是老师的上课记录
+		List<TClassRecord> classList = classMapper.selectList(new QueryWrapper<TClassRecord>()
+				.eq("check_status", 1).inSql("schedule_id",
 				"SELECT id FROM t_schedule_record WHERE teacher_id =" + id));
 		
 		//2、获取排课计划信息
 		List<Long> idList = new ArrayList<>();
-		for (int i = 0; i < reserveList.size(); i++) {
-			 idList.add(reserveList.get(i).getScheduleId());
+		for (int i = 0; i < classList.size(); i++) {
+			 idList.add(classList.get(i).getScheduleId());
 		}
 		List<TScheduleRecord> scheduleList = scheduleMapper.selectBatchIds(idList);
 		//清空idList数据，以供下面复用
@@ -117,19 +117,19 @@ public class TeacherServiceImpl implements TeacherService{
 		//5、组合成DTO数据信息
 		//5.1 sql结果对应关系
 		//1条 上课记录 =》 1条 排课记录（1 条 会员记录） =》1条 课程记录 =》  n条 会员卡记录
-		TReservationRecord reserve ;
+		TClassRecord classed ;
 		TScheduleRecord schedule;
 		TCourse course;
 		TMemberCard card;
 		List<ClassRecordDTO> classDtoList = new ArrayList<>();
-		for(int i = 0; i < reserveList.size(); i++) {
-			reserve = reserveList.get(i);
+		for(int i = 0; i < classList.size(); i++) {
+			classed = classList.get(i);
 			schedule = scheduleList.get(i);
 			course = courseList.get(i);
 			for(int j = 0; j < cardList.size() ; j++) {
 				card = cardList.get(j);
 				//DTO转换
-				ClassRecordDTO classRecordDTO = ClassRecordConvert.INSTANCE.entity2Dto(reserve, course, schedule, card);
+				ClassRecordDTO classRecordDTO = ClassRecordConvert.INSTANCE.entity2Dto(classed, course, schedule, card);
 				//转换完成一条记录，就存放一条记录
 				classDtoList.add(classRecordDTO);
 			}

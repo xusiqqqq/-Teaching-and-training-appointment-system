@@ -77,7 +77,8 @@ public class EmployeeServiceImpl implements EmployeeService{
 			return false;
 		}
 		employee.setRolePassword(newPwd);
-		update(employee);
+		employeeMapper.updateById(employee);
+		System.out.println("修改密码处理  === 1 次");
 		return true;
 	}
 	

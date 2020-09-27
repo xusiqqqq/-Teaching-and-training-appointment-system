@@ -18,6 +18,8 @@ public interface ReserveService {
 
 	boolean save(TReservationRecord reserve);
 	
+	boolean update(TReservationRecord reserve);
+	
 	/**
 	 * 获取当前排课的预约记录
 	 * @param scheduleId 排课记录id

@@ -17,6 +17,7 @@ import com.kclm.xsap.entity.TCourse;
 import com.kclm.xsap.entity.TMember;
 import com.kclm.xsap.entity.TReservationRecord;
 import com.kclm.xsap.entity.TScheduleRecord;
+import com.kclm.xsap.mapper.TClassRecordMapper;
 import com.kclm.xsap.mapper.TCourseMapper;
 import com.kclm.xsap.mapper.TMemberMapper;
 import com.kclm.xsap.mapper.TReservationRecordMapper;
@@ -37,6 +38,9 @@ public class ReserveServiceImpl implements ReserveService{
 	@Autowired
 	TMemberMapper memberMapper;
 	
+	@Autowired
+	TClassRecordMapper classMapper;
+	
 	@Override
 	public boolean save(TReservationRecord reserve) {
 		//判断：用户是否已经用任意一张会员卡预约过某次排课计划
@@ -49,12 +53,18 @@ public class ReserveServiceImpl implements ReserveService{
 			System.out.println("已经用会员卡预约过当前课程，无法再次预约！");
 			return false;
 		}
-		//未预约，添加会员预约时，设置状态为已预约
+		//未预约，添加会员预约时，则设置状态为已预约
 		reserve.setStatus(1);
 		reserveMapper.insert(reserve);
 		return true;
 	}
-
+		
+	@Override
+	public boolean update(TReservationRecord reserve) {
+		reserveMapper.updateById(reserve);
+		return true;
+	}
+	
 	@Override
 	public List<ReserveRecordDTO> listReserveRecords(Long scheduleId) {
 		//1、获取到排课信息
@@ -82,7 +92,7 @@ public class ReserveServiceImpl implements ReserveService{
 			for(int j = 0; j < reserveList.size(); j++) {
 				reserve = reserveList.get(j);
 				//DTO转换
-				ReserveRecordDTO reserveRecordDTO = ReserveRecordConvert.INSTANCE.entity2Dto(course, schedule, member, reserve);	
+				ReserveRecordDTO reserveRecordDTO = ReserveRecordConvert.INSTANCE.entity2Dto(course, schedule, reserve, member);	
 				//添加到预约记录集合
 				reserveDtoList.add(reserveRecordDTO);
 			}

@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.kclm.xsap.mapper.TReservationRecordMapper">
-  <resultMap id="TReservationRecordMap" type="com.kclm.xsap.entity.TReservationRecord">
+<mapper namespace="com.kclm.xsap.mapper.TClassRecordMapper">
+  <resultMap id="TClassRecordMap" type="com.kclm.xsap.entity.TClassRecord">
     <!--@mbg.generated-->
     <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="status" jdbcType="BOOLEAN" property="status" />
-    <result column="comment" jdbcType="VARCHAR" property="comment" />
-    <result column="note" jdbcType="VARCHAR" property="note" />
-    <result column="class_note" jdbcType="VARCHAR" property="classNote" />
-    <result column="operator" jdbcType="VARCHAR" property="operator" />
     <result column="member_id" jdbcType="BIGINT" property="memberId" />
     <result column="card_name" jdbcType="VARCHAR" property="cardName" />
     <result column="schedule_id" jdbcType="BIGINT" property="scheduleId" />
+    <result column="note" jdbcType="VARCHAR" property="note" />
+    <result column="comment" jdbcType="VARCHAR" property="comment" />
+    <result column="check_status" jdbcType="INTEGER" property="checkStatus" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
     <result column="version" jdbcType="INTEGER" property="version" />
@@ -46,7 +44,7 @@
   </resultMap>
   <sql id="TReservationRecord_Column_List">
     <!--@mbg.generated-->
-    id,  `status`, `comment`, note, class_note, `operator`, member_id, card_name, schedule_id, create_time, 
+    id, `comment`, note, check_status, member_id, card_name, schedule_id, create_time, 
     last_modify_time, version
   </sql>
   <sql id="member_sql">
