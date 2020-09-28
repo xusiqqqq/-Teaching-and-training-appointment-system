@@ -1,7 +1,5 @@
 package com.kclm.xsap.dto.convert;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 import org.mapstruct.Mapper;
@@ -12,7 +10,6 @@ import org.mapstruct.factory.Mappers;
 import com.kclm.xsap.dto.CourseScheduleDTO;
 import com.kclm.xsap.dto.ReserveRecordDTO;
 import com.kclm.xsap.entity.TCourse;
-import com.kclm.xsap.entity.TMemberCard;
 import com.kclm.xsap.entity.TScheduleRecord;
 
 /**

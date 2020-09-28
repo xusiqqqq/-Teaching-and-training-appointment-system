@@ -33,12 +33,12 @@
                     <li class="nav-header">
                         <div class="dropdown profile-element">
                             <span>
-                            <img alt="image" class="img-circle" src="../static/img/profile_small.jpg" th:src="@{/static/img/profile_small.jpg}"/>
+                            <img alt="image" name="avatarUrl" class="img-circle" src="../static/img/profile_small.jpg" th:src="@{/static/img/{avatar}(avatar=${session.LOGIN_USER.avatarUrl})}"/>
                             </span>
                             <a data-toggle="dropdown" class="dropdown-toggle" href="#">
                                 <span class="clear">
-                               <span class="block m-t-xs"><strong class="font-bold" th:text="${userInfo.name}">admin</strong></span>
-                                <span class="text-muted text-xs block" th:text="${user_roleType}">超级管理员<b class="caret" ></b></span>
+                               <span class="block m-t-xs"><strong class="font-bold" th:text="${session.LOGIN_USER.name}">admin</strong></span>
+                                <span class="text-muted text-xs block" th:text="${session.LOGIN_USER.roleName}">超级管理员<b class="caret" ></b></span>
                                 </span>
                             </a>
                             <ul class="dropdown-menu animated fadeInRight m-t-xs">

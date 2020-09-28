@@ -8,7 +8,6 @@ import org.mapstruct.factory.Mappers;
 import com.kclm.xsap.dto.ReserveRecordDTO;
 import com.kclm.xsap.entity.TCourse;
 import com.kclm.xsap.entity.TMember;
-import com.kclm.xsap.entity.TMemberCard;
 import com.kclm.xsap.entity.TReservationRecord;
 import com.kclm.xsap.entity.TScheduleRecord;
 
@@ -42,9 +41,9 @@ public interface ReserveRecordConvert {
 		@Mapping(source = "reserve.note",target = "reserveNote"),
 		@Mapping(source = "reserve.status",target = "reserveStatus"),
 		@Mapping(source = "course.id", target = "courseId"),
-			@Mapping(source = "schedule.id", target = "reserveId"),
-			@Mapping(source = "member.id", target = "scheduleId"),
-			@Mapping(source = "reserve.id", target = "memberId")
+		@Mapping(source = "schedule.id", target = "reserveId"),
+		@Mapping(source = "member.id", target = "scheduleId"),
+		@Mapping(source = "reserve.id", target = "memberId")
 	})
 	ReserveRecordDTO entity2Dto(TCourse course,TScheduleRecord schedule,TReservationRecord reserve,TMember member);
 

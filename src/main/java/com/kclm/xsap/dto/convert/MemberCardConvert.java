@@ -9,7 +9,6 @@ import org.mapstruct.factory.Mappers;
 
 import com.kclm.xsap.dto.MemberCardDTO;
 import com.kclm.xsap.entity.TMemberCard;
-import com.kclm.xsap.entity.TMemberLog;
 
 /**
  * 

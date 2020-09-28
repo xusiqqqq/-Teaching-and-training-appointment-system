@@ -8,8 +8,6 @@ import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
 import com.kclm.xsap.dto.HomePageDTO;
-import com.kclm.xsap.entity.TMember;
-import com.kclm.xsap.entity.TReservationRecord;
 
 /**
  * 

@@ -1,10 +1,6 @@
 package com.kclm.xsap.dto;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
-
-import com.kclm.xsap.entity.TMemberLog;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

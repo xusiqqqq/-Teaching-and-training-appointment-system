@@ -7,8 +7,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import com.kclm.xsap.dto.ReportDTO;
-import com.kclm.xsap.entity.TMemberBindRecord;
-import com.kclm.xsap.entity.TMemberCard;
 
 /**
  * 

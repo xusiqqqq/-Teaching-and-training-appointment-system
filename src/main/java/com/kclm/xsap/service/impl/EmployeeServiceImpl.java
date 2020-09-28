@@ -29,13 +29,6 @@ public class EmployeeServiceImpl implements EmployeeService{
 	//注册
 	@Override
 	public boolean register(TEmployee emp) {
-		//判断用户名（手机号）是否已存在
-		TEmployee userName = employeeMapper.findByUserName(emp.getPhone());
-		if(userName != null) {
-			//用户名已存在
-			System.out.println("用户名已存在！");
-			return false;
-		}
 		//新增用户信息
 		employeeMapper.insert(emp);
 		return true;
@@ -78,16 +71,13 @@ public class EmployeeServiceImpl implements EmployeeService{
 		}
 		employee.setRolePassword(newPwd);
 		employeeMapper.updateById(employee);
-		System.out.println("修改密码处理  === 1 次");
 		return true;
 	}
 	
 	//重置密码
 	@Override
 	public boolean resetPassward(String username,String newPwd) {
-		System.out.println("username:" + username);
 		TEmployee employee = employeeMapper.findByUserName(username);
-		System.out.println("employee:"+ employee);
 		if(employee == null)
 			return false;
 		employee.setRolePassword(newPwd);
