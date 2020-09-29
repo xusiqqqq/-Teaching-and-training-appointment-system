@@ -151,7 +151,7 @@
                                                 <th>上课人数</th>
                                                 <th>使用次数</th>
 
-                                                <th>老师评分</th>
+                                                <th>老师评价</th>
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -180,10 +180,10 @@
                                         <tr>
                                             <th>会员卡</th>
                                             <th>操作时间</th>
+                                            <th>消费次数</th>
+                                            <th>剩下次数</th>
+                                            <th>消费金额</th>
                                             <th>操作类型</th>
-                                            <th>卡次变化</th>
-                                            <th>有效天数变化</th>
-                                            <th>金额</th>
                                             <th>操作人</th>
                                             <th>备注</th>
                                             <th>状态</th>
@@ -632,17 +632,27 @@ $(function () {
         "columns": [
             {"data": "clubCard"},
             {"data": "operationTime"},
-            {"data": "operationRatings"},
             {"data": "cardChange"},
             {"data": "validDayChange"},
             {"data": "amountMoney"},
+            {"data": "operationRatings"},
             {"data": "operator"},
             {"data": "appointmentRemark"},
-            {"data": "cartState"}
+            {"data": "cartState", "render": function (data, type, row) {
+                    //console.log(data + " -> "+type+" -> "+row);
+                    if(data == '已确认') {
+                        return '<span class="label label-success">'+data+'</span>';
+                    } else if(data == '已取消') {
+                        return '<span class="label label-danger">'+data+'</span>';
+                    } else {
+                        return '<span class="label label-default">'+data+'</span>';
+                    }
+                }}
         ],
         //去掉搜索
         searching: true,
         lengthChange: false,
+        "autoWidth": false,  //禁用自动宽度
         language: {
             "decimal": "",//小数的小数位符号  比如“，”作为数字的小数位符号
             "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
