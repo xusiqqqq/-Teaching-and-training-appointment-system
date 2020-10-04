@@ -31,3 +31,4 @@ public interface ReportConvert {
 	ReportDTO entity2Dto(Map<String,Integer> data);
 	
 }
+

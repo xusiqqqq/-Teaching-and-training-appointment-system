@@ -61,14 +61,15 @@
                         <ul class="nav nav-tabs">
                             <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true"> 会员卡信息</a>
                             </li>
-                            <li class=""><a data-toggle="tab" href="#tab-2" aria-expanded="false">上课记录</a>
-                            </li>
                             <li class=""><a data-toggle="tab" href="#tab-3" aria-expanded="false">预约记录</a>
+                            </li>
+                            <li class=""><a data-toggle="tab" href="#tab-2" aria-expanded="false">上课记录</a>
                             </li>
                             <li class=""><a data-toggle="tab" href="#tab-4" aria-expanded="false">消费记录</a>
                             </li>
                         </ul>
                         <div class="tab-content">
+                            <!--  会员卡信息  Begin： -->
                             <div id="tab-1" class="tab-pane active">
                                 <div class="panel-body">
                                     <!--table table-striped table-bordered table-hover dataTables-example-->
@@ -102,36 +103,8 @@
                                     </table>
                                 </div>
                             </div>
-                            <div id="tab-2" class="tab-pane">
-                                <div class="panel-body">
-                                    <div class="ibox-content">
-                                        <table class="table table-striped table-bordered table-hover dataTables-example t2" style="margin-top: 15px;">
-                                            <thead>
-                                            <tr>
-                                                <th>课程</th>
-                                                <th>上课时间</th>
-                                                <th>会员卡</th>
-                                                <th>上课人数</th>
-                                                <th>使用次数</th>
-                                                <th>上课备注</th>
-                                                <th>老师评分</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
+
+                            <!--  预约记录  Begin： -->
                             <div id="tab-3" class="tab-pane">
                                 <div class="panel-body">
                                     <table class="table table-striped table-bordered table-hover dataTables-example t3" style="margin-top: 15px;">
@@ -163,6 +136,43 @@
                                     </table>
                                 </div>
                             </div>
+
+                            <!--  上课记录  Begin： -->
+                            <div id="tab-2" class="tab-pane">
+                                <div class="panel-body">
+                                    <div class="ibox-content">
+                                        <table class="table table-striped table-bordered table-hover dataTables-example t2" style="margin-top: 15px;">
+                                            <thead>
+                                            <tr>
+                                                <th>课程</th>
+                                                <th>上课时间</th>
+                                                <th>授课老师</th>
+                                                <th>会员卡</th>
+                                                <th>上课人数</th>
+                                                <th>使用次数</th>
+
+                                                <th>老师评价</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+
+                                                <td></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--  上课记录  End： -->
+
+                            <!--  消费记录  Begin： -->
                             <div id="tab-4" class="tab-pane">
                                 <div class="panel-body">
                                     <table class="table table-striped table-bordered table-hover dataTables-example t4" style="margin-top: 15px;">
@@ -170,10 +180,10 @@
                                         <tr>
                                             <th>会员卡</th>
                                             <th>操作时间</th>
+                                            <th>消费次数</th>
+                                            <th>剩下次数</th>
+                                            <th>消费金额</th>
                                             <th>操作类型</th>
-                                            <th>卡次变化</th>
-                                            <th>有效天数变化</th>
-                                            <th>金额</th>
                                             <th>操作人</th>
                                             <th>备注</th>
                                             <th>状态</th>
@@ -195,6 +205,8 @@
                                     </table>
                                 </div>
                             </div>
+                            <!--  消费记录  Begin： -->
+
                         </div>
                     </div>
                 </div>
@@ -436,29 +448,44 @@
 <!-- Peity -->
 <script src="../../static/js/plugins/peity/jquery.peity.min.js" th:src="@{/static/js/plugins/peity/jquery.peity.min.js}"></script>
 
-<script type="text/javascript" src="http://tajs.qq.com/stats?sId=9051096" charset="UTF-8"></script>
-<!--统计代码，可删除-->
-
 <script>
-    $('.dataTables-example.t1').dataTable({
-        //TODO json获取数据
-        "data": [
-            {"id":10, "clubCard": "12次大课",
-                "cartType": "次卡(有限期)",
-                "numberAvailable":12,
-                "expirationTime":"2020-08-26 00:00:00",
-                "cartState":"激活"},
-            {"id":11, "clubCard": "12课时1对1",
-                "cartType": "次卡(有限期)",
-                "numberAvailable":11,
-                "expirationTime":"2020-08-26 00:00:00",
-                "cartState":"激活"},
-            {"id":11, "clubCard": "12课时1对1",
-                "cartType": "次卡(有限期)",
-                "numberAvailable":11,
-                "expirationTime":"2020-08-26 00:00:00",
-                "cartState":"激活"}
-        ],
+
+$(function () {
+
+    $('.dataTables-example.t1')
+        .on('init.dt',function () {
+            console.log("datatable初始化完成....");
+            /*多个滑动按钮同时存在不可少代码*/
+            var elems = Array.prototype.slice.call($('.js-switch'));
+            elems.forEach(function(html) {
+                var switchery = new Switchery(html);
+                //给这个 元素添加事件
+                $(html).on("change",function (event) {
+                   //通过event.target 来获取原 元素
+                    console.log(event.target.checked);
+                    //
+                    //发送AJAX请求到服务端
+                    $.ajax({
+                        url: "/xxx.do",  //此处要把 event.target.checked 的值传递回去, 设计一个请求参数，其值为  event.target.checked
+                        method: "GET",
+                        success: function (data) {
+                            //1. 更新 状态列的 文字信息, 这个 data 是由服务端传递回来的，如果改为 true, 则 data为 激活，否则为 停用
+                            $(html).parent("td").prev().text(data);
+                        },
+                        error: function (jqXHR) {
+                            //出错了：
+                            console.log(jqXHR.status+" : "+jqXHR.responseText);
+                        }
+                    })
+                })
+            });
+        })
+        .dataTable({
+        //注： 后面开发时，url的位置写 服务端控制器的 mapping值,服务端返回的将是json数据
+        ajax: {
+            url: './demo-data/memberCard.json',
+            dataSrc: ''  //注：如果json文件中的数据存在key的话，则此处写 key的名字
+        },
         //行的定义
         "columns": [
             {"data": "clubCard"},
@@ -466,16 +493,19 @@
             {"data": "numberAvailable"},
             {"data": "expirationTime"},
             {"data": "cartState"},
-            {"data": null,"orderable": false, "render": function (data, type, row) {
+            {"data": null,
+                "orderable": false,
+                "render": function (data, type, row) {
                     var id = '"' + row.id + '"';
-                    var html = " <input type=\"checkbox\" class=\"js-switch\" checked />&nbsp; &nbsp;"
+                    let html = " <input type='checkbox' class='js-switch' checked />";
                     return html;
                 }},
-            {"data": null,"orderable": false, "render": function (data, type, row) {
+            {"data": null,"orderable": false,
+                "render": function (data, type, row) {
                     var id = '"' + row.id + '"';
-                    var html = "<a href='javascript:void(0);'  class='btn btn-white btn-xs' data-toggle='modal' data-target='#details_recharge'>充值<i class='fa fa-re'></i></a>&nbsp &nbsp"
-                    html += "<a href=''  class='btn btn-white btn-xs' data-toggle='modal' data-target='#details_deduction'> 扣费</a>&nbsp &nbsp"
-                    html += "<a href='#?id="+id+"'  class='delete btn btn-white btn-xs' data-toggle='modal' data-target='#details_operating'> 操作记录</i></a>"
+                    var html = "<a href='javascript:void(0);'  class='btn btn-primary btn-xs' data-toggle='modal' data-target='#details_recharge'>充值<i class='fa fa-re'></i></a>&nbsp &nbsp"
+                    html += "<a href=''  class='btn btn-info btn-xs' data-toggle='modal' data-target='#details_deduction'> 扣费</a>&nbsp &nbsp"
+                    html += "<a href='#?id="+id+"'  class='delete btn btn-danger btn-xs' data-toggle='modal' data-target='#details_operating'> 操作记录</i></a>"
                     return html;
                 }}
         ],
@@ -503,84 +533,14 @@
             }
         }
     });
-    $('.dataTables-example.t2').dataTable({
-        //TODO json获取数据
-        "data": [
-            {"id":10, "memberCourse": "钢琴一对一",
-                "memberSchooltime": "2019-10-31 15:40:00",
-                "clubCard":"12课时一对一",
-                "memberForwardCounting":1,
-                "numberUse":1,
-                "appointmentRemark":"下午去上课",
-                "teacherRatings":"优秀",
-            },
-            {"id":10, "memberCourse": "钢琴一对一",
-                "memberSchooltime": "2019-10-31 15:40:00",
-                "clubCard":"12课时一对一",
-                "memberForwardCounting":1,
-                "numberUse":1,
-                "appointmentRemark":"下午去上课",
-                "teacherRatings":"优秀",
-            }
-        ],
-        //行的定义
-        "columns": [
-            {"data": "memberCourse"},
-            {"data": "memberSchooltime"},
-            {"data": "clubCard"},
-            {"data": "memberForwardCounting"},
-            {"data": "numberUse"},
-            {"data": "appointmentRemark"},
-            {"data": "teacherRatings"}
-        ],
-        //去掉搜索
-        searching: true,
-        lengthChange: false,
-        language: {
-            "decimal": "",//小数的小数位符号  比如“，”作为数字的小数位符号
-            "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
-            "info": "当前 _START_ 条到 _END_ 条 共 _TOTAL_ 条",//左下角的信息，变量可以自定义，到官网详细查看
-            /*  "infoEmpty": "无记录",//当没有数据时，左下角的信息*/
-            "infoFiltered": "(从 _MAX_ 条记录过滤)",//当表格过滤的时候，将此字符串附加到主要信息
-            "infoPostFix": "",//在摘要信息后继续追加的字符串
-            "thousands": ",",//千分位分隔符
-            "lengthMenu": "每页 _MENU_ 条记录",//用来描述分页长度选项的字符串
-            "loadingRecords": "加载中...",//用来描述数据在加载中等待的提示字符串 - 当异步读取数据的时候显示
-            "processing": "处理中...",//用来描述加载进度的字符串
-            "search": "搜索",//用来描述搜索输入框的字符串
-            "zeroRecords": "没有找到",//当没有搜索到结果时，显示
-            "paginate": {
-                "first": "首页",
-                "previous": "上一页",
-                "next": "下一页",
-                "last": "尾页"
-            }
-        }
-    });
+
+    //预约记录
     $('.dataTables-example.t3').dataTable({
-        //TODO json获取数据
-        "data": [
-            {"id":10, "memberCourse": "钢琴一对一",
-                "memberSchooltime": "2019-10-31 15:40:00",
-                "clubCard": "12课时一对一",
-                "memberForwardCounting":"1",
-                "numberUse":1,
-                "operationTime":"2019-10-31 08:57:08",
-                "operator":"梁婷",
-                "appointmentRemark":"可能晚点到",
-                "operationRatings":"已预约",
-            },
-            {"id":10, "memberCourse": "钢琴一对一",
-                "memberSchooltime": "2019-10-31 15:40:00",
-                "clubCard": "12课时一对一",
-                "memberForwardCounting":"1",
-                "numberUse":1,
-                "operationTime":"2019-10-31 08:57:08",
-                "operator":"梁婷",
-                "appointmentRemark":"可能晚点到",
-                "operationRatings":"已预约",
-            }
-        ],
+        //通过 ajax 来指定服务端的数据URL
+        ajax: {
+            url: './demo-data/reservationRecord.json',
+            dataSrc: ''  //注：如果json文件中的数据存在key的话，则此处写 key的名字
+        },
         //行的定义
         "columns": [
             {"data":"memberCourse"},
@@ -594,8 +554,9 @@
             {"data": "operationRatings"}
         ],
         //去掉搜索
-        searching: false,
+        searching: true,
         lengthChange: false,
+        "autoWidth": false,  //禁用自动宽度
         language: {
             "decimal": "",//小数的小数位符号  比如“，”作为数字的小数位符号
             "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
@@ -617,58 +578,81 @@
             }
         }
     });
-    $('.dataTables-example.t4').dataTable({
+
+    //上课记录
+    $('.dataTables-example.t2').dataTable({
         //TODO json获取数据
-        "data": [
-            {"id":10,
-                "clubCard": "12课时一对一",
-                "operationTime":"2019-10-31 08:57:08",
-                "operationRatings":"扣费",
-                "cardChange":"-1",
-                "validDayChange": "钢琴一对一",
-                "amountMoney": "0",
-                "operator":"梁婷",
-                "appointmentRemark":"可能晚点到",
-                "cartState":"激活"
-            },
-            {"id":10,
-                "clubCard": "12次大课",
-                "operationTime":"2019-10-31 08:57:08",
-                "operationRatings":"首次绑卡",
-                "cardChange":"12",
-                "validDayChange": "300",
-                "amountMoney": "480",
-                "operator":"梁婷",
-                "appointmentRemark":"送水杯",
-                "cartState":"激活"
-            },
-            {"id":10,
-                "clubCard": "12课时一对一",
-                "operationTime":"2019-10-31 08:57:08",
-                "operationRatings":"首次绑卡",
-                "cardChange":"12",
-                "validDayChange": "300",
-                "amountMoney": "1920",
-                "operator":"梁婷",
-                "appointmentRemark":"送水杯",
-                "cartState":"激活"
-            }
-        ],
+        ajax: {
+            url: './demo-data/classRecord.json',
+            dataSrc: ''  //注：如果json文件中的数据存在key的话，则此处写 key的名字
+        },
         //行的定义
         "columns": [
+            {"data": "memberCourse"},
+            {"data": "memberSchooltime"},
+            {"data": "teacherName"},
             {"data": "clubCard"},
-            {"data": "operationTime"},
-            {"data": "operationRatings"},
-            {"data": "cardChange"},
-            {"data": "validDayChange"},
-            {"data": "amountMoney"},
-            {"data": "operator"},
-            {"data": "appointmentRemark"},
-            {"data": "cartState"}
+            {"data": "memberForwardCounting"},
+            {"data": "numberUse"},
+            {"data": "teacherRatings"}
         ],
         //去掉搜索
         searching: true,
         lengthChange: false,
+        "autoWidth": false,  //禁用自动宽度
+        language: {
+            "decimal": "",//小数的小数位符号  比如“，”作为数字的小数位符号
+            "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
+            "info": "当前 _START_ 条到 _END_ 条 共 _TOTAL_ 条",//左下角的信息，变量可以自定义，到官网详细查看
+            /*  "infoEmpty": "无记录",//当没有数据时，左下角的信息*/
+            "infoFiltered": "(从 _MAX_ 条记录过滤)",//当表格过滤的时候，将此字符串附加到主要信息
+            "infoPostFix": "",//在摘要信息后继续追加的字符串
+            "thousands": ",",//千分位分隔符
+            "lengthMenu": "每页 _MENU_ 条记录",//用来描述分页长度选项的字符串
+            "loadingRecords": "加载中...",//用来描述数据在加载中等待的提示字符串 - 当异步读取数据的时候显示
+            "processing": "处理中...",//用来描述加载进度的字符串
+            "search": "搜索",//用来描述搜索输入框的字符串
+            "zeroRecords": "没有找到",//当没有搜索到结果时，显示
+            "paginate": {
+                "first": "首页",
+                "previous": "上一页",
+                "next": "下一页",
+                "last": "尾页"
+            }
+        }
+    });
+    //消费记录
+    $('.dataTables-example.t4').dataTable({
+        //
+        ajax: {
+            url: './demo-data/consumeRecord.json',
+            dataSrc: ''  //注：如果json文件中的数据存在key的话，则此处写 key的名字
+        },
+        //行的定义
+        "columns": [
+            {"data": "clubCard"},
+            {"data": "operationTime"},
+            {"data": "cardChange"},
+            {"data": "validDayChange"},
+            {"data": "amountMoney"},
+            {"data": "operationRatings"},
+            {"data": "operator"},
+            {"data": "appointmentRemark"},
+            {"data": "cartState", "render": function (data, type, row) {
+                    //console.log(data + " -> "+type+" -> "+row);
+                    if(data == '已确认') {
+                        return '<span class="label label-success">'+data+'</span>';
+                    } else if(data == '已取消') {
+                        return '<span class="label label-danger">'+data+'</span>';
+                    } else {
+                        return '<span class="label label-default">'+data+'</span>';
+                    }
+                }}
+        ],
+        //去掉搜索
+        searching: true,
+        lengthChange: false,
+        "autoWidth": false,  //禁用自动宽度
         language: {
             "decimal": "",//小数的小数位符号  比如“，”作为数字的小数位符号
             "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
@@ -750,12 +734,6 @@
         }
     });
 
-    /*多个滑动按钮同时存在不可少代码*/
-    var elems = Array.prototype.slice.call($('.js-switch'));
-    elems.forEach(function(html) {
-        var switchery = new Switchery(html);
-    });
-
     /*时间选择器配置*/
     $('#myDate').datepicker({
         language: "zh-CN",
@@ -767,9 +745,10 @@
         startDate: '1970-1-1', //与你自己设置的格式一致yyyy-mm-dd，未设置的话与默认格式一致mm/dd/yyyy
         endDate: '2070-1-1'
     });
+});
+
+
 </script>
-
-
 
 </body>
 
