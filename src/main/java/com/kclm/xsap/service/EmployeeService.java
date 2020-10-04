@@ -13,6 +13,13 @@ import com.kclm.xsap.entity.TEmployee;
 public interface EmployeeService {
 
 	/**
+	 * 	通过id查找员工信息
+	 * @param id
+	 * @return TEmployee。员工信息
+	 */
+	TEmployee findById(Integer id);
+	
+	/**
 	 * 	通过手机号/邮箱找到用户信息
 	 * @param username username 操作员用户名
 	 * @return TEmployee。员工信息

@@ -136,7 +136,7 @@ public class EmployeeController {
 		//设置默认真实姓名
 		emp.setName("user");
 		employeeService.register(emp);
-		return "x_login";
+		return "redirect:toLogin";
 	}
 	
 	//根据认证的用户名，发送邮件至其邮箱
@@ -164,31 +164,20 @@ public class EmployeeController {
 		return "send_mail_ok";
 	}
 	
-	//重置当前用户的密码
-	@RequestMapping("/resetPassward.do")
-	public String resetPassword(String password,String pwd2,Model model) {
-		model.addAttribute("CHECK_PWD_ERROR",false);
-		if(!password.equals(pwd2)) {
-			model.addAttribute("CHECK_PWD_ERROR",true);
-			return "x_reset_passward";
-		}
-		//重置当前账号的密码
-		boolean isOk = employeeService.resetPassward(global_username, password);
-		if(!isOk) {
-			System.out.println("重置密码失败");
-			return "x_reset_passward";
-		}
-		//! 链接上带参数传递，去掉参数
-		
-		return "x_login";			
+	//显示最近的更新信息
+	@RequestMapping("/showModify.do")
+	@ResponseBody
+	public TEmployee showModify(@RequestParam("id") Integer id) {
+		TEmployee employee = employeeService.findById(id);
+		System.out.println("根据"+id+ "得到的图书信息：" +employee);
+		return employee;
 	}
-		
 	
 	//修改用户信息
 	//在响应数据回浏览器时，指定json类型
 	@RequestMapping(value = "/modifyUser.do",produces = "application/json")
 	@ResponseBody
-	public TEmployee modifyUser(@RequestParam("avatar_file") MultipartFile avatar_file,@RequestBody TEmployee emp,HttpSession session,Model model) {
+	public TEmployee modifyUser(MultipartFile avatar_file,@RequestBody TEmployee emp,HttpSession session,Model model) {
 		System.out.println("=======================");
 		System.out.println("=====avatar: " + avatar_file);
 		System.out.println("------实体数据before：" + emp);
