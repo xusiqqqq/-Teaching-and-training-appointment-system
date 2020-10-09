@@ -4,11 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-import com.kclm.xsap.dto.ClassRecordDTO;
-import com.kclm.xsap.dto.ConsumeRecordDTO;
-import com.kclm.xsap.dto.MemberCardDTO;
 import com.kclm.xsap.dto.MemberDTO;
-import com.kclm.xsap.dto.ReserveRecordDTO;
 import com.kclm.xsap.entity.TMember;
 
 /**

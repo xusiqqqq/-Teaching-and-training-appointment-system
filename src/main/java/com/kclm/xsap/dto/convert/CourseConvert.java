@@ -3,7 +3,6 @@ package com.kclm.xsap.dto.convert;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-import com.kclm.xsap.dto.ClassRecordDTO;
 import com.kclm.xsap.dto.CourseDTO;
 import com.kclm.xsap.entity.TCourse;
 

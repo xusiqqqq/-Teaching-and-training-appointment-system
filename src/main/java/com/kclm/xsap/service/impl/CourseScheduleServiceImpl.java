@@ -1,5 +1,7 @@
 package com.kclm.xsap.service.impl;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -7,20 +9,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.kclm.xsap.dto.ClassRecordDTO;
 import com.kclm.xsap.dto.CourseScheduleDTO;
 import com.kclm.xsap.dto.ReserveRecordDTO;
+import com.kclm.xsap.dto.convert.ClassRecordConvert;
 import com.kclm.xsap.dto.convert.CourseScheduleConvert;
+import com.kclm.xsap.entity.TClassRecord;
 import com.kclm.xsap.entity.TCourse;
+import com.kclm.xsap.entity.TMember;
 import com.kclm.xsap.entity.TMemberCard;
 import com.kclm.xsap.entity.TScheduleRecord;
+import com.kclm.xsap.mapper.TClassRecordMapper;
 import com.kclm.xsap.mapper.TCourseMapper;
 import com.kclm.xsap.mapper.TEmployeeMapper;
 import com.kclm.xsap.mapper.TMemberCardMapper;
+import com.kclm.xsap.mapper.TMemberMapper;
 import com.kclm.xsap.mapper.TScheduleRecordMapper;
 import com.kclm.xsap.service.CourseScheduleService;
 
+@Service
+@Transactional
 public class CourseScheduleServiceImpl implements CourseScheduleService{
 
 	@Autowired
@@ -38,6 +50,7 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 		return true;
 	}
 
+	//获取给定的日期范围内所有的排课记录
 	@Override
 	public List<CourseScheduleDTO> listSchedule(LocalDate startDate, LocalDate endDate) {
 		List<TScheduleRecord> scheduleList = scheduleMapper.selectList(new QueryWrapper<TScheduleRecord>()
@@ -59,6 +72,12 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 	
 	@Autowired
 	TEmployeeMapper employeeMapper;
+	
+	@Autowired
+	TClassRecordMapper classMapper;
+	
+	@Autowired
+	TMemberMapper memberMapper;
 	
 	@Override
 	public CourseScheduleDTO findById(Long scheduleId) {
@@ -93,7 +112,28 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 		//获取当前课程对应的预约记录
 		ReserveServiceImpl reserveService = new ReserveServiceImpl();
 		List<ReserveRecordDTO> reserveDTO = reserveService.listReserveRecords(scheduleId);
-		CourseScheduleDTO scheduleDto = CourseScheduleConvert.INSTANCE.entity2Dto(schedule, course, supportCards, teacherName, reserveDTO);
+		
+		//==获取当前课程的上课数据
+		List<TClassRecord> classList = classMapper.selectList(new QueryWrapper<TClassRecord>().eq("schedule_id", scheduleId));
+		List<ClassRecordDTO> classDtoList = new ArrayList<ClassRecordDTO>();
+		for (TClassRecord classed : classList) {
+			//查出会员卡的次数单价，取值四舍五入
+			TMemberCard memberCard = cardMapper.selectOne(new QueryWrapper<TMemberCard>().eq("name", classed.getCardName()));
+			BigDecimal price = new BigDecimal(memberCard.getPrice().toString());
+			BigDecimal count = new BigDecimal(memberCard.getTotalCount().toString());
+			BigDecimal unitPrice = price.divide(count, 2, RoundingMode.HALF_UP);	
+			//消耗的次数
+			BigDecimal countCost = new BigDecimal(course.getTimesCost().toString());
+			BigDecimal involveMoney = unitPrice.multiply(countCost);
+			TMember member = memberMapper.selectById(classed.getMemberId());
+			//dto转换
+			ClassRecordDTO classRecordDTO = ClassRecordConvert.INSTANCE.entity2Dto(classed, member,null, null, memberCard, null, involveMoney);
+			//dto拼接
+			classDtoList.add(classRecordDTO);
+		}
+		//dto转换
+		CourseScheduleDTO scheduleDto = CourseScheduleConvert.INSTANCE.entity2Dto(schedule, course, supportCards, teacherName, reserveDTO, classDtoList);
+		
 		//计算下课时间
 		LocalTime plusClassTime = schedule.getClassTime().plusMinutes(course.getDuration());
 		LocalDateTime endTime = LocalDateTime.of(schedule.getStartDate(),plusClassTime);

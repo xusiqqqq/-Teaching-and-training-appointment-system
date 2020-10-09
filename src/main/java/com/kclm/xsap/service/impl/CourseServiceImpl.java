@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -14,6 +16,8 @@ import com.kclm.xsap.entity.TCourse;
 import com.kclm.xsap.mapper.TCourseMapper;
 import com.kclm.xsap.service.CourseService;
 
+@Service
+@Transactional
 public class CourseServiceImpl implements CourseService{
 
 	@Autowired

@@ -3,6 +3,8 @@ package com.kclm.xsap.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kclm.xsap.entity.TClassRecord;
@@ -11,6 +13,8 @@ import com.kclm.xsap.mapper.TClassRecordMapper;
 import com.kclm.xsap.mapper.TReservationRecordMapper;
 import com.kclm.xsap.service.ClassService;
 
+@Service
+@Transactional
 public class ClassServiceImpl implements ClassService{
 
 	@Autowired

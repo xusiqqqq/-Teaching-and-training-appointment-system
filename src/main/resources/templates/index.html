@@ -33,21 +33,21 @@
                     <li class="nav-header">
                         <div class="dropdown profile-element">
                             <span>
-                            <img alt="image" class="img-circle" src="../static/img/profile_small.jpg" th:src="@{/static/img/profile_small.jpg}"/>
+                            <img alt="image" width="80px" height="80px" name="avatarUrl" class="img-circle" src="../static/img/profile_small.jpg" th:src="@{/static/img/{avatar}(avatar=${session.LOGIN_USER.avatarUrl})}"/>
                             </span>
                             <a data-toggle="dropdown" class="dropdown-toggle" href="#">
                                 <span class="clear">
-                               <span class="block m-t-xs"><strong class="font-bold" th:text="${userInfo.name}">admin</strong></span>
-                                <span class="text-muted text-xs block" th:text="${user_roleType}">超级管理员<b class="caret" ></b></span>
+                               <span class="block m-t-xs"><strong class="font-bold" th:text="${session.LOGIN_USER.name}">admin</strong></span>
+                                <span class="text-muted text-xs block" th:text="${session.LOGIN_USER.roleName}">超级管理员<b class="caret" ></b></span>
                                 </span>
                             </a>
                             <ul class="dropdown-menu animated fadeInRight m-t-xs">
                                 <li><a class="J_menuItem" href="x_modify_password.html" th:href="@{/user/x_modify_password.do}" target="_self">修改密码</a>
                                 </li>
                                 <li><a class="J_menuItem" href="x_profile.html" th:href="@{/user/x_profile.do}">个人资料</a>
-                                </li>
+                                </li>	
                                 <li class="divider"></li>
-                                <li><a href="x_login.html" th:href="@{/user/logout.do}">安全退出</a>
+                                <li><a href="x_login.html" th:href="@{/user/logout.do}">安全退出</a>	
                                 </li>
                             </ul>
                         </div>
@@ -69,13 +69,13 @@
                         <ul class="nav nav-second-level">
                             <li>
 
-                                <a class="J_menuItem" href="member/x_member_list.html"><i class="fa fa-circle-o"></i>会员</a>
+                                <a class="J_menuItem" href="member/x_member_list.html" th:href="@{/member/x_member_list.do}"><i class="fa fa-circle-o"></i>会员</a>
                             </li>
                             <li>
-                                <a class="J_menuItem" href="member/x_member_card.html"><i class="fa fa-circle-o"></i>会员卡</a>
+                                <a class="J_menuItem" href="member/x_member_card.html" th:href="@{/member/x_member_card.do}"><i class="fa fa-circle-o"></i>会员卡</a>
                             </li>
                             <li>
-                                <a class="J_menuItem" href="member/x_member_card_bind.html"><i class="fa fa-circle-o"></i>会员绑定</a>
+                                <a class="J_menuItem" href="member/x_member_card_bind.html" th:href="@{/member/x_member_card_bind.do}"><i class="fa fa-circle-o"></i>会员绑定</a>
                             </li>
                         </ul>
                     </li>
@@ -89,33 +89,33 @@
                         <ul class="nav nav-second-level">
                             <li>
 
-                                <a class="J_menuItem" href="course/x_course_list.html"><i class="fa fa-circle-o"></i>团课课程</a>
+                                <a class="J_menuItem" href="course/x_course_list.html" th:href="@{/course/x_course_list.do}"><i class="fa fa-circle-o"></i>团课课程</a>
                             </li>
                             <li>
-                                <a class="J_menuItem" href="course/x_course_schedule.html"><i class="fa fa-circle-o"></i>团课课程表</a>
+                                <a class="J_menuItem" href="course/x_course_schedule.html" th:href="@{/course/x_course_schedule.do}"><i class="fa fa-circle-o"></i>团课课程表</a>
                             </li>
                             <li>
-                                <a class="J_menuItem" href="course/x_course_reservation.html"><i class="fa fa-circle-o"></i>团课预约设置</a>
+                                <a class="J_menuItem" href="course/x_course_reservation.html" th:href="@{/course/x_course_reservation.do}"><i class="fa fa-circle-o"></i>团课预约设置</a>
                             </li>
                         </ul>
                     </li>
 
                     <li>
-                        <a class="J_menuItem" href="employee/x_teacher_list.html">
+                        <a class="J_menuItem" href="employee/x_teacher_list.html" th:href="@{/employee/x_teacher_list.do}">
                             <i class="fa fa-user"></i>
                             <span class="nav-label">老师管理</span>
                         </a>
                     </li>
 
                     <li>
-                        <a class="J_menuItem" href="x_wechat.html">
+                        <a class="J_menuItem" href="x_wechat.html" th:href="@{/wechat/x_wechat.do}">
                             <i class="fa fa-wechat"></i>
                             <span class="nav-label">微信设置</span>
                         </a>
                     </li>
 
                     <li>
-                        <a class="J_menuItem" href="x_app_store.html">
+                        <a class="J_menuItem" href="x_app_store.html" th:href="@{/app/x_app_store.do}">
                             <i class="fa fa-tasks"></i>
                             <span class="nav-label">应用中心(新)</span>
                         </a>
@@ -200,7 +200,7 @@
                 </button>
                 <nav class="page-tabs J_menuTabs">
                     <div class="page-tabs-content">
-                        <a href="javascript:;" class="active J_menuTab" data-id="x_index_home.html">首页</a>
+                        <a href="javascript:void(0);" class="active J_menuTab" data-id="x_index_home.html">首页</a>
                     </div>
                 </nav>
                 <button class="roll-nav roll-right J_tabRight"><i class="fa fa-forward"></i>
@@ -224,7 +224,7 @@
 
             <!-- 我们要添加内容的区域 TODO  -->
             <div class="row J_mainContent" id="content-main">
-                <iframe class="J_iframe" name="iframe0" width="100%" height="100%" src="x_index_home.html?v=4.0"  frameborder="0" data-id="x_index_home.html" seamless></iframe>
+                <iframe class="J_iframe" name="iframe0" width="100%" height="100%" src="x_index_home.html?v=4.0" th:src="@{/index/x_index_home.do}" frameborder="0" data-id="x_index_home.html" seamless></iframe>
             </div>
 
             <div class="footer">

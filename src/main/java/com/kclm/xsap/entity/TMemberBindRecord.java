@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
@@ -27,6 +28,7 @@ public class TMemberBindRecord extends BaseEntity implements Serializable{
 	 *  用来封装会员的实体数据
 	 */
 	@TableField(exist = false)
+	@ToString.Exclude
     private TMember member;
 	
     /**
@@ -37,6 +39,7 @@ public class TMemberBindRecord extends BaseEntity implements Serializable{
 	 *  用来封装会员卡的实体数据
 	 */
 	@TableField(exist = false)
+	@ToString.Exclude
     private TMemberCard card;
 
 	

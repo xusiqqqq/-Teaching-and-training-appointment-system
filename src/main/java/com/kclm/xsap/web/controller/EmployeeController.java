@@ -4,7 +4,9 @@
 
 package com.kclm.xsap.web.controller;
 
+import java.io.File;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -12,11 +14,12 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttribute;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.kclm.xsap.entity.TEmployee;
 import com.kclm.xsap.service.EmployeeService;
@@ -31,6 +34,8 @@ import com.kclm.xsap.service.EmployeeService;
 @RequestMapping("/user")
 public class EmployeeController {
 	
+	private static final String RESOURCE_PATH = "static/img";
+
 	//调用service层
 	@Autowired
 	private EmployeeService employeeService;
@@ -99,11 +104,9 @@ public class EmployeeController {
 		
 		loginUser.setRoleName(loginUser.getRoleType() == 1 ? "超级管理员":"普通管理员");
 		loginUser.setLastModifyTime(LocalDateTime.now());
-		model.addAttribute("userInfo", loginUser);
-		model.addAttribute("user_roleType",loginUser.getRoleName());
 		//保存当前用户信息至Session域，供其它http请求使用
 		session.setAttribute("LOGIN_USER", loginUser);
-		return "index";
+		return "redirect:toIndex.do";
 	}
 	
 	//退出登录
@@ -116,9 +119,15 @@ public class EmployeeController {
 	//注册界面
 	@RequestMapping("/register.do")
 	public String register(String userName,String password,String pwd2,Model model) {
-		model.addAttribute("CHECK_PWD_ERROR",false);
+		model.addAttribute("CHECK_TYPE_ERROR",-1);
 		if(!password.equals(pwd2)) {
-			model.addAttribute("CHECK_PWD_ERROR",true);
+			model.addAttribute("CHECK_TYPE_ERROR",1);
+			return "x_register";
+		}
+		//注册的用户名是否已存在
+		TEmployee employee = employeeService.findByUser(userName);
+		if(employee != null) {
+			model.addAttribute("CHECK_TYPE_ERROR",0);
 			return "x_register";
 		}
 		TEmployee emp = new TEmployee();
@@ -127,7 +136,7 @@ public class EmployeeController {
 		//设置默认真实姓名
 		emp.setName("user");
 		employeeService.register(emp);
-		return "x_login";
+		return "redirect:toLogin";
 	}
 	
 	//根据认证的用户名，发送邮件至其邮箱
@@ -155,38 +164,60 @@ public class EmployeeController {
 		return "send_mail_ok";
 	}
 	
-	//重置当前用户的密码
-	@RequestMapping("/resetPassward.do")
-	public String resetPassword(String password,String pwd2,Model model) {
-		model.addAttribute("CHECK_PWD_ERROR",false);
-		if(!password.equals(pwd2)) {
-			model.addAttribute("CHECK_PWD_ERROR",true);
-			return "x_reset_passward";
-		}
-		//重置当前账号的密码
-		boolean isOk = employeeService.resetPassward(global_username, password);
-		if(!isOk) {
-			System.out.println("重置密码失败");
-			return "x_reset_passward";
-		}
-		//! 链接上带参数传递，去掉参数
-		
-		return "x_login";			
+	//显示最近的更新信息
+	@RequestMapping("/showModify.do")
+	@ResponseBody
+	public TEmployee showModify(@RequestParam("id") Integer id) {
+		TEmployee employee = employeeService.findById(id);
+		System.out.println("根据"+id+ "得到的图书信息：" +employee);
+		return employee;
 	}
-		
 	
 	//修改用户信息
 	//在响应数据回浏览器时，指定json类型
-//	@RequestMapping(value = "/modifyUser.do",produces = "application/json")
-	@RequestMapping(value = "/modifyUser.do",produces = {"application/json"})
-//	@ResponseBody
-	public String modifyUser(@RequestBody TEmployee emp,HttpSession session) {
-		//销毁上一次的Session内容，将更新后的结果重新存入session
-		session.invalidate();
+	@RequestMapping(value = "/modifyUser.do",produces = "application/json")
+	@ResponseBody
+	public TEmployee modifyUser(MultipartFile avatar_file,@RequestBody TEmployee emp,HttpSession session,Model model) {
+		System.out.println("=======================");
+		System.out.println("=====avatar: " + avatar_file);
+		System.out.println("------实体数据before：" + emp);
+		System.out.println("------实体数据before版本号：" + emp.getVersion());
+		if(!avatar_file.isEmpty()) {
+    		//上传文件
+    		String fileName;
+			try {
+				fileName = uploadFiles(avatar_file);
+				//设置图片全名
+				emp.setAvatarUrl(fileName);
+			} catch (Exception e) {
+				System.out.println("-----------图片信息有误！-----------");
+				e.printStackTrace();
+			}
+    	}
+		//保存原值
+		TEmployee oldEmp = employeeService.findByUser(global_username);
+		if(oldEmp != null) {
+			emp.setId(oldEmp.getId());
+			emp.setRoleName(oldEmp.getRoleType() == 1 ? "超级管理员":"普通管理员");
+			emp.setCreateTime(oldEmp.getCreateTime());
+			emp.setLastModifyTime(LocalDateTime.now());
+			emp.setVersion(oldEmp.getVersion());
+			//判断新输入的手机号是否已存在
+			TEmployee checkPhone = employeeService.findByUser(emp.getPhone());
+			if(checkPhone != null) {
+				model.addAttribute("CHECK_PHONE_ERROR", true);
+				//返回原值
+				return oldEmp;
+			}	
+		}
+		System.out.println("!!------实体数据after：" + emp);
+		System.out.println("!!------实体数据after版本号：" + emp.getVersion());
 		TEmployee employee = employeeService.update(emp);
+		if(employee != null)
+			global_username = employee.getPhone();
 		session.setAttribute("LOGIN_USER", employee);
 		System.out.println("更新后：" +employee);
-		return "x_profile";
+		return employee;
 	}
 	
 	//修改密码
@@ -197,7 +228,6 @@ public class EmployeeController {
 			model.addAttribute("CHECK_PWD_ERROR",1);
 			return "x_modify_password";
 		}
-		System.out.println("运行了1次--------------");
 		boolean isOk = employeeService.updatePassword(global_username, oldPwd, newPwd);
 		System.out.println(isOk +"  :-----------");
 		if(!isOk) {
@@ -207,6 +237,36 @@ public class EmployeeController {
 		}
 		//密码修改完，重新登录
 		return "redirect:logout.do";
+	}
+	
+	
+	/* ====================以下是公共方法区==================== */
+	
+	//文件上传
+	public String uploadFiles(MultipartFile uploadFile) throws Exception{
+		//定义文件名
+		String fileName = ""; 
+		//1.获取原始文件名 
+		String uploadFileName = uploadFile.getOriginalFilename(); 
+		//3.把文件加上随机数，防止文件重复 
+		String uuid = UUID.randomUUID().toString().replace("-", "").toUpperCase(); 
+		//4.判断是否输入了文件名 
+		fileName = uuid + "_"+ uploadFileName;
+		System.out.println(fileName);
+		//2.获取文件路径
+		String basePath = ResourceUtils.getURL("classpath:").getPath();
+		System.out.println("basePath: "+basePath);
+		//4.判断路径是否存在
+		File realPath = new File(basePath,RESOURCE_PATH);
+		System.out.println("filePath: "+realPath);
+		if(!realPath.exists()) {
+			System.out.println("创建目录结构。。。");
+			realPath.mkdirs(); 
+		} 
+		//5.使用MulitpartFile接口中方法，把上传的文件写到指定位置 
+		uploadFile.transferTo(new File(realPath,fileName)); 
+		System.out.println("图片名："+fileName);
+		return fileName;
 	}
 	
 }

@@ -30,9 +30,9 @@ public class ReserveRecordDTO{
 	private String courseName;
 	
 	/**
-	 * 上课时间
+	 * 预约时间
 	 */
-	private LocalDateTime classTime;
+	private LocalDateTime reserveTime;
 	
 	/**
 	 * 会员名
@@ -70,12 +70,12 @@ public class ReserveRecordDTO{
 	private String operator;
 	
 	/**
-	 * 预约备注
+	 * 预约备注/预约来源
 	 */
 	private String reserveNote;
 	
 	/**
-	 * 预约状态
+	 * 预约状态/预约结果
 	 */
 	private Integer reserveStatus;
 	

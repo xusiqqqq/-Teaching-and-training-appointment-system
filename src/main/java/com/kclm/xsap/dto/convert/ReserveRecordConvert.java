@@ -8,7 +8,6 @@ import org.mapstruct.factory.Mappers;
 import com.kclm.xsap.dto.ReserveRecordDTO;
 import com.kclm.xsap.entity.TCourse;
 import com.kclm.xsap.entity.TMember;
-import com.kclm.xsap.entity.TMemberCard;
 import com.kclm.xsap.entity.TReservationRecord;
 import com.kclm.xsap.entity.TScheduleRecord;
 
@@ -35,16 +34,16 @@ public interface ReserveRecordConvert {
 	 */
 	@Mappings({	
 		@Mapping(source = "course.name",target = "courseName"),
-		@Mapping(target = "classTime",expression = "java (java.time.LocalDateTime.of(schedule.getStartDate(), schedule.getClassTime()))"),
 		@Mapping(source = "member.name",target = "memberName"),
 		@Mapping(source = "schedule.orderNums",target = "reserveNumbers"),
-		@Mapping(source = "reserve.createTime",target = "operateTime"),
+		@Mapping(source = "reserve.createTime",target = "reserveTime"),
+		@Mapping(source = "reserve.lastModifyTime",target = "operateTime"),
 		@Mapping(source = "reserve.note",target = "reserveNote"),
 		@Mapping(source = "reserve.status",target = "reserveStatus"),
 		@Mapping(source = "course.id", target = "courseId"),
-			@Mapping(source = "schedule.id", target = "reserveId"),
-			@Mapping(source = "member.id", target = "scheduleId"),
-			@Mapping(source = "reserve.id", target = "memberId")
+		@Mapping(source = "schedule.id", target = "reserveId"),
+		@Mapping(source = "member.id", target = "scheduleId"),
+		@Mapping(source = "reserve.id", target = "memberId")
 	})
 	ReserveRecordDTO entity2Dto(TCourse course,TScheduleRecord schedule,TReservationRecord reserve,TMember member);
 

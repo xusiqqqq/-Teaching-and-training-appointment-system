@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -22,6 +24,8 @@ import com.kclm.xsap.mapper.TMemberCardMapper;
 import com.kclm.xsap.mapper.TScheduleRecordMapper;
 import com.kclm.xsap.service.TeacherService;
 
+@Service
+@Transactional
 public class TeacherServiceImpl implements TeacherService{
 
 	@Autowired
@@ -129,7 +133,8 @@ public class TeacherServiceImpl implements TeacherService{
 			for(int j = 0; j < cardList.size() ; j++) {
 				card = cardList.get(j);
 				//DTO转换
-				ClassRecordDTO classRecordDTO = ClassRecordConvert.INSTANCE.entity2Dto(classed, course, schedule, card);
+				ClassRecordDTO classRecordDTO = ClassRecordConvert.INSTANCE
+						.entity2Dto(classed, null, course, schedule, card, null, null);
 				//转换完成一条记录，就存放一条记录
 				classDtoList.add(classRecordDTO);
 			}

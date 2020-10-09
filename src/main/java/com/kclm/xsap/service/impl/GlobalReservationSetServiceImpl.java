@@ -3,11 +3,15 @@ package com.kclm.xsap.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kclm.xsap.entity.TGlobalReservationSet;
 import com.kclm.xsap.mapper.TGlobalReservationSetMapper;
 import com.kclm.xsap.service.GlobalReservationSetService;
 
+@Service
+@Transactional
 public class GlobalReservationSetServiceImpl implements GlobalReservationSetService{
 
 	@Autowired

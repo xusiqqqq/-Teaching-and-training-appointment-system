@@ -5,7 +5,6 @@ import java.util.List;
 import com.kclm.xsap.dto.MemberLogDTO;
 import com.kclm.xsap.entity.TConsumeRecord;
 import com.kclm.xsap.entity.TMemberCard;
-import com.kclm.xsap.entity.TMemberLog;
 import com.kclm.xsap.entity.TRechargeRecord;
 
 /**
