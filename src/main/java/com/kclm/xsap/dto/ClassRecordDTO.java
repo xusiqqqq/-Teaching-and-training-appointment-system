@@ -1,6 +1,9 @@
-package com.kclm.xsap.dto;
+	package com.kclm.xsap.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
+import com.kclm.xsap.entity.TMember;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,6 +31,14 @@ public class ClassRecordDTO{
 	private Long scheduleId;
 
 	private Long cardId;
+	
+	private Long memberId;
+	
+	/**
+	 *  会员信息
+	 */
+	private TMember member;
+	
 	/**
 	 * 课程名
 	 */
@@ -37,6 +48,11 @@ public class ClassRecordDTO{
 	 * 上课时间
 	 */
 	private LocalDateTime classTime;
+	
+	/**
+	 * 授课老师
+	 */
+	private String teacherName;
 	
 	/**
 	 * 会员卡名
@@ -52,6 +68,11 @@ public class ClassRecordDTO{
 	 * 消耗卡次/节
 	 */
 	private Integer timesCost;
+	
+	/**
+	 * 	涉及金额
+	 */
+	private BigDecimal involveMoney;
 	
 	/**
 	 * 上课备注

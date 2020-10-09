@@ -21,6 +21,7 @@ public class TConsumeRecord extends BaseEntity implements Serializable{
 	 *	用来封装会员实体
 	 */
 	@TableField(exist = false)
+	@ToString.Exclude
     private TMember member;
 	
 	/**

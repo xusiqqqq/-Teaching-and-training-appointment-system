@@ -71,4 +71,9 @@ public class CourseScheduleDTO {
 	 * 预约记录
 	 */
 	private List<ReserveRecordDTO> reserveRecord;
+	
+	/**
+	 * 上课数据
+	 */
+	private List<ClassRecordDTO> classRecord;
 }

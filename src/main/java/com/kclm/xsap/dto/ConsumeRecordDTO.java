@@ -1,4 +1,4 @@
-package com.kclm.xsap.dto;
+	package com.kclm.xsap.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -43,9 +43,9 @@ public class ConsumeRecordDTO{
 	private Integer cardCountChange;
 	
 	/**
-	 * 有效天数变化
+	 * 剩下次数
 	 */
-	private Integer cardDayChange;
+	private Integer timesRemainder;
 	
 	/**
 	 * 花费的金额

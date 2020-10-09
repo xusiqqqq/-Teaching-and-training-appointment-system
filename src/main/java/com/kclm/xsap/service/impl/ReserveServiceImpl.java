@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kclm.xsap.dto.ReserveRecordDTO;
@@ -24,6 +26,8 @@ import com.kclm.xsap.mapper.TReservationRecordMapper;
 import com.kclm.xsap.mapper.TScheduleRecordMapper;
 import com.kclm.xsap.service.ReserveService;
 
+@Service
+@Transactional
 public class ReserveServiceImpl implements ReserveService{
 
 	@Autowired
@@ -41,6 +45,7 @@ public class ReserveServiceImpl implements ReserveService{
 	@Autowired
 	TClassRecordMapper classMapper;
 	
+	//新增预约记录
 	@Override
 	public boolean save(TReservationRecord reserve) {
 		//判断：用户是否已经用任意一张会员卡预约过某次排课计划
@@ -58,13 +63,15 @@ public class ReserveServiceImpl implements ReserveService{
 		reserveMapper.insert(reserve);
 		return true;
 	}
-		
+	
+	//更新预约记录
 	@Override
 	public boolean update(TReservationRecord reserve) {
 		reserveMapper.updateById(reserve);
 		return true;
 	}
 	
+	//当前排课的预约记录
 	@Override
 	public List<ReserveRecordDTO> listReserveRecords(Long scheduleId) {
 		//1、获取到排课信息
@@ -101,6 +108,7 @@ public class ReserveServiceImpl implements ReserveService{
 		return reserveDtoList;
 	}
 
+	//导出当前排课的预约记录
 	@Override
 	public List<ReserveRecordDTO> listExportRecord(Long scheduleId) {
 		//数据由上面的方法查询到
@@ -109,6 +117,7 @@ public class ReserveServiceImpl implements ReserveService{
 		return reserveRecordDto;
 	}
 
+	//导出指定时间段的预约记录
 	@Override
 	public List<ReserveRecordDTO> listExportRecordRange(LocalDate startDate, LocalDate endDate) {
 		//对日期区间做LocalDateTime类型转换

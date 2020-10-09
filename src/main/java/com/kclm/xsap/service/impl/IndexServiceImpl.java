@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kclm.xsap.dto.HomePageDTO;
@@ -25,6 +27,8 @@ import com.kclm.xsap.mapper.TMemberMapper;
 import com.kclm.xsap.mapper.TReservationRecordMapper;
 import com.kclm.xsap.service.IndexService;
 
+@Service
+@Transactional
 public class IndexServiceImpl implements IndexService{
 
 	@Autowired

@@ -7,11 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.kclm.xsap.dto.MemberLogDTO;
+import com.kclm.xsap.dto.convert.MemberLogConvert;
 import com.kclm.xsap.entity.TConsumeRecord;
 import com.kclm.xsap.entity.TMemberBindRecord;
 import com.kclm.xsap.entity.TMemberCard;
@@ -24,6 +27,8 @@ import com.kclm.xsap.mapper.TMemberLogMapper;
 import com.kclm.xsap.mapper.TRechargeRecordMapper;
 import com.kclm.xsap.service.MemberCardService;
 
+@Service
+@Transactional
 public class MemberCardServiceImpl implements MemberCardService{
 
 	@Autowired
@@ -146,30 +151,16 @@ public class MemberCardServiceImpl implements MemberCardService{
 		Integer validTimes = bindRecord.getValidCount();
 		
 		//会员卡到期日
-		LocalDateTime createTime = bindRecord.getCreateTime();
-		createTime = createTime.plusDays(bindRecord.getValidDay());
+		LocalDateTime endTime = bindRecord.getCreateTime();
+		endTime = endTime.plusDays(bindRecord.getValidDay());
 		
 		//获取到会员指定的会员卡的操作记录
 		List<TMemberLog> logList = logMapper.selectList(new QueryWrapper<TMemberLog>()
 				.eq("member_id", memberId).eq("card_id", cardId));
 		List<MemberLogDTO> logDtoList = new ArrayList<>();
 		for (TMemberLog log : logList) {
-			//会员卡激活状态
-			logDto.setStatus(status);
-			//会员卡备注
-			logDto.setCardNote(note);
-			//当前会员卡可用次数
-			logDto.setValidTimes(validTimes);
-			//当前会员卡到期时间
-			logDto.setEndToDate(createTime);
-			//操作时间
-			logDto.setOperateTime(log.getCreateTime());
-			//金额
-			logDto.setInvolveMoney(log.getInvolveMoney());
-			//操作类型
-			logDto.setOperateType(log.getType());
-			//操作人
-			logDto.setOperator(log.getOperator());
+			//dto转换
+			logDto = MemberLogConvert.INSTANCE.entity2DTO(log, status, note, validTimes, endTime);
 			//存到dto中
 			logDtoList.add(logDto);
 		}	

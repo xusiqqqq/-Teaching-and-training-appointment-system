@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -32,6 +34,7 @@ import com.kclm.xsap.entity.TScheduleRecord;
 import com.kclm.xsap.mapper.TClassRecordMapper;
 import com.kclm.xsap.mapper.TConsumeRecordMapper;
 import com.kclm.xsap.mapper.TCourseMapper;
+import com.kclm.xsap.mapper.TEmployeeMapper;
 import com.kclm.xsap.mapper.TMemberBindRecordMapper;
 import com.kclm.xsap.mapper.TMemberCardMapper;
 import com.kclm.xsap.mapper.TMemberMapper;
@@ -39,6 +42,8 @@ import com.kclm.xsap.mapper.TReservationRecordMapper;
 import com.kclm.xsap.mapper.TScheduleRecordMapper;
 import com.kclm.xsap.service.MemberService;
 
+@Service
+@Transactional
 public class MemberServiceImpl implements MemberService{
 
 	@Autowired
@@ -65,6 +70,8 @@ public class MemberServiceImpl implements MemberService{
 	@Autowired
 	private TCourseMapper courseMapper;
 	
+	@Autowired
+	private TEmployeeMapper employeeMapper;
 	
 	@Override
 	public boolean save(TMember member) {
@@ -217,10 +224,11 @@ public class MemberServiceImpl implements MemberService{
 			classed = classList.get(i);
 			schedule = scheduleList.get(i);
 			course = courseList.get(i);
+			String teacherName = employeeMapper.selectById(schedule.getTeacherId()).getName();
 			for(int j = 0; j < cardList.size() ; j++) {
 				card = cardList.get(j);
 				//DTO转换
-				ClassRecordDTO classRecordDTO = ClassRecordConvert.INSTANCE.entity2Dto(classed, course, schedule, card);
+				ClassRecordDTO classRecordDTO = ClassRecordConvert.INSTANCE.entity2Dto(classed, null,course, schedule, card,teacherName, null);
 				//转换完成一条记录，就存放一条记录
 				classDtoList.add(classRecordDTO);
 			}
@@ -295,7 +303,6 @@ public class MemberServiceImpl implements MemberService{
 			
 			consume.setOperateType("上课支出");
 			consume.setOperator("系统自动处理");
-			
 			//查出会员卡的次数单价，取值四舍五入
 			TMemberCard card = cardMapper.selectById(consume.getCardId());
 			BigDecimal price = new BigDecimal(card.getPrice().toString());
@@ -304,9 +311,15 @@ public class MemberServiceImpl implements MemberService{
 			//消费的次数
 			BigDecimal countCost = new BigDecimal(course.getTimesCost().toString());
 			consume.setMoneyCost(unitPrice.multiply(countCost));
-			
 			//录入一条消费记录
 			consumeMapper.insert(consume);
+			//消费操作
+			TMemberBindRecord bindRecord = bindMapper.selectOne(new QueryWrapper<TMemberBindRecord>()
+					.eq("card_id", consume.getCardId()).eq("member_id", consume.getMemberId()));
+			bindRecord.setValidCount(bindRecord.getValidCount() + consume.getCardCountChange());
+			bindRecord.setValidDay(bindRecord.getValidDay() + consume.getCardDayChange());
+			bindRecord.setReceivedMoney(consume.getMoneyCost());
+			bindMapper.update(bindRecord, null);
 		}
 		
 		/* 以下是查询 */
@@ -326,8 +339,12 @@ public class MemberServiceImpl implements MemberService{
 		for(int i = 0; i < consumeList.size(); i++) {
 			 consumeRecord = consumeList.get(i);
 			 memberCard = cardList.get(i);
+			 //查询剩余卡次
+			 TMemberBindRecord bindRecord = bindMapper.selectOne(new QueryWrapper<TMemberBindRecord>()
+					 .eq("card_id", memberCard.getId()).eq("member_id", id));
+			 Integer timesRemainder = bindRecord.getValidCount();
 			 //DTO组合
-			 ConsumeRecordDTO consumeDto = ConsumeRecordConvert.INSTANCE.entity2Dto(consumeRecord, memberCard);
+			 ConsumeRecordDTO consumeDto = ConsumeRecordConvert.INSTANCE.entity2Dto(consumeRecord, memberCard,timesRemainder);
 			 //存放所有DTO数据
 			 consumeDtoList.add(consumeDto);
 		}

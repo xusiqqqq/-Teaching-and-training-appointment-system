@@ -51,23 +51,25 @@
 
     <!--查询某一时间段内的约课用户信息-->
     <div class="wrapper wrapper-content">
+		<!-- 起始时间 -->
         <div class="form-group ">
             <div class="input-group date selecttime" >
                 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                <input type="text" class="form-control myDate" value="2019-11-11">
+                <input name="startDate" id="startDate" type="text" class="form-control myDate" value="2019-11-11">
                 <script type="text/javascript">
                     $("input").focus(function () {
-                        $("input").css("background-color","#FFFFCC");
+                        $("input").css("background-color","#ff0000"); 
                     })
                 </script>
             </div>
         </div>
+		<!-- 终止时间 -->
         <div class="form-group " style="margin-top: -15px">
             <div class="input-group date selecttime" >
                 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                <input type="text" class="form-control myDate" value="2020-5-11">
+                <input name="endDate" id="endDate" type="text" class="form-control myDate" value="2020-5-11">
             </div>
-            <button type="button" class="btn btn-info" style="margin-left: 15px;margin-top: 15px">查询</button>
+            <button type="button" class="btn btn-info" id="homeSearch" style="margin-left: 15px;margin-top: 15px">查询</button>
         </div>
 
         <!--    体部信息-->
@@ -169,7 +171,15 @@
             <script type="text/javascript">
                 // 基于准备好的dom，初始化echarts实例
                 var myChartPie = echarts.init(document.getElementById('pie'));
-
+				$(function(){
+					//获取应用名
+					var appName = [[${#request.getContextPath()}]];
+					console.log("appName: " + appName);
+					$.post(appName +"/index/",function(reportData){
+						console.log("报表数据："+ reportData);
+						
+					});
+				});
                 var option = {          //指定图表的配置项和数据
                     title: {
                         text: '会员卡统计',
@@ -240,6 +250,7 @@
     <!--统计代码，可删除-->
 
     <script>
+		/* 日期控件属性设置 */
         $('.myDate').datepicker({
             language: "zh-CN",//中文版
             clearBtn: true,//清除
@@ -250,6 +261,22 @@
             startDate: '1970-1-1', //与你自己设置的格式一致yyyy-mm-dd，未设置的话与默认格式一致mm/dd/yyyy
             endDate: '2070-1-1'
         });
+		/* 首页数据查询 */
+		var start_date = $("#startDate").val();
+		var end_date = $("#endDate").val();
+		$(function(){
+			//获取应用名
+			var appName = [[${#request.getContextPath()}]];
+			console.log("appName: " + appName);
+			//首页统计数据
+			$("#homeSearch").click(function(){
+				$.get(appName + "/index/homePage.do",{startDate:start_date,endDate:end_date},function(indexData){
+					console.log("首页数据："+indexData);
+					
+				});
+			});
+		});
+		
     </script>
 
 </body>

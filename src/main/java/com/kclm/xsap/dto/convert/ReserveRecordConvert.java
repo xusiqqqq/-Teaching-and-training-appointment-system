@@ -34,10 +34,10 @@ public interface ReserveRecordConvert {
 	 */
 	@Mappings({	
 		@Mapping(source = "course.name",target = "courseName"),
-		@Mapping(target = "classTime",expression = "java (java.time.LocalDateTime.of(schedule.getStartDate(), schedule.getClassTime()))"),
 		@Mapping(source = "member.name",target = "memberName"),
 		@Mapping(source = "schedule.orderNums",target = "reserveNumbers"),
-		@Mapping(source = "reserve.createTime",target = "operateTime"),
+		@Mapping(source = "reserve.createTime",target = "reserveTime"),
+		//操作时间？
 		@Mapping(source = "reserve.note",target = "reserveNote"),
 		@Mapping(source = "reserve.status",target = "reserveStatus"),
 		@Mapping(source = "course.id", target = "courseId"),
