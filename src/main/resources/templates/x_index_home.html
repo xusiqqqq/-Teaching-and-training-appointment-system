@@ -19,7 +19,9 @@
 
     <!-- ECharts -->
     <script src="../static/js/plugins/echarts/echarts-all.js" th:src="@{/static/js/plugins/echarts/echarts-all.js}"></script>
-
+  <!-- 全局js -->
+    <script src="../static/js/jquery.min.js?v=2.1.4" th:src="@{/static/js/jquery.min.js(v='2.1.4')}"></script>
+    <script src="../static/js/bootstrap.min.js?v=3.3.6"  th:src="@{/static/js/bootstrap.min.js(v='3.3.6')}"></script>
 
     <style type="text/css">
         .box{
@@ -73,15 +75,15 @@
         </div>
 
         <!--    体部信息-->
-        <div class="box" style="margin-left: 17px">
+        <div class="box" style="margin-left: 10px">
             <span style="font-size: 25px;" class="left"><strong>72</strong></span>
             <p class="left">会员总数</p>
         </div>
-        <div class="box " style="margin-left: 30px">
+        <div class="box " style="margin-left: 10px">
             <span style="font-size: 25px" class="left"><strong>2</strong></span>
             <p class="left">活跃用户(近一个月有过约课的用户)</p>
         </div>
-        <div class="box left" style="margin-left: 30px">
+        <div class="box " style="margin-left: 10px">
             <span style="font-size: 25px" class="left"><strong>76</strong></span>
             <p class="left">预约总数</p>
         </div>
@@ -229,10 +231,6 @@
 
 
 </div>
-
-    <!-- 全局js -->
-    <script src="../static/js/jquery.min.js?v=2.1.4" th:src="@{/static/js/jquery.min.js(v='2.1.4')}"></script>
-    <script src="../static/js/bootstrap.min.js?v=3.3.6"  th:src="@{/static/js/bootstrap.min.js(v='3.3.6')}"></script>
 
 <!--    bookstrap-->
     <script src="../static/js/plugins/datapicker/bootstrap-datepicker.js" th:src="@{/static/js/plugins/datapicker/bootstrap-datepicker.js}"></script>

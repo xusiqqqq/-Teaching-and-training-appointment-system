@@ -37,7 +37,7 @@ public interface ReserveRecordConvert {
 		@Mapping(source = "member.name",target = "memberName"),
 		@Mapping(source = "schedule.orderNums",target = "reserveNumbers"),
 		@Mapping(source = "reserve.createTime",target = "reserveTime"),
-		//操作时间？
+		@Mapping(source = "reserve.lastModifyTime",target = "operateTime"),
 		@Mapping(source = "reserve.note",target = "reserveNote"),
 		@Mapping(source = "reserve.status",target = "reserveStatus"),
 		@Mapping(source = "course.id", target = "courseId"),
