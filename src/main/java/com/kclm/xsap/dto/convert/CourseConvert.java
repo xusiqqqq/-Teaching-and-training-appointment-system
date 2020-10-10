@@ -14,10 +14,10 @@ import com.kclm.xsap.entity.TCourse;
  * @description 此类用来描述了课程DTO类型转换
  *
  */
-@Mapper
+@Mapper(componentModel = "spring")
 public interface CourseConvert {
 
-	CourseConvert INSTANCE = Mappers.getMapper(CourseConvert.class);
+	//CourseConvert INSTANCE = Mappers.getMapper(CourseConvert.class);
 	
 	/**
 	 * 

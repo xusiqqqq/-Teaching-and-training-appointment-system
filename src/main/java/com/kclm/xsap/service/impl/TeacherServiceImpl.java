@@ -30,6 +30,9 @@ public class TeacherServiceImpl implements TeacherService{
 
 	@Autowired
 	TEmployeeMapper employeeMapper;
+
+	@Autowired
+	private ClassRecordConvert classRecordConvert;
 		
 	@Override
 	public boolean save(TEmployee emp) {
@@ -133,7 +136,8 @@ public class TeacherServiceImpl implements TeacherService{
 			for(int j = 0; j < cardList.size() ; j++) {
 				card = cardList.get(j);
 				//DTO转换
-				ClassRecordDTO classRecordDTO = ClassRecordConvert.INSTANCE
+				//ClassRecordDTO classRecordDTO = ClassRecordConvert.INSTANCE
+				ClassRecordDTO classRecordDTO = classRecordConvert
 						.entity2Dto(classed, null, course, schedule, card, null, null);
 				//转换完成一条记录，就存放一条记录
 				classDtoList.add(classRecordDTO);

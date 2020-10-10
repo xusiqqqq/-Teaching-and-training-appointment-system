@@ -32,6 +32,12 @@ import com.kclm.xsap.service.IndexService;
 public class IndexServiceImpl implements IndexService{
 
 	@Autowired
+	private ReportConvert reportConvert;
+
+	@Autowired
+	private HomePageConvert homePageConvert;
+
+	@Autowired
 	TMemberMapper memberMapper;
 	
 	@Autowired
@@ -91,8 +97,9 @@ public class IndexServiceImpl implements IndexService{
 			changeDateTime = changeDateTime.plusDays(1);
 		}
 		//==DTO组合
-		HomePageDTO homePageDto = HomePageConvert.INSTANCE.entity2Dto(totalMembers, reserveNums, activeNums, reserveNumsList, memberNumslist);
-		
+		//HomePageDTO homePageDto = HomePageConvert.INSTANCE.entity2Dto(totalMembers, reserveNums, activeNums, reserveNumsList, memberNumslist);
+		HomePageDTO homePageDto = homePageConvert.entity2Dto(totalMembers, reserveNums, activeNums, reserveNumsList, memberNumslist);
+
 		return homePageDto;
 	}
 
@@ -113,7 +120,8 @@ public class IndexServiceImpl implements IndexService{
 			List<TMemberBindRecord> bindList = bindMapper.selectList(new QueryWrapper<TMemberBindRecord>().eq("card_id", card.getId()));
 			data.put(card.getName(), bindList.size());
 			//DTO转换
-			reportDto = ReportConvert.INSTANCE.entity2Dto(data);
+			//reportDto = ReportConvert.INSTANCE.entity2Dto(data);
+			reportDto = reportConvert.entity2Dto(data);
 			reportDtoList.add(reportDto);
 		}
 		return reportDtoList;

@@ -21,6 +21,9 @@ import com.kclm.xsap.service.CourseService;
 public class CourseServiceImpl implements CourseService{
 
 	@Autowired
+	private CourseConvert courseConvert;
+
+	@Autowired
 	private TCourseMapper courseMapper;
 	
 	@Override
@@ -50,7 +53,8 @@ public class CourseServiceImpl implements CourseService{
 		List<CourseDTO> courseDtoList = new ArrayList<CourseDTO>();
 		for (TCourse course : courseList) {
 			//DTO转换
-			CourseDTO courseDTO = CourseConvert.INSTANCE.entity2Dto(course);
+			//CourseDTO courseDTO = CourseConvert.INSTANCE.entity2Dto(course);
+			CourseDTO courseDTO = courseConvert.entity2Dto(course);
 			courseDtoList.add(courseDTO);
 		}
 		return courseDtoList;
@@ -62,7 +66,8 @@ public class CourseServiceImpl implements CourseService{
 		List<CourseDTO> courseDtoList = new ArrayList<CourseDTO>();
 		for (TCourse course : courseList) {
 			//DTO转换
-			CourseDTO courseDTO = CourseConvert.INSTANCE.entity2Dto(course);
+			//CourseDTO courseDTO = CourseConvert.INSTANCE.entity2Dto(course);
+			CourseDTO courseDTO = courseConvert.entity2Dto(course);
 			courseDtoList.add(courseDTO);
 		}
 		return courseDtoList;

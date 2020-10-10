@@ -22,11 +22,9 @@ import com.kclm.xsap.entity.TScheduleRecord;
  * @description 此类用来描述了上课记录DTO类型转换
  *
  */
-@Mapper
+@Mapper(componentModel = "spring")
 public interface ClassRecordConvert {
 
-	ClassRecordConvert INSTANCE = Mappers.getMapper(ClassRecordConvert.class);
-	
 	/**
 	 * 
 	 * @param classRecord 对应上课记录实体类
@@ -48,7 +46,7 @@ public interface ClassRecordConvert {
 		@Mapping(source = "member.id",target = "memberId"),
 		@Mapping(source = "schedule.id",target = "scheduleId"),
 		@Mapping(source = "card.id",target = "cardId"),
-		@Mapping(target = "classTime",expression = "java(LocalDateTime.of(schedule.getStartDate(),schedule.getClassTime() ))")
+		@Mapping(target = "classTime",expression = "java(java.time.LocalDateTime.of(schedule.getStartDate(),schedule.getClassTime() ))")
 	})
 	ClassRecordDTO entity2Dto(TClassRecord classRecord,TMember member,TCourse course,TScheduleRecord schedule,TMemberCard card,String teacherName,BigDecimal involveMoney);
 	

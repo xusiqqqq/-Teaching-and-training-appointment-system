@@ -47,6 +47,21 @@ import com.kclm.xsap.service.MemberService;
 public class MemberServiceImpl implements MemberService{
 
 	@Autowired
+	private MemberConvert memberConvert;
+
+	@Autowired
+	private MemberCardConvert memberCardConvert;
+
+	@Autowired
+	private ReserveRecordConvert reserveRecordConvert;
+
+	@Autowired
+	private ConsumeRecordConvert consumeRecordConvert;
+
+	@Autowired
+	private ClassRecordConvert classRecordConvert;
+
+	@Autowired
 	private TMemberMapper memberMapper;
 	
 	@Autowired
@@ -145,7 +160,8 @@ public class MemberServiceImpl implements MemberService{
 		//消费记录
 		List<ConsumeRecordDTO> consumeRecords = listConsumeRecords(id);
 		//组合DTO
-		MemberDTO memberDto = MemberConvert.INSTANCE.entity2Dto(member);
+		//MemberDTO memberDto = MemberConvert.INSTANCE.entity2Dto(member);
+		MemberDTO memberDto = memberConvert.entity2Dto(member);
 		memberDto.setCardMessage(cardRecords);
 		memberDto.setClassRecord(classRecords);
 		memberDto.setReserveRecord(reserveRecords);
@@ -178,7 +194,8 @@ public class MemberServiceImpl implements MemberService{
 			TMemberCard memberCard = cardMapper.selectById(bindRecord.getCardId());
 			
 			//组成一条会员卡信息DTO
-			cardDto = MemberCardConvert.INSTANCE.entity2Dto(validTimes, endTime, memberCard);
+			//cardDto = MemberCardConvert.INSTANCE.entity2Dto(validTimes, endTime, memberCard);
+			cardDto = memberCardConvert.entity2Dto(validTimes, endTime, memberCard);
 			cardDtoList.add(cardDto);
 		}
 		return cardDtoList;
@@ -228,7 +245,8 @@ public class MemberServiceImpl implements MemberService{
 			for(int j = 0; j < cardList.size() ; j++) {
 				card = cardList.get(j);
 				//DTO转换
-				ClassRecordDTO classRecordDTO = ClassRecordConvert.INSTANCE.entity2Dto(classed, null,course, schedule, card,teacherName, null);
+				//ClassRecordDTO classRecordDTO = ClassRecordConvert.INSTANCE.entity2Dto(classed, null,course, schedule, card,teacherName, null);
+				ClassRecordDTO classRecordDTO = classRecordConvert.entity2Dto(classed, null,course, schedule, card,teacherName, null);
 				//转换完成一条记录，就存放一条记录
 				classDtoList.add(classRecordDTO);
 			}
@@ -271,7 +289,8 @@ public class MemberServiceImpl implements MemberService{
 			schedule = scheduleList.get(i);
 			course = courseList.get(i);			
 			//DTO转换
-			ReserveRecordDTO reserveDto = ReserveRecordConvert.INSTANCE.entity2Dto(course, schedule, reserve,null);
+			//ReserveRecordDTO reserveDto = ReserveRecordConvert.INSTANCE.entity2Dto(course, schedule, reserve,null);
+			ReserveRecordDTO reserveDto = reserveRecordConvert.entity2Dto(course, schedule, reserve,null);
 			//转换完成一条记录，就存放一条记录
 			reserveDtoList.add(reserveDto);
 		}
@@ -344,7 +363,8 @@ public class MemberServiceImpl implements MemberService{
 					 .eq("card_id", memberCard.getId()).eq("member_id", id));
 			 Integer timesRemainder = bindRecord.getValidCount();
 			 //DTO组合
-			 ConsumeRecordDTO consumeDto = ConsumeRecordConvert.INSTANCE.entity2Dto(consumeRecord, memberCard,timesRemainder);
+			 //ConsumeRecordDTO consumeDto = ConsumeRecordConvert.INSTANCE.entity2Dto(consumeRecord, memberCard,timesRemainder);
+			 ConsumeRecordDTO consumeDto = consumeRecordConvert.entity2Dto(consumeRecord, memberCard,timesRemainder);
 			 //存放所有DTO数据
 			 consumeDtoList.add(consumeDto);
 		}

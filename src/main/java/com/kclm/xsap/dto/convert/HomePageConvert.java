@@ -17,10 +17,10 @@ import com.kclm.xsap.dto.HomePageDTO;
  * @description 此类用来描述了首页的统计数据DTO转换
  *
  */
-@Mapper
+@Mapper(componentModel = "spring")
 public interface HomePageConvert {
 
-	HomePageConvert INSTANCE = Mappers.getMapper(HomePageConvert.class);
+	//HomePageConvert INSTANCE = Mappers.getMapper(HomePageConvert.class);
 	
 	/**
 	 * 

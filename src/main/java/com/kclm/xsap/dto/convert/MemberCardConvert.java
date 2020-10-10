@@ -18,10 +18,10 @@ import com.kclm.xsap.entity.TMemberCard;
  * @description 此类用来描述了会员卡信息的DTO类型转换
  *
  */
-@Mapper
+@Mapper(componentModel = "spring")
 public interface MemberCardConvert {
 
-	MemberCardConvert INSTANCE = Mappers.getMapper(MemberCardConvert.class);
+	//MemberCardConvert INSTANCE = Mappers.getMapper(MemberCardConvert.class);
 	
 	/**
 	 * 

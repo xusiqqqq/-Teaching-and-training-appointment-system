@@ -21,10 +21,10 @@ import com.kclm.xsap.entity.TScheduleRecord;
  * @description 此类用来描述了排课计划DTO类型转换
  *
  */
-@Mapper
+@Mapper(componentModel = "spring")
 public interface CourseScheduleConvert {
 
-	CourseScheduleConvert INSTANCE = Mappers.getMapper(CourseScheduleConvert.class);
+	//CourseScheduleConvert INSTANCE = Mappers.getMapper(CourseScheduleConvert.class);
 	
 	/**
 	 * 
@@ -43,7 +43,7 @@ public interface CourseScheduleConvert {
 		@Mapping(source = "course.limitAge",target = "limitAge"),
 		@Mapping(source = "schedule.id", target = "scheduleId"),
 		@Mapping(source = "course.id", target = "courseId"),
-		@Mapping(target = "startTime",expression = "java(LocalDateTime.of(schedule.getStartDate(),schedule.getClassTime() ))"),
+		@Mapping(target = "startTime",expression = "java(java.time.LocalDateTime.of(schedule.getStartDate(),schedule.getClassTime() ))"),
 		@Mapping(source = "reserveDto", target = "reserveRecord"),
 		@Mapping(source = "classDto", target = "classRecord")
 	})

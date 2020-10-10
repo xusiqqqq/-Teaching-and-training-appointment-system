@@ -31,6 +31,9 @@ import com.kclm.xsap.service.ReserveService;
 public class ReserveServiceImpl implements ReserveService{
 
 	@Autowired
+	private ReserveRecordConvert reserveRecordConvert;
+
+	@Autowired
 	TReservationRecordMapper reserveMapper;
 	
 	@Autowired
@@ -99,7 +102,8 @@ public class ReserveServiceImpl implements ReserveService{
 			for(int j = 0; j < reserveList.size(); j++) {
 				reserve = reserveList.get(j);
 				//DTO转换
-				ReserveRecordDTO reserveRecordDTO = ReserveRecordConvert.INSTANCE.entity2Dto(course, schedule, reserve, member);	
+				//ReserveRecordDTO reserveRecordDTO = ReserveRecordConvert.INSTANCE.entity2Dto(course, schedule, reserve, member);
+				ReserveRecordDTO reserveRecordDTO = reserveRecordConvert.entity2Dto(course, schedule, reserve, member);
 				//添加到预约记录集合
 				reserveDtoList.add(reserveRecordDTO);
 			}
