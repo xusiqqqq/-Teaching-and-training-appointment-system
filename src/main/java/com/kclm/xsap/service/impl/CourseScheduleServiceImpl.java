@@ -8,6 +8,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,7 @@ import com.kclm.xsap.service.CourseScheduleService;
 
 @Service
 @Transactional
+@Slf4j
 public class CourseScheduleServiceImpl implements CourseScheduleService{
 
 	@Autowired
@@ -120,6 +122,8 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 		//获取当前课程对应的预约记录
 		List<ReserveRecordDTO> reserveDTO = reserveService.listReserveRecords(scheduleId);
 		System.out.println("-------reserveDTO: "+reserveDTO);
+
+		System.out.println("*********** "+classRecordConvert);
 		//==获取当前课程的上课数据
 		List<TClassRecord> classList = classMapper.selectList(new QueryWrapper<TClassRecord>().eq("schedule_id", scheduleId));
 		List<ClassRecordDTO> classDtoList = new ArrayList<ClassRecordDTO>();
@@ -146,7 +150,7 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 		//dto转换
 		//CourseScheduleDTO scheduleDto = CourseScheduleConvert.INSTANCE.entity2Dto(schedule, course, supportCards, teacherName, reserveDTO, classDtoList);
 		CourseScheduleDTO scheduleDto = courseScheduleConvert.entity2Dto(schedule, course, supportCards, teacherName, reserveDTO, classDtoList);
-
+		log.debug("排课计划DTO; "+scheduleDto);
 		//计算下课时间
 		LocalTime plusClassTime = schedule.getClassTime().plusMinutes(course.getDuration());
 		LocalDateTime endTime = LocalDateTime.of(schedule.getStartDate(),plusClassTime);
