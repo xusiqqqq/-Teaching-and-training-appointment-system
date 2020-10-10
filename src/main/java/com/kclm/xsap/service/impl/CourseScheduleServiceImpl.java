@@ -79,6 +79,9 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 	@Autowired
 	TMemberMapper memberMapper;
 	
+	@Autowired
+	ReserveServiceImpl reserveService;
+	
 	@Override
 	public CourseScheduleDTO findById(Long scheduleId) {
 		//获取当前选中的排课记录信息
@@ -110,15 +113,18 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 		String teacherName = employeeMapper.selectById(schedule.getTeacherId()).getName();
 		
 		//获取当前课程对应的预约记录
-		ReserveServiceImpl reserveService = new ReserveServiceImpl();
 		List<ReserveRecordDTO> reserveDTO = reserveService.listReserveRecords(scheduleId);
-		
+		System.out.println("-------reserveDTO: "+reserveDTO);
 		//==获取当前课程的上课数据
 		List<TClassRecord> classList = classMapper.selectList(new QueryWrapper<TClassRecord>().eq("schedule_id", scheduleId));
 		List<ClassRecordDTO> classDtoList = new ArrayList<ClassRecordDTO>();
 		for (TClassRecord classed : classList) {
 			//查出会员卡的次数单价，取值四舍五入
 			TMemberCard memberCard = cardMapper.selectOne(new QueryWrapper<TMemberCard>().eq("name", classed.getCardName()));
+			if(memberCard == null) {
+				System.out.println("没有此会员卡！");
+				return null;
+			}
 			BigDecimal price = new BigDecimal(memberCard.getPrice().toString());
 			BigDecimal count = new BigDecimal(memberCard.getTotalCount().toString());
 			BigDecimal unitPrice = price.divide(count, 2, RoundingMode.HALF_UP);	

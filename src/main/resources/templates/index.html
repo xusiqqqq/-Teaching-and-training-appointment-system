@@ -19,7 +19,15 @@
     <link href="../static/css/font-awesome.min.css?v=4.4.0" th:href="@{/static/css/font-awesome.min.css(v='4.4.0')}" rel="stylesheet">
     <link href="../static/css/animate.css" th:href="@{/static/css/animate.css}" rel="stylesheet">
     <link href="../static/css/style.css?v=5.0" th:href="@{/static/css/style.css(v='5.0')}" rel="stylesheet">
-
+	<script src="../static/js/jquery.min.js?v=2.1.4" th:src="@{/static/js/jquery.min.js(v='2.1.4')}"></script>
+	<script src="../static/js/bootstrap.min.js?v=3.3.6" th:src="@{/static/js/bootstrap.min.js(v='3.3.6')}"></script>
+	<script type="text/javascript">
+		$(function(){
+		//资源路径名
+		var appName = "";//[[$request.getContextPath()]];
+		console.log("appName: " + appName);
+		});
+	</script>
 </head>
 
 <body class="fixed-sidebar full-height-layout gray-bg" style="overflow:hidden">
@@ -344,8 +352,6 @@
     </div>
 
     <!-- 全局js -->
-    <script src="../static/js/jquery.min.js?v=2.1.4" th:src="@{/static/js/jquery.min.js(v='2.1.4')}"></script>
-    <script src="../static/js/bootstrap.min.js?v=3.3.6" th:src="@{/static/js/bootstrap.min.js(v='3.3.6')}"></script>
     <script src="../static/js/plugins/metisMenu/jquery.metisMenu.js" th:src="@{/static/js/plugins/metisMenu/jquery.metisMenu.js}"></script>
     <script src="../static/js/plugins/slimscroll/jquery.slimscroll.min.js" th:src="@{/static/js/plugins/slimscroll/jquery.slimscroll.min.js}"></script>
     <script src="../static/js/plugins/layer/layer.min.js" th:src="@{/static/js/plugins/layer/layer.min.js}"></script>

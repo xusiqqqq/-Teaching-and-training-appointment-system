@@ -41,7 +41,8 @@ public class ClassServiceImpl implements ClassService{
 			classed.setNote(reserve.getClassNote());
 			//存入教师评语
 			classed.setComment(reserve.getComment());
-			
+			//最后一次预约修改时间，可表示为“上课”就绪，作为上课记录创建时间
+			classed.setCreateTime(reserve.getLastModifyTime());
 			//录入一条上课记录
 			classMapper.insert(classed);
 		}
