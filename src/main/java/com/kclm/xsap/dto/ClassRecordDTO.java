@@ -7,8 +7,9 @@ import com.kclm.xsap.entity.TMember;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 
-/**
+	/**
  * 
  * @author harima
  * @since JDK11.0
@@ -18,6 +19,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode
+@Accessors(chain = true)
 public class ClassRecordDTO{
 
 	/****

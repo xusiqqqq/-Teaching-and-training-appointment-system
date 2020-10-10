@@ -40,11 +40,11 @@
                         <img src="../../static/img/个性头像.png" alt="会员信息" class="img-circle" style="height: 150px;width: 150px; float: left; ">
                         <div style="float: left; padding-left: 15px">
                             <label>
-                                <h2><strong><p>测试宝宝</p></strong></h2>
-                                <p><span>性别:</span>男</p>
-                                <p><span>手机号:</span>18549959978</p>
-                                <p><span>出生日期:</span>2000-10-1</p>
-                                <p><span>备注:</span></p>
+                                <h2><strong>测试宝宝</strong></h2>
+                                <p><span style="margin-right: 15px;">性别:</span>男</p>
+                                <p><span style="margin-right: 5px;">手机号:</span>18549959978</p>
+                                <p><span style="margin-right: 5px;">出生日期:</span>2000-10-1</p>
+                                <p><span style="margin-right: 5px;">备注:</span>xxxxxxx</p>
                             </label>
                         </div>
                         <a class="btn btn-success" data-toggle='modal' data-target='#details' type="button" style="float: right">编辑信息</a>
@@ -152,6 +152,7 @@
                                                 <th>使用次数</th>
 
                                                 <th>老师评价</th>
+                                                <th>确认状态</th>
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -163,6 +164,7 @@
                                                 <td></td>
                                                 <td></td>
 
+                                                <td></td>
                                                 <td></td>
                                             </tr>
                                             </tbody>
@@ -186,12 +188,11 @@
                                             <th>操作类型</th>
                                             <th>操作人</th>
                                             <th>备注</th>
-                                            <th>状态</th>
+
                                         </tr>
                                         </thead>
                                         <tbody>
                                         <tr>
-                                            <td></td>
                                             <td></td>
                                             <td></td>
                                             <td></td>
@@ -594,7 +595,17 @@ $(function () {
             {"data": "clubCard"},
             {"data": "memberForwardCounting"},
             {"data": "numberUse"},
-            {"data": "teacherRatings"}
+            {"data": "teacherRatings"},
+            {"data": "checkStatus", "render": function (data, type, row) {
+                    //console.log(data + " -> "+type+" -> "+row);
+                    if(data == '已上课') {
+                        return '<span class="label label-success">'+data+'</span>';
+                    } else if(data == '未上课') {
+                        return '<span class="label label-danger">'+data+'</span>';
+                    } else {
+                        return '<span class="label label-default">'+data+'</span>';
+                    }
+                }}
         ],
         //去掉搜索
         searching: true,
@@ -637,17 +648,7 @@ $(function () {
             {"data": "amountMoney"},
             {"data": "operationRatings"},
             {"data": "operator"},
-            {"data": "appointmentRemark"},
-            {"data": "cartState", "render": function (data, type, row) {
-                    //console.log(data + " -> "+type+" -> "+row);
-                    if(data == '已确认') {
-                        return '<span class="label label-success">'+data+'</span>';
-                    } else if(data == '已取消') {
-                        return '<span class="label label-danger">'+data+'</span>';
-                    } else {
-                        return '<span class="label label-default">'+data+'</span>';
-                    }
-                }}
+            {"data": "appointmentRemark"}
         ],
         //去掉搜索
         searching: true,

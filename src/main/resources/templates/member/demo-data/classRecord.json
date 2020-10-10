@@ -8,7 +8,8 @@
     "memberForwardCounting":6,
     "numberUse":1,
     "appointmentRemark":"xxxxx",
-    "teacherRatings":"宝宝上课表现很稳定"
+    "teacherRatings":"宝宝上课表现很稳定",
+    "checkStatus":"已上课"
   },
   {
     "id":11,
@@ -19,6 +20,7 @@
     "memberForwardCounting":1,
     "numberUse":1,
     "appointmentRemark":"下午去上课",
-    "teacherRatings":"宝宝上课很认真"
+    "teacherRatings":"因个人原因未来上课",
+    "checkStatus":"未上课"
   }
 ]

@@ -17,10 +17,10 @@ import com.kclm.xsap.entity.TMemberCard;
  * @description 此类用来描述了消费记录DTO类型转换
  *
  */
-@Mapper
+@Mapper(componentModel = "spring")
 public interface ConsumeRecordConvert {
 
-	ConsumeRecordConvert INSTANCE = Mappers.getMapper(ConsumeRecordConvert.class);
+	//ConsumeRecordConvert INSTANCE = Mappers.getMapper(ConsumeRecordConvert.class);
 	/**
 	 * 
 	 * @param consume	对应消费记录实体类
@@ -31,7 +31,9 @@ public interface ConsumeRecordConvert {
 		@Mapping(source = "consume.id", target = "consumeId"),
 		@Mapping(source = "card.id", target = "cardId"),
 		@Mapping(source = "card.name",target = "cardName"),
-		@Mapping(source = "consume.createTime",target = "operateTime")		
+		@Mapping(source = "consume.createTime",target = "operateTime"),
+		//以消费记录的note为映射依据
+		@Mapping(source = "consume.note",target = "note")
 	})
 	ConsumeRecordDTO entity2Dto(TConsumeRecord consume,TMemberCard card,Integer timesRemainder);
 	

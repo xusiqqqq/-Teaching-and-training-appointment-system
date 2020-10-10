@@ -19,10 +19,10 @@ import com.kclm.xsap.entity.TScheduleRecord;
  * @description 此类用来描述了预约记录的信息DTO转换
  *
  */
-@Mapper
+@Mapper(componentModel = "spring")
 public interface ReserveRecordConvert {
 
-	ReserveRecordConvert INSTANCE = Mappers.getMapper(ReserveRecordConvert.class);
+	//ReserveRecordConvert INSTANCE = Mappers.getMapper(ReserveRecordConvert.class);
 	
 	/**
 	 * 排课计划表所查阅的预约记录，关系到多个会员

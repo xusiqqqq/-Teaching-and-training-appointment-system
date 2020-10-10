@@ -32,6 +32,12 @@ import com.kclm.xsap.service.IndexService;
 public class IndexServiceImpl implements IndexService{
 
 	@Autowired
+	private ReportConvert reportConvert;
+
+	@Autowired
+	private HomePageConvert homePageConvert;
+
+	@Autowired
 	TMemberMapper memberMapper;
 	
 	@Autowired
@@ -63,7 +69,6 @@ public class IndexServiceImpl implements IndexService{
 		List<Integer> reserveNumsList = new ArrayList<>();
 		//对日期区间做LocalDateTime类型转换
 		LocalDateTime startDateTime = LocalDateTime.of(startDate, LocalTime.MIN);
-		LocalDateTime endDateTime = LocalDateTime.of(endDate, LocalTime.MAX);
 		//用来日期自增，从指定的开始日期开始
 		LocalDateTime changeDateTime = startDateTime;
 		
@@ -95,8 +100,9 @@ public class IndexServiceImpl implements IndexService{
 			changeDateTime = changeDateTime.plusDays(1);
 		}
 		//==DTO组合
-		HomePageDTO homePageDto = HomePageConvert.INSTANCE.entity2Dto(totalMembers, reserveNums, activeNums, reserveNumsList, memberNumslist);
-		
+		//HomePageDTO homePageDto = HomePageConvert.INSTANCE.entity2Dto(totalMembers, reserveNums, activeNums, reserveNumsList, memberNumslist);
+		HomePageDTO homePageDto = homePageConvert.entity2Dto(totalMembers, reserveNums, activeNums, reserveNumsList, memberNumslist);
+
 		return homePageDto;
 	}
 
@@ -122,7 +128,8 @@ public class IndexServiceImpl implements IndexService{
 			data.put(card.getName(), bindList.size());
 			//DTO转换
 			System.out.println("会员卡绑定统计：" + data);
-			reportDto = ReportConvert.INSTANCE.entity2Dto(data);
+			//reportDto = ReportConvert.INSTANCE.entity2Dto(data);
+			reportDto = reportConvert.entity2Dto(data);
 			reportDtoList.add(reportDto);
 		}
 		return reportDtoList;

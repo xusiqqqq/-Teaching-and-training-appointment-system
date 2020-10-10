@@ -16,10 +16,10 @@ import com.kclm.xsap.dto.ReportDTO;
  * @description 此类用来描述了首页图表数据DTO转换
  *
  */
-@Mapper
+@Mapper(componentModel = "spring")
 public interface ReportConvert {
 
-	ReportConvert INSTANCE = Mappers.getMapper(ReportConvert.class);
+	//ReportConvert INSTANCE = Mappers.getMapper(ReportConvert.class);
 	
 	/**
 	 * 

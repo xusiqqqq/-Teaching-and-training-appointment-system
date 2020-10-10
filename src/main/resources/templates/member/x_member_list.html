@@ -180,12 +180,11 @@
 			});
 			
             $('.dataTables-example').dataTable({
-                //TODO json获取数据
-                "data": [
-                    {"id":10, "memberName": "张宝宝(14977665522)", "gender": "男", "clubCard": "sdlkfsjdlfjdslfjdslkfjdslkfdsjlkf","remark":""},
-                    {"id":10, "memberName": "李宝宝(18977665522)", "gender": "男", "clubCard": "sdlkfsjdlfjdslfjdslkfjdslkfdsjlkf","remark":""},
-                    {"id":10, "memberName": "王宝宝(14977665522)", "gender": "男", "clubCard": "sdlkfsjdlfjdslfjdslkfjdslkfdsjlkf","remark":""},
-                ],
+                //注： 后面开发时，url的位置写 服务端控制器的 mapping值,服务端返回的将是json数据
+                ajax: {
+                    url: './demo-data/memberList.json',
+                    dataSrc: ''  //注：如果json文件中的数据存在key的话，则此处写 key的名字
+                },
                 //行的定义
                 "columns": [
                     {"data": "memberName"},

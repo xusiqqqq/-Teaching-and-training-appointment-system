@@ -36,7 +36,12 @@ import com.kclm.xsap.service.CourseScheduleService;
 public class CourseScheduleServiceImpl implements CourseScheduleService{
 
 	@Autowired
+	private CourseScheduleConvert courseScheduleConvert;
+
+	@Autowired
 	TScheduleRecordMapper scheduleMapper;
+	@Autowired
+	ClassRecordConvert classRecordConvert;
 	
 	@Override
 	public boolean save(TScheduleRecord schedule) {
@@ -133,13 +138,15 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 			BigDecimal involveMoney = unitPrice.multiply(countCost);
 			TMember member = memberMapper.selectById(classed.getMemberId());
 			//dto转换
-			ClassRecordDTO classRecordDTO = ClassRecordConvert.INSTANCE.entity2Dto(classed, member,null, null, memberCard, null, involveMoney);
+			//ClassRecordDTO classRecordDTO = ClassRecordConvert.INSTANCE.entity2Dto(classed, member,null, null, memberCard, null, involveMoney);
+			ClassRecordDTO classRecordDTO = classRecordConvert.entity2Dto(classed, member,null, null, memberCard, null, involveMoney);
 			//dto拼接
 			classDtoList.add(classRecordDTO);
 		}
 		//dto转换
-		CourseScheduleDTO scheduleDto = CourseScheduleConvert.INSTANCE.entity2Dto(schedule, course, supportCards, teacherName, reserveDTO, classDtoList);
-		
+		//CourseScheduleDTO scheduleDto = CourseScheduleConvert.INSTANCE.entity2Dto(schedule, course, supportCards, teacherName, reserveDTO, classDtoList);
+		CourseScheduleDTO scheduleDto = courseScheduleConvert.entity2Dto(schedule, course, supportCards, teacherName, reserveDTO, classDtoList);
+
 		//计算下课时间
 		LocalTime plusClassTime = schedule.getClassTime().plusMinutes(course.getDuration());
 		LocalDateTime endTime = LocalDateTime.of(schedule.getStartDate(),plusClassTime);

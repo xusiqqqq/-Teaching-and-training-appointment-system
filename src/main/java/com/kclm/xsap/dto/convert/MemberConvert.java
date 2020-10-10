@@ -15,10 +15,10 @@ import com.kclm.xsap.entity.TMember;
  * @description 此类用来描述了会员的DTO类型转换
  *
  */
-@Mapper
+@Mapper(componentModel = "spring")
 public interface MemberConvert {
 
-	MemberConvert INSTANCE = Mappers.getMapper(MemberConvert.class);
+	//MemberConvert INSTANCE = Mappers.getMapper(MemberConvert.class);
 	
 	/**
 	 * 

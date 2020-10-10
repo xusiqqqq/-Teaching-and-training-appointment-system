@@ -20,10 +20,10 @@ import org.mapstruct.factory.Mappers;
  * @Create 2020-09-25 10:26
  * @Description TODO
  */
-@Mapper
+@Mapper(componentModel = "spring")
 public interface MemberLogConvert {
 
-    MemberLogConvert INSTANCE = Mappers.getMapper(MemberLogConvert.class);
+    //MemberLogConvert INSTANCE = Mappers.getMapper(MemberLogConvert.class);
 
     /**
      * 

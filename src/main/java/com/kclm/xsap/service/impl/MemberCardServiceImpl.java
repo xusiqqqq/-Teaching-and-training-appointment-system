@@ -33,6 +33,9 @@ import com.kclm.xsap.service.MemberCardService;
 public class MemberCardServiceImpl implements MemberCardService{
 
 	@Autowired
+	private MemberLogConvert memberLogConvert;
+
+	@Autowired
 	TMemberCardMapper cardMapper;
 	
 	@Override
@@ -180,7 +183,8 @@ public class MemberCardServiceImpl implements MemberCardService{
 		List<MemberLogDTO> logDtoList = new ArrayList<>();
 		for (TMemberLog log : logList) {
 			//dto转换
-			logDto = MemberLogConvert.INSTANCE.entity2DTO(log, status, note, validTimes, endTime);
+			//logDto = MemberLogConvert.INSTANCE.entity2DTO(log, status, note, validTimes, endTime);
+			logDto = memberLogConvert.entity2DTO(log, status, note, validTimes, endTime);
 			//存到dto中
 			logDtoList.add(logDto);
 		}	

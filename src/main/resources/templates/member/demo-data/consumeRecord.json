@@ -8,8 +8,7 @@
     "amountMoney": "￥160",
     "operationRatings":"上课扣费",
     "operator":"梁婷",
-    "appointmentRemark":"优惠体验课",
-    "cartState":"已确认"
+    "appointmentRemark":"优惠体验课"
   },
   {
     "id":11,
@@ -20,8 +19,7 @@
     "amountMoney": "￥0",
     "operationRatings":"首次绑卡",
     "operator":"梁婷",
-    "appointmentRemark":"授课扣费",
-    "cartState":"已确认"
+    "appointmentRemark":"授课扣费"
   },
   {
     "id":12,
@@ -32,7 +30,6 @@
     "amountMoney": "￥40",
     "operationRatings":"上课扣费",
     "operator":"梁婷",
-    "appointmentRemark":"授课扣费",
-    "cartState":"已取消"
+    "appointmentRemark":"授课扣费"
   }
 ]
