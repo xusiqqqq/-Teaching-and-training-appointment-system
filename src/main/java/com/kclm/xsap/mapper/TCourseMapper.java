@@ -11,4 +11,9 @@ import com.kclm.xsap.entity.TCourse;
 public interface TCourseMapper extends BaseMapper<TCourse> {
 	
 	List<TCourse> findAll();
+	
+	//以下方法针对中间表操作
+	boolean insertMix(Long cardId,Long courseId);
+	
+	boolean deleteBindCard(Long courseId);
 }

@@ -69,7 +69,6 @@ public class IndexServiceImpl implements IndexService{
 		List<Integer> reserveNumsList = new ArrayList<>();
 		//对日期区间做LocalDateTime类型转换
 		LocalDateTime startDateTime = LocalDateTime.of(startDate, LocalTime.MIN);
-		LocalDateTime endDateTime = LocalDateTime.of(endDate, LocalTime.MAX);
 		//用来日期自增，从指定的开始日期开始
 		LocalDateTime changeDateTime = startDateTime;
 		
@@ -77,8 +76,10 @@ public class IndexServiceImpl implements IndexService{
 		Long getDays = endDate.toEpochDay() - startDate.toEpochDay();
 		
 		for(int i = 0; i< getDays; i++) {
+			//当天的预约情况
 			reserveList = reserveMapper.selectList(new QueryWrapper<TReservationRecord>()
-					.eq("status", 1).between("create_time", changeDateTime, endDateTime));
+					.eq("status", 1).between("create_time", changeDateTime, 
+					LocalDateTime.of(changeDateTime.toLocalDate(), LocalTime.MAX)));
 			//存入当天的预约数量
 			reserveNumsList.add(reserveList.size());
 			//自增一天
@@ -89,8 +90,10 @@ public class IndexServiceImpl implements IndexService{
 		changeDateTime = startDateTime;
 		List<Integer> memberNumslist = new ArrayList<>();
 		for(int i = 0; i< getDays; i++) {
+			//当天的会员新增情况
 			List<TMember> memberNums = memberMapper.selectList(new QueryWrapper<TMember>()
-					.between("create_time", changeDateTime, endDateTime));
+					.between("create_time", changeDateTime, 
+							LocalDateTime.of(changeDateTime.toLocalDate(), LocalTime.MAX)));
 			//存入当天新增会员的数量
 			memberNumslist.add(memberNums.size());
 			//自增一天
@@ -116,10 +119,15 @@ public class IndexServiceImpl implements IndexService{
 		Map<String,Integer> data = new HashMap<String, Integer>();
 		//会员卡种类名称+会员卡绑定数量
 		List<TMemberCard> cardList = cardMapper.selectList(null);
-		for (TMemberCard card : cardList) {
+		for (int i = 0 ; i < cardList.size() ; i++) {
+			TMemberCard card = 	cardList.get(i);
 			List<TMemberBindRecord> bindList = bindMapper.selectList(new QueryWrapper<TMemberBindRecord>().eq("card_id", card.getId()));
+			if(bindList == null || bindList.size() == 0) {
+				continue;
+			}
 			data.put(card.getName(), bindList.size());
 			//DTO转换
+			System.out.println("会员卡绑定统计：" + data);
 			//reportDto = ReportConvert.INSTANCE.entity2Dto(data);
 			reportDto = reportConvert.entity2Dto(data);
 			reportDtoList.add(reportDto);

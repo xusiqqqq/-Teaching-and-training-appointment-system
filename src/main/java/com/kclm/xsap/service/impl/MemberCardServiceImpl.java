@@ -16,6 +16,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.kclm.xsap.dto.MemberLogDTO;
 import com.kclm.xsap.dto.convert.MemberLogConvert;
 import com.kclm.xsap.entity.TConsumeRecord;
+import com.kclm.xsap.entity.TCourse;
 import com.kclm.xsap.entity.TMemberBindRecord;
 import com.kclm.xsap.entity.TMemberCard;
 import com.kclm.xsap.entity.TMemberLog;
@@ -40,11 +41,19 @@ public class MemberCardServiceImpl implements MemberCardService{
 	@Override
 	public boolean save(TMemberCard card) {
 		cardMapper.insert(card);
+		//中间表插入数据
+		List<TCourse> courseList = card.getCourseList();
+		for (TCourse course : courseList) {
+			cardMapper.insertMix(card.getId(), course.getId());
+		}
 		return true;
 	}
 
 	@Override
 	public boolean deleteById(Long id) {
+		//中间表删除关联的数据
+		cardMapper.deleteBindCourse(id);
+		//本表
 		cardMapper.deleteById(id);
 		return true;
 	}
@@ -52,6 +61,15 @@ public class MemberCardServiceImpl implements MemberCardService{
 	@Override
 	public boolean update(TMemberCard card) {
 		cardMapper.updateById(card);
+		//更新中间表: 先删除已绑定的，再重新绑定
+		cardMapper.deleteBindCourse(card.getId());
+		//向中间表插入数据
+		List<TCourse> courseList = card.getCourseList();
+		if(courseList != null) {			
+			for (TCourse course : courseList) {
+				cardMapper.insertMix(card.getId(), course.getId());
+			}
+		}
 		return true;
 	}
 
@@ -99,8 +117,9 @@ public class MemberCardServiceImpl implements MemberCardService{
 				.eq("card_id", recharge.getCardId()).eq("member_id", recharge.getMemberId()));
 		bindRecord.setValidCount(bindRecord.getValidCount() + recharge.getAddCount());
 		bindRecord.setValidDay(bindRecord.getValidDay() + recharge.getAddDay());
-		bindRecord.setReceivedMoney(recharge.getReceivedMoney());
-		bindMapper.update(bindRecord, null);
+		//bindRecord.setReceivedMoney(recharge.getReceivedMoney());
+		bindMapper.update(bindRecord, new QueryWrapper<TMemberBindRecord>()
+				.eq("card_id", recharge.getCardId()).eq("member_id", recharge.getMemberId()));
 		return true;
 	}
 
@@ -131,8 +150,9 @@ public class MemberCardServiceImpl implements MemberCardService{
 				.eq("card_id", consume.getCardId()).eq("member_id", consume.getMemberId()));
 		bindRecord.setValidCount(bindRecord.getValidCount() + consume.getCardCountChange());
 		bindRecord.setValidDay(bindRecord.getValidDay() + consume.getCardDayChange());
-		bindRecord.setReceivedMoney(consume.getMoneyCost());
-		bindMapper.update(bindRecord, null);
+		//bindRecord.setReceivedMoney(consume.getMoneyCost());
+		bindMapper.update(bindRecord, new QueryWrapper<TMemberBindRecord>()
+				.eq("card_id", consume.getCardId()).eq("member_id", consume.getMemberId()));
 		return true;
 	}
 

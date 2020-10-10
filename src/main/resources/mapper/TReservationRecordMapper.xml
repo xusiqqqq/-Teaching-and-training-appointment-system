@@ -5,6 +5,7 @@
     <!--@mbg.generated-->
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="status" jdbcType="BOOLEAN" property="status" />
+    <result column="reserve_nums" jdbcType="INTEGER" property="reserveNums" />
     <result column="comment" jdbcType="VARCHAR" property="comment" />
     <result column="note" jdbcType="VARCHAR" property="note" />
     <result column="class_note" jdbcType="VARCHAR" property="classNote" />
@@ -46,7 +47,7 @@
   </resultMap>
   <sql id="TReservationRecord_Column_List">
     <!--@mbg.generated-->
-    id,  `status`, `comment`, note, class_note, `operator`, member_id, card_name, schedule_id, create_time, 
+    id,  `status`, reserve_nums ,`comment`, note, class_note, `operator`, member_id, card_name, schedule_id, create_time, 
     last_modify_time, version
   </sql>
   <sql id="member_sql">

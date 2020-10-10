@@ -8,5 +8,5 @@ import com.kclm.xsap.entity.TMember;
 @Mapper
 public interface TMemberMapper extends BaseMapper<TMember> {
 
-	TMember findById(Integer id);
+	TMember findById(Long id);
 }

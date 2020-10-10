@@ -61,8 +61,19 @@ public class ReserveServiceImpl implements ReserveService{
 			System.out.println("已经用会员卡预约过当前课程，无法再次预约！");
 			return false;
 		}
+		TScheduleRecord schedule = scheduleMapper.selectById(reserve.getScheduleId());
+		Integer contains = courseMapper.selectById(schedule.getCourseId()).getContains();
+		Integer totalNums = schedule.getOrderNums() + reserve.getReserveNums();
+		if(totalNums >= contains ) {
+			System.out.println("当前课程预约人数：" + schedule.getOrderNums());
+			System.out.println("人数超额！" + (totalNums - contains) + " 人 ");
+			return false;
+		}
+		//预约人数增加
+		schedule.setOrderNums(totalNums);
+		scheduleMapper.updateById(schedule);
 		//未预约，添加会员预约时，则设置状态为已预约
-		reserve.setStatus(1);
+		reserve.setStatus(1);		
 		reserveMapper.insert(reserve);
 		return true;
 	}
@@ -70,6 +81,23 @@ public class ReserveServiceImpl implements ReserveService{
 	//更新预约记录
 	@Override
 	public boolean update(TReservationRecord reserve) {
+		//预约人数判断
+		TScheduleRecord schedule = scheduleMapper.selectById(reserve.getScheduleId());
+		Integer contains = courseMapper.selectById(schedule.getCourseId()).getContains();
+		Integer totalNums = schedule.getOrderNums() + reserve.getReserveNums();
+		if(totalNums >= contains ) {
+			System.out.println("当前课程预约人数：" + schedule.getOrderNums());
+			System.out.println("人数超额！" + (totalNums - contains) + " 人 ");
+			return false;
+		}
+		//预约人数变动
+		if(reserve.getStatus() == 1) {
+			schedule.setOrderNums(totalNums);			
+		}else {
+			schedule.setOrderNums(schedule.getOrderNums() - reserve.getReserveNums());		
+		}
+		scheduleMapper.updateById(schedule);
+		//预约人数满足条件时，进行更新
 		reserveMapper.updateById(reserve);
 		return true;
 	}
@@ -77,8 +105,10 @@ public class ReserveServiceImpl implements ReserveService{
 	//当前排课的预约记录
 	@Override
 	public List<ReserveRecordDTO> listReserveRecords(Long scheduleId) {
+		System.out.println("1)-------scheduleId: "+scheduleId);
 		//1、获取到排课信息
 		TScheduleRecord schedule = scheduleMapper.selectById(scheduleId);
+		System.out.println("2)-------schedule: "+schedule);
 		//2、根据排课计划id获取到对应的课程信息
 		TCourse course = courseMapper.selectById(schedule.getCourseId());
 		//3、根据scheduleId查询到对应的预约记录
@@ -102,6 +132,10 @@ public class ReserveServiceImpl implements ReserveService{
 			for(int j = 0; j < reserveList.size(); j++) {
 				reserve = reserveList.get(j);
 				//DTO转换
+				System.out.println("1)---course: " + course);
+				System.out.println("2)---schedule: " + schedule);
+				System.out.println("3)---reserve: " + reserve);
+				System.out.println("4)---member: " + member);
 				//ReserveRecordDTO reserveRecordDTO = ReserveRecordConvert.INSTANCE.entity2Dto(course, schedule, reserve, member);
 				ReserveRecordDTO reserveRecordDTO = reserveRecordConvert.entity2Dto(course, schedule, reserve, member);
 				//添加到预约记录集合

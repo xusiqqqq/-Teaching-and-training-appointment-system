@@ -35,9 +35,9 @@
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
 
-                        <a class="btn btn-primary J_menuItem" href="x_member_add.html">添加会员</a>
-                        <a class="btn btn-default J_menuItem" href="x_member_import.html">批量导入会员</a>
-                        <a class="btn btn-default J_menuItem" href="x_member_bind.html">批量绑卡</a>
+                        <a class="btn btn-primary J_menuItem" href="x_member_add.html" th:href="@{/member/x_member_add.do}">添加会员</a>
+                        <a class="btn btn-default J_menuItem" href="x_member_import.html" th:href="@{/member/x_member_import.do}">批量导入会员</a>
+                        <a class="btn btn-default J_menuItem" href="x_member_bind.html" th:href="@{/member/x_member_bind.do}">批量绑卡</a>
 
                         <div class="ibox-tools">
                             <a class="collapse-link">
@@ -170,6 +170,15 @@
     <!-- Page-Level Scripts -->
     <script>
         $(document).ready(function () {
+			//获取资源路径
+			var appName = [[${#request.getContextPath()}]];
+			console.log("appName: " + appName);
+			
+			//发送ajax请求，页面加载时拿到会员信息
+			$.ajax({
+				url:"/member/"
+			});
+			
             $('.dataTables-example').dataTable({
                 //注： 后面开发时，url的位置写 服务端控制器的 mapping值,服务端返回的将是json数据
                 ajax: {

@@ -40,4 +40,12 @@
   	select c.*,mc.id as card_id,mc.name as card_name,mc.price,mc.type from t_course c 
   	 left outer join t_course_card cc on c.id = cc.course_id left outer join t_member_card mc on cc.card_id = mc.id;
   </select>
+  <!-- 向中间表插入数据 -->
+  <insert id="insertMix">
+  	insert into t_course_card (card_id,course_id) values(#{cardId},#{courseId});
+  </insert>
+  <!-- 中间表删除数据 -->
+  <delete id="deleteBindCard">
+  	delete from t_course_card where course_id = #{courseId};
+  </delete>
 </mapper>
