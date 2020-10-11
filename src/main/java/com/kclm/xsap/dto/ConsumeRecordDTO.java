@@ -1,4 +1,4 @@
-	package com.kclm.xsap.dto;
+package com.kclm.xsap.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

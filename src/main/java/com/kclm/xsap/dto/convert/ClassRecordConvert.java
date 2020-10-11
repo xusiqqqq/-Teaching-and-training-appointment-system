@@ -1,6 +1,7 @@
 package com.kclm.xsap.dto.convert;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -46,9 +47,11 @@ public interface ClassRecordConvert {
 		@Mapping(source = "member.id",target = "memberId"),
 		@Mapping(source = "schedule.id",target = "scheduleId"),
 		@Mapping(source = "card.id",target = "cardId"),
-		@Mapping(target = "classTime",expression = "java(if(schdule ! = null) {java.time.LocalDateTime.of( schedule.getStartDate(),schedule.getClassTime() )} )")
+		@Mapping(source = "schedule",target = "classTime")
 	})
 	ClassRecordDTO entity2Dto(TClassRecord classRecord,TMember member,TCourse course,TScheduleRecord schedule,TMemberCard card,String teacherName,BigDecimal involveMoney);
 	
-	
+	default LocalDateTime scheduleToClassTime(TScheduleRecord schedule) {
+		return LocalDateTime.of(schedule.getStartDate(),schedule.getClassTime());
+	}
 }
