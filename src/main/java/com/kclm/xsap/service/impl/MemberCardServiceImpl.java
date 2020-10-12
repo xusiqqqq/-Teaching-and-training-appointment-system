@@ -32,8 +32,8 @@ import com.kclm.xsap.service.MemberCardService;
 @Transactional
 public class MemberCardServiceImpl implements MemberCardService{
 
-	@Autowired
-	private MemberLogConvert memberLogConvert;
+//	@Autowired
+//	private MemberLogConvert memberLogConvert;
 
 	@Autowired
 	TMemberCardMapper cardMapper;

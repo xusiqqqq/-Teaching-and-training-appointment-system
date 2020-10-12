@@ -46,20 +46,20 @@ import com.kclm.xsap.service.MemberService;
 @Transactional
 public class MemberServiceImpl implements MemberService{
 
-	@Autowired
-	private MemberConvert memberConvert;
+//	@Autowired
+//	private MemberConvert memberConvert;
 
-	@Autowired
-	private MemberCardConvert memberCardConvert;
+//	@Autowired
+//	private MemberCardConvert memberCardConvert;
+//
+//	@Autowired
+//	private ReserveRecordConvert reserveRecordConvert;
+//
+//	@Autowired
+//	private ConsumeRecordConvert consumeRecordConvert;
 
-	@Autowired
-	private ReserveRecordConvert reserveRecordConvert;
-
-	@Autowired
-	private ConsumeRecordConvert consumeRecordConvert;
-
-	@Autowired
-	private ClassRecordConvert classRecordConvert;
+//	@Autowired
+//	private ClassRecordConvert classRecordConvert;
 
 	@Autowired
 	private TMemberMapper memberMapper;
@@ -161,7 +161,13 @@ public class MemberServiceImpl implements MemberService{
 		List<ConsumeRecordDTO> consumeRecords = listConsumeRecords(id);
 		//组合DTO
 		//MemberDTO memberDto = MemberConvert.INSTANCE.entity2Dto(member);
-		MemberDTO memberDto = memberConvert.entity2Dto(member);
+		MemberDTO memberDto = new MemberDTO();
+		memberDto.setName(member.getName());
+		memberDto.setGender(member.getSex());
+		memberDto.setPhone(member.getPhone());
+		memberDto.setBirthday(member.getBirthday());
+		memberDto.setNote(member.getNote());
+		
 		memberDto.setCardMessage(cardRecords);
 		memberDto.setClassRecord(classRecords);
 		memberDto.setReserveRecord(reserveRecords);

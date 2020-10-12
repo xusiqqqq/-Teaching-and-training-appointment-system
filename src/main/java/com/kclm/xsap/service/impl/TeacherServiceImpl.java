@@ -32,8 +32,8 @@ public class TeacherServiceImpl implements TeacherService{
 	@Autowired
 	TEmployeeMapper employeeMapper;
 
-	@Autowired
-	private ClassRecordConvert classRecordConvert;
+//	@Autowired
+//	private ClassRecordConvert classRecordConvert;
 		
 	@Override
 	public boolean save(TEmployee emp) {

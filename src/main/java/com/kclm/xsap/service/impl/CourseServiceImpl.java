@@ -21,8 +21,8 @@ import com.kclm.xsap.service.CourseService;
 @Transactional
 public class CourseServiceImpl implements CourseService{
 
-	@Autowired
-	private CourseConvert courseConvert;
+//	@Autowired
+//	private CourseConvert courseConvert;
 
 	@Autowired
 	private TCourseMapper courseMapper;

@@ -30,8 +30,8 @@ import com.kclm.xsap.service.ReserveService;
 @Transactional
 public class ReserveServiceImpl implements ReserveService{
 
-	@Autowired
-	private ReserveRecordConvert reserveRecordConvert;
+//	@Autowired
+//	private ReserveRecordConvert reserveRecordConvert;
 
 	@Autowired
 	TReservationRecordMapper reserveMapper;

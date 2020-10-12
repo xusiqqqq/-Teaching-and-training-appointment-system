@@ -35,13 +35,14 @@ import com.kclm.xsap.service.CourseScheduleService;
 @Transactional
 public class CourseScheduleServiceImpl implements CourseScheduleService{
 
-	@Autowired
-	private CourseScheduleConvert courseScheduleConvert;
+//	@Autowired
+//	private CourseScheduleConvert courseScheduleConvert;
+	
+//	@Autowired
+//	ClassRecordConvert classRecordConvert;
 
 	@Autowired
 	TScheduleRecordMapper scheduleMapper;
-	@Autowired
-	ClassRecordConvert classRecordConvert;
 	
 	@Override
 	public boolean save(TScheduleRecord schedule) {

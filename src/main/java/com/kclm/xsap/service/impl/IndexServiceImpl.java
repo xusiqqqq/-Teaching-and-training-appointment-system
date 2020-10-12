@@ -31,11 +31,11 @@ import com.kclm.xsap.service.IndexService;
 @Transactional
 public class IndexServiceImpl implements IndexService{
 
-	@Autowired
-	private ReportConvert reportConvert;
-
-	@Autowired
-	private HomePageConvert homePageConvert;
+//	@Autowired
+//	private ReportConvert reportConvert;
+//
+//	@Autowired
+//	private HomePageConvert homePageConvert;
 
 	@Autowired
 	TMemberMapper memberMapper;

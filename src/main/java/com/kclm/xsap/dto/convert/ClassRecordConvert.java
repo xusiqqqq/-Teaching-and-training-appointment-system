@@ -38,7 +38,6 @@ public interface ClassRecordConvert {
 	 * @return ClassRecordDTO。上课记录要展示的信息
 	 */
 	@Mappings({
-		@Mapping(source = "card.name",target = "cardName"),
 		@Mapping(source = "course.name",target = "courseName"),
 		@Mapping(source = "schedule.orderNums",target = "classNumbers"),
 		@Mapping(source = "classRecord.note",target = "classNote"),
@@ -50,7 +49,7 @@ public interface ClassRecordConvert {
 		@Mapping(source = "schedule",target = "classTime"),
 		@Mapping(source = "classRecord.createTime",target = "operateTime")
 	})
-	ClassRecordDTO entity2Dto(TClassRecord classRecord,TMember member,TCourse course,TScheduleRecord schedule,TMemberCard card,String teacherName,BigDecimal involveMoney);
+	ClassRecordDTO entity2Dto(TClassRecord classRecord,TMember member,TCourse course,TScheduleRecord schedule,String cardName,String teacherName,BigDecimal involveMoney);
 	
 	default LocalDateTime scheduleToClassTime(TScheduleRecord schedule) {
 		return LocalDateTime.of(schedule.getStartDate(),schedule.getClassTime());
