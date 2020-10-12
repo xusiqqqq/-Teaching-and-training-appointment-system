@@ -104,7 +104,7 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 				"SELECT card_id FROM t_course_card ca,t_course co WHERE ca.course_id = co.id"));
 		//拼接会员卡名
 		StringBuilder sb = new StringBuilder();
-		TMemberCard card;
+		TMemberCard card = new TMemberCard();
 		for(int i = 0; i < cardList.size() ; i++) {
 			card = cardList.get(i);
 			if(i < cardList.size() -1) {
@@ -139,7 +139,7 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 			TMember member = memberMapper.selectById(classed.getMemberId());
 			//dto转换
 			//ClassRecordDTO classRecordDTO = ClassRecordConvert.INSTANCE.entity2Dto(classed, member,null, null, memberCard, null, involveMoney);
-			ClassRecordDTO classRecordDTO = classRecordConvert.entity2Dto(classed, member,null, null, memberCard, null, involveMoney);
+			ClassRecordDTO classRecordDTO = classRecordConvert.entity2Dto(classed, member,null, null, memberCard.getName(), null, involveMoney);
 			//dto拼接
 			classDtoList.add(classRecordDTO);
 		}

@@ -1,5 +1,9 @@
 package com.kclm.xsap.dto;
 
+import java.util.List;
+
+import com.kclm.xsap.entity.TMemberCard;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -35,6 +39,11 @@ public class CourseDTO {
 	 * 展示的背景颜色
 	 */
 	private String color;
+	
+	/**
+	 * 	绑定会员卡
+	 */
+	private List<TMemberCard> cardList;
 	
 	/**
 	 * 介绍
