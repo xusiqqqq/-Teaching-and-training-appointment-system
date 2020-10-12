@@ -46,11 +46,13 @@ public interface ClassRecordConvert {
 		@Mapping(source = "member.id",target = "memberId"),
 		@Mapping(source = "schedule.id",target = "scheduleId"),
 		@Mapping(source = "card.id",target = "cardId"),
-		@Mapping(source = "schedule",target = "classTime")
+		//@Mapping(target = "classTime",expression = "java(java.time.LocalDateTime.of(schedule.getStartDate(),schedule.getClassTime() ))")
+		@Mapping(source = "schedule", target = "classTime")
 	})
 	ClassRecordDTO entity2Dto(TClassRecord classRecord,TMember member,TCourse course,TScheduleRecord schedule,String cardName,String teacherName,BigDecimal involveMoney);
-	
+
 	default LocalDateTime scheduleToClassTime(TScheduleRecord schedule) {
-		return LocalDateTime.of(schedule.getStartDate(),schedule.getClassTime());
+		System.out.println("------- 调用了 scheduleToClassTime方法...");
+		return LocalDateTime.of(schedule.getStartDate(), schedule.getClassTime());
 	}
 }
