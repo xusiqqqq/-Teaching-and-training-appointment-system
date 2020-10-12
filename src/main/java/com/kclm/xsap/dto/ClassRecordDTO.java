@@ -18,8 +18,7 @@ import lombok.experimental.Accessors;
  *
  */
 @Data
-@EqualsAndHashCode
-@Accessors(chain = true)
+@EqualsAndHashCode(callSuper = false)
 public class ClassRecordDTO{
 
 	/****
