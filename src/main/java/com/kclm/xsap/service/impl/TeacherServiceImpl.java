@@ -16,7 +16,6 @@ import com.kclm.xsap.dto.convert.ClassRecordConvert;
 import com.kclm.xsap.entity.TClassRecord;
 import com.kclm.xsap.entity.TCourse;
 import com.kclm.xsap.entity.TEmployee;
-import com.kclm.xsap.entity.TMemberCard;
 import com.kclm.xsap.entity.TScheduleRecord;
 import com.kclm.xsap.mapper.TClassRecordMapper;
 import com.kclm.xsap.mapper.TCourseMapper;
@@ -115,7 +114,6 @@ public class TeacherServiceImpl implements TeacherService{
 		//4、组合成DTO数据信息
 		//4.1 sql结果对应关系
 		//1条 上课记录 =》 1条 排课记录（1 条 会员记录） =》1条 课程记录 =》  n条 会员卡记录
-
 		List<ClassRecordDTO> classDtoList = new ArrayList<>();
 		for(int i = 0; i < classList.size(); i++) {
 			TClassRecord classed = new TClassRecord();

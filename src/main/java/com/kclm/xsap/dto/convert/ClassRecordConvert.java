@@ -52,6 +52,7 @@ public interface ClassRecordConvert {
 	ClassRecordDTO entity2Dto(TClassRecord classRecord,TMember member,TCourse course,TScheduleRecord schedule,String cardName,String teacherName,BigDecimal involveMoney);
 	
 	default LocalDateTime scheduleToClassTime(TScheduleRecord schedule) {
-		return LocalDateTime.of(schedule.getStartDate(),schedule.getClassTime());
+		System.out.println("------- 调用了 scheduleToClassTime方法...");
+		return LocalDateTime.of(schedule.getStartDate(), schedule.getClassTime());
 	}
 }

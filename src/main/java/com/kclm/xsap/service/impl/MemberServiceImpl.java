@@ -250,13 +250,14 @@ public class MemberServiceImpl implements MemberService{
 			classed = classList.get(i);
 			schedule = scheduleList.get(i);
 			course = courseList.get(i);
+			String cardName = classed.getCardName();
 			String teacherName = employeeMapper.selectById(schedule.getTeacherId()).getName();
 			//=======DTO存储
 			ClassRecordDTO classRecordDTO = new ClassRecordDTO();
 			classRecordDTO.setCourseName(course.getName());
 			classRecordDTO.setClassTime(LocalDateTime.of(schedule.getStartDate(), schedule.getClassTime()));
 			classRecordDTO.setTeacherName(teacherName);
-			classRecordDTO.setCardName(classed.getCardName());
+			classRecordDTO.setCardName(cardName);
 			classRecordDTO.setClassNumbers(schedule.getOrderNums());
 			classRecordDTO.setTimesCost(course.getTimesCost());
 			classRecordDTO.setComment(classed.getComment());

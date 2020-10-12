@@ -8,6 +8,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,7 @@ import com.kclm.xsap.service.CourseScheduleService;
 
 @Service
 @Transactional
+@Slf4j
 public class CourseScheduleServiceImpl implements CourseScheduleService{
 
 //	@Autowired

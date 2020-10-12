@@ -41,9 +41,9 @@ public class CourseDTO {
 	private String color;
 	
 	/**
-	 * 	会员卡绑定
+	 * 	绑定会员卡
 	 */
-	private List<TMemberCard> memberCardList;
+	private List<TMemberCard> cardList;
 	
 	/**
 	 * 介绍

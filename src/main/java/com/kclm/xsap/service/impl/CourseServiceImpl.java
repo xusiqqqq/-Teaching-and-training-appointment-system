@@ -76,7 +76,7 @@ public class CourseServiceImpl implements CourseService{
 			courseDTO.setDuration(course.getDuration());
 			courseDTO.setContains(course.getContains());
 			courseDTO.setColor(course.getColor());
-			courseDTO.setMemberCardList(course.getCardList());
+			courseDTO.setCardList(course.getCardList());
 			courseDTO.setIntroduce(course.getIntroduce());
 			courseDTO.setLimitSex(course.getLimitSex());
 			courseDTO.setLimitAge(course.getLimitAge());
@@ -97,7 +97,7 @@ public class CourseServiceImpl implements CourseService{
 			courseDTO.setDuration(course.getDuration());
 			courseDTO.setContains(course.getContains());
 			courseDTO.setColor(course.getColor());
-			courseDTO.setMemberCardList(course.getCardList());
+			courseDTO.setCardList(course.getCardList());
 			courseDTO.setIntroduce(course.getIntroduce());
 			courseDTO.setLimitSex(course.getLimitSex());
 			courseDTO.setLimitAge(course.getLimitAge());
