@@ -29,7 +29,7 @@ import javax.sql.DataSource;
  */
 @Configuration
 @ConfigurationProperties(prefix = "spring.datasource")
-@PropertySource(value = "classpath:application_dev.properties")
+//@PropertySource(value = "classpath:application_dev.properties")
 public class DataSourceConfig {
 
 	private static final Logger log = LoggerFactory.getLogger(DataSourceConfig.class);
