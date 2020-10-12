@@ -47,7 +47,8 @@ public interface ClassRecordConvert {
 		@Mapping(source = "member.id",target = "memberId"),
 		@Mapping(source = "schedule.id",target = "scheduleId"),
 		@Mapping(source = "card.id",target = "cardId"),
-		@Mapping(source = "schedule",target = "classTime")
+		@Mapping(source = "schedule",target = "classTime"),
+		@Mapping(source = "classRecord.createTime",target = "operateTime")
 	})
 	ClassRecordDTO entity2Dto(TClassRecord classRecord,TMember member,TCourse course,TScheduleRecord schedule,TMemberCard card,String teacherName,BigDecimal involveMoney);
 	

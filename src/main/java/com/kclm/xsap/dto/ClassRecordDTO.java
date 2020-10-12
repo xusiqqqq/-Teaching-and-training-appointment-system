@@ -91,4 +91,9 @@ public class ClassRecordDTO{
 	 */
 	private Integer checkStatus;
 	
+	/**
+	 * 	操作记录
+	 */
+	private LocalDateTime operateTime;
+	
 }

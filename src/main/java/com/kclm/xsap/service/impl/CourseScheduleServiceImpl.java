@@ -118,11 +118,13 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 		String teacherName = employeeMapper.selectById(schedule.getTeacherId()).getName();
 		
 		//获取当前课程对应的预约记录
-		List<ReserveRecordDTO> reserveDTO = reserveService.listReserveRecords(scheduleId);
-		System.out.println("-------reserveDTO: "+reserveDTO);
+		List<ReserveRecordDTO> reserveDtoList = reserveService.listReserveRecords(scheduleId);
+		System.out.println("-------reserveDTO: "+reserveDtoList);
 		//==获取当前课程的上课数据
 		List<TClassRecord> classList = classMapper.selectList(new QueryWrapper<TClassRecord>().eq("schedule_id", scheduleId));
+		
 		List<ClassRecordDTO> classDtoList = new ArrayList<ClassRecordDTO>();
+		ClassRecordDTO classRecordDTO = new ClassRecordDTO();
 		for (TClassRecord classed : classList) {
 			//查出会员卡的次数单价，取值四舍五入
 			TMemberCard memberCard = cardMapper.selectOne(new QueryWrapper<TMemberCard>().eq("name", classed.getCardName()));
@@ -136,22 +138,49 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 			//消耗的次数
 			BigDecimal countCost = new BigDecimal(course.getTimesCost().toString());
 			BigDecimal involveMoney = unitPrice.multiply(countCost);
+			//获取会员信息
 			TMember member = memberMapper.selectById(classed.getMemberId());
-			//dto转换
-			//ClassRecordDTO classRecordDTO = ClassRecordConvert.INSTANCE.entity2Dto(classed, member,null, null, memberCard, null, involveMoney);
-			ClassRecordDTO classRecordDTO = classRecordConvert.entity2Dto(classed, member,null, null, memberCard, null, involveMoney);
+			//====== dto值存储
+			//	会员信息
+			classRecordDTO.setMember(member);
+			//	会员名
+			classRecordDTO.setCardName(classed.getCardName());
+			//	消费次数
+			classRecordDTO.setTimesCost(course.getTimesCost());
+			//	消费金额
+			classRecordDTO.setInvolveMoney(involveMoney);
+			//	操作时间
+			classRecordDTO.setOperateTime(classed.getCreateTime());
 			//dto拼接
 			classDtoList.add(classRecordDTO);
 		}
-		//dto转换
-		//CourseScheduleDTO scheduleDto = CourseScheduleConvert.INSTANCE.entity2Dto(schedule, course, supportCards, teacherName, reserveDTO, classDtoList);
-		CourseScheduleDTO scheduleDto = courseScheduleConvert.entity2Dto(schedule, course, supportCards, teacherName, reserveDTO, classDtoList);
-
-		//计算下课时间
+		//======dto值存储
+		CourseScheduleDTO scheduleDto = new CourseScheduleDTO();
+		//	课程名
+		scheduleDto.setCourseName(course.getName());
+		//	上课时间
+		scheduleDto.setStartTime(LocalDateTime.of(schedule.getStartDate(),schedule.getClassTime()));
+		//	计算下课时间
 		LocalTime plusClassTime = schedule.getClassTime().plusMinutes(course.getDuration());
 		LocalDateTime endTime = LocalDateTime.of(schedule.getStartDate(),plusClassTime);
 		scheduleDto.setEndTime(endTime);
-				
+		//	时长
+		scheduleDto.setDuration(course.getDuration());
+		//	限制性别
+		scheduleDto.setLimitSex(course.getLimitSex());
+		//	限制年龄
+		scheduleDto.setLimitAge(course.getLimitAge());
+		//	支持的会员卡
+		scheduleDto.setSupportCards(supportCards);
+		//	上课老师
+		scheduleDto.setTeacherName(teacherName);
+		//	上课人数
+		scheduleDto.setClassNumbers(schedule.getOrderNums());
+		//	预约记录
+		scheduleDto.setReserveRecord(reserveDtoList);
+		//	上课数据
+		scheduleDto.setClassRecord(classDtoList);
+		
 		return scheduleDto;
 	}
 

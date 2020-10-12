@@ -69,10 +69,18 @@ public class CourseServiceImpl implements CourseService{
 		List<TCourse> courseList = pageList.getRecords();
 		
 		List<CourseDTO> courseDtoList = new ArrayList<CourseDTO>();
+		CourseDTO courseDTO = new CourseDTO();
 		for (TCourse course : courseList) {
-			//DTO转换
-			//CourseDTO courseDTO = CourseConvert.INSTANCE.entity2Dto(course);
-			CourseDTO courseDTO = courseConvert.entity2Dto(course);
+			//======DTO存储
+			courseDTO.setName(course.getName());
+			courseDTO.setDuration(course.getDuration());
+			courseDTO.setContains(course.getContains());
+			courseDTO.setColor(course.getColor());
+			courseDTO.setMemberCardList(course.getCardList());
+			courseDTO.setIntroduce(course.getIntroduce());
+			courseDTO.setLimitSex(course.getLimitSex());
+			courseDTO.setLimitAge(course.getLimitAge());
+			courseDTO.setLimitCounts(course.getLimitCounts());
 			courseDtoList.add(courseDTO);
 		}
 		return courseDtoList;
@@ -81,11 +89,20 @@ public class CourseServiceImpl implements CourseService{
 	@Override
 	public List<CourseDTO> findAll() {
 		List<TCourse> courseList = courseMapper.selectList(null);
+		
 		List<CourseDTO> courseDtoList = new ArrayList<CourseDTO>();
+		CourseDTO courseDTO = new CourseDTO();
 		for (TCourse course : courseList) {
-			//DTO转换
-			//CourseDTO courseDTO = CourseConvert.INSTANCE.entity2Dto(course);
-			CourseDTO courseDTO = courseConvert.entity2Dto(course);
+			//======DTO存储
+			courseDTO.setName(course.getName());
+			courseDTO.setDuration(course.getDuration());
+			courseDTO.setContains(course.getContains());
+			courseDTO.setColor(course.getColor());
+			courseDTO.setMemberCardList(course.getCardList());
+			courseDTO.setIntroduce(course.getIntroduce());
+			courseDTO.setLimitSex(course.getLimitSex());
+			courseDTO.setLimitAge(course.getLimitAge());
+			courseDTO.setLimitCounts(course.getLimitCounts());
 			courseDtoList.add(courseDTO);
 		}
 		return courseDtoList;

@@ -182,9 +182,15 @@ public class MemberCardServiceImpl implements MemberCardService{
 				.eq("member_id", memberId).eq("card_id", cardId));
 		List<MemberLogDTO> logDtoList = new ArrayList<>();
 		for (TMemberLog log : logList) {
-			//dto转换
-			//logDto = MemberLogConvert.INSTANCE.entity2DTO(log, status, note, validTimes, endTime);
-			logDto = memberLogConvert.entity2DTO(log, status, note, validTimes, endTime);
+			//===========dto存储
+			logDto.setOperateTime(log.getCreateTime());
+			logDto.setOperateType(log.getType());
+			logDto.setValidTimes(validTimes);
+			logDto.setEndToDate(endTime);
+			logDto.setInvolveMoney(log.getInvolveMoney());
+			logDto.setOperator(log.getOperator());
+			logDto.setCardNote(note);
+			logDto.setStatus(status);
 			//存到dto中
 			logDtoList.add(logDto);
 		}	

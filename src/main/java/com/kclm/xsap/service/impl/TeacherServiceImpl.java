@@ -1,5 +1,6 @@
 package com.kclm.xsap.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -115,33 +116,26 @@ public class TeacherServiceImpl implements TeacherService{
 		//清空idList数据，以供下面复用
 		idList.clear();
 		
-		//4、获取会员卡信息
-		for (int i = 0; i < courseList.size(); i++) {
-			 idList.add(courseList.get(i).getId());
-		}
-		List<TMemberCard> cardList = cardMapper.selectBatchIds(idList);
-		
-		//5、组合成DTO数据信息
-		//5.1 sql结果对应关系
+		//4、组合成DTO数据信息
+		//4.1 sql结果对应关系
 		//1条 上课记录 =》 1条 排课记录（1 条 会员记录） =》1条 课程记录 =》  n条 会员卡记录
-		TClassRecord classed ;
-		TScheduleRecord schedule;
-		TCourse course;
-		TMemberCard card;
+		TClassRecord classed = new TClassRecord();
+		TScheduleRecord schedule = new TScheduleRecord();
+		TCourse course = new TCourse();
+
 		List<ClassRecordDTO> classDtoList = new ArrayList<>();
+		ClassRecordDTO classRecordDTO = new ClassRecordDTO();
 		for(int i = 0; i < classList.size(); i++) {
 			classed = classList.get(i);
 			schedule = scheduleList.get(i);
 			course = courseList.get(i);
-			for(int j = 0; j < cardList.size() ; j++) {
-				card = cardList.get(j);
-				//DTO转换
-				//ClassRecordDTO classRecordDTO = ClassRecordConvert.INSTANCE
-				ClassRecordDTO classRecordDTO = classRecordConvert
-						.entity2Dto(classed, null, course, schedule, card, null, null);
-				//转换完成一条记录，就存放一条记录
-				classDtoList.add(classRecordDTO);
-			}
+			//======DTO存储
+			classRecordDTO.setCourseName(course.getName());
+			classRecordDTO.setClassTime(LocalDateTime.of(schedule.getStartDate(), schedule.getClassTime()));
+			classRecordDTO.setCardName(classed.getCardName());
+			classRecordDTO.setTimesCost(course.getTimesCost());
+			//转换完成一条记录，就存放一条记录
+			classDtoList.add(classRecordDTO);
 		}
 		
 		return classDtoList;

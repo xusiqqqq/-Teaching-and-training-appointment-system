@@ -124,20 +124,29 @@ public class ReserveServiceImpl implements ReserveService{
 		//5、组合成DTO数据信息
 		//sql结果对应关系
 		//1个  排课号 =》 1门课（由会员指定1张会员卡） =》  n个  预约记录（1条 预约记录 =》 1个 会员号）
-		TReservationRecord reserve;
-		TMember member;
+		TReservationRecord reserve = new TReservationRecord();
+		TMember member = new TMember();
+
 		List<ReserveRecordDTO> reserveDtoList = new ArrayList<>();
+		ReserveRecordDTO reserveRecordDTO = new ReserveRecordDTO(); 
 		for(int i = 0; i < memberList.size(); i++) {
 			member = memberList.get(i);
 			for(int j = 0; j < reserveList.size(); j++) {
 				reserve = reserveList.get(j);
-				//DTO转换
+				//========DTO存储
 				System.out.println("1)---course: " + course);
 				System.out.println("2)---schedule: " + schedule);
 				System.out.println("3)---reserve: " + reserve);
 				System.out.println("4)---member: " + member);
-				//ReserveRecordDTO reserveRecordDTO = ReserveRecordConvert.INSTANCE.entity2Dto(course, schedule, reserve, member);
-				ReserveRecordDTO reserveRecordDTO = reserveRecordConvert.entity2Dto(course, schedule, reserve, member);
+				reserveRecordDTO.setMemberName(member.getName());
+				reserveRecordDTO.setPhone(member.getPhone());
+				reserveRecordDTO.setCardName(reserve.getCardName());
+				reserveRecordDTO.setReserveNumbers(schedule.getOrderNums());
+				reserveRecordDTO.setTimesCost(course.getTimesCost());
+				reserveRecordDTO.setOperateTime(reserve.getCreateTime());
+				reserveRecordDTO.setOperator(reserve.getOperator());
+				reserveRecordDTO.setReserveNote(reserve.getNote());
+				reserveRecordDTO.setReserveStatus(reserve.getStatus());
 				//添加到预约记录集合
 				reserveDtoList.add(reserveRecordDTO);
 			}

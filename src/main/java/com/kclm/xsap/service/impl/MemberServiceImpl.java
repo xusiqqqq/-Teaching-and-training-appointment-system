@@ -173,7 +173,7 @@ public class MemberServiceImpl implements MemberService{
 	@Override
 	public List<MemberCardDTO> findAllCardRecords(Long id) {
 		List<MemberCardDTO> cardDtoList = new ArrayList<>();
-		MemberCardDTO cardDto;
+		MemberCardDTO cardDto = new MemberCardDTO();
 		
 		//查询到当前会员绑定的所有会员卡
 		List<TMemberBindRecord> bindList = bindMapper.selectList(new QueryWrapper<TMemberBindRecord>()
@@ -194,8 +194,11 @@ public class MemberServiceImpl implements MemberService{
 			TMemberCard memberCard = cardMapper.selectById(bindRecord.getCardId());
 			
 			//组成一条会员卡信息DTO
-			//cardDto = MemberCardConvert.INSTANCE.entity2Dto(validTimes, endTime, memberCard);
-			cardDto = memberCardConvert.entity2Dto(validTimes, endTime, memberCard);
+			cardDto.setName(memberCard.getName());
+			cardDto.setType(memberCard.getType());
+			cardDto.setTotalCount(validTimes);
+			cardDto.setDueTime(endTime);
+			cardDto.setStatus(memberCard.getStatus());
 			cardDtoList.add(cardDto);
 		}
 		return cardDtoList;
@@ -224,32 +227,31 @@ public class MemberServiceImpl implements MemberService{
 		//清空idList数据，以供下面复用
 		idList.clear();
 		
-		//4、获取会员卡信息
-		for (int i = 0; i < courseList.size(); i++) {
-			 idList.add(courseList.get(i).getId());
-		}
-		List<TMemberCard> cardList = cardMapper.selectBatchIds(idList);
-		//5、组合成DTO数据信息
-		//5.1 sql结果对应关系
+		//4、组合成DTO数据信息
+		//4.1 sql结果对应关系
 		//1条 上课记录 =》 1条 排课记录（1 条 会员记录） =》1条 课程记录 =》  n条 会员卡记录
-		TClassRecord classed ;
-		TScheduleRecord schedule;
-		TCourse course;
-		TMemberCard card;
+		TClassRecord classed = new TClassRecord();
+		TScheduleRecord schedule = new TScheduleRecord();
+		TCourse course = new TCourse();
+
 		List<ClassRecordDTO> classDtoList = new ArrayList<>();
+		ClassRecordDTO classRecordDTO = new ClassRecordDTO();
 		for(int i = 0; i < classList.size(); i++) {
 			classed = classList.get(i);
 			schedule = scheduleList.get(i);
 			course = courseList.get(i);
 			String teacherName = employeeMapper.selectById(schedule.getTeacherId()).getName();
-			for(int j = 0; j < cardList.size() ; j++) {
-				card = cardList.get(j);
-				//DTO转换
-				//ClassRecordDTO classRecordDTO = ClassRecordConvert.INSTANCE.entity2Dto(classed, null,course, schedule, card,teacherName, null);
-				ClassRecordDTO classRecordDTO = classRecordConvert.entity2Dto(classed, null,course, schedule, card,teacherName, null);
-				//转换完成一条记录，就存放一条记录
-				classDtoList.add(classRecordDTO);
-			}
+			//=======DTO存储
+			classRecordDTO.setCourseName(course.getName());
+			classRecordDTO.setClassTime(LocalDateTime.of(schedule.getStartDate(), schedule.getClassTime()));
+			classRecordDTO.setTeacherName(teacherName);
+			classRecordDTO.setCardName(classed.getCardName());
+			classRecordDTO.setClassNumbers(schedule.getOrderNums());
+			classRecordDTO.setTimesCost(course.getTimesCost());
+			classRecordDTO.setComment(classed.getComment());
+			classRecordDTO.setCheckStatus(classed.getCheckStatus());
+			
+			classDtoList.add(classRecordDTO);
 		}
 		return classDtoList;
 	}
@@ -280,18 +282,28 @@ public class MemberServiceImpl implements MemberService{
 		//4、组合成DTO数据信息
 		//4.1 sql结果对应关系
 		//1条 预约记录（包含已预约的会员卡名） =》 1条 排课记录（1 条 会员记录） =》1条 课程记录
-		TReservationRecord reserve ;
-		TScheduleRecord schedule;
-		TCourse course;
+		TReservationRecord reserve = new TReservationRecord();
+		TScheduleRecord schedule = new TScheduleRecord();
+		TCourse course = new TCourse();
+
 		List<ReserveRecordDTO> reserveDtoList = new ArrayList<>();
+		ReserveRecordDTO reserveDto = new ReserveRecordDTO();
 		for(int i = 0; i < reserveList.size(); i++) {
 			reserve = reserveList.get(i);
 			schedule = scheduleList.get(i);
 			course = courseList.get(i);			
-			//DTO转换
-			//ReserveRecordDTO reserveDto = ReserveRecordConvert.INSTANCE.entity2Dto(course, schedule, reserve,null);
-			ReserveRecordDTO reserveDto = reserveRecordConvert.entity2Dto(course, schedule, reserve,null);
-			//转换完成一条记录，就存放一条记录
+			//========DTO存储
+			reserveDto.setCourseName(course.getName());
+			reserveDto.setReserveTime(reserve.getCreateTime());
+			reserveDto.setCardName(reserve.getCardName());
+			reserveDto.setReserveNumbers(schedule.getOrderNums());
+			reserveDto.setTimesCost(course.getTimesCost());
+			//修改时间作为操作时间
+			reserveDto.setOperateTime(reserve.getLastModifyTime());
+			reserveDto.setOperator(reserve.getOperator());
+			reserveDto.setReserveNote(reserve.getNote());
+			reserveDto.setReserveStatus(reserve.getStatus());
+			
 			reserveDtoList.add(reserveDto);
 		}
 		return reserveDtoList;
@@ -337,8 +349,9 @@ public class MemberServiceImpl implements MemberService{
 					.eq("card_id", consume.getCardId()).eq("member_id", consume.getMemberId()));
 			bindRecord.setValidCount(bindRecord.getValidCount() + consume.getCardCountChange());
 			bindRecord.setValidDay(bindRecord.getValidDay() + consume.getCardDayChange());
-			bindRecord.setReceivedMoney(consume.getMoneyCost());
-			bindMapper.update(bindRecord, null);
+//			bindRecord.setReceivedMoney(consume.getMoneyCost());
+			bindMapper.update(bindRecord, new QueryWrapper<TMemberBindRecord>()
+					.eq("card_id", consume.getCardId()).eq("member_id", consume.getMemberId()));
 		}
 		
 		/* 以下是查询 */
@@ -351,10 +364,12 @@ public class MemberServiceImpl implements MemberService{
 		}
 		//根据每条消费记录查询到的会员卡信息
 		List<TMemberCard> cardList = cardMapper.selectBatchIds(idList);
+
+		TConsumeRecord consumeRecord = new TConsumeRecord();
+		TMemberCard memberCard = new TMemberCard();
 		
 		List<ConsumeRecordDTO> consumeDtoList = new ArrayList<>();
-		TConsumeRecord consumeRecord;
-		TMemberCard memberCard;
+		ConsumeRecordDTO consumeDto = new ConsumeRecordDTO();
 		for(int i = 0; i < consumeList.size(); i++) {
 			 consumeRecord = consumeList.get(i);
 			 memberCard = cardList.get(i);
@@ -362,9 +377,15 @@ public class MemberServiceImpl implements MemberService{
 			 TMemberBindRecord bindRecord = bindMapper.selectOne(new QueryWrapper<TMemberBindRecord>()
 					 .eq("card_id", memberCard.getId()).eq("member_id", id));
 			 Integer timesRemainder = bindRecord.getValidCount();
-			 //DTO组合
-			 //ConsumeRecordDTO consumeDto = ConsumeRecordConvert.INSTANCE.entity2Dto(consumeRecord, memberCard,timesRemainder);
-			 ConsumeRecordDTO consumeDto = consumeRecordConvert.entity2Dto(consumeRecord, memberCard,timesRemainder);
+			 //==========DTO存储
+			 consumeDto.setCardName(memberCard.getName());
+			 consumeDto.setOperateTime(consumeRecord.getCreateTime());
+			 consumeDto.setCardCountChange(consumeRecord.getCardCountChange());
+			 consumeDto.setTimesRemainder(timesRemainder);
+			 consumeDto.setMoneyCost(consumeRecord.getMoneyCost());
+			 consumeDto.setOperateType(consumeRecord.getOperateType());
+			 consumeDto.setOperator(consumeRecord.getOperator());
+			 consumeDto.setNote(consumeRecord.getNote());
 			 //存放所有DTO数据
 			 consumeDtoList.add(consumeDto);
 		}
