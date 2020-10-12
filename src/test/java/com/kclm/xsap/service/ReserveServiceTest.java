@@ -56,8 +56,8 @@ public class ReserveServiceTest {
 	//-------涉及到convert
 	@Test
 	public void listExportRecordRange() {
-		LocalDate startDate = LocalDate.of(2020, 9, 18);
-		LocalDate endDate = LocalDate.of(2020, 10, 8);
+		LocalDate startDate = LocalDate.of(2020, 9, 22);
+		LocalDate endDate = LocalDate.of(2020, 10, 4);
 		List<ReserveRecordDTO> exportRecordRange = reserveService.listExportRecordRange(startDate, endDate);
 		for (ReserveRecordDTO export : exportRecordRange) {
 			System.out.println("------"+ export);

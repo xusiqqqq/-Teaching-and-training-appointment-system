@@ -89,11 +89,10 @@ public class CourseServiceImpl implements CourseService{
 	@Override
 	public List<CourseDTO> findAll() {
 		List<TCourse> courseList = courseMapper.selectList(null);
-		
 		List<CourseDTO> courseDtoList = new ArrayList<CourseDTO>();
-		CourseDTO courseDTO = new CourseDTO();
 		for (TCourse course : courseList) {
 			//======DTO存储
+			CourseDTO courseDTO = new CourseDTO();
 			courseDTO.setName(course.getName());
 			courseDTO.setDuration(course.getDuration());
 			courseDTO.setContains(course.getContains());

@@ -25,12 +25,11 @@ public class ClassServiceImpl implements ClassService{
 	
 	@Override
 	public boolean save() {
-		TClassRecord classed = new TClassRecord();
-		
 		//找出用户的预约记录，若其状态为“已预约”，则录入上课记录
 		List<TReservationRecord> reserveList = reserveMapper.selectList(
 				new QueryWrapper<TReservationRecord>().eq("status", 1));
 		for (TReservationRecord reserve : reserveList) {
+			TClassRecord classed = new TClassRecord();
 			//存入会员id
 			classed.setMemberId(reserve.getMemberId());
 			//存入会员卡名

@@ -105,15 +105,21 @@ public class ReserveServiceImpl implements ReserveService{
 	//当前排课的预约记录
 	@Override
 	public List<ReserveRecordDTO> listReserveRecords(Long scheduleId) {
-		System.out.println("1)-------scheduleId: "+scheduleId);
 		//1、获取到排课信息
 		TScheduleRecord schedule = scheduleMapper.selectById(scheduleId);
-		System.out.println("2)-------schedule: "+schedule);
+		if(schedule == null) {
+			return null;
+		}
 		//2、根据排课计划id获取到对应的课程信息
 		TCourse course = courseMapper.selectById(schedule.getCourseId());
 		//3、根据scheduleId查询到对应的预约记录
 		List<TReservationRecord> reserveList = reserveMapper.selectList(
 				new QueryWrapper<TReservationRecord>().eq("schedule_id", scheduleId));
+		
+		if(reserveList == null || reserveList.size() < 1) {
+			return null;
+		}
+		
 		//4、根据预约记录获取会员信息
 		List<Long> idList = new ArrayList<>();
 		for (int i = 0; i < reserveList.size(); i++) {
@@ -124,32 +130,27 @@ public class ReserveServiceImpl implements ReserveService{
 		//5、组合成DTO数据信息
 		//sql结果对应关系
 		//1个  排课号 =》 1门课（由会员指定1张会员卡） =》  n个  预约记录（1条 预约记录 =》 1个 会员号）
-		TReservationRecord reserve = new TReservationRecord();
-		TMember member = new TMember();
-
 		List<ReserveRecordDTO> reserveDtoList = new ArrayList<>();
-		ReserveRecordDTO reserveRecordDTO = new ReserveRecordDTO(); 
+		System.out.println("-----------");
+		System.out.println("会员列表条目："+memberList.size());
+		System.out.println("-----------");
 		for(int i = 0; i < memberList.size(); i++) {
+			TReservationRecord reserve = new TReservationRecord();
+			TMember member = new TMember();
 			member = memberList.get(i);
-			for(int j = 0; j < reserveList.size(); j++) {
-				reserve = reserveList.get(j);
-				//========DTO存储
-				System.out.println("1)---course: " + course);
-				System.out.println("2)---schedule: " + schedule);
-				System.out.println("3)---reserve: " + reserve);
-				System.out.println("4)---member: " + member);
-				reserveRecordDTO.setMemberName(member.getName());
-				reserveRecordDTO.setPhone(member.getPhone());
-				reserveRecordDTO.setCardName(reserve.getCardName());
-				reserveRecordDTO.setReserveNumbers(schedule.getOrderNums());
-				reserveRecordDTO.setTimesCost(course.getTimesCost());
-				reserveRecordDTO.setOperateTime(reserve.getCreateTime());
-				reserveRecordDTO.setOperator(reserve.getOperator());
-				reserveRecordDTO.setReserveNote(reserve.getNote());
-				reserveRecordDTO.setReserveStatus(reserve.getStatus());
-				//添加到预约记录集合
-				reserveDtoList.add(reserveRecordDTO);
-			}
+			//========DTO存储
+			ReserveRecordDTO reserveRecordDTO = new ReserveRecordDTO();
+			reserveRecordDTO.setMemberName(member.getName());
+			reserveRecordDTO.setPhone(member.getPhone());
+			reserveRecordDTO.setCardName(reserve.getCardName());
+			reserveRecordDTO.setReserveNumbers(schedule.getOrderNums());
+			reserveRecordDTO.setTimesCost(course.getTimesCost());
+			reserveRecordDTO.setOperateTime(reserve.getCreateTime());
+			reserveRecordDTO.setOperator(reserve.getOperator());
+			reserveRecordDTO.setReserveNote(reserve.getNote());
+			reserveRecordDTO.setReserveStatus(reserve.getStatus());
+			//添加到预约记录集合
+			reserveDtoList.add(reserveRecordDTO);
 		}
 		
 		return reserveDtoList;
@@ -174,10 +175,15 @@ public class ReserveServiceImpl implements ReserveService{
 		List<TReservationRecord> reserveList = reserveMapper.selectList(new QueryWrapper<TReservationRecord>()
 				.between("create_time", startDateTime, endDateTime));
 		List<ReserveRecordDTO> reserveDtoList = new ArrayList<>();
+		if(reserveList == null) {
+			return null;
+		}
+		
 		for(int i = 0; i < reserveList.size(); i++) {
 			Long id = reserveList.get(i).getScheduleId();
 			List<ReserveRecordDTO> listReserveRecordsDto = listReserveRecords(id);
-			reserveDtoList.addAll(listReserveRecordsDto);
+			if(listReserveRecordsDto != null)
+				reserveDtoList.addAll(listReserveRecordsDto);
 		}
 		
 		return reserveDtoList;

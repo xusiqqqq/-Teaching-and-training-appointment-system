@@ -159,8 +159,6 @@ public class MemberCardServiceImpl implements MemberCardService{
 	//查询操作记录
 	@Override
 	public List<MemberLogDTO> listOperateLog(Long memberId,Long cardId) {
-		MemberLogDTO logDto = new MemberLogDTO();
-		
 		TMemberCard memberCard = cardMapper.selectById(cardId);
 		//会员卡的激活状态
 		Integer status = memberCard.getStatus();
@@ -175,7 +173,9 @@ public class MemberCardServiceImpl implements MemberCardService{
 		
 		//会员卡到期日
 		LocalDateTime endTime = bindRecord.getCreateTime();
-		endTime = endTime.plusDays(bindRecord.getValidDay());
+		if(endTime != null) {
+			endTime = endTime.plusDays(bindRecord.getValidDay());			
+		}
 		
 		//获取到会员指定的会员卡的操作记录
 		List<TMemberLog> logList = logMapper.selectList(new QueryWrapper<TMemberLog>()
@@ -183,6 +183,7 @@ public class MemberCardServiceImpl implements MemberCardService{
 		List<MemberLogDTO> logDtoList = new ArrayList<>();
 		for (TMemberLog log : logList) {
 			//===========dto存储
+			MemberLogDTO logDto = new MemberLogDTO();
 			logDto.setOperateTime(log.getCreateTime());
 			logDto.setOperateType(log.getType());
 			logDto.setValidTimes(validTimes);

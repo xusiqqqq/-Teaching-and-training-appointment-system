@@ -92,20 +92,18 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 	public CourseScheduleDTO findById(Long scheduleId) {
 		//获取当前选中的排课记录信息
 		TScheduleRecord schedule = scheduleMapper.selectById(scheduleId);
-		
+		if(schedule == null) {
+			return null;
+		}
 		//根据排课记录获取到对应的课程信息
 		TCourse course = courseMapper.selectById(schedule.getCourseId());
 		
 		//根据课程id获取到支持的会员卡信息
-		/*
-		 SELECT * FROM t_member_card WHERE id IN (SELECT card_id FROM t_course_card ca,
- 			t_course co WHERE ca.course_id = co.id);
-		 */
 		List<TMemberCard> cardList = cardMapper.selectList(new QueryWrapper<TMemberCard>().inSql("id",
-				"SELECT card_id FROM t_course_card ca,t_course co WHERE ca.course_id = co.id"));
+				"SELECT card_id FROM t_course_card ca WHERE ca.course_id = " + course.getId()));
 		//拼接会员卡名
 		StringBuilder sb = new StringBuilder();
-		TMemberCard card;
+		TMemberCard card = new TMemberCard();
 		for(int i = 0; i < cardList.size() ; i++) {
 			card = cardList.get(i);
 			if(i < cardList.size() -1) {
@@ -121,14 +119,17 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 		//获取当前课程对应的预约记录
 		List<ReserveRecordDTO> reserveDtoList = reserveService.listReserveRecords(scheduleId);
 		System.out.println("-------reserveDTO: "+reserveDtoList);
+		if(reserveDtoList == null || reserveDtoList.size() < 1) {
+			return null;
+		}
 		//==获取当前课程的上课数据
 		List<TClassRecord> classList = classMapper.selectList(new QueryWrapper<TClassRecord>().eq("schedule_id", scheduleId));
 		
 		List<ClassRecordDTO> classDtoList = new ArrayList<ClassRecordDTO>();
-		ClassRecordDTO classRecordDTO = new ClassRecordDTO();
 		for (TClassRecord classed : classList) {
 			//查出会员卡的次数单价，取值四舍五入
-			TMemberCard memberCard = cardMapper.selectOne(new QueryWrapper<TMemberCard>().eq("name", classed.getCardName()));
+			TMemberCard memberCard = cardMapper.selectOne(new QueryWrapper<TMemberCard>()
+					.eq("name", classed.getCardName()));
 			if(memberCard == null) {
 				System.out.println("没有此会员卡！");
 				return null;
@@ -142,9 +143,10 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 			//获取会员信息
 			TMember member = memberMapper.selectById(classed.getMemberId());
 			//====== dto值存储
+			ClassRecordDTO classRecordDTO = new ClassRecordDTO();
 			//	会员信息
 			classRecordDTO.setMember(member);
-			//	会员名
+			//	会员卡名
 			classRecordDTO.setCardName(classed.getCardName());
 			//	消费次数
 			classRecordDTO.setTimesCost(course.getTimesCost());
@@ -152,6 +154,8 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 			classRecordDTO.setInvolveMoney(involveMoney);
 			//	操作时间
 			classRecordDTO.setOperateTime(classed.getCreateTime());
+			System.out.println("-----上课记录："+classRecordDTO);
+			System.out.println("------------------");
 			//dto拼接
 			classDtoList.add(classRecordDTO);
 		}

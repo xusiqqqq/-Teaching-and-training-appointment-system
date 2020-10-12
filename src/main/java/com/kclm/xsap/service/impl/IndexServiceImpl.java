@@ -120,18 +120,19 @@ public class IndexServiceImpl implements IndexService{
 	@Override
 	public List<ReportDTO> statistic() {
 		List<ReportDTO> reportDtoList = new ArrayList<>();
-		ReportDTO reportDto = new ReportDTO();
-		Map<String,Integer> data = new HashMap<String, Integer>();
 		//会员卡种类名称+会员卡绑定数量
 		List<TMemberCard> cardList = cardMapper.selectList(null);
 		for (int i = 0 ; i < cardList.size() ; i++) {
 			TMemberCard card = 	cardList.get(i);
-			List<TMemberBindRecord> bindList = bindMapper.selectList(new QueryWrapper<TMemberBindRecord>().eq("card_id", card.getId()));
+			List<TMemberBindRecord> bindList = bindMapper.selectList(new QueryWrapper<TMemberBindRecord>()
+					.eq("card_id", card.getId()));
 			if(bindList == null || bindList.size() == 0) {
 				continue;
 			}
+			Map<String,Integer> data = new HashMap<String, Integer>();
 			data.put(card.getName(), bindList.size());
 			//=======DTO存储
+			ReportDTO reportDto = new ReportDTO();
 			System.out.println("会员卡绑定统计：" + data);
 			reportDto.setMemberCardBindingMap(data);
 			reportDtoList.add(reportDto);

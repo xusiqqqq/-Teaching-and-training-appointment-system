@@ -128,8 +128,14 @@ public class MemberServiceImpl implements MemberService{
 
 	@Override
 	public boolean bindCard(TMemberBindRecord cardBind) {
+		TMemberBindRecord bindRecord = bindMapper.selectOne(new QueryWrapper<TMemberBindRecord>()
+				.eq("member_id", cardBind.getMemberId()).eq("card_id", cardBind.getCardId()));
+		if(bindRecord != null) {
+			System.out.println("当前卡已绑定过！");
+			return false;
+		}
 		bindMapper.insert(cardBind);
-		return false;
+		return true;
 	}
 
 	/* 待处理  - begin*/
@@ -178,13 +184,13 @@ public class MemberServiceImpl implements MemberService{
 	//会员卡信息
 	@Override
 	public List<MemberCardDTO> findAllCardRecords(Long id) {
+		System.out.println("---------- 会员卡信息 --------");
 		List<MemberCardDTO> cardDtoList = new ArrayList<>();
-		MemberCardDTO cardDto = new MemberCardDTO();
 		
 		//查询到当前会员绑定的所有会员卡
 		List<TMemberBindRecord> bindList = bindMapper.selectList(new QueryWrapper<TMemberBindRecord>()
 				.eq("member_id", id));
-		TMemberBindRecord bindRecord;
+		TMemberBindRecord bindRecord = new TMemberBindRecord();
 		for(int i = 0; i < bindList.size(); i++) {
 			bindRecord = bindList.get(i);
 			//会员卡可用次数
@@ -200,6 +206,7 @@ public class MemberServiceImpl implements MemberService{
 			TMemberCard memberCard = cardMapper.selectById(bindRecord.getCardId());
 			
 			//组成一条会员卡信息DTO
+			MemberCardDTO cardDto = new MemberCardDTO();
 			cardDto.setName(memberCard.getName());
 			cardDto.setType(memberCard.getType());
 			cardDto.setTotalCount(validTimes);
@@ -213,41 +220,39 @@ public class MemberServiceImpl implements MemberService{
 	//上课记录
 	@Override
 	public List<ClassRecordDTO> listClassRecords(Long id) {
+		System.out.println("---------- 上课记录 --------");
 		//获取上课记录。这里获取的是会员的上课记录
 		List<TClassRecord> classList = classMapper.selectList(new QueryWrapper<TClassRecord>()
 				.eq("member_id", id));
 		//获取排课计划
-		List<Long> idList = new ArrayList<>();
+		List<TScheduleRecord> scheduleList = new ArrayList<>();
 		for (int i = 0; i < classList.size(); i++) {
-			 idList.add(classList.get(i).getScheduleId());
+			TScheduleRecord scheduleRecord = scheduleMapper.selectById(classList.get(i).getScheduleId());
+			scheduleList.add(scheduleRecord);
 		}
-		List<TScheduleRecord> scheduleList = scheduleMapper.selectBatchIds(idList);
-		//清空idList数据，以供下面复用
-		idList.clear();
 		
 		//3、获取课程信息
+		List<TCourse> courseList = new ArrayList<TCourse>();
 		for (int i = 0; i < scheduleList.size(); i++) {
-			 idList.add(scheduleList.get(i).getCourseId());
+			TCourse course = courseMapper.selectById(scheduleList.get(i).getCourseId());
+			courseList.add(course);
 		}
-		List<TCourse> courseList = courseMapper.selectBatchIds(idList);
-		//清空idList数据，以供下面复用
-		idList.clear();
 		
 		//4、组合成DTO数据信息
 		//4.1 sql结果对应关系
 		//1条 上课记录 =》 1条 排课记录（1 条 会员记录） =》1条 课程记录 =》  n条 会员卡记录
-		TClassRecord classed = new TClassRecord();
-		TScheduleRecord schedule = new TScheduleRecord();
-		TCourse course = new TCourse();
-
 		List<ClassRecordDTO> classDtoList = new ArrayList<>();
-		ClassRecordDTO classRecordDTO = new ClassRecordDTO();
 		for(int i = 0; i < classList.size(); i++) {
+			TClassRecord classed = new TClassRecord();
+			TScheduleRecord schedule = new TScheduleRecord();
+			TCourse course = new TCourse();
+			
 			classed = classList.get(i);
 			schedule = scheduleList.get(i);
 			course = courseList.get(i);
 			String teacherName = employeeMapper.selectById(schedule.getTeacherId()).getName();
 			//=======DTO存储
+			ClassRecordDTO classRecordDTO = new ClassRecordDTO();
 			classRecordDTO.setCourseName(course.getName());
 			classRecordDTO.setClassTime(LocalDateTime.of(schedule.getStartDate(), schedule.getClassTime()));
 			classRecordDTO.setTeacherName(teacherName);
@@ -266,39 +271,38 @@ public class MemberServiceImpl implements MemberService{
 	//跟上课记录不同的地方在于，预约状态不限制，预约的会员卡仅能一次预约一门课，一门课在被预约的状态下，同一个会员不能二次预约
 	@Override
 	public List<ReserveRecordDTO> listReserveRecords(Long id) {
+		System.out.println("---------- 预约记录 --------");
 		List<TReservationRecord> reserveList = reserveMapper.selectList(new QueryWrapper<TReservationRecord>()
 				.eq("member_id", id));
 		//获取排课计划
-		List<Long> idList = new ArrayList<>();
+		List<TScheduleRecord> scheduleList = new ArrayList<TScheduleRecord>();
 		for (int i = 0; i < reserveList.size(); i++) {
-			 idList.add(reserveList.get(i).getScheduleId());
+			TScheduleRecord scheduleRecord = scheduleMapper.selectById(reserveList.get(i).getScheduleId());
+			scheduleList.add(scheduleRecord);
 		}
-		List<TScheduleRecord> scheduleList = scheduleMapper.selectBatchIds(idList);
-		//清空idList数据，以供下面复用
-		idList.clear();
 		
 		//3、获取课程信息
+		List<TCourse> courseList = new ArrayList<TCourse>();
 		for (int i = 0; i < scheduleList.size(); i++) {
-			 idList.add(scheduleList.get(i).getCourseId());
+			TCourse course = courseMapper.selectById(scheduleList.get(i).getCourseId());
+			courseList.add(course);
 		}
-		List<TCourse> courseList = courseMapper.selectBatchIds(idList);
-		//清空idList数据，以供下面复用
-		idList.clear();
 		
 		//4、组合成DTO数据信息
 		//4.1 sql结果对应关系
 		//1条 预约记录（包含已预约的会员卡名） =》 1条 排课记录（1 条 会员记录） =》1条 课程记录
-		TReservationRecord reserve = new TReservationRecord();
-		TScheduleRecord schedule = new TScheduleRecord();
-		TCourse course = new TCourse();
 
 		List<ReserveRecordDTO> reserveDtoList = new ArrayList<>();
-		ReserveRecordDTO reserveDto = new ReserveRecordDTO();
 		for(int i = 0; i < reserveList.size(); i++) {
+			TReservationRecord reserve = new TReservationRecord();
+			TScheduleRecord schedule = new TScheduleRecord();
+			TCourse course = new TCourse();
+
 			reserve = reserveList.get(i);
 			schedule = scheduleList.get(i);
 			course = courseList.get(i);			
 			//========DTO存储
+			ReserveRecordDTO reserveDto = new ReserveRecordDTO();
 			reserveDto.setCourseName(course.getName());
 			reserveDto.setReserveTime(reserve.getCreateTime());
 			reserveDto.setCardName(reserve.getCardName());
@@ -318,13 +322,15 @@ public class MemberServiceImpl implements MemberService{
 	//消费记录
 	@Override
 	public List<ConsumeRecordDTO> listConsumeRecords(Long id) {
+		System.out.println("---------- 消费记录 --------");
 		/* 查询前，先对上课记录进行消费录入 */
 		
 		//查出所有确认已上课事务记录，进行消费记录的录入
 		List<TClassRecord> classList = classMapper.selectList(
-				new QueryWrapper<TClassRecord>().eq("check_status", 1));
-		TConsumeRecord consume = new TConsumeRecord();
+				new QueryWrapper<TClassRecord>().eq("check_status", 1).eq("member_id", id));
 		for (TClassRecord classed : classList) {
+			TConsumeRecord consume = new TConsumeRecord();
+			
 			consume.setMemberId(classed.getMemberId());
 			//查出卡号
 			Long cardId = cardMapper.selectOne(new QueryWrapper<TMemberCard>()
@@ -371,19 +377,19 @@ public class MemberServiceImpl implements MemberService{
 		//根据每条消费记录查询到的会员卡信息
 		List<TMemberCard> cardList = cardMapper.selectBatchIds(idList);
 
-		TConsumeRecord consumeRecord = new TConsumeRecord();
-		TMemberCard memberCard = new TMemberCard();
-		
 		List<ConsumeRecordDTO> consumeDtoList = new ArrayList<>();
-		ConsumeRecordDTO consumeDto = new ConsumeRecordDTO();
 		for(int i = 0; i < consumeList.size(); i++) {
-			 consumeRecord = consumeList.get(i);
-			 memberCard = cardList.get(i);
+			TConsumeRecord consumeRecord = new TConsumeRecord();
+			TMemberCard memberCard = new TMemberCard();
+
+			consumeRecord = consumeList.get(i);
+			memberCard = cardList.get(i);
 			 //查询剩余卡次
 			 TMemberBindRecord bindRecord = bindMapper.selectOne(new QueryWrapper<TMemberBindRecord>()
 					 .eq("card_id", memberCard.getId()).eq("member_id", id));
 			 Integer timesRemainder = bindRecord.getValidCount();
 			 //==========DTO存储
+			 ConsumeRecordDTO consumeDto = new ConsumeRecordDTO();
 			 consumeDto.setCardName(memberCard.getName());
 			 consumeDto.setOperateTime(consumeRecord.getCreateTime());
 			 consumeDto.setCardCountChange(consumeRecord.getCardCountChange());
@@ -395,7 +401,6 @@ public class MemberServiceImpl implements MemberService{
 			 //存放所有DTO数据
 			 consumeDtoList.add(consumeDto);
 		}
-		
 		return consumeDtoList;
 	}
 
