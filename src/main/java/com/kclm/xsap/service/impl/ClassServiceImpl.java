@@ -66,12 +66,24 @@ public class ClassServiceImpl implements ClassService{
 			classMapper.insert(classed);
 		}
 		
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean update(TClassRecord classed) {
-		classMapper.updateById(classed);
+		classMapper.update(classed,new QueryWrapper<TClassRecord>().eq("id", classed.getId()));
+		return true;
+	}
+
+	@Override
+	public boolean updateAll() {
+		List<TClassRecord> classList = classMapper.selectList(new QueryWrapper<TClassRecord>().eq("check_status", 0));
+		for (TClassRecord classed : classList) {
+			System.out.println("-------"+classed);
+			classed.setCheckStatus(1);
+			classMapper.update(classed,new QueryWrapper<TClassRecord>().eq("id", classed.getId()));
+		}
+		
 		return true;
 	}
 

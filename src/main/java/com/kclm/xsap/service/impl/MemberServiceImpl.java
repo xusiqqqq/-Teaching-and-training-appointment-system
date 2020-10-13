@@ -362,7 +362,7 @@ public class MemberServiceImpl implements MemberService{
 					.eq("card_id", consume.getCardId()).eq("member_id", consume.getMemberId()));
 			bindRecord.setValidCount(bindRecord.getValidCount() + consume.getCardCountChange());
 			bindRecord.setValidDay(bindRecord.getValidDay() + consume.getCardDayChange());
-//			bindRecord.setReceivedMoney(consume.getMoneyCost());
+			bindRecord.setReceivedMoney(bindRecord.getReceivedMoney().subtract(consume.getMoneyCost()));
 			bindMapper.update(bindRecord, new QueryWrapper<TMemberBindRecord>()
 					.eq("card_id", consume.getCardId()).eq("member_id", consume.getMemberId()));
 		}

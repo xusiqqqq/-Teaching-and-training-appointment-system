@@ -27,4 +27,10 @@ public class ClassServiceTest {
 		classService.update(classed);
 	}
 	
+	//更新所有“未确认”上课记录
+	@Test
+	public void updateAll() {
+		classService.updateAll();
+	}
+	
 }

@@ -19,4 +19,6 @@ public interface ClassService {
 	
 	boolean update(TClassRecord classed);
 	
+	boolean updateAll();
+	
 }

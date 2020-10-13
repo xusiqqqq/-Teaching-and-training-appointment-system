@@ -121,9 +121,9 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 		//获取当前课程对应的预约记录
 		List<ReserveRecordDTO> reserveDtoList = reserveService.listReserveRecords(scheduleId);
 		System.out.println("-------reserveDTO: "+reserveDtoList);
-		if(reserveDtoList == null || reserveDtoList.size() < 1) {
-			return null;
-		}
+//		if(reserveDtoList == null || reserveDtoList.size() < 1) {
+//			return null;
+//		}
 		//==获取当前课程的上课数据
 		List<TClassRecord> classList = classMapper.selectList(new QueryWrapper<TClassRecord>().eq("schedule_id", scheduleId));
 		

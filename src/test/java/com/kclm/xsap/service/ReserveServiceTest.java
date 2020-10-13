@@ -35,6 +35,14 @@ public class ReserveServiceTest {
 		reserveService.update(reserve);
 	}
 
+	@Test
+	public void listReserved() {
+		List<ReserveRecordDTO> reserveList = reserveService.listReserved(1L);
+		for (ReserveRecordDTO reserve : reserveList) {
+			System.out.println("---"+ reserve);
+		}
+	}
+	
 	//-------涉及到convert
 	@Test
 	public void listReserveRecords() {

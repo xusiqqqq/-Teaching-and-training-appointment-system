@@ -117,7 +117,7 @@ public class MemberCardServiceImpl implements MemberCardService{
 				.eq("card_id", recharge.getCardId()).eq("member_id", recharge.getMemberId()));
 		bindRecord.setValidCount(bindRecord.getValidCount() + recharge.getAddCount());
 		bindRecord.setValidDay(bindRecord.getValidDay() + recharge.getAddDay());
-		//bindRecord.setReceivedMoney(recharge.getReceivedMoney());
+		bindRecord.setReceivedMoney(bindRecord.getReceivedMoney().add(recharge.getReceivedMoney()));
 		bindMapper.update(bindRecord, new QueryWrapper<TMemberBindRecord>()
 				.eq("card_id", recharge.getCardId()).eq("member_id", recharge.getMemberId()));
 		return true;
@@ -150,7 +150,7 @@ public class MemberCardServiceImpl implements MemberCardService{
 				.eq("card_id", consume.getCardId()).eq("member_id", consume.getMemberId()));
 		bindRecord.setValidCount(bindRecord.getValidCount() + consume.getCardCountChange());
 		bindRecord.setValidDay(bindRecord.getValidDay() + consume.getCardDayChange());
-		//bindRecord.setReceivedMoney(consume.getMoneyCost());
+		bindRecord.setReceivedMoney(bindRecord.getReceivedMoney().subtract(consume.getMoneyCost()));
 		bindMapper.update(bindRecord, new QueryWrapper<TMemberBindRecord>()
 				.eq("card_id", consume.getCardId()).eq("member_id", consume.getMemberId()));
 		return true;
