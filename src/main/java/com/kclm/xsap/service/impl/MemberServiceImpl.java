@@ -148,6 +148,7 @@ public class MemberServiceImpl implements MemberService{
 		log.setMemberId(cardBind.getMemberId());
 		log.setCardId(cardBind.getCardId());
 		log.setType("绑卡操作");
+		log.setOperator("系统处理");
 		log.setInvolveMoney(cardBind.getReceivedMoney());
 		logMapper.insert(log );
 		return true;

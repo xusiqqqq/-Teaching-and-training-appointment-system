@@ -176,9 +176,12 @@
 
                             <div id="tab-3" class="tab-pane">
                                 <div class="panel-body">
+                                    <!-- 添加一个批理确认扣费按钮 -->
+                                    <button class="btn btn-primary" id="deleteAll">批量确认</button>
                                     <table class="table table-striped table-bordered table-hover dataTables-example-3">
                                         <thead>
                                         <tr>
+                                            <th><input type="checkbox" class="checkbox" id="selectAll"/> </th>
                                             <th>会员</th>
                                             <th>手机号</th>
                                             <th>会员卡</th>
@@ -457,6 +460,23 @@
                     }
                 }
             ],
+            "fnDrawCallback": function () {
+                //给复选框添加事件
+                console.log("绘制完表格后...");
+                $('.cancel_btn').click(function () {
+                    swal({
+                        title: "您确定要取消本次预约吗？",
+                        text: "注意:如果当天取消预约超过2次，则当前不能再次预约了",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "确认",
+                        closeOnConfirm: false
+                    }, function () {
+                        swal("取消预约成功！", "","success");
+                    });
+                });
+            },
             "bSort": false,
             "searching": true,
             "pagingType": "full_numbers",
@@ -501,6 +521,11 @@
                 dataSrc: ""
             },
             "columns":[
+                {"data": null, "render": function (data,type,row) {
+                        //在回传的JSON中，要有真正的ID值
+                        return "<input type='checkbox' class='checkbox' name='classDataIds' value='"+row.id+"'/>";
+                    }
+                },
                 {"data": "username"},
                 {"data": "phone"},
                 {"data": "memberCard"},
@@ -529,7 +554,7 @@
             ],
             "autoWidth": false,  //禁用自动宽度
             "bSort": false,
-            "searching": true,
+            "searching": false,
             "pagingType": "full_numbers",
             "bLengthChange": false,
             "info": false
@@ -550,6 +575,68 @@
                 swal("删除成功！", "","success");
             });
         });
+
+        //给全选 复选框添加事件
+        $("#selectAll").change(function () {
+            //选出所有的复选框【不含 #select-all】
+            $(":checkbox").not("#selectAll").prop("checked", $("#selectAll").prop("checked"));
+        });
+
+        //2. 给删除所选  按钮添加 单击事件
+        $("#deleteAll").click(function () {
+            //定义一个变量来保存是否有 选中的复选框
+            var isSelect = false;
+            //定义 一个变量来存储用户选中的复选框 的值
+            var queryData = "";   //格式是： key=value1&key=value2&key=value3
+            var datas = [];
+            //针对所有的复选框进行迭代
+            $(":checkbox").not("#selectAll").each(function (index, item) {
+                isSelect = isSelect || $(item).prop("checked");
+                // 只要是被选中的，就取出它的值
+                if ($(item).prop("checked")) {
+                    queryData = (queryData + "flags=" + $(item).val() + "&");
+                    //
+                    datas.push($(item).val());
+                }
+            });
+            //把queryData中的最后一个 & 给删除掉
+            queryData = queryData.substring(0, queryData.length - 1);
+            //
+            console.log(queryData);
+            //把数组转换成 json 字符串
+            var datasJson = JSON.stringify(datas);
+            console.log(datasJson);
+
+            //判断
+            if (!isSelect) {
+                //说明没有选中任何一个
+                alert("至少要选中一个");
+            } else {
+                //说明有选中，继续提示真的要删除吗
+                if (confirm("确定要批量确认会员扣费吗？")) {
+                    //执行删除操作 ... 使用 ajax 来发送异步删除的请求
+                    $.ajax({
+                        //url: "${pageContext.request.contextPath}/book/deleteSelect.do?"+queryData,
+                        url: appName + "/xxxx.do",
+                        method: "post",
+                        data: datasJson,
+                        async: true,
+                        dataType: "text",   //表示期望服务端返回给我们的数据格式
+                        contentType: "application/json",  //客户端给服务端的格式
+                        success: function (data) {
+                            //成功
+                            alert(data);
+                            //重新加载本页面
+                            window.location.reload();
+                        },
+                        error: function (jqXHR) {
+                            // 失败
+                            alert("删除失败了");
+                        }
+                    });
+                }
+            }
+        }); //
     });
 </script>
 
