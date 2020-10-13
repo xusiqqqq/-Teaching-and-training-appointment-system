@@ -11,8 +11,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.kclm.xsap.dto.CourseScheduleDTO;
 import com.kclm.xsap.entity.TScheduleRecord;
 
+
 @SpringBootTest
-public class CourseScheduleServiceTest {
+public class CourseScheduleTest {
+
 
 	@Autowired
 	private CourseScheduleService scheduleService;
@@ -26,7 +28,7 @@ public class CourseScheduleServiceTest {
 		schedule.setStartDate(LocalDate.of(2020, 10, 6));
 		schedule.setClassTime(LocalTime.now());
 		scheduleService.save(schedule);
-	}
+		}
 	
 	//删除指定排课记录
 	@Test
@@ -38,7 +40,7 @@ public class CourseScheduleServiceTest {
 	@Test
 	public void listSchedule() {
 		LocalDate startDate = LocalDate.of(2020, 9, 8);
-		LocalDate endDate = LocalDate.of(2020, 10, 2);
+		LocalDate endDate = LocalDate.of(2020, 9, 9);
 		List<CourseScheduleDTO> listSchedule = scheduleService.listSchedule(startDate, endDate);
 		for (CourseScheduleDTO schedule : listSchedule) {
 			System.out.println("---: " + schedule);
@@ -51,5 +53,4 @@ public class CourseScheduleServiceTest {
 		CourseScheduleDTO schedule = scheduleService.findById(1L);
 		System.out.println("排课计划："+schedule);
 	}
-	
 }

@@ -1,5 +1,6 @@
 package com.kclm.xsap.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +31,8 @@ public class TeacherServiceImpl implements TeacherService{
 	@Autowired
 	TEmployeeMapper employeeMapper;
 
-	@Autowired
-	private ClassRecordConvert classRecordConvert;
+//	@Autowired
+//	private ClassRecordConvert classRecordConvert;
 		
 	@Override
 	public boolean save(TEmployee emp) {
@@ -41,6 +42,11 @@ public class TeacherServiceImpl implements TeacherService{
 
 	@Override
 	public boolean deleteById(Long id) {
+		TEmployee employee = employeeMapper.selectById(id);
+		if(employee == null) {
+			System.out.println("------无此条教师记录");
+			return false;
+		}
 		employeeMapper.deleteById(id);
 		return true;
 	}
@@ -97,40 +103,43 @@ public class TeacherServiceImpl implements TeacherService{
 				.eq("check_status", 1).inSql("schedule_id",
 				"SELECT id FROM t_schedule_record WHERE teacher_id =" + id));
 		
+		if(classList == null || classList.size() < 1) {
+			System.out.println("-------当前教师没有上课记录");
+			return null;
+		}
+		
 		//2、获取排课计划信息
-		List<Long> idList = new ArrayList<>();
+		List<TScheduleRecord> scheduleList = new ArrayList<TScheduleRecord>();
 		for (int i = 0; i < classList.size(); i++) {
-			 idList.add(classList.get(i).getScheduleId());
+			TScheduleRecord scheduleRecord = scheduleMapper.selectById(classList.get(i).getScheduleId());
+			scheduleList.add(scheduleRecord);
 		}
-		List<TScheduleRecord> scheduleList = scheduleMapper.selectBatchIds(idList);
-		//清空idList数据，以供下面复用
-		idList.clear();
-		
 		//3、获取课程信息
+		List<TCourse> courseList = new ArrayList<TCourse>();
 		for (int i = 0; i < scheduleList.size(); i++) {
-			 idList.add(scheduleList.get(i).getCourseId());
+			TCourse course = courseMapper.selectById(scheduleList.get(i).getCourseId());
+			courseList.add(course);
 		}
-		List<TCourse> courseList = courseMapper.selectBatchIds(idList);
-		//清空idList数据，以供下面复用
-		idList.clear();
 		
-		
-		//5、组合成DTO数据信息
-		//5.1 sql结果对应关系
+		//4、组合成DTO数据信息
+		//4.1 sql结果对应关系
 		//1条 上课记录 =》 1条 排课记录（1 条 会员记录） =》1条 课程记录 =》  n条 会员卡记录
-		TClassRecord classed = new TClassRecord();
-		TScheduleRecord schedule = new TScheduleRecord();
-		TCourse course = new TCourse();
 		List<ClassRecordDTO> classDtoList = new ArrayList<>();
 		for(int i = 0; i < classList.size(); i++) {
+			TClassRecord classed = new TClassRecord();
+			TScheduleRecord schedule = new TScheduleRecord();
+			TCourse course = new TCourse();
+
 			classed = classList.get(i);
 			schedule = scheduleList.get(i);
 			course = courseList.get(i);
-			String cardName = classed.getCardName();
-			//DTO转换
-			//ClassRecordDTO classRecordDTO = ClassRecordConvert.INSTANCE
-			ClassRecordDTO classRecordDTO = classRecordConvert
-					.entity2Dto(classed, null, course, schedule, cardName, null, null);
+			//======DTO存储
+			ClassRecordDTO classRecordDTO = new ClassRecordDTO();
+			classRecordDTO.setClassRecordId(classed.getId());
+			classRecordDTO.setCourseName(course.getName());
+			classRecordDTO.setClassTime(LocalDateTime.of(schedule.getStartDate(), schedule.getClassTime()));
+			classRecordDTO.setCardName(classed.getCardName());
+			classRecordDTO.setTimesCost(course.getTimesCost());
 			//转换完成一条记录，就存放一条记录
 			classDtoList.add(classRecordDTO);
 		}

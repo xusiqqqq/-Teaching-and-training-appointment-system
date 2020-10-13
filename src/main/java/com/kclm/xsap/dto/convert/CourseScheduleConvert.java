@@ -48,6 +48,6 @@ public interface CourseScheduleConvert {
 		@Mapping(source = "classDto", target = "classRecord")
 	})
 	CourseScheduleDTO entity2Dto(TScheduleRecord schedule,TCourse course,
-			String supportCards,String teacherName,List<ReserveRecordDTO> reserveDto, List<ClassRecordDTO> classDto); 
+			String supportCards,String teacherName,List<ReserveRecordDTO> reservedList,List<ReserveRecordDTO> reserveDto, List<ClassRecordDTO> classDto); 
 
 }

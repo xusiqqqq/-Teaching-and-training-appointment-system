@@ -21,8 +21,8 @@ import com.kclm.xsap.service.CourseService;
 @Transactional
 public class CourseServiceImpl implements CourseService{
 
-	@Autowired
-	private CourseConvert courseConvert;
+//	@Autowired
+//	private CourseConvert courseConvert;
 
 	@Autowired
 	private TCourseMapper courseMapper;
@@ -40,6 +40,11 @@ public class CourseServiceImpl implements CourseService{
 
 	@Override
 	public boolean deleteById(Long id) {
+		TCourse course = courseMapper.selectById(id);
+		if(course == null) {
+			System.out.println("----------无此条课程记录");
+			return false;
+		}
 		//删除中间表关联的键
 		courseMapper.deleteBindCard(id);
 		//本表
@@ -69,10 +74,19 @@ public class CourseServiceImpl implements CourseService{
 		List<TCourse> courseList = pageList.getRecords();
 		
 		List<CourseDTO> courseDtoList = new ArrayList<CourseDTO>();
+		CourseDTO courseDTO = new CourseDTO();
 		for (TCourse course : courseList) {
-			//DTO转换
-			//CourseDTO courseDTO = CourseConvert.INSTANCE.entity2Dto(course);
-			CourseDTO courseDTO = courseConvert.entity2Dto(course);
+			//======DTO存储
+			courseDTO.setId(course.getId());
+			courseDTO.setName(course.getName());
+			courseDTO.setDuration(course.getDuration());
+			courseDTO.setContains(course.getContains());
+			courseDTO.setColor(course.getColor());
+			courseDTO.setCardList(course.getCardList());
+			courseDTO.setIntroduce(course.getIntroduce());
+			courseDTO.setLimitSex(course.getLimitSex());
+			courseDTO.setLimitAge(course.getLimitAge());
+			courseDTO.setLimitCounts(course.getLimitCounts());
 			courseDtoList.add(courseDTO);
 		}
 		return courseDtoList;
@@ -83,9 +97,17 @@ public class CourseServiceImpl implements CourseService{
 		List<TCourse> courseList = courseMapper.selectList(null);
 		List<CourseDTO> courseDtoList = new ArrayList<CourseDTO>();
 		for (TCourse course : courseList) {
-			//DTO转换
-			//CourseDTO courseDTO = CourseConvert.INSTANCE.entity2Dto(course);
-			CourseDTO courseDTO = courseConvert.entity2Dto(course);
+			//======DTO存储
+			CourseDTO courseDTO = new CourseDTO();
+			courseDTO.setName(course.getName());
+			courseDTO.setDuration(course.getDuration());
+			courseDTO.setContains(course.getContains());
+			courseDTO.setColor(course.getColor());
+			courseDTO.setCardList(course.getCardList());
+			courseDTO.setIntroduce(course.getIntroduce());
+			courseDTO.setLimitSex(course.getLimitSex());
+			courseDTO.setLimitAge(course.getLimitAge());
+			courseDTO.setLimitCounts(course.getLimitCounts());
 			courseDtoList.add(courseDTO);
 		}
 		return courseDtoList;

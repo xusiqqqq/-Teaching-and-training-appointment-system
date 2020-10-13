@@ -31,11 +31,11 @@ import com.kclm.xsap.service.IndexService;
 @Transactional
 public class IndexServiceImpl implements IndexService{
 
-	@Autowired
-	private ReportConvert reportConvert;
-
-	@Autowired
-	private HomePageConvert homePageConvert;
+//	@Autowired
+//	private ReportConvert reportConvert;
+//
+//	@Autowired
+//	private HomePageConvert homePageConvert;
 
 	@Autowired
 	TMemberMapper memberMapper;
@@ -99,10 +99,15 @@ public class IndexServiceImpl implements IndexService{
 			//自增一天
 			changeDateTime = changeDateTime.plusDays(1);
 		}
-		//==DTO组合
-		//HomePageDTO homePageDto = HomePageConvert.INSTANCE.entity2Dto(totalMembers, reserveNums, activeNums, reserveNumsList, memberNumslist);
-		HomePageDTO homePageDto = homePageConvert.entity2Dto(totalMembers, reserveNums, activeNums, reserveNumsList, memberNumslist);
-
+		//=========DTO存储
+		HomePageDTO homePageDto = new HomePageDTO();
+		homePageDto.setStartDate(startDate);
+		homePageDto.setEndDate(endDate);
+		homePageDto.setTotalMembers(totalMembers);
+		homePageDto.setActiveMembers(activeNums);
+		homePageDto.setTotalReservations(reserveNums);
+		homePageDto.setDailyReservations(reserveNumsList);
+		homePageDto.setDailyNewMembers(memberNumslist);
 		return homePageDto;
 	}
 
@@ -115,21 +120,21 @@ public class IndexServiceImpl implements IndexService{
 	@Override
 	public List<ReportDTO> statistic() {
 		List<ReportDTO> reportDtoList = new ArrayList<>();
-		ReportDTO reportDto;
-		Map<String,Integer> data = new HashMap<String, Integer>();
 		//会员卡种类名称+会员卡绑定数量
 		List<TMemberCard> cardList = cardMapper.selectList(null);
 		for (int i = 0 ; i < cardList.size() ; i++) {
 			TMemberCard card = 	cardList.get(i);
-			List<TMemberBindRecord> bindList = bindMapper.selectList(new QueryWrapper<TMemberBindRecord>().eq("card_id", card.getId()));
+			List<TMemberBindRecord> bindList = bindMapper.selectList(new QueryWrapper<TMemberBindRecord>()
+					.eq("card_id", card.getId()));
 			if(bindList == null || bindList.size() == 0) {
 				continue;
 			}
+			Map<String,Integer> data = new HashMap<String, Integer>();
 			data.put(card.getName(), bindList.size());
-			//DTO转换
+			//=======DTO存储
+			ReportDTO reportDto = new ReportDTO();
 			System.out.println("会员卡绑定统计：" + data);
-			//reportDto = ReportConvert.INSTANCE.entity2Dto(data);
-			reportDto = reportConvert.entity2Dto(data);
+			reportDto.setMemberCardBindingMap(data);
 			reportDtoList.add(reportDto);
 		}
 		return reportDtoList;

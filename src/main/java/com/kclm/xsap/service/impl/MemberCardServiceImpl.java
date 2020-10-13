@@ -32,8 +32,8 @@ import com.kclm.xsap.service.MemberCardService;
 @Transactional
 public class MemberCardServiceImpl implements MemberCardService{
 
-	@Autowired
-	private MemberLogConvert memberLogConvert;
+//	@Autowired
+//	private MemberLogConvert memberLogConvert;
 
 	@Autowired
 	TMemberCardMapper cardMapper;
@@ -51,6 +51,11 @@ public class MemberCardServiceImpl implements MemberCardService{
 
 	@Override
 	public boolean deleteById(Long id) {
+		TMemberCard card = cardMapper.selectById(id);
+		if(card == null) {
+			System.out.println("---------此条会员卡信息不存在");
+			return false;
+		}
 		//中间表删除关联的数据
 		cardMapper.deleteBindCourse(id);
 		//本表
@@ -117,7 +122,7 @@ public class MemberCardServiceImpl implements MemberCardService{
 				.eq("card_id", recharge.getCardId()).eq("member_id", recharge.getMemberId()));
 		bindRecord.setValidCount(bindRecord.getValidCount() + recharge.getAddCount());
 		bindRecord.setValidDay(bindRecord.getValidDay() + recharge.getAddDay());
-		//bindRecord.setReceivedMoney(recharge.getReceivedMoney());
+		bindRecord.setReceivedMoney(bindRecord.getReceivedMoney().add(recharge.getReceivedMoney()));
 		bindMapper.update(bindRecord, new QueryWrapper<TMemberBindRecord>()
 				.eq("card_id", recharge.getCardId()).eq("member_id", recharge.getMemberId()));
 		return true;
@@ -150,7 +155,7 @@ public class MemberCardServiceImpl implements MemberCardService{
 				.eq("card_id", consume.getCardId()).eq("member_id", consume.getMemberId()));
 		bindRecord.setValidCount(bindRecord.getValidCount() + consume.getCardCountChange());
 		bindRecord.setValidDay(bindRecord.getValidDay() + consume.getCardDayChange());
-		//bindRecord.setReceivedMoney(consume.getMoneyCost());
+		bindRecord.setReceivedMoney(bindRecord.getReceivedMoney().subtract(consume.getMoneyCost()));
 		bindMapper.update(bindRecord, new QueryWrapper<TMemberBindRecord>()
 				.eq("card_id", consume.getCardId()).eq("member_id", consume.getMemberId()));
 		return true;
@@ -159,32 +164,51 @@ public class MemberCardServiceImpl implements MemberCardService{
 	//查询操作记录
 	@Override
 	public List<MemberLogDTO> listOperateLog(Long memberId,Long cardId) {
-		MemberLogDTO logDto = new MemberLogDTO();
-		
 		TMemberCard memberCard = cardMapper.selectById(cardId);
-		//会员卡的激活状态
-		Integer status = memberCard.getStatus();
 		
-		//会员卡备注
-		String note = memberCard.getNote();
+		Integer status = 0;
+		String note = "待补充";
+		if(memberCard != null) {
+			//会员卡的激活状态
+			status = memberCard.getStatus();
+			//会员卡备注
+			note = memberCard.getNote();
+		}
 		
 		//会员卡可用次数
 		TMemberBindRecord bindRecord = bindMapper.selectOne(new QueryWrapper<TMemberBindRecord>()
 				.eq("member_id", memberId).eq("card_id", cardId));
-		Integer validTimes = bindRecord.getValidCount();
-		
-		//会员卡到期日
-		LocalDateTime endTime = bindRecord.getCreateTime();
-		endTime = endTime.plusDays(bindRecord.getValidDay());
+		Integer validTimes = 0;
+		LocalDateTime endTime = null;
+		if(bindRecord != null) {
+			validTimes = bindRecord.getValidCount();
+			//会员卡到期日
+			endTime = bindRecord.getCreateTime();
+			if(endTime != null) {
+				endTime = endTime.plusDays(bindRecord.getValidDay());			
+			}
+		}
 		
 		//获取到会员指定的会员卡的操作记录
 		List<TMemberLog> logList = logMapper.selectList(new QueryWrapper<TMemberLog>()
 				.eq("member_id", memberId).eq("card_id", cardId));
 		List<MemberLogDTO> logDtoList = new ArrayList<>();
+		if(logList == null || logList.size() < 1) {
+			System.out.println("-------当前用户的此张卡，无任何操作记录");
+			return null;
+		}
 		for (TMemberLog log : logList) {
-			//dto转换
-			//logDto = MemberLogConvert.INSTANCE.entity2DTO(log, status, note, validTimes, endTime);
-			logDto = memberLogConvert.entity2DTO(log, status, note, validTimes, endTime);
+			//===========dto存储
+			MemberLogDTO logDto = new MemberLogDTO();
+			logDto.setId(log.getId());
+			logDto.setOperateTime(log.getCreateTime());
+			logDto.setOperateType(log.getType());
+			logDto.setValidTimes(validTimes);
+			logDto.setEndToDate(endTime);
+			logDto.setInvolveMoney(log.getInvolveMoney());
+			logDto.setOperator(log.getOperator());
+			logDto.setCardNote(note);
+			logDto.setStatus(status);
 			//存到dto中
 			logDtoList.add(logDto);
 		}	

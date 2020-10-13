@@ -29,12 +29,19 @@ public class ReserveServiceTest {
 
 	@Test
 	public void update() {
-		TReservationRecord reserve = new TReservationRecord();
-		reserve.setId(1L);
-		reserve.setCardName("卡二·改");
+		TReservationRecord reserve = reserveService.findOne(1L);
+		reserve.setStatus(1);
 		reserveService.update(reserve);
 	}
 
+	@Test
+	public void listReserved() {
+		List<ReserveRecordDTO> reserveList = reserveService.listReserved(1L);
+		for (ReserveRecordDTO reserve : reserveList) {
+			System.out.println("---"+ reserve);
+		}
+	}
+	
 	//-------涉及到convert
 	@Test
 	public void listReserveRecords() {
@@ -56,8 +63,8 @@ public class ReserveServiceTest {
 	//-------涉及到convert
 	@Test
 	public void listExportRecordRange() {
-		LocalDate startDate = LocalDate.of(2020, 9, 18);
-		LocalDate endDate = LocalDate.of(2020, 10, 8);
+		LocalDate startDate = LocalDate.of(2020, 9, 22);
+		LocalDate endDate = LocalDate.of(2020, 10, 4);
 		List<ReserveRecordDTO> exportRecordRange = reserveService.listExportRecordRange(startDate, endDate);
 		for (ReserveRecordDTO export : exportRecordRange) {
 			System.out.println("------"+ export);
