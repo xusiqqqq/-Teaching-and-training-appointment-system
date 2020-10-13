@@ -36,6 +36,6 @@ public interface ClassService {
 	boolean updateAll();
 	
 	//删除单个上课记录
-	boolean deleteOne();
+//	boolean deleteOne();
 	
 }
