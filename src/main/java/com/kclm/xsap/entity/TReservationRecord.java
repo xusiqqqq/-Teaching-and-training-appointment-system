@@ -60,6 +60,11 @@ public class TReservationRecord extends BaseEntity implements Serializable{
     private Integer reserveNums;
     
     /**
+     *  取消次数
+     */
+    private Integer cancelTimes;
+    
+    /**
     * 教师评语
     */
     private String comment;

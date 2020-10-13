@@ -29,6 +29,7 @@ import com.kclm.xsap.entity.TCourse;
 import com.kclm.xsap.entity.TMember;
 import com.kclm.xsap.entity.TMemberBindRecord;
 import com.kclm.xsap.entity.TMemberCard;
+import com.kclm.xsap.entity.TMemberLog;
 import com.kclm.xsap.entity.TReservationRecord;
 import com.kclm.xsap.entity.TScheduleRecord;
 import com.kclm.xsap.mapper.TClassRecordMapper;
@@ -37,13 +38,17 @@ import com.kclm.xsap.mapper.TCourseMapper;
 import com.kclm.xsap.mapper.TEmployeeMapper;
 import com.kclm.xsap.mapper.TMemberBindRecordMapper;
 import com.kclm.xsap.mapper.TMemberCardMapper;
+import com.kclm.xsap.mapper.TMemberLogMapper;
 import com.kclm.xsap.mapper.TMemberMapper;
 import com.kclm.xsap.mapper.TReservationRecordMapper;
 import com.kclm.xsap.mapper.TScheduleRecordMapper;
 import com.kclm.xsap.service.MemberService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
 @Transactional
+@Slf4j
 public class MemberServiceImpl implements MemberService{
 
 //	@Autowired
@@ -88,6 +93,9 @@ public class MemberServiceImpl implements MemberService{
 	@Autowired
 	private TEmployeeMapper employeeMapper;
 	
+	@Autowired
+	private TMemberLogMapper logMapper;
+	
 	@Override
 	public boolean save(TMember member) {
 		memberMapper.insert(member);
@@ -131,10 +139,17 @@ public class MemberServiceImpl implements MemberService{
 		TMemberBindRecord bindRecord = bindMapper.selectOne(new QueryWrapper<TMemberBindRecord>()
 				.eq("member_id", cardBind.getMemberId()).eq("card_id", cardBind.getCardId()));
 		if(bindRecord != null) {
-			System.out.println("当前卡已绑定过！");
+			System.out.println("绑卡无效！ 已绑定过此卡");
 			return false;
 		}
 		bindMapper.insert(cardBind);
+		//操作记录
+		TMemberLog log = new TMemberLog();
+		log.setMemberId(cardBind.getMemberId());
+		log.setCardId(cardBind.getCardId());
+		log.setType("绑卡操作");
+		log.setInvolveMoney(cardBind.getReceivedMoney());
+		logMapper.insert(log );
 		return true;
 	}
 
@@ -157,6 +172,10 @@ public class MemberServiceImpl implements MemberService{
 	@Override
 	public MemberDTO getMemberDetailById(Long id) {
 		TMember member = memberMapper.selectById(id);
+		if(member == null) {
+			System.out.println("------此会员不存在");
+			return null;
+		}
 		//会员卡信息
 		List<MemberCardDTO> cardRecords = findAllCardRecords(id);
 		//上课记录
@@ -191,6 +210,11 @@ public class MemberServiceImpl implements MemberService{
 		//查询到当前会员绑定的所有会员卡
 		List<TMemberBindRecord> bindList = bindMapper.selectList(new QueryWrapper<TMemberBindRecord>()
 				.eq("member_id", id));
+		if(bindList == null || bindList.size() < 1) {
+			System.out.println("------当前会员没绑定任何卡");
+			return null;
+		}
+		
 		TMemberBindRecord bindRecord = new TMemberBindRecord();
 		for(int i = 0; i < bindList.size(); i++) {
 			bindRecord = bindList.get(i);
@@ -226,6 +250,10 @@ public class MemberServiceImpl implements MemberService{
 		//获取上课记录。这里获取的是会员的上课记录
 		List<TClassRecord> classList = classMapper.selectList(new QueryWrapper<TClassRecord>()
 				.eq("member_id", id));
+		if(classList == null || classList.size() < 1) {
+			System.out.println("------此会员没有上课记录");
+			return null;
+		}
 		//获取排课计划
 		List<TScheduleRecord> scheduleList = new ArrayList<>();
 		for (int i = 0; i < classList.size(); i++) {
@@ -278,6 +306,11 @@ public class MemberServiceImpl implements MemberService{
 		System.out.println("---------- 预约记录 --------");
 		List<TReservationRecord> reserveList = reserveMapper.selectList(new QueryWrapper<TReservationRecord>()
 				.eq("member_id", id));
+		if(reserveList == null || reserveList.size() < 1) {
+			log.debug("--------此会员没有任何预约记录");
+			return null;
+		}
+		
 		//获取排课计划
 		List<TScheduleRecord> scheduleList = new ArrayList<TScheduleRecord>();
 		for (int i = 0; i < reserveList.size(); i++) {
@@ -333,48 +366,55 @@ public class MemberServiceImpl implements MemberService{
 		//查出所有确认已上课事务记录，进行消费记录的录入
 		List<TClassRecord> classList = classMapper.selectList(
 				new QueryWrapper<TClassRecord>().eq("check_status", 1).eq("member_id", id));
-		for (TClassRecord classed : classList) {
-			TConsumeRecord consume = new TConsumeRecord();
-			
-			consume.setMemberId(classed.getMemberId());
-			//查出卡号
-			Long cardId = cardMapper.selectOne(new QueryWrapper<TMemberCard>()
-					.eq("name", classed.getCardName())).getId();
-			consume.setCardId(cardId);
-			//查询出某课程单词课需花费的次数
-			TScheduleRecord scheduleRecord = scheduleMapper.selectById(classed.getScheduleId());
-			TCourse course = courseMapper.selectById(scheduleRecord.getCourseId());
-			consume.setCardCountChange(course.getTimesCost());
-			
-			//为系统自动处理时，天数不进行消耗处理
-			consume.setCardDayChange(0);
-			
-			consume.setOperateType("上课支出");
-			consume.setOperator("系统自动处理");
-			//查出会员卡的次数单价，取值四舍五入
-			TMemberCard card = cardMapper.selectById(consume.getCardId());
-			BigDecimal price = new BigDecimal(card.getPrice().toString());
-			BigDecimal count = new BigDecimal(card.getTotalCount().toString());
-			BigDecimal unitPrice = price.divide(count, 2, RoundingMode.HALF_UP);
-			//消费的次数
-			BigDecimal countCost = new BigDecimal(course.getTimesCost().toString());
-			consume.setMoneyCost(unitPrice.multiply(countCost));
-			//录入一条消费记录
-			consumeMapper.insert(consume);
-			//消费操作
-			TMemberBindRecord bindRecord = bindMapper.selectOne(new QueryWrapper<TMemberBindRecord>()
-					.eq("card_id", consume.getCardId()).eq("member_id", consume.getMemberId()));
-			bindRecord.setValidCount(bindRecord.getValidCount() + consume.getCardCountChange());
-			bindRecord.setValidDay(bindRecord.getValidDay() + consume.getCardDayChange());
-			bindRecord.setReceivedMoney(bindRecord.getReceivedMoney().subtract(consume.getMoneyCost()));
-			bindMapper.update(bindRecord, new QueryWrapper<TMemberBindRecord>()
-					.eq("card_id", consume.getCardId()).eq("member_id", consume.getMemberId()));
+		if(classList != null) {
+			for (TClassRecord classed : classList) {
+				TConsumeRecord consume = new TConsumeRecord();
+				
+				consume.setMemberId(classed.getMemberId());
+				//查出卡号
+				Long cardId = cardMapper.selectOne(new QueryWrapper<TMemberCard>()
+						.eq("name", classed.getCardName())).getId();
+				consume.setCardId(cardId);
+				//查询出某课程单词课需花费的次数
+				TScheduleRecord scheduleRecord = scheduleMapper.selectById(classed.getScheduleId());
+				TCourse course = courseMapper.selectById(scheduleRecord.getCourseId());
+				consume.setCardCountChange(course.getTimesCost());
+				
+				//为系统自动处理时，天数不进行消耗处理
+				consume.setCardDayChange(0);
+				
+				consume.setOperateType("上课支出");
+				consume.setOperator("系统自动处理");
+				//查出会员卡的次数单价，取值四舍五入
+				TMemberCard card = cardMapper.selectById(consume.getCardId());
+				BigDecimal price = new BigDecimal(card.getPrice().toString());
+				BigDecimal count = new BigDecimal(card.getTotalCount().toString());
+				BigDecimal unitPrice = price.divide(count, 2, RoundingMode.HALF_UP);
+				//消费的次数
+				BigDecimal countCost = new BigDecimal(course.getTimesCost().toString());
+				consume.setMoneyCost(unitPrice.multiply(countCost));
+				//录入一条消费记录
+				consumeMapper.insert(consume);
+				//消费操作
+				TMemberBindRecord bindRecord = bindMapper.selectOne(new QueryWrapper<TMemberBindRecord>()
+						.eq("card_id", consume.getCardId()).eq("member_id", consume.getMemberId()));
+				bindRecord.setValidCount(bindRecord.getValidCount() + consume.getCardCountChange());
+				bindRecord.setValidDay(bindRecord.getValidDay() + consume.getCardDayChange());
+				bindRecord.setReceivedMoney(bindRecord.getReceivedMoney().subtract(consume.getMoneyCost()));
+				bindMapper.update(bindRecord, new QueryWrapper<TMemberBindRecord>()
+						.eq("card_id", consume.getCardId()).eq("member_id", consume.getMemberId()));
+			}
 		}
 		
 		/* 以下是查询 */
 		
 		List<TConsumeRecord> consumeList = consumeMapper.selectList(new QueryWrapper<TConsumeRecord>()
 				.eq("member_id", id));
+		if(consumeList == null || consumeList.size() < 1) {
+			log.debug("--------此会员没有任何消费记录");
+			return null;
+		}
+		
 		List<Long> idList = new ArrayList<>();
 		for(int i = 0; i < consumeList.size(); i++) {
 			idList.add(consumeList.get(i).getCardId());

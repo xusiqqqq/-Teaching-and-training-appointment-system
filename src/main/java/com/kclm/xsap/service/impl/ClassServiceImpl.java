@@ -127,4 +127,15 @@ public class ClassServiceImpl implements ClassService{
 		return true;
 	}
 
+	@Override
+	public boolean deleteOne(Long classId) {
+		TClassRecord classed = classMapper.selectById(classId);
+		if(classed == null) {
+			System.out.println("------没有此条上课记录");
+			return false;
+		}
+		classMapper.deleteById(classId);
+		return false;
+	}
+
 }

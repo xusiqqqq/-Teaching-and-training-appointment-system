@@ -187,6 +187,8 @@
                                             <th>消费次数</th>
                                             <th>消费金额</th>
                                             <th>操作时间</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -450,11 +452,10 @@
                 {"data": "source"},
                 {"data": "note"},
                 {"data": null,"render": function (data,type,row) {
-                        var html = "<button  class='btn btn-warning btn-xs cancel_btn'>取消预约</button>&nbsp &nbsp";
-                        html += "<button  class='btn btn-danger btn-xs' data-toggle='modal' data-target='#details_deduction'>上课扣费</button>";
+                        var html = "<button  class='btn btn-warning cancel_btn'>取消预约</button>&nbsp &nbsp";
                         return html;
-                    }},
-
+                    }
+                }
             ],
             "bSort": false,
             "searching": true,
@@ -507,7 +508,24 @@
                 {"data": "age"},
                 {"data": "useTimes"},
                 {"data": "amountMoney"},
-                {"data": "operateTime"}
+                {"data": "operateTime"},
+                {"data": "status", "render": function (data, type, row) {
+                        //此处要使用 row 来获取当前被渲染的行的数据
+                        if(row.status == '未确认') {
+                            return "<span class='label label-warning'>"+row.status+"</span>"
+                        } else  {
+                            return "<span class='label label-success'>"+row.status+"</span>";
+                        }
+                    }},
+                {"data": null, "render": function (data, type, row) {
+                        //此处进行判断后，再决定是否要激按钮
+                        if(data.status == '未确认') {
+                            return "<button  class='btn btn-primary btn-xs' data-toggle='modal' data-target='#details_deduction'>确认扣费</button>";
+                        } else {
+                            return "<button  class='btn btn-default btn-xs' disabled>确认扣费</button>";
+                        }
+                    }
+                }
             ],
             "autoWidth": false,  //禁用自动宽度
             "bSort": false,

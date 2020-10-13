@@ -48,6 +48,13 @@ public class ReserveServiceImpl implements ReserveService{
 	@Autowired
 	TClassRecordMapper classMapper;
 	
+	//查询一条预约记录
+	@Override
+	public TReservationRecord findOne(Long reserveId) {
+		TReservationRecord reservationRecord = reserveMapper.selectById(reserveId);
+		return reservationRecord;
+	}
+	
 	//新增预约记录
 	@Override
 	public boolean save(TReservationRecord reserve) {
@@ -58,7 +65,7 @@ public class ReserveServiceImpl implements ReserveService{
 		TReservationRecord checkResult = reserveMapper.selectOne(new QueryWrapper<TReservationRecord>()
 				.allEq(params));
 		if(checkResult.getStatus() == 1) {
-			System.out.println("已经用会员卡预约过当前课程，无法再次预约！");
+			System.out.println("已经用过会员卡预约过当前课程，无法再次预约！");
 			return false;
 		}
 		TScheduleRecord schedule = scheduleMapper.selectById(reserve.getScheduleId());
@@ -81,8 +88,22 @@ public class ReserveServiceImpl implements ReserveService{
 	//更新预约记录
 	@Override
 	public boolean update(TReservationRecord reserve) {
-		//预约人数判断
 		TScheduleRecord schedule = scheduleMapper.selectById(reserve.getScheduleId());
+		//统计预约取消次数
+		TReservationRecord cancelled = reserveMapper.selectOne(new QueryWrapper<TReservationRecord>()
+				.eq("status", 0).eq("id", reserve.getId()));
+		if(cancelled != null) {
+			reserve.setCancelTimes(reserve.getCancelTimes() + 1);
+			System.out.println("-------预约取消次数："+reserve.getCancelTimes());
+			reserveMapper.updateById(reserve);
+		}
+		//判断当卡用户对当前课程预约的次数
+		Integer limitCounts = courseMapper.selectById(schedule.getCourseId()).getLimitCounts();
+		if(reserve.getCancelTimes() >= limitCounts) {
+			System.out.println("当前课程预约次数已满，不可再进行预约");
+			return false;
+		}
+		//预约人数判断
 		Integer contains = courseMapper.selectById(schedule.getCourseId()).getContains();
 		Integer totalNums = schedule.getOrderNums() + reserve.getReserveNums();
 		if(totalNums >= contains ) {
@@ -108,6 +129,7 @@ public class ReserveServiceImpl implements ReserveService{
 		//1、获取到排课信息
 		TScheduleRecord schedule = scheduleMapper.selectById(scheduleId);
 		if(schedule == null) {
+			System.out.println("--------此排课信息不存在");
 			return null;
 		}
 		//2、根据排课计划id获取到对应的课程信息
@@ -116,16 +138,14 @@ public class ReserveServiceImpl implements ReserveService{
 		List<TReservationRecord> reserveList = reserveMapper.selectList(
 				new QueryWrapper<TReservationRecord>().eq("schedule_id", scheduleId).eq("status", 1));
 		
-		if(reserveList == null || reserveList.size() < 1) {
-			return null;
-		}
-		
 		//4、根据预约记录获取会员信息
-		List<Long> idList = new ArrayList<>();
-		for (int i = 0; i < reserveList.size(); i++) {
-			 idList.add(reserveList.get(i).getMemberId());
+		List<TMember> memberList = new ArrayList<TMember>();
+		if(reserveList != null) {
+			for (int i = 0; i < reserveList.size(); i++) {
+				TMember member = memberMapper.selectById(reserveList.get(i).getMemberId());
+				memberList.add(member);
+			}
 		}
-		List<TMember> memberList = memberMapper.selectBatchIds(idList);
 		
 		//5、组合成DTO数据信息
 		//sql结果对应关系
@@ -175,11 +195,11 @@ public class ReserveServiceImpl implements ReserveService{
 		}
 		
 		//4、根据预约记录获取会员信息
-		List<Long> idList = new ArrayList<>();
+		List<TMember> memberList = new ArrayList<TMember>();
 		for (int i = 0; i < reserveList.size(); i++) {
-			 idList.add(reserveList.get(i).getMemberId());
+			TMember member = memberMapper.selectById(reserveList.get(i).getMemberId());
+			memberList.add(member);
 		}
-		List<TMember> memberList = memberMapper.selectBatchIds(idList);
 		
 		//5、组合成DTO数据信息
 		//sql结果对应关系
@@ -231,6 +251,7 @@ public class ReserveServiceImpl implements ReserveService{
 				.between("create_time", startDateTime, endDateTime));
 		List<ReserveRecordDTO> reserveDtoList = new ArrayList<>();
 		if(reserveList == null) {
+			System.out.println("-------该段时间内，没有任何预约记录");
 			return null;
 		}
 		

@@ -54,6 +54,11 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 
 	@Override
 	public boolean deleteById(Long id) {
+		TScheduleRecord scheduleRecord = scheduleMapper.selectById(id);
+		if(scheduleRecord == null) {
+			System.out.println("-------无此条排课记录");
+			return false;
+		}
 		scheduleMapper.deleteById(id);
 		return true;
 	}
@@ -61,6 +66,10 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 	//获取给定的日期范围内所有的排课记录
 	@Override
 	public List<CourseScheduleDTO> listSchedule(LocalDate startDate, LocalDate endDate) {
+		if(startDate == null || endDate == null) {
+			System.out.println("------输入参数不全");
+			return null;
+		}
 		List<TScheduleRecord> scheduleList = scheduleMapper.selectList(new QueryWrapper<TScheduleRecord>()
 				.between("start_date", startDate, endDate));
 		List<CourseScheduleDTO> courseScheduleDtoList = new ArrayList<>();

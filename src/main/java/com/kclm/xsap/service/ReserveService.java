@@ -20,6 +20,9 @@ public interface ReserveService {
 	
 	boolean update(TReservationRecord reserve);
 	
+	//查询一条预约记录
+	TReservationRecord findOne(Long reserveId);
+	
 	/**
 	 * 获取当前排课的已预约记录
 	 * @param scheduleId 排课记录id

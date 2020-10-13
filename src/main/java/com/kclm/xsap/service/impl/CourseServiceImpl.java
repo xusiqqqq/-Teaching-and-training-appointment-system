@@ -40,6 +40,11 @@ public class CourseServiceImpl implements CourseService{
 
 	@Override
 	public boolean deleteById(Long id) {
+		TCourse course = courseMapper.selectById(id);
+		if(course == null) {
+			System.out.println("----------无此条课程记录");
+			return false;
+		}
 		//删除中间表关联的键
 		courseMapper.deleteBindCard(id);
 		//本表

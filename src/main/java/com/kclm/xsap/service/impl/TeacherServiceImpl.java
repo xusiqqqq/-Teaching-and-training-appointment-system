@@ -42,6 +42,11 @@ public class TeacherServiceImpl implements TeacherService{
 
 	@Override
 	public boolean deleteById(Long id) {
+		TEmployee employee = employeeMapper.selectById(id);
+		if(employee == null) {
+			System.out.println("------无此条教师记录");
+			return false;
+		}
 		employeeMapper.deleteById(id);
 		return true;
 	}
@@ -97,6 +102,11 @@ public class TeacherServiceImpl implements TeacherService{
 		List<TClassRecord> classList = classMapper.selectList(new QueryWrapper<TClassRecord>()
 				.eq("check_status", 1).inSql("schedule_id",
 				"SELECT id FROM t_schedule_record WHERE teacher_id =" + id));
+		
+		if(classList == null || classList.size() < 1) {
+			System.out.println("-------当前教师没有上课记录");
+			return null;
+		}
 		
 		//2、获取排课计划信息
 		List<TScheduleRecord> scheduleList = new ArrayList<TScheduleRecord>();

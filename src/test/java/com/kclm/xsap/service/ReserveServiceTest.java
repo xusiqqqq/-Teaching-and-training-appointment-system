@@ -29,9 +29,8 @@ public class ReserveServiceTest {
 
 	@Test
 	public void update() {
-		TReservationRecord reserve = new TReservationRecord();
-		reserve.setId(1L);
-		reserve.setCardName("卡二·改");
+		TReservationRecord reserve = reserveService.findOne(1L);
+		reserve.setStatus(1);
 		reserveService.update(reserve);
 	}
 
