@@ -184,6 +184,7 @@ public class MemberCardServiceImpl implements MemberCardService{
 		for (TMemberLog log : logList) {
 			//===========dto存储
 			MemberLogDTO logDto = new MemberLogDTO();
+			logDto.setId(log.getId());
 			logDto.setOperateTime(log.getCreateTime());
 			logDto.setOperateType(log.getType());
 			logDto.setValidTimes(validTimes);

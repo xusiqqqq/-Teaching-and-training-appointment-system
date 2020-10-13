@@ -121,6 +121,9 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 		//获取当前课程对应的预约记录
 		List<ReserveRecordDTO> reserveDtoList = reserveService.listReserveRecords(scheduleId);
 		System.out.println("-------reserveDTO: "+reserveDtoList);
+		//获取当前课程对应的  已预约记录
+		List<ReserveRecordDTO> reservedList = reserveService.listReserved(scheduleId);
+		System.out.println("-------reservedDTO: "+reservedList);
 //		if(reserveDtoList == null || reserveDtoList.size() < 1) {
 //			return null;
 //		}
@@ -146,6 +149,8 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 			TMember member = memberMapper.selectById(classed.getMemberId());
 			//====== dto值存储
 			ClassRecordDTO classRecordDTO = new ClassRecordDTO();
+			//上课记录id
+			classRecordDTO.setClassRecordId(classed.getId());
 			//	会员信息
 			classRecordDTO.setMember(member);
 			//	会员卡名
@@ -163,6 +168,8 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 		}
 		//======dto值存储
 		CourseScheduleDTO scheduleDto = new CourseScheduleDTO();
+		//排课记录id
+		scheduleDto.setScheduleId(scheduleId);
 		//	课程名
 		scheduleDto.setCourseName(course.getName());
 		//	上课时间
@@ -183,6 +190,8 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 		scheduleDto.setTeacherName(teacherName);
 		//	上课人数
 		scheduleDto.setClassNumbers(schedule.getOrderNums());
+		//已预约记录
+		scheduleDto.setReservedList(reservedList);
 		//	预约记录
 		scheduleDto.setReserveRecord(reserveDtoList);
 		//	上课数据

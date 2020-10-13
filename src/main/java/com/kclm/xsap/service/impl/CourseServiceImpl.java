@@ -72,6 +72,7 @@ public class CourseServiceImpl implements CourseService{
 		CourseDTO courseDTO = new CourseDTO();
 		for (TCourse course : courseList) {
 			//======DTO存储
+			courseDTO.setId(course.getId());
 			courseDTO.setName(course.getName());
 			courseDTO.setDuration(course.getDuration());
 			courseDTO.setContains(course.getContains());

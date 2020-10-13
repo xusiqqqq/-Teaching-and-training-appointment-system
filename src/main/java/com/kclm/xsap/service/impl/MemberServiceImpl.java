@@ -168,6 +168,7 @@ public class MemberServiceImpl implements MemberService{
 		//组合DTO
 		//MemberDTO memberDto = MemberConvert.INSTANCE.entity2Dto(member);
 		MemberDTO memberDto = new MemberDTO();
+		memberDto.setId(id);
 		memberDto.setName(member.getName());
 		memberDto.setGender(member.getSex());
 		memberDto.setPhone(member.getPhone());
@@ -207,6 +208,7 @@ public class MemberServiceImpl implements MemberService{
 			
 			//组成一条会员卡信息DTO
 			MemberCardDTO cardDto = new MemberCardDTO();
+			cardDto.setMemberCardId(memberCard.getId());
 			cardDto.setName(memberCard.getName());
 			cardDto.setType(memberCard.getType());
 			cardDto.setTotalCount(validTimes);
@@ -254,6 +256,7 @@ public class MemberServiceImpl implements MemberService{
 			String teacherName = employeeMapper.selectById(schedule.getTeacherId()).getName();
 			//=======DTO存储
 			ClassRecordDTO classRecordDTO = new ClassRecordDTO();
+			classRecordDTO.setClassRecordId(classed.getId());
 			classRecordDTO.setCourseName(course.getName());
 			classRecordDTO.setClassTime(LocalDateTime.of(schedule.getStartDate(), schedule.getClassTime()));
 			classRecordDTO.setTeacherName(teacherName);
@@ -304,6 +307,7 @@ public class MemberServiceImpl implements MemberService{
 			course = courseList.get(i);			
 			//========DTO存储
 			ReserveRecordDTO reserveDto = new ReserveRecordDTO();
+			reserveDto.setReserveId(reserve.getId());
 			reserveDto.setCourseName(course.getName());
 			reserveDto.setReserveTime(reserve.getCreateTime());
 			reserveDto.setCardName(reserve.getCardName());
@@ -391,6 +395,7 @@ public class MemberServiceImpl implements MemberService{
 			 Integer timesRemainder = bindRecord.getValidCount();
 			 //==========DTO存储
 			 ConsumeRecordDTO consumeDto = new ConsumeRecordDTO();
+			 consumeDto.setConsumeId(consumeRecord.getId());
 			 consumeDto.setCardName(memberCard.getName());
 			 consumeDto.setOperateTime(consumeRecord.getCreateTime());
 			 consumeDto.setCardCountChange(consumeRecord.getCardCountChange());

@@ -140,6 +140,7 @@ public class ReserveServiceImpl implements ReserveService{
 			member = memberList.get(i);
 			//========DTO存储
 			ReserveRecordDTO reserveRecordDTO = new ReserveRecordDTO();
+			reserveRecordDTO.setReserveId(reserve.getId());
 			reserveRecordDTO.setMemberName(member.getName());
 			reserveRecordDTO.setPhone(member.getPhone());
 			reserveRecordDTO.setCardName(reserve.getCardName());
@@ -193,6 +194,7 @@ public class ReserveServiceImpl implements ReserveService{
 			member = memberList.get(i);
 			//========DTO存储
 			ReserveRecordDTO reserveRecordDTO = new ReserveRecordDTO();
+			reserveRecordDTO.setReserveId(reserve.getId());
 			reserveRecordDTO.setMemberName(member.getName());
 			reserveRecordDTO.setPhone(member.getPhone());
 			reserveRecordDTO.setCardName(reserve.getCardName());

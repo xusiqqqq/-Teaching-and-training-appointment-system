@@ -21,10 +21,7 @@ public class ClassServiceTest {
 	//更新上课记录
 	@Test
 	public void update() {
-		TClassRecord classed = new TClassRecord();
-		classed.setId(2L);
-		classed.setComment("--及格");
-		classService.update(classed);
+		classService.update(3L,1);
 	}
 	
 	//更新所有“未确认”上课记录

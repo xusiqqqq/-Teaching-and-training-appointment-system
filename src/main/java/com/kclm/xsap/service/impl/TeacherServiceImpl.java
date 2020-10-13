@@ -125,6 +125,7 @@ public class TeacherServiceImpl implements TeacherService{
 			course = courseList.get(i);
 			//======DTO存储
 			ClassRecordDTO classRecordDTO = new ClassRecordDTO();
+			classRecordDTO.setClassRecordId(classed.getId());
 			classRecordDTO.setCourseName(course.getName());
 			classRecordDTO.setClassTime(LocalDateTime.of(schedule.getStartDate(), schedule.getClassTime()));
 			classRecordDTO.setCardName(classed.getCardName());

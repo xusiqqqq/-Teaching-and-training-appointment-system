@@ -68,6 +68,11 @@ public class CourseScheduleDTO {
 	private Integer classNumbers;
 	
 	/**
+	 * 	已预约记录
+	 */
+	private  List<ReserveRecordDTO> reservedList;
+	
+	/**
 	 * 预约记录
 	 */
 	private List<ReserveRecordDTO> reserveRecord;
