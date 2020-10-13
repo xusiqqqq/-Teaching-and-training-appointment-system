@@ -29,6 +29,7 @@ import com.kclm.xsap.entity.TCourse;
 import com.kclm.xsap.entity.TMember;
 import com.kclm.xsap.entity.TMemberBindRecord;
 import com.kclm.xsap.entity.TMemberCard;
+import com.kclm.xsap.entity.TMemberLog;
 import com.kclm.xsap.entity.TReservationRecord;
 import com.kclm.xsap.entity.TScheduleRecord;
 import com.kclm.xsap.mapper.TClassRecordMapper;
@@ -37,6 +38,7 @@ import com.kclm.xsap.mapper.TCourseMapper;
 import com.kclm.xsap.mapper.TEmployeeMapper;
 import com.kclm.xsap.mapper.TMemberBindRecordMapper;
 import com.kclm.xsap.mapper.TMemberCardMapper;
+import com.kclm.xsap.mapper.TMemberLogMapper;
 import com.kclm.xsap.mapper.TMemberMapper;
 import com.kclm.xsap.mapper.TReservationRecordMapper;
 import com.kclm.xsap.mapper.TScheduleRecordMapper;
@@ -88,6 +90,9 @@ public class MemberServiceImpl implements MemberService{
 	@Autowired
 	private TEmployeeMapper employeeMapper;
 	
+	@Autowired
+	private TMemberLogMapper logMapper;
+	
 	@Override
 	public boolean save(TMember member) {
 		memberMapper.insert(member);
@@ -128,8 +133,21 @@ public class MemberServiceImpl implements MemberService{
 
 	@Override
 	public boolean bindCard(TMemberBindRecord cardBind) {
+		TMemberBindRecord bindRecord = bindMapper.selectOne(new QueryWrapper<TMemberBindRecord>()
+				.eq("member_id", cardBind.getMemberId()).eq("card_id", cardBind.getCardId()));
+		if(bindRecord != null) {
+			System.out.println("绑卡无效！ 已绑定过此卡");
+			return false;
+		}
 		bindMapper.insert(cardBind);
-		return false;
+		//操作记录
+		TMemberLog log = new TMemberLog();
+		log.setMemberId(cardBind.getMemberId());
+		log.setCardId(cardBind.getCardId());
+		log.setType("绑卡操作");
+		log.setInvolveMoney(cardBind.getReceivedMoney());
+		logMapper.insert(log );
+		return true;
 	}
 
 	/* 待处理  - begin*/
