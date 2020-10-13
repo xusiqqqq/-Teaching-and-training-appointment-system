@@ -18,8 +18,7 @@ import lombok.experimental.Accessors;
  *
  */
 @Data
-@EqualsAndHashCode
-@Accessors(chain = true)
+@EqualsAndHashCode(callSuper = false)
 public class ClassRecordDTO{
 
 	/****
@@ -90,5 +89,10 @@ public class ClassRecordDTO{
 	 * 上课状态检定。1，已上课；0，未上课
 	 */
 	private Integer checkStatus;
+	
+	/**
+	 * 	操作记录
+	 */
+	private LocalDateTime operateTime;
 	
 }

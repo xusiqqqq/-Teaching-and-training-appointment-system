@@ -67,7 +67,7 @@ public class TeacherServiceTest {
 	//---------涉及到convert
 	@Test
 	public void listClassRecord() {
-		List<ClassRecordDTO> list = teacherService.listClassRecord(1L);
+		List<ClassRecordDTO> list = teacherService.listClassRecord(2L);
 		for (ClassRecordDTO classed : list) {
 			System.out.println("-------");
 			System.out.println(classed);

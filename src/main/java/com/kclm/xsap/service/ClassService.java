@@ -13,10 +13,29 @@ import com.kclm.xsap.entity.TClassRecord;
 public interface ClassService {
 
 	/**
-	 * 	根据预约的情况，进行上课记录的录入
+	 * 	根据预约id，进行上课记录的单个录入
+	 * @param reserveId	预约id
+	 * @return
 	 */
-	boolean save();
+	boolean saveByReserveId(Long reserveId);
 	
-	boolean update(TClassRecord classed);
+	/**
+	 * 	针对“已预约”，进行全部录入
+	 * @return
+	 */
+	boolean saveAll();
+	
+	/**
+	 * 
+	 * @param classId	上课记录id
+	 * @param status	上课记录确认状态
+	 * @return
+	 */
+	boolean update(Long classId,Integer status);
+	
+	boolean updateAll();
+	
+	//删除单个上课记录
+	boolean deleteOne(Long classId);
 	
 }
