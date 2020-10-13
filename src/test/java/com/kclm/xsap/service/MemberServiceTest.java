@@ -62,8 +62,8 @@ public class MemberServiceTest {
 	@Test
 	public void bindCard() {
 		TMemberBindRecord cardBind = new TMemberBindRecord();
-		cardBind.setMemberId(1L);
-		cardBind.setCardId(3L);
+		cardBind.setMemberId(2L);
+		cardBind.setCardId(4L);
 		cardBind.setValidCount(30);
 		cardBind.setValidDay(30);
 		cardBind.setReceivedMoney(BigDecimal.valueOf(380.85));

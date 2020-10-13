@@ -41,16 +41,13 @@ CREATE TABLE `t_class_record` (
 /*Data for the table `t_class_record` */
 
 insert  into `t_class_record`(`id`,`member_id`,`card_name`,`schedule_id`,`note`,`comment`,`check_status`,`create_time`,`last_modify_time`,`version`) values 
-(1,1,'12课时1对1',1,'下午上课','优秀',0,'2020-10-01 14:36:44',NULL,1),
-(2,1,'12课时1对1',2,'晚上上课','及格',1,'2020-10-09 16:06:36',NULL,2),
-(3,2,'24课时1对1',1,NULL,'优秀',0,'2020-10-02 14:36:57',NULL,1),
-(4,2,'36课时1对1',3,'早上上课','状态不佳',1,'2020-10-01 14:37:03',NULL,1),
-(5,3,'64课时1对4',4,'周末补课','优秀',0,'2020-10-04 14:37:07',NULL,1),
-(6,3,'48课时1对12',5,'额外赠课',NULL,1,'2020-09-07 14:37:19',NULL,1),
-(7,2,'12课时1对1',1,'下午上课','优秀',1,'2020-10-03 14:37:13',NULL,1),
-(8,1,NULL,1,NULL,NULL,0,'2020-10-09 14:42:11',NULL,1),
-(9,1,NULL,2,NULL,NULL,0,'2020-10-09 14:42:11',NULL,1),
-(10,2,NULL,3,NULL,NULL,0,'2020-10-09 14:42:11',NULL,1);
+(1,1,'12课时1对1',1,'下午上课','优秀',1,'2020-10-01 14:36:44',NULL,2),
+(2,1,'12课时1对1',2,'晚上上课','及格',1,'2020-10-09 16:06:36',NULL,3),
+(3,1,'24课时1对1',3,'下午上课','优秀',1,'2020-10-01 14:36:44',NULL,4),
+(4,2,'12课时1对1',1,'下午上课','优秀',1,'2020-10-01 14:36:44',NULL,3),
+(5,2,'36课时1对1',2,'下午上课','优秀',1,'2020-10-01 14:36:44',NULL,2),
+(6,3,'12课时1对1',4,'下午上课','优秀',1,'2020-10-01 14:36:44',NULL,3),
+(7,1,'24课时1对1',5,'下午上课','优秀',1,'2020-10-01 14:36:44',NULL,2);
 
 /*Table structure for table `t_consume_record` */
 
@@ -74,20 +71,13 @@ CREATE TABLE `t_consume_record` (
   KEY `fk_consume_member_id` (`member_id`),
   CONSTRAINT `fk_consume_card_id` FOREIGN KEY (`card_id`) REFERENCES `t_member_bind_record` (`card_id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `fk_consume_member_id` FOREIGN KEY (`member_id`) REFERENCES `t_member_bind_record` (`member_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 COMMENT='消费记录';
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 COMMENT='消费记录';
 
 /*Data for the table `t_consume_record` */
 
 insert  into `t_consume_record`(`id`,`operate_type`,`card_count_change`,`card_day_change`,`money_cost`,`operator`,`note`,`member_id`,`card_id`,`create_time`,`last_modify_time`,`version`) values 
-(1,'首次绑卡',10,2,NULL,'企鹅',NULL,1,1,NULL,NULL,1),
-(2,'扣款',5,3,NULL,'海鸥',NULL,1,3,NULL,NULL,1),
-(3,'扣款',3,3,NULL,'海豚',NULL,2,1,NULL,NULL,1),
-(4,'扣款',4,4,NULL,'海豚',NULL,3,2,NULL,NULL,1),
-(5,'扣款',5,5,NULL,'海鸥',NULL,NULL,NULL,NULL,NULL,1),
-(6,'扣款',6,6,NULL,'企鹅',NULL,NULL,NULL,NULL,NULL,1),
-(7,'扣款',7,7,NULL,'海鸥',NULL,NULL,NULL,NULL,NULL,1),
-(8,'扣款',8,8,NULL,'企鹅',NULL,NULL,NULL,NULL,NULL,1),
-(9,'扣款',9,9,NULL,'企鹅',NULL,NULL,NULL,NULL,NULL,1);
+(12,'上课支出',3,0,72.00,'系统自动处理',NULL,1,1,'2020-10-12 23:23:55',NULL,1),
+(13,'扣款',3,6,72.00,'熊',NULL,2,1,'2020-10-13 00:50:36',NULL,1);
 
 /*Table structure for table `t_course` */
 
@@ -113,7 +103,7 @@ CREATE TABLE `t_course` (
 /*Data for the table `t_course` */
 
 insert  into `t_course`(`id`,`name`,`duration`,`contains`,`color`,`introduce`,`times_cost`,`limit_sex`,`limit_age`,`limit_counts`,`create_time`,`last_modify_time`,`version`) values 
-(1,'历史',30,9,'blue','数学课',1,'男',6,1,'2020-09-09 09:47:42',NULL,2),
+(1,'历史',30,50,'blue','数学课',1,'男',6,2,'2020-09-09 09:47:42',NULL,2),
 (2,'ds',30,9,'red','地理课',2,'女',7,1,NULL,NULL,1),
 (3,'英语',34,4,'green','英语课',3,'男',8,1,NULL,NULL,1),
 (4,'数学',45,6,'blue','数学课',1,'男',6,1,'2020-09-11 10:51:11',NULL,1),
@@ -259,22 +249,17 @@ CREATE TABLE `t_member_bind_record` (
   KEY `fk_bind_card_id` (`card_id`),
   CONSTRAINT `fk_bind_card_id` FOREIGN KEY (`card_id`) REFERENCES `t_member_card` (`id`),
   CONSTRAINT `fk_bind_member_id` FOREIGN KEY (`member_id`) REFERENCES `t_member` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 COMMENT='中间表：会员绑定记录';
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8 COMMENT='中间表：会员绑定记录';
 
 /*Data for the table `t_member_bind_record` */
 
 insert  into `t_member_bind_record`(`id`,`member_id`,`card_id`,`valid_count`,`valid_day`,`received_money`,`pay_mode`,`note`,`create_time`,`last_modify_time`,`version`) values 
-(1,1,1,38,43,120.90,NULL,'绑定1',NULL,NULL,2),
-(2,1,3,5,5,400.00,NULL,'绑定2',NULL,NULL,1),
-(3,2,1,65,6,300.00,NULL,'绑定3',NULL,NULL,1),
-(4,3,2,55,55,329.00,NULL,'绑定4',NULL,NULL,1),
-(5,NULL,NULL,5,5,55.00,NULL,'bind-5',NULL,NULL,1),
-(7,NULL,NULL,7,7,77.00,NULL,'bind-7',NULL,NULL,1),
-(8,NULL,NULL,8,8,88.00,NULL,'bind-8',NULL,NULL,1),
-(9,NULL,NULL,9,9,99.00,NULL,'绑定9',NULL,NULL,1),
-(10,NULL,NULL,10,10,100.00,NULL,'绑定10',NULL,NULL,1),
-(11,NULL,NULL,11,11,111.00,NULL,'绑定11',NULL,NULL,1),
-(12,NULL,NULL,2,2,22.20,NULL,'绑定++','2020-09-11 17:22:24',NULL,1);
+(1,1,1,46,53,120.90,NULL,'绑定1','2020-10-01 21:15:55',NULL,4),
+(2,1,3,5,5,400.00,NULL,'绑定2','2020-10-02 21:16:00',NULL,1),
+(3,2,1,68,12,300.00,NULL,'绑定3','2020-09-11 21:16:18',NULL,2),
+(4,3,2,55,55,329.00,NULL,'绑定4','2020-09-18 21:16:12',NULL,1),
+(5,1,4,5,5,55.00,NULL,'bind-5','2020-09-03 21:16:25',NULL,1),
+(14,2,4,30,30,380.85,'线下支付',NULL,'2020-10-13 13:28:40',NULL,1);
 
 /*Table structure for table `t_member_card` */
 
@@ -294,7 +279,7 @@ CREATE TABLE `t_member_card` (
   `last_modify_time` datetime DEFAULT NULL COMMENT '修改时间',
   `version` int(10) unsigned DEFAULT '1' COMMENT '版本',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 COMMENT='会员卡表';
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COMMENT='会员卡表';
 
 /*Data for the table `t_member_card` */
 
@@ -302,12 +287,12 @@ insert  into `t_member_card`(`id`,`name`,`price`,`description`,`note`,`type`,`to
 (1,'12课时1对1',240.00,'网课','卡1','无限次',10,2,1,NULL,NULL,1),
 (2,'6人小班',100.00,'30课时','卡2','100次',14,4,0,NULL,NULL,1),
 (3,'15人大班',99.00,'32课时','卡3','99次',32,4,1,NULL,NULL,1),
-(4,'12人',333.33,'18课时','note-4','无限次',NULL,NULL,0,NULL,NULL,1),
-(5,'12人',333.33,'18课时','note-4','无限次',NULL,NULL,0,NULL,NULL,1),
-(6,'12人',333.33,'18课时','note-6','无限次',NULL,NULL,0,NULL,NULL,1),
-(7,'12人',333.33,'18课时','note-7','无限次',NULL,NULL,0,NULL,NULL,1),
-(8,'12人',333.33,'18课时','note-8','无限次',NULL,NULL,0,NULL,NULL,1),
-(9,'12人',333.33,'18课时','note-9','无限次',NULL,NULL,0,NULL,NULL,1);
+(4,'24课时1对1',333.33,'18课时','note-4','无限次',12,12,0,NULL,NULL,1),
+(5,'36课时1对1',333.33,'18课时','note-4','无限次',14,14,0,NULL,NULL,1),
+(6,'48课时1对12',333.33,'18课时','note-6','无限次',14,14,0,NULL,NULL,1),
+(7,'64课时1对4',333.33,'18课时','note-7','无限次',12,14,0,NULL,NULL,1),
+(8,'36课时1对8',333.33,'18课时','note-8','无限次',12,14,0,NULL,NULL,1),
+(9,'12人',333.33,'18课时','note-9','无限次',12,14,0,NULL,NULL,1);
 
 /*Table structure for table `t_member_log` */
 
@@ -328,21 +313,14 @@ CREATE TABLE `t_member_log` (
   KEY `fk_log_card_id` (`card_id`),
   CONSTRAINT `fk_log_card_id` FOREIGN KEY (`card_id`) REFERENCES `t_member_bind_record` (`card_id`),
   CONSTRAINT `fk_log_member_id` FOREIGN KEY (`member_id`) REFERENCES `t_member_bind_record` (`member_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 COMMENT='操作记录';
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8 COMMENT='操作记录';
 
 /*Data for the table `t_member_log` */
 
 insert  into `t_member_log`(`id`,`type`,`involve_money`,`operator`,`member_id`,`card_id`,`create_time`,`last_modify_time`,`version`) values 
-(1,'充值',NULL,'企鹅',1,1,NULL,NULL,1),
-(2,'充值',NULL,'企鹅',1,3,NULL,NULL,1),
-(3,'充值',NULL,'海豚',2,1,NULL,NULL,1),
-(4,'扣费',NULL,'企鹅',3,NULL,NULL,NULL,1),
-(5,'扣费',NULL,'海鸥',NULL,NULL,NULL,NULL,1),
-(6,'扣费',NULL,'海鸥',NULL,NULL,NULL,NULL,1),
-(7,'扣费',NULL,'海鸥',NULL,NULL,NULL,NULL,1),
-(8,'扣费',NULL,'海鸥',NULL,NULL,NULL,NULL,1),
-(9,'充值',NULL,'海豚',NULL,NULL,NULL,NULL,1),
-(11,'充值',120.90,'蚂蚁',1,1,'2020-10-10 14:11:38',NULL,1);
+(12,'消费',72.00,'熊',2,1,'2020-10-13 00:50:41',NULL,1),
+(13,'充值',120.90,'蚂蚁',1,1,'2020-10-13 00:54:02',NULL,1),
+(14,'绑卡操作',380.85,'系统处理',2,4,'2020-10-13 13:28:43',NULL,1);
 
 /*Table structure for table `t_recharge_record` */
 
@@ -366,21 +344,12 @@ CREATE TABLE `t_recharge_record` (
   KEY `fk_charge_card_id` (`card_id`),
   CONSTRAINT `fk_charge_card_id` FOREIGN KEY (`card_id`) REFERENCES `t_member_bind_record` (`card_id`),
   CONSTRAINT `fk_charge_member_id` FOREIGN KEY (`member_id`) REFERENCES `t_member_bind_record` (`member_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 COMMENT='充值记录';
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 COMMENT='充值记录';
 
 /*Data for the table `t_recharge_record` */
 
 insert  into `t_recharge_record`(`id`,`add_count`,`add_day`,`received_money`,`pay_mode`,`operator`,`note`,`member_id`,`card_id`,`create_time`,`last_modify_time`,`version`) values 
-(1,3,3,33.00,NULL,NULL,NULL,1,1,NULL,NULL,1),
-(2,2,2,22.00,NULL,NULL,NULL,2,3,NULL,NULL,1),
-(3,1,1,11.00,NULL,NULL,NULL,3,1,NULL,NULL,1),
-(4,4,4,44.00,NULL,NULL,NULL,2,2,NULL,NULL,1),
-(5,5,5,55.00,NULL,NULL,'note-5',NULL,NULL,NULL,NULL,1),
-(6,6,6,66.00,NULL,NULL,'note-6',NULL,NULL,NULL,NULL,1),
-(7,7,7,77.00,NULL,NULL,'note-7',NULL,NULL,NULL,NULL,1),
-(8,8,8,88.00,NULL,NULL,'note-8',NULL,NULL,NULL,NULL,1),
-(9,9,9,99.00,NULL,NULL,'note-9',NULL,NULL,NULL,NULL,1),
-(11,5,10,120.90,'支付宝','蚂蚁',NULL,1,1,'2020-10-10 14:11:34',NULL,1);
+(12,5,10,120.90,'支付宝','蚂蚁',NULL,1,1,'2020-10-13 00:53:58',NULL,1);
 
 /*Table structure for table `t_reservation_record` */
 
@@ -390,6 +359,7 @@ CREATE TABLE `t_reservation_record` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `status` tinyint(1) unsigned DEFAULT '0' COMMENT '预约状态，1有效，0无效',
   `reserve_nums` int(10) unsigned DEFAULT '1' COMMENT '单次操作预约人数',
+  `cancel_times` int(10) unsigned DEFAULT '0' COMMENT '取消次数统计',
   `comment` varchar(255) DEFAULT NULL COMMENT '教师评语',
   `note` varchar(255) DEFAULT NULL,
   `class_note` varchar(255) DEFAULT NULL COMMENT '上课备注',
@@ -409,16 +379,11 @@ CREATE TABLE `t_reservation_record` (
 
 /*Data for the table `t_reservation_record` */
 
-insert  into `t_reservation_record`(`id`,`status`,`reserve_nums`,`comment`,`note`,`class_note`,`operator`,`member_id`,`card_name`,`schedule_id`,`create_time`,`last_modify_time`,`version`) values 
-(1,1,NULL,NULL,NULL,NULL,'海豚',1,'12课时1对1',1,'2020-09-22 03:27:17','2020-10-09 15:05:08',1),
-(2,1,NULL,NULL,NULL,NULL,'企鹅',1,'12课时1对1',2,'2020-09-22 03:27:29','2020-10-07 15:05:14',1),
-(3,1,NULL,NULL,NULL,NULL,'企鹅',2,'12课时1对1',3,'2020-09-22 03:27:33','2020-10-06 15:05:18',1),
-(4,0,NULL,NULL,NULL,NULL,'海豚',3,'12课时1对1',1,'2020-10-03 22:59:52','2020-10-07 15:05:22',1),
-(5,0,NULL,'不错','note-5',NULL,'海鸥',NULL,NULL,NULL,NULL,NULL,1),
-(6,0,NULL,'不错','note-6',NULL,'海鸥',NULL,NULL,NULL,NULL,NULL,1),
-(7,0,NULL,'不错','note-7',NULL,'海鸥',NULL,NULL,NULL,NULL,NULL,1),
-(8,0,NULL,'不错','note-8',NULL,'海鸥',NULL,NULL,NULL,NULL,NULL,1),
-(9,0,NULL,'不错','note-9',NULL,'海鸥',NULL,NULL,NULL,NULL,NULL,1);
+insert  into `t_reservation_record`(`id`,`status`,`reserve_nums`,`cancel_times`,`comment`,`note`,`class_note`,`operator`,`member_id`,`card_name`,`schedule_id`,`create_time`,`last_modify_time`,`version`) values 
+(1,1,1,2,NULL,NULL,NULL,'海豚',1,'12课时1对1',1,'2020-09-22 03:27:17','2020-10-09 15:05:08',6),
+(2,1,1,0,NULL,NULL,NULL,'企鹅',1,'12课时1对1',2,'2020-09-22 03:27:29','2020-10-07 15:05:14',1),
+(3,1,1,0,NULL,NULL,NULL,'企鹅',2,'12课时1对1',3,'2020-09-22 03:27:33','2020-10-06 15:05:18',1),
+(4,0,1,0,NULL,NULL,NULL,'海豚',3,'12课时1对1',1,'2020-10-03 22:59:52','2020-10-07 15:05:22',1);
 
 /*Table structure for table `t_schedule_record` */
 
@@ -446,16 +411,11 @@ CREATE TABLE `t_schedule_record` (
 /*Data for the table `t_schedule_record` */
 
 insert  into `t_schedule_record`(`id`,`course_id`,`teacher_id`,`order_nums`,`start_date`,`class_time`,`limit_sex`,`limit_age`,`create_time`,`last_modify_time`,`version`) values 
-(1,1,1,34,'2020-09-08','09:00:45',NULL,NULL,NULL,NULL,1),
-(2,3,1,28,'2020-09-04','09:00:33',NULL,NULL,NULL,NULL,1),
-(3,2,2,45,'2020-09-08','09:00:44',NULL,NULL,NULL,NULL,1),
-(4,1,2,21,'2020-09-09','14:00:55',NULL,NULL,NULL,NULL,1),
-(5,1,2,7,'2020-09-09','15:30:00',NULL,NULL,NULL,NULL,1),
-(6,NULL,NULL,5,'2020-09-11','14:40:00','男',8,NULL,NULL,1),
-(7,NULL,NULL,3,'2020-09-02','14:30:00','男',7,NULL,NULL,1),
-(8,NULL,NULL,43,'2020-09-12','14:10:00','男',6,NULL,NULL,1),
-(9,NULL,NULL,8,'2020-09-14','11:40:00','女',9,NULL,NULL,1),
-(10,3,3,0,'2020-10-06','17:07:21',NULL,NULL,'2020-10-09 17:07:21',NULL,1);
+(1,1,1,33,'2020-09-08','09:00:45','女',12,'2020-09-17 00:52:44',NULL,4),
+(2,3,1,28,'2020-09-04','09:00:33','男',14,'2020-10-02 00:52:50',NULL,1),
+(3,2,2,45,'2020-09-08','09:00:44','女',12,'2020-10-03 00:52:54',NULL,1),
+(4,1,2,21,'2020-09-09','14:00:55','男',15,'2020-10-04 00:53:00',NULL,1),
+(5,1,2,7,'2020-09-09','15:30:00','男',13,'2020-10-01 00:53:04',NULL,1);
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
