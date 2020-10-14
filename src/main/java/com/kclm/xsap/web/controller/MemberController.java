@@ -21,7 +21,7 @@ public class MemberController {
 	//=》添加会员
 	@RequestMapping("/x_member_add.do")
 	public String x_member_add() {
-		return folderName + "/x_member_add";
+		return folderName + "/x_member_list";
 	}
 	//=》批量导入会员
 	@RequestMapping("/x_member_import.do")

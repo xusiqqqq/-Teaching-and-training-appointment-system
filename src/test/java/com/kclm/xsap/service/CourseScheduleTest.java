@@ -53,4 +53,11 @@ public class CourseScheduleTest {
 		CourseScheduleDTO schedule = scheduleService.findById(1L);
 		System.out.println("排课计划："+schedule);
 	}
+	
+	@Test
+	public void copySchedule() {
+		LocalDate sourceDate = LocalDate.of(2020, 9, 8);
+		LocalDate targetDate = LocalDate.of(2020, 9, 10);
+		scheduleService.copySchedule(sourceDate, targetDate);
+	}
 }

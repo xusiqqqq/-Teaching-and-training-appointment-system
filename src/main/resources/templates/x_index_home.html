@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
 
@@ -175,9 +175,9 @@
                 var myChartPie = echarts.init(document.getElementById('pie'));
 				$(function(){
 					//获取应用名
-					var appName = ""; //[[${#request.getContextPath()}]];
+					var appName = [[${#request.getContextPath()}]] 
 					console.log("appName: " + appName);
-					$.post(appName +"/index/",function(reportData){
+					$.post(appName +"/index/report.do",function(reportData){
 						console.log("报表数据："+ reportData);
 						
 					});
@@ -263,7 +263,7 @@
 		var end_date = $("#endDate").val();
 		$(function(){
 			//获取应用名
-			var appName = ""; //[[${#request.getContextPath()}]];
+			var appName = [[${#request.getContextPath()}]] 
 			console.log("appName: " + appName);
 			//首页统计数据
 			$("#homeSearch").click(function(){

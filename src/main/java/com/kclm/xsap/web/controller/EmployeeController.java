@@ -24,6 +24,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.kclm.xsap.entity.TEmployee;
 import com.kclm.xsap.service.EmployeeService;
 
+import lombok.extern.slf4j.Slf4j;
+
 /******************
  * @Author yejf
  * @Version v1.0
@@ -32,6 +34,7 @@ import com.kclm.xsap.service.EmployeeService;
  */
 @Controller
 @RequestMapping("/user")
+@Slf4j
 public class EmployeeController {
 	
 	private static final String RESOURCE_PATH = "static/img";
@@ -43,52 +46,56 @@ public class EmployeeController {
 	/* ============一些全局设置=========== */
 	
 	//保存用户账号
-	private String global_username = "";
+	private static String global_username = "";
 	
 	/* ============用作页面跳转============ */
 	
-	//登录界面
+	//=》登录界面
 	@RequestMapping("/toLogin")
 	public String welcome() {
 		return "x_login";
 	}
 	
-	//注册界面
+	//=》注册界面
 	@RequestMapping("/toRegister.do")
 	public String toRegister() {
 		return "x_register";
 	}
 	
-	//账户认证页面
+	//=》账户认证页面
 	@RequestMapping("/toEnsureUser.do")
 	public String toEnsureUser() {
 		return "x_ensure_user";
 	}
 		
-	//重置密码页面
+	//=》重置密码页面
 	@RequestMapping("/gotoResetPwdPage.do")
 	public String toRestPwdPage() {
 		return "x_reset_passward";
 	}
 	
-	//个人信息
-	@RequestMapping("/x_profile.do")
-	public String x_profile() {
-		return "x_profile";
-	}
 	
-	//修改密码
+	//=》修改密码
 	@RequestMapping("/x_modify_password.do")
 	public String x_modify_password() {
 		return "x_modify_password";
 	}
 	
-	//首页
+	//=》首页
 	@RequestMapping("/toIndex.do")
 	public String toIndex() {
 		return "index";
 	}
+	
 	/* =============用作页面数据处理=========== */
+	//个人信息
+	@RequestMapping("/x_profile.do")
+	public String x_profile(Model model) {
+		System.out.println("x_profile....");
+		TEmployee employee = employeeService.findByUser(global_username);
+		model.addAttribute("userInfo", employee);
+		return "x_profile";
+	}
 	
 	//登录界面
 	@RequestMapping("/login.do")
@@ -175,16 +182,15 @@ public class EmployeeController {
 	
 	//修改用户信息
 	//在响应数据回浏览器时，指定json类型
-	@RequestMapping(value = "/modifyUser.do",produces = "application/json")
-	@ResponseBody
-	public TEmployee modifyUser(MultipartFile avatar_file,@RequestBody TEmployee emp,HttpSession session,Model model) {
-		System.out.println("=======================");
-		System.out.println("=====avatar: " + avatar_file);
-		System.out.println("------实体数据before：" + emp);
-		System.out.println("------实体数据before版本号：" + emp.getVersion());
+	@RequestMapping(value = "/modifyUser.do")
+	public String modifyUser(@RequestParam("avatar_file") MultipartFile avatar_file,TEmployee emp,HttpSession session,Model model) {
+		log.debug("=======================");
+		log.debug("=====avatar: " + avatar_file);
+		log.debug("------实体数据before：" + emp);
+		log.debug("------实体数据before版本号：" + emp.getVersion());
 		if(!avatar_file.isEmpty()) {
-    		//上传文件
-    		String fileName;
+			//上传文件
+			String fileName;
 			try {
 				fileName = uploadFiles(avatar_file);
 				//设置图片全名
@@ -193,7 +199,7 @@ public class EmployeeController {
 				System.out.println("-----------图片信息有误！-----------");
 				e.printStackTrace();
 			}
-    	}
+		}
 		//保存原值
 		TEmployee oldEmp = employeeService.findByUser(global_username);
 		if(oldEmp != null) {
@@ -206,18 +212,19 @@ public class EmployeeController {
 			TEmployee checkPhone = employeeService.findByUser(emp.getPhone());
 			if(checkPhone != null) {
 				model.addAttribute("CHECK_PHONE_ERROR", true);
+				log.debug("。。。手机号重复！。。。。。。");
 				//返回原值
-				return oldEmp;
+				return "redirect:x_profile.do";
 			}	
 		}
-		System.out.println("!!------实体数据after：" + emp);
-		System.out.println("!!------实体数据after版本号：" + emp.getVersion());
 		TEmployee employee = employeeService.update(emp);
 		if(employee != null)
+			log.debug("!!------实体数据after：" + employee);
+			log.debug("!!------实体数据after版本号：" + employee.getVersion());
 			global_username = employee.getPhone();
 		session.setAttribute("LOGIN_USER", employee);
 		System.out.println("更新后：" +employee);
-		return employee;
+		return "redirect:x_profile.do";
 	}
 	
 	//修改密码
