@@ -37,31 +37,30 @@
     <div class="row animated fadeInRight">
         <div class="col-md-12 white-bg margin-bottom padding">
             <div class="col-md-12">
-            	
+            	<div style="margin-left: 12px">
+            	    <figure class="text-center">
+            	        <div style="position: relative;border: 5px solid lightblue;width: 150px;height:150px;margin: 5px auto;border-radius: 50%;">
+            	            <img name="avatarUrl" src="../static/img/a1.jpg" 
+            				th:src="@{/static/img/{avatar}(avatar=${userInfo.avatarUrl})}"
+            				 alt="" id="avatar_img" style="width: 140px;height: 140px;left:0;top: 0;border-radius: 50%;"/>
+            	            <input type="file" id="avatar_file" name="avatar_file"
+            	                   accept="image/jpg,image/jpeg,image/png,image/gif"
+            	                   style="width: 100%;height:100%;opacity: 0;position: absolute;left:0;top: 0;"/>
+            	        </div>
+            	        <br/>
+            	        <p style="font-size: 20px">点击更换头像</p>
+            	    </figure>
+            	</div>
+				
             <form action="#" th:action="@{/user/modifyUser.do}" name="updateUserForm" method="post" class="form-horizontal" enctype="multipart/form-data">
-            	
-                <div style="margin-left: 12px">
-                    <figure class="text-center">
-                        <div style="position: relative;border: 5px solid lightblue;width: 150px;height:150px;margin: 5px auto;border-radius: 50%;">
-                            <img name="avatarUrl" src="../static/img/a1.jpg" 
-							th:src="@{/static/img/{avatar}(avatar=${userInfo.avatarUrl})}"
-							 alt="" id="avatar_img" style="width: 140px;height: 140px;left:0;top: 0;border-radius: 50%;"/>
-                            <input type="file" id="avatar_file" name="avatar_file"
-                                   accept="image/jpg,image/jpeg,image/png,image/gif"
-                                   style="width: 100%;height:100%;opacity: 0;position: absolute;left:0;top: 0;"/>
-                        </div>
-                        <br/>
-                        <p style="font-size: 20px">点击更换头像</p>
-                    </figure>
-                </div>
                 <div class="modal-dialog">
                     <div>
                         <!--体部定义-->
                         <div class="modal-body">
                             <!-- 表单定义 -->
-                            		<center>                            			
-                        	<span th:if="${CHECK_PHONE_ERROR}" class="text-danger">手机号已存在，请重新输入！</span>
-                            		</center>
+                            <center>
+								<span th:if="${CHECK_PHONE_ERROR}" class="text-danger">手机号跟其它用户撞名了</span>
+                            </center>
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">用户名</label>
                                     <div class="col-sm-8">
@@ -135,72 +134,42 @@
     // 头像预览
     $("#avatar_file").change(function () {
         // 获取上传文件对象
+       console.log($(this));
         var file = $(this)[0].files[0];
-        // 读取文件URL
-        var reader = new FileReader();
-        reader.readAsDataURL(file);
-        // 阅读文件完成后触发的事件
-        reader.onload = function () {
-            // 读取的URL结果：this.result
-            $("#avatar_img").attr("src", this.result);
-            
-            
-        }
+		console.log(file);
+		console.log("更新之前的图片信息："+"[[${userInfo.avatarUrl}]]");
+		//获取应用名
+       // var appName = [[${#request.getContextPath()}]];
+		//console.log("appName: "+appName);
+		//
+		var formData = new FormData();
+		formData.append('avatarFile',file); 
+		console.log(formData);
+		
+		$.ajax({
+			url: "/xsap/user/modifyUserImg.do",
+			method: "post",
+			data:formData,
+			dataType:"json",	//接收服务器传输的数据格式
+			contentType:false,	//必需使用 false,  这样才能使用form表单采用 multipart/form-data 传输
+			processData: false,
+			success:function(userData){
+				console.log(userData);
+				if(userData != null){
+					// 读取的URL结果：this.result	@{/static/img/{avatar}(avatar=${userInfo.avatarUrl})}
+					console.log("之后的图片信息："+userData.avatarUrl);
+					$("#avatar_img").attr("th:src", "@{/static/img/"+ userData.avatarUrl +"}");
+					//刷新界面
+					window.location.reload();
+				}
+			},
+			error: function (jqXHR) {
+				alert("更新失败, 请重新再试!");
+			}
+		}); 
+                
     });
 </script>
-
-<script type="text/javascript">
-	//JQuery入口
-	// $(function(){
-		// alert("get out!!!");
-		
-	// });
-		/* //0. 获取应用名
-		var appName = [[${#request.getContextPath()}]]
-		var userId = ${session.LOGIN_USER.id};
-		console.log("appName: " + appName);
-		console.log(userId);
-		//获取当前账号的基本信息
-		$.get(appName + "/user/showModify.do?id=" + userId,function(userInfo){
-			$("img[name='avatarUrl']").attr("src",appName + "/static/img/" + userInfo.avatarUrl);
-			$("input[name='avatar_file']").val(userInfo.avatarUrl);
-			$("input[name='name']").val(userInfo.name);
-			$("input[name='phone']").val(userInfo.phone);
-			$("input[name='sex']").prop("checked",userInfo.sex == $("input[name='sex']").val()? true : false);
-			$("input[name='createTime']").val(userInfo.createTime);
-			$("input[name='lastModifyTime']").val(userInfo.lastModifyTime);
-		});
-		
-		//更新操作，提交表单数据
-		$("#update_teacher_btn").click(function(){
-			//拿到表单数据，封装处理
-			alert("更新操作！");
-			var form = document.forms["updateUserForm"];
-			var formData = new FormData(form);
-			console.log("---"+formData);
-			$.ajax({
-				url: appName +"/user/modifyUser.do",
-				method: "post",
-				data:formData,
-				dataType:"json",	//接收服务器传输的数据格式
-				contentType:false,	//必需使用 false,  这样才能使用form表单采用 multipart/form-data 传输
-				processData: false,
-				success:function(userInfo){
-					console.log(userInfo);
-					if(userInfo != null){
-						alert("更新成功！");
-						//刷新界面
-						window.location.reload();
-					}
-				},
-                error: function (jqXHR) {
-                    alert("更新失败, 请重新再试!");
-                }
-			});
-		}); */
-	
-	
-    </script>
 
 </body>
 

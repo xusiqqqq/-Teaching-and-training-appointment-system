@@ -90,9 +90,12 @@ public class EmployeeController {
 	/* =============用作页面数据处理=========== */
 	//个人信息
 	@RequestMapping("/x_profile.do")
-	public String x_profile(Model model) {
-		System.out.println("x_profile....");
+	public String x_profile(Model model,HttpSession session) {
+		//获取当前用户信息
 		TEmployee employee = employeeService.findByUser(global_username);
+		if(employee != null) {
+			employee.setRoleName(employee.getRoleType() == 1 ? "超级管理员":"普通管理员");			
+		}
 		model.addAttribute("userInfo", employee);
 		return "x_profile";
 	}
@@ -181,25 +184,39 @@ public class EmployeeController {
 	}
 	
 	//修改用户信息
-	//在响应数据回浏览器时，指定json类型
-	@RequestMapping(value = "/modifyUser.do")
-	public String modifyUser(@RequestParam("avatar_file") MultipartFile avatar_file,TEmployee emp,HttpSession session,Model model) {
-		log.debug("=======================");
-		log.debug("=====avatar: " + avatar_file);
-		log.debug("------实体数据before：" + emp);
-		log.debug("------实体数据before版本号：" + emp.getVersion());
-		if(!avatar_file.isEmpty()) {
+	//1、修改图像信息
+	@RequestMapping(value = "/modifyUserImg.do")
+	@ResponseBody
+	public TEmployee modifyUserImg(@RequestParam("avatarFile") MultipartFile avatarFile,HttpSession session) {
+		log.debug("=====avatar: " + avatarFile);
+		//查询到当前的员工信息
+		TEmployee oldEmp = employeeService.findByUser(global_username);
+		if(!avatarFile.isEmpty()) {
 			//上传文件
 			String fileName;
 			try {
-				fileName = uploadFiles(avatar_file);
+				fileName = uploadFiles(avatarFile);
 				//设置图片全名
-				emp.setAvatarUrl(fileName);
+				oldEmp.setAvatarUrl(fileName);
 			} catch (Exception e) {
 				System.out.println("-----------图片信息有误！-----------");
 				e.printStackTrace();
 			}
 		}
+		TEmployee employee = employeeService.update(oldEmp);
+		//更新Session域的信息
+		session.setAttribute("LOGIN_USER", employee);
+		return employee;
+	}
+	
+	//2、修改基本信息
+	@RequestMapping(value = "/modifyUser.do")
+	public String modifyUser(TEmployee emp,HttpSession session,Model model) {
+		log.debug("=======================");
+		log.debug("------实体数据before：" + emp);
+		log.debug("------实体数据before版本号：" + emp.getVersion());
+//		//校检手机号的提示信息
+//		session.setAttribute("CHECK_PHONE_ERROR", false);
 		//保存原值
 		TEmployee oldEmp = employeeService.findByUser(global_username);
 		if(oldEmp != null) {
@@ -210,21 +227,28 @@ public class EmployeeController {
 			emp.setVersion(oldEmp.getVersion());
 			//判断新输入的手机号是否已存在
 			TEmployee checkPhone = employeeService.findByUser(emp.getPhone());
+			log.debug("-------原有电话："+emp.getPhone());
+			log.debug("-------库里的电话："+checkPhone.getPhone());
 			if(checkPhone != null) {
-				model.addAttribute("CHECK_PHONE_ERROR", true);
-				log.debug("。。。手机号重复！。。。。。。");
+				//校检手机号的提示信息
+				model.addAttribute("CHECK_PHONE_ERROR", false);
+				if(!checkPhone.getPhone().equals(oldEmp.getPhone()) ) {
+					model.addAttribute("CHECK_PHONE_ERROR", true);
+					log.debug("。。。手机号跟其它用户撞名了！。。。。。。");
+				}
 				//返回原值
-				return "redirect:x_profile.do";
+				return "forward:x_profile.do";
 			}	
 		}
 		TEmployee employee = employeeService.update(emp);
-		if(employee != null)
+		if(employee != null) {
 			log.debug("!!------实体数据after：" + employee);
 			log.debug("!!------实体数据after版本号：" + employee.getVersion());
 			global_username = employee.getPhone();
+		}
 		session.setAttribute("LOGIN_USER", employee);
 		System.out.println("更新后：" +employee);
-		return "redirect:x_profile.do";
+		return "forward:x_profile.do";
 	}
 	
 	//修改密码

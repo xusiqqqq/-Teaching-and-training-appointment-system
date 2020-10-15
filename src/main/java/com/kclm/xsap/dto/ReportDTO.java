@@ -18,8 +18,15 @@ import lombok.EqualsAndHashCode;
 public class ReportDTO {
 
 	/**
-	 * 会员卡种类名称+会员卡绑定数量
+	 * 会员卡种类名称
 	 */
-	private Map<String,Integer> memberCardBindingMap;
+	private String name;
+	
+	/**
+	 * 会员卡绑定数量
+	 */
+	private Integer value;
+	
+//	private Map<String,Integer> memberCardBindingMap;
 	
 }

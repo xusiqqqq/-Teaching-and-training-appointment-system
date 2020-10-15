@@ -57,7 +57,7 @@
         <div class="form-group ">
             <div class="input-group date selecttime" >
                 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                <input name="startDate" id="startDate" type="text" class="form-control myDate" value="2019-11-11">
+                <input name="startDate" id="startDate" type="text" class="form-control myDate" value="2020-09-09">
                 <script type="text/javascript">
                     $("input").focus(function () {
                         $("input").css("background-color","#ff0000"); 
@@ -69,22 +69,22 @@
         <div class="form-group " style="margin-top: -15px">
             <div class="input-group date selecttime" >
                 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                <input name="endDate" id="endDate" type="text" class="form-control myDate" value="2020-5-11">
+                <input name="endDate" id="endDate" type="text" class="form-control myDate" value="2020-10-10">
             </div>
             <button type="button" class="btn btn-info" id="homeSearch" style="margin-left: 15px;margin-top: 15px">查询</button>
         </div>
 
         <!--    体部信息-->
-        <div class="box" style="margin-left: 10px">
-            <span style="font-size: 25px;" class="left"><strong>72</strong></span>
+        <div class="box" style="margin-left: 10px; width: 300px" >  
+            <span style="font-size: 25px;" class="left" id="totalMembers"><strong>34</strong></span>
             <p class="left">会员总数</p>
         </div>
-        <div class="box " style="margin-left: 10px">
-            <span style="font-size: 25px" class="left"><strong>2</strong></span>
+        <div class="box " style="margin-left: 10px ;width: 300px">
+            <span style="font-size: 25px" class="left" id="activeMembers"><strong>2</strong></span>
             <p class="left">活跃用户(近一个月有过约课的用户)</p>
         </div>
-        <div class="box " style="margin-left: 10px">
-            <span style="font-size: 25px" class="left"><strong>76</strong></span>
+        <div class="box " style="margin-left: 10px; width: 300px">
+            <span style="font-size: 25px" class="left" id="totalReservations"><strong>78</strong></span>
             <p class="left">预约总数</p>
         </div>
 
@@ -92,32 +92,81 @@
         <div style="background-color: white;width: 1050px;margin-top: 130px;text-align: center;margin-left: 18px">
             <div id="broken_line" style="width: 1000px;height:400px;"></div>
             <script type="text/javascript">
-                // 基于准备好的dom，初始化echarts实例
-                var myChartLine = echarts.init(document.getElementById('broken_line'));
+            var start_date = $("#startDate").val();
+            var end_date = $("#endDate").val();
+           
+    		$('.myDate').change(function(){
+    			/* 首页数据查询 */
+    			start_date = $("#startDate").val();
+    			console.log(start_date);
+    			//start_date = start_date.toString();
+    			end_date = $("#endDate").val();
+    			console.log(end_date);
+    			//end_date = end_date.toString();
+    			
+    		});
+    		
+    		// 基于准备好的dom，初始化echarts实例
+            var myChartLine = echarts.init(document.getElementById('broken_line'));
+    		//图表参数设置
+    		var option;
+    		
+    		//首页统计数据
+    		$("#homeSearch").click(function(){
+                if(start_date != null && start_date.length != 0 && end_date != null && end_date.length != 0){
+    				 $.get("[[${#request.getContextPath()}]]/index/homePage.do",{startDateStr:start_date,endDateStr:end_date},function(indexData){
 
-                // 指定图表的配置项和数据
-                var option = {
-                    title: {
-                        text: '每日约课数量'
-                    },
-                    xAxis: {
-                        type: 'category',
-                        data: ['2019-10-24', '2019-10-25', '2019-10-26', '2019-10-27', '2019-10-28', '2019-10-29', '2019-10-30','2019-10-31']
-                    },
-                    yAxis: {
-                        type: 'value'
-                    },
-                    series: [{
-                        data: [0, 0, 0, 0, 0,0, 1,1],
-                        type: 'line',
-                        // areaStyle: {
-                        //     color:'blue'
-                        // }
-                    }]
-                };
+    					 option = {
+			                title: {
+			                    text: '每日约课数量'
+			                },
+			                xAxis: {
+			                    type: 'category',
+			                    data:  indexData.dateList
+			                },
+			                yAxis: {
+			                    type: 'value'
+			                },
+			                series: [{
+			                    data: indexData.dailyReservations,
+			                    type: 'line',
+			                    // areaStyle: {
+			                    //     color:'blue'	 
+			                    // }
+			                }]
+			            };
 
-                // 使用刚指定的配置项和数据显示图表。
-                myChartLine.setOption(option);
+			            // 使用刚指定的配置项和数据显示图表。
+			            myChartLine.setOption(option);
+    				});
+	   		     }else{
+	   			 	alert("日期区间不能未空！");		    	 
+	   		     }
+   			});
+			    		
+    		// 指定图表的配置项和数据
+            option = {
+                title: {
+                    text: '每日约课数量'
+                },
+                xAxis: {
+                    type: 'category',
+                    data:  []
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [{
+                    data: [],
+                    type: 'line',
+                    // areaStyle: {
+                    //     color:'blue'	 
+                    // }
+                }]
+            };
+
+            // 使用刚指定的配置项和数据显示图表。
+            myChartLine.setOption(option);
             </script>
         </div>
 
@@ -125,44 +174,108 @@
         <div style="background-color: white;width: 1050px;margin-top: 30px;text-align: center;margin-left: 18px">
             <div id="ChartLine2" style="width: 1000px;height:400px;"></div>
             <script type="text/javascript">
-                // 基于准备好的dom，初始化echarts实例
-                var myChartLine2 = echarts.init(document.getElementById('ChartLine2'));
+            var start_date = $("#startDate").val();
+            var end_date = $("#endDate").val();
+           
+    		$('.myDate').change(function(){
+    			/* 首页数据查询 */
+    			start_date = $("#startDate").val();
+    			console.log(start_date);
+    			//start_date = start_date.toString();
+    			end_date = $("#endDate").val();
+    			console.log(end_date);
+    			//end_date = end_date.toString();
+    			
+    		});
+    		
+    		// 基于准备好的dom，初始化echarts实例
+	        var myChartLine2 = echarts.init(document.getElementById('ChartLine2'));
+    		//图表参数设置
+    		var option;
+    		
+    		//首页统计数据
+    		$("#homeSearch").click(function(){
+    			 if(start_date != null && start_date.length != 0 && end_date != null && end_date.length != 0){
+    				 $.get("[[${#request.getContextPath()}]]/index/homePage.do",{startDateStr:start_date,endDateStr:end_date},function(indexData){
+						
+						option = {
+			                  title:{
+			                    text: '每日新增会员数量',
+			                  },
+			                  tooltip: {
+			                      trigger: 'item',
+			                      formatter: "{a} <br/>{b}: {c}"
+			                  },
 
-                var option = {
-                    title:{
-                      text: '每日新增会员数量',
-                    },
-                    tooltip: {
-                        trigger: 'item',
-                        formatter: "{a} <br/>{b}: {c}"
-                    },
+			                  xAxis: {
+			                      type: 'category',
+			                      data: indexData.dateList
+			                  },
+			                  yAxis: {
+			                      type: 'value'
+			                  },
+			                  series : [          // 系列列表,每个系列通过 type 决定自己的图表类型
+			                      {
+			                          name:'流量详情',
+			                          type:'line',    //类型是线型的
+			                          stack: '总量',
+			                          areaStyle: {
+			                             color:'blue'//填充区域颜色
+			                          },
+			                          itemStyle : {
+			                              normal : {
+			                                  color:'#275F82', //改变折线点的颜色
 
-                    xAxis: {
-                        type: 'category',
-                        data: ['2019-10-24', '2019-10-25', '2019-10-26', '2019-10-27', '2019-10-28', '2019-10-29', '2019-10-30','2019-10-31']
-                    },
-                    yAxis: {
-                        type: 'value'
-                    },
-                    series : [          // 系列列表,每个系列通过 type 决定自己的图表类型
-                        {
-                            name:'流量详情',
-                            type:'line',    //类型是线型的
-                            stack: '总量',
-                            areaStyle: {
-                               color:'blue'//填充区域颜色
-                            },
-                            itemStyle : {
-                                normal : {
-                                    color:'#275F82', //改变折线点的颜色
+			                              }
+			                          },
+			                          data: indexData.dailyNewMembers
+			                      }
+			                  ]
+			              };
+				         // 使用刚指定的配置项和数据显示图表。
+				         myChartLine2.setOption(option);
+    				});
+    		     }else{
+    			 	alert("日期区间不能未空！");		    	 
+    		     }
+    			});
+              
+	          option = {
+                  title:{
+                    text: '每日新增会员数量',
+                  },
+                  tooltip: {
+                      trigger: 'item',
+                      formatter: "{a} <br/>{b}: {c}"
+                  },
 
-                                }
-                            },
-                            data:[0,1,0,2,0,1,1,1]
-                        }
-                    ]
-                };
-                myChartLine2.setOption(option);
+                  xAxis: {
+                      type: 'category',
+                      data: []
+                  },
+                  yAxis: {
+                      type: 'value'
+                  },
+                  series : [          // 系列列表,每个系列通过 type 决定自己的图表类型
+                      {
+                          name:'流量详情',
+                          type:'line',    //类型是线型的
+                          stack: '总量',
+                          areaStyle: {
+                             color:'blue'//填充区域颜色
+                          },
+                          itemStyle : {
+                              normal : {
+                                  color:'#275F82', //改变折线点的颜色
+
+                              }
+                          },
+                          data: []
+                      }
+                  ]
+              };
+	         // 使用刚指定的配置项和数据显示图表。
+	         myChartLine2.setOption(option);
             </script>
         </div>
 
@@ -174,58 +287,57 @@
                 // 基于准备好的dom，初始化echarts实例
                 var myChartPie = echarts.init(document.getElementById('pie'));
 				$(function(){
-					//获取应用名
-					var appName = [[${#request.getContextPath()}]] 
-					console.log("appName: " + appName);
-					$.post(appName +"/index/report.do",function(reportData){
-						console.log("报表数据："+ reportData);
+					$.post("[[${#request.getContextPath()}]]/index/report.do",function(reportData){
+						console.log(reportData);
+						var nameList = new Array();
+						//遍历报表数据
+						for(var i = 0; i < reportData.length; i++){
+							var	key = reportData[i].name;
+							var val = reportData[i].value;			
+							//存放name到数组中
+							nameList.push(key);
+						}
 						
+						var option = {          //指定图表的配置项和数据
+		                    title: {
+		                        text: '会员卡统计',
+		                        subtext: '绑定会员卡数量',
+		                        x: 'center'
+		                    },
+		                    //提示框，鼠标悬浮交互时的信息提示，
+		                    // 意思就是鼠标悬浮某块图片时，会出现这块图片的具体信息，如位置啊、大小比重啊...
+		                    tooltip: {
+		                        trigger: 'item',
+		                        formatter: '{a} <br/>{b} : {c} ({d}%)'
+		                    },
+		                    legend: {               //legend：这是设置图例数据的
+		                        orient: 'vertical',//图例垂直
+		                        x: '20px',//图表标题横向位置
+		                        y:'50px',//图表标题纵向位置
+		                        left:'70%',
+		                        data: nameList
+		                    },
+		                    series: [       // 系列列表,每个系列通过 type 决定自己的图表类型
+		                        {
+		                            name: '访问来源',       //点击图，显示某一块图的访问来源
+		                            type: 'pie',
+		                            radius: '55%',          //圆饼图的大小
+		                            center: ['50%', '50%'], //设置图的位置，显示居中
+		                            data: reportData,
+		                            emphasis: {
+		                                itemStyle: {
+		                                    shadowBlur: 10,
+		                                    shadowOffsetX: 5,
+		                                    shadowColor: 'rgba(0, 0, 0, 0.5,0.3)'
+		                                }
+		                            }
+		                        }
+			                ]
+				        };
+	              		myChartPie.setOption(option);
 					});
 				});
-                var option = {          //指定图表的配置项和数据
-                    title: {
-                        text: '会员卡统计',
-                        subtext: '绑定会员卡数量',
-                        x: 'center'
-                    },
-                    //提示框，鼠标悬浮交互时的信息提示，
-                    // 意思就是鼠标悬浮某块图片时，会出现这块图片的具体信息，如位置啊、大小比重啊...
-                    tooltip: {
-                        trigger: 'item',
-                        formatter: '{a} <br/>{b} : {c} ({d}%)'
-                    },
-                    legend: {               //legend：这是设置图例数据的
-                        orient: 'vertical',//图例垂直
-                        x: '20px',//图表标题横向位置
-                        y:'50px',//图表标题纵向位置
-                        left:'70%',
-                        data: ['12课时', '24课时', '48课时', '96课时', '12课时一对一','12次大课']
-                    },
-                    series: [       // 系列列表,每个系列通过 type 决定自己的图表类型
-                        {
-                            name: '访问来源',       //点击图，显示某一块图的访问来源
-                            type: 'pie',
-                            radius: '55%',          //圆饼图的大小
-                            center: ['50%', '50%'], //设置图的位置，显示居中
-                            data: [
-                                {value: 335, name: '12课时'},
-                                {value: 310, name: '24课时'},
-                                {value: 234, name: '48课时'},
-                                {value: 135, name: '96课时'},
-                                {value: 255, name: '12课时一对一'},
-                                {value: 300, name: '12次大课'}
-                            ],
-                            emphasis: {
-                                itemStyle: {
-                                    shadowBlur: 10,
-                                    shadowOffsetX: 5,
-                                    shadowColor: 'rgba(0, 0, 0, 0.5,0.3)'
-                                }
-                            }
-                        }
-                    ]
-                };
-                myChartPie.setOption(option);
+               
             </script>
         </div>
 
@@ -243,7 +355,7 @@
     <!-- Peity -->
     <script src="../static/js/plugins/peity/jquery.peity.min.js" th:src="@{/static/js/plugins/peity/jquery.peity.min.js}"></script>
     <!-- Peity -->
-    <script type="text/javascript" src="http://tajs.qq.com/stats?sId=9051096" charset="UTF-8"></script>
+    <!-- <script type="text/javascript" src="http://tajs.qq.com/stats?sId=9051096" charset="UTF-8"></script> -->
     <!--统计代码，可删除-->
 
     <script>
@@ -255,23 +367,16 @@
             todayHighlight: true,
             format: 'yyyy-mm-dd',
             todayBtn: false,//今日按钮
-            startDate: '1970-1-1', //与你自己设置的格式一致yyyy-mm-dd，未设置的话与默认格式一致mm/dd/yyyy
-            endDate: '2070-1-1'
+            startDate: '1970-01-01', //与你自己设置的格式一致yyyy-mm-dd，未设置的话与默认格式一致mm/dd/yyyy
+            endDate: '2070-01-01'
         });
-		/* 首页数据查询 */
-		var start_date = $("#startDate").val();
-		var end_date = $("#endDate").val();
+       
 		$(function(){
-			//获取应用名
-			var appName = [[${#request.getContextPath()}]] 
-			console.log("appName: " + appName);
-			//首页统计数据
-			$("#homeSearch").click(function(){
-				$.get(appName + "/index/homePage.do",{startDate:start_date,endDate:end_date},function(indexData){
-					console.log("首页数据："+indexData);
-					
-				});
-			});
+			 $.post("[[${#request.getContextPath()}]]/index/homePage.do",function(indexData){
+				$("#totalMembers").html(indexData.totalMembers);
+				$("#activeMembers").html(indexData.activeMembers);
+				$("#totalReservations").html(indexData.totalReservations);
+			 });
 		});
 		
     </script>

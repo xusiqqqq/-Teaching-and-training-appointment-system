@@ -54,4 +54,9 @@ public class HomePageDTO {
 	 */
 	private List<Integer> dailyNewMembers;
 	
+	/**
+	 * 日期区间
+	 */
+	private List<LocalDate> dateList;
+	
 }
