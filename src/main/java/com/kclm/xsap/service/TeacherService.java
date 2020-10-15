@@ -22,6 +22,13 @@ public interface TeacherService {
 	boolean update(TEmployee emp);
 	
 	/**
+	 * 	头像切换，更新操作
+	 * @param  emp 员工信息
+	 * @return
+	 */
+	boolean avatarChange(TEmployee emp);
+	
+	/**
 	 *  获取所有教师信息
 	 * @return List<TEmployee>。教师信息结果集
 	 */

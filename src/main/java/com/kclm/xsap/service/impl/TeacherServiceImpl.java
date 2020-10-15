@@ -24,8 +24,11 @@ import com.kclm.xsap.mapper.TMemberCardMapper;
 import com.kclm.xsap.mapper.TScheduleRecordMapper;
 import com.kclm.xsap.service.TeacherService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
 @Transactional
+@Slf4j
 public class TeacherServiceImpl implements TeacherService{
 
 	@Autowired
@@ -145,6 +148,18 @@ public class TeacherServiceImpl implements TeacherService{
 		}
 		
 		return classDtoList;
+	}
+
+	//头像切换
+	@Override
+	public boolean avatarChange(TEmployee emp) {
+		TEmployee employee = employeeMapper.selectById(emp.getId());
+		if(employee == null) {
+			log.debug("--------没有此员工");
+			return false;
+		}
+		employeeMapper.updateById(employee);
+		return true;
 	}
 
 }

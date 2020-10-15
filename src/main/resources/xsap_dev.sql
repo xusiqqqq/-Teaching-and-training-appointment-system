@@ -168,8 +168,8 @@ CREATE TABLE `t_employee` (
 /*Data for the table `t_employee` */
 
 insert  into `t_employee`(`id`,`name`,`phone`,`sex`,`birthday`,`introduce`,`avatar_url`,`note`,`role_name`,`role_password`,`role_type`,`role_email`,`is_deleted`,`create_time`,`last_modify_time`,`version`) values 
-(1,'张老师','123456','女','2020-09-07','教数学','a3.jpg','。。。','admin','567',1,'3496351038@qq.com',0,'2020-09-03 10:22:27',NULL,1),
-(2,'李老220','123123','男','2020-09-09','地理','a5.jpg','，，，','普通管理员','66',0,NULL,0,'2020-09-02 14:57:11','2020-09-27 15:54:36',8),
+(1,'张老师','123456','女','2020-09-07','教数学','a3.jpg','。。。','admin','567',1,'3496351038@qq.com',0,'2020-09-03 10:22:27','2020-10-01 06:59:49',1),
+(2,'李老','123123','男','2020-09-09','地理','1EC82C4CA06C4EC4B6C85239C4C645D8_01三层架构.png','，，，','普通管理员','66',0,NULL,0,'2020-09-02 14:57:11','2020-10-14 10:33:36',39),
 (3,'黑衣人','112358','男','2020-09-25','玄学','a8.jpg',NULL,'test','111',0,NULL,0,NULL,NULL,1),
 (4,'魏老','4','男','2020-09-26','教体育','a6.jpg','note-2','user1','123',0,NULL,0,'2020-09-27 11:32:57',NULL,1),
 (5,'赵老','5','男',NULL,'教体育',NULL,'note-3','user2','123',0,NULL,0,'2020-09-27 11:32:57',NULL,1),
@@ -402,11 +402,11 @@ CREATE TABLE `t_schedule_record` (
   `last_modify_time` datetime DEFAULT NULL COMMENT '修改时间',
   `version` int(10) unsigned DEFAULT '1' COMMENT '版本',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `only_course_teach` (`course_id`,`teacher_id`,`class_time`),
+  UNIQUE KEY `only_course_teach` (`course_id`,`teacher_id`,`class_time`,`start_date`),
   KEY `fk_sche_teacher_id` (`teacher_id`),
   CONSTRAINT `fk_sche_course_id` FOREIGN KEY (`course_id`) REFERENCES `t_course` (`id`),
   CONSTRAINT `fk_sche_teacher_id` FOREIGN KEY (`teacher_id`) REFERENCES `t_employee` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COMMENT='中间表：排课计划表';
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 COMMENT='中间表：排课计划表';
 
 /*Data for the table `t_schedule_record` */
 
@@ -415,7 +415,9 @@ insert  into `t_schedule_record`(`id`,`course_id`,`teacher_id`,`order_nums`,`sta
 (2,3,1,28,'2020-09-04','09:00:33','男',14,'2020-10-02 00:52:50',NULL,1),
 (3,2,2,45,'2020-09-08','09:00:44','女',12,'2020-10-03 00:52:54',NULL,1),
 (4,1,2,21,'2020-09-09','14:00:55','男',15,'2020-10-04 00:53:00',NULL,1),
-(5,1,2,7,'2020-09-09','15:30:00','男',13,'2020-10-01 00:53:04',NULL,1);
+(5,1,2,7,'2020-09-09','15:30:00','男',13,'2020-10-01 00:53:04',NULL,1),
+(12,1,1,33,'2020-09-10','09:00:45','女',12,'2020-09-17 00:52:44',NULL,4),
+(13,2,2,45,'2020-09-10','09:00:44','女',12,'2020-10-03 00:52:54',NULL,1);
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

@@ -31,6 +31,7 @@ public class IndexServiceTest {
 	@Test
 	public void statistic() {
 		List<ReportDTO> statistic = indexService.statistic();
+		System.out.println("报表数据：" + statistic);
 		for (ReportDTO report : statistic) {
 			System.out.println("report :" + report);
 		}
