@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.kclm.xsap.dto.MemberLogDTO;
 import com.kclm.xsap.entity.TConsumeRecord;
+import com.kclm.xsap.entity.TMemberBindRecord;
 import com.kclm.xsap.entity.TMemberCard;
 import com.kclm.xsap.entity.TRechargeRecord;
 
@@ -19,9 +20,50 @@ public interface MemberCardService {
 
 	boolean save(TMemberCard card);
 	
+	/**
+	 * 	删除操作，实际为让卡片变为“不激活”
+	 * @param id
+	 * @return
+	 */
 	boolean deleteById(Long id);
 	
 	boolean update(TMemberCard card);
+	
+	/**
+	 * 	通过id查询会员卡信息
+	 * @param id
+	 * @return
+	 */
+	TMemberCard findById(Long id);
+	
+	/**
+	 * 	通过name查找会员卡信息
+	 * @param name
+	 * @return
+	 */
+	TMemberCard findByName(String name);
+	
+	/**
+	 * 	查询指定会员的绑卡信息
+	 * @param memberId
+	 * @param cardId
+	 * @return
+	 */
+	TMemberBindRecord findBindRecord(Long memberId, Long cardId);
+	
+	/**
+	 * 	更新会员绑卡记录
+	 * @param bind
+	 * @return
+	 */
+	boolean updateBindRecord(TMemberBindRecord bind);
+	
+	/**
+	 * 	找到某个课程绑定的所有会员卡信息
+	 * @param courseId
+	 * @return
+	 */
+	List<TMemberCard> listByCourseId(Long courseId);
 	
 	/**
 	 *  获取所有的会员卡信息

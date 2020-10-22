@@ -26,16 +26,31 @@ public interface ClassService {
 	boolean saveAll();
 	
 	/**
-	 * 
+	 * 	单个上课记录更新
 	 * @param classId	上课记录id
 	 * @param status	上课记录确认状态
 	 * @return
 	 */
 	boolean update(Long classId,Integer status);
 	
+	/**
+	 * 	针对“未确认”上课，进行全部上课记录的更新
+	 * @return
+	 */
 	boolean updateAll();
 	
-	//删除单个上课记录
+	/**
+	 * 	删除单个上课记录
+	 * @param classId
+	 * @return
+	 */
 	boolean deleteOne(Long classId);
+	
+	/**
+	 * 	根据id查找上课记录
+	 * @param classId
+	 * @return
+	 */
+	TClassRecord findById(Long classId);
 	
 }

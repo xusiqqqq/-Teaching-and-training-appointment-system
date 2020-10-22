@@ -69,44 +69,47 @@
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
         <div class="col-sm-12">
-            <form class="form-horizontal">
+            <form class="form-horizontal" id="editForm" th:action="@{/card/cardEdit.do}">
                 <div style="background-color: #FFFFFF;">
                     <div class="form-group">
                         <label for="inputCardName"
                                class="col-sm-2 control-label margin_top"><span
                                 style="color: red">*&nbsp;</span>会员卡名称</label>
                         <div class="col-sm-8">
-                            <input type="text" class="form-control margin_top" id="inputCardName" placeholder="会员卡名称"
-                                   value="12次大课"
-                                   required>
+                        	<!-- 隐藏域，id -->
+                        	<input type="hidden" name="id" value="1" th:value="${cardMsg.id}"/>
+                        
+                            <input type="text" class="form-control margin_top"  name="name" placeholder="会员卡名称"
+                                   value="12次大课" th:value="${cardMsg.name}" required>
+                            <span class="text-danger">[[${NAME_EXIST}]]</span>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="inputCardPrice" class="col-sm-2 control-label input_margin_top"><span
                                 style="color: red">*&nbsp;</span>价格</label>
-                        <div class="col-sm-2">
+                        <div class="col-md-2">
                             <!--<input type="number" class="form-control input_margin_top" id="inputCardPrice"
                                    placeholder="价格" min="0" value="480"
-                                   required>-->
+                                   required>--> 
                             <div class="input-group input_margin_top">
-                                <div class="input-group-addon">￥</div>
-                                <input type="number" class="form-control" placeholder="价格" id="inputCardPrice" min="0">
-                                <div class="input-group-addon">元</div>
+                           		<div class="input-group-addon">￥</div>
+                            	<input type="number" name="price" th:value="${cardMsg.price}" class="form-control" placeholder="价格" id="inputCardPrice" min="0">
+                           		<div class="input-group-addon">元</div>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="inputCardDescribe" class="col-sm-2 control-label input_margin_top">描述信息</label>
                         <div class="col-sm-8">
-                            <textarea type="text" class="form-control input_margin_top"
-                                      id="inputCardDescribe">多人上的课</textarea>
+                            <textarea name="desc" class="form-control input_margin_top"
+                                      id="inputCardDescribe"  th:text="${cardMsg.description}">多人上的课</textarea>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="inputCardRemark" class="col-sm-2 control-label input_margin_top">备注信息</label>
                         <div class="col-sm-8">
-                            <textarea type="text" class="form-control input_margin_top margin_buttom"
-                                      id="inputCardRemark"></textarea>
+                            <textarea name="note" class="form-control input_margin_top margin_buttom"
+                                      id="inputCardRemark"  th:text="${cardMsg.note}"></textarea>
                         </div>
                     </div>
                 </div>
@@ -114,10 +117,11 @@
                     <div class="form-group">
                         <label for="member_card_type" class="col-sm-2 control-label margin_top">会员卡类型</label>
                         <div class="col-sm-8">
-                            <select class="form-control m-b margin_top disabled" disabled name="account"
+                            <select class="form-control m-b margin_top disabled" disabled name="type"
                                     id="member_card_type">
-                                <option>次卡(有期限)</option>
-                                <option>次卡(无期限)</option>
+                                <option th:attr="selected=${cardMsg.type== '0' ? selected :''}">--空--</option>
+                                <option th:attr="selected=${cardMsg.type== '1' ? selected : ''}">次卡(有期限)</option>
+                                <option th:attr="selected=${cardMsg.type== '2' ? selected : ''}">次卡(无期限)</option>
                             </select>
                         </div>
                     </div>
@@ -125,18 +129,16 @@
                         <label for="useTimes" class="col-sm-2 control-label input_margin_top"><span
                                 style="color: red">*&nbsp;</span>可用次数</label>
                         <div class="col-sm-2">
-                            <input type="number" class="form-control input_margin_top" id="useTimes"
-                                   placeholder="可用次数" min="0" value="12"
-                                   required>
+                            <input type="number" name="totalCount" class="form-control input_margin_top" id="useTimes"
+                                   placeholder="可用次数" min="0" value="60" th:value="${cardMsg.totalDay}"  required>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="useDays" class="col-sm-2 control-label input_margin_top"><span
                                 style="color: red">*&nbsp;</span>可用天数</label>
                         <div class="col-sm-2">
-                            <input type="number" class="form-control input_margin_top" id="useDays"
-                                   placeholder="可用天数" min="0" value="300"
-                                   required>
+                            <input type="number" name="totalDay" class="form-control input_margin_top" id="useDays"
+                                   placeholder="可用天数" min="0" value="30" th:value="${cardMsg.totalDay}" required>
                         </div>
                     </div>
                     <div class="form-group">
@@ -146,7 +148,7 @@
                                    id="support_program">
                                 <thead>
                                 <tr>
-                                    <th><input type="checkbox" name="input[]" id="check_all" class="i-checks"></th>
+                                    <th><input type="checkbox" id="check_all" class="i-checks"></th>
                                     <th class="col-sm-7">课程</th>
                                     <th>收费情况(次卡)</th>
                                 </tr>
@@ -156,7 +158,7 @@
                     </div>
                     <div class="form-group">
                         <div class="col-sm-offset-2 col-sm-10 margin_buttom btn_margin_top">
-                            <button type="submit" class="btn btn-success">保存</button>
+                            <button type="submit" class="btn btn-success" id="saveBtn">保存</button>
                             <a href="x_member_card.html" type="button" class="btn btn-default ">取消</a>
                         </div>
                     </div>
@@ -180,48 +182,58 @@
 <script src="../../static/js/plugins/iCheck/icheck.min.js" th:src="@{/static/js/plugins/iCheck/icheck.min.js}"></script>
 <script>
     $(function () {
-        $('.dataTables-example').dataTable({
-            //获取数据
-            /*TODO:此处为未来与后端进行交互的地方*/
-            "data": [
-                {"id": 1, "course": "钢琴大课", "charge": 1},
-                {"id": 2, "course": "钢琴一对一", "charge": 1},
-                {"id": 3, "course": "跳绳课", "charge": 1},
-                {"id": 4, "course": "搏击(6-8周岁)", "charge": 1},
-                {"id": 5, "course": "橄榄球(6-8周岁)", "charge": 1},
-                {"id": 6, "course": "篮球(6-8周岁)", "charge": 1}
-            ],
-            //行的定义
-            "columns": [
-                {
-                    "data": null, "render": function (data, type, row) {
-                        let id = '"' + row.id + '"';
-                        let html = "<input type='checkbox' name='input[]' id='check_all' class='i-checks'>";
-                        return html;
-                    }
-                },
-                {"data": "course"},
-                {
-                    "data": null, "render": function (data, type, row) {
-                        let html = "<span class='pie'>每节课收取&nbsp;<input type='text' disabled class='form-control input_width' value='" + row.charge + "'>次/人</span>";
-                        return html;
-                    }
-                }
-            ],
-            language: {
-                "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
-                "loadingRecords": "加载中...",//用来描述数据在加载中等待的提示字符串 - 当异步读取数据的时候显示
-                "processing": "处理中...",//用来描述加载进度的字符串
-                "sInfo": "" // 这样就可以隐藏了
-            },
-            searching: false,//是否开始本地搜索
-            paging: false,
-            lengthChange: false,//是否允许用户改变表格每页显示的记录数
-            columnDefs: [{
-                targets: 0,//编辑取消排序
-                "orderable": false
-            }]
-        })
+    	$("#saveBtn").on("mouseenter",function(){
+    		var editForm = $("#editForm").serialize();
+    		console.log(editForm);
+    	});
+    	console.log("[[${cardMsg}]]");
+    	//获取所有的课程数据
+    	$.post("/xsap/course/courseList.do",function(courseData){
+    		console.log(courseData);
+	        $('.dataTables-example').dataTable({
+	            //获取数据
+	            /*TODO:此处为未来与后端进行交互的地方*/
+	            "data": courseData,
+	            //行的定义
+	            "columns": [
+	                {
+	                    "data": "id", "render": function (data, type, row) {
+	                        let id = data;
+	                        let html = "<input type='checkbox' name='courseListStr' class='i-checks' value='"+ id +"' >";
+	                        return html;
+	                    },bAutoWidth: "false", sWidth: "1%"
+	                },
+	                {"data": "name", sWidth: "15%"},
+	                {
+	                    "data": "timesCost", "render": function (data, type, row) {
+	                        let html = "<span class='pie'>每节课收取&nbsp;<input type='text' disabled class='form-control input_width' value='" + data + "'>次/人</span>";
+	                        return html;
+	                    }, sWidth: "15%"
+	                }
+	            ],
+	            language: {
+	                "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
+	                "loadingRecords": "加载中...",//用来描述数据在加载中等待的提示字符串 - 当异步读取数据的时候显示
+	                "processing": "处理中...",//用来描述加载进度的字符串
+	                "sInfo": "" // 这样就可以隐藏了
+	            },
+	            searching: false,//是否开始本地搜索
+	            paging: false,
+	            lengthChange: false,//是否允许用户改变表格每页显示的记录数
+	            columnDefs: [{
+	                targets: 0,//编辑取消排序
+	                "orderable": false
+	            }]
+	        });
+	        var course = [[${courseCarry}]]   		
+	   		console.log(course);
+	   		if(course != null){			
+	    		for(var i = 0; i < course.length; i++){
+	    			$("input[name='courseListStr'][value='"+ course[i] +"']").prop("checked",true);
+	    		}
+	   		}
+    	});
+    	
     })
 </script>
 <script>

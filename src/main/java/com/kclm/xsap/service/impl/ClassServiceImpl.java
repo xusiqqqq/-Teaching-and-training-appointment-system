@@ -138,4 +138,11 @@ public class ClassServiceImpl implements ClassService{
 		return false;
 	}
 
+	//根据id查找上课记录
+	@Override
+	public TClassRecord findById(Long classId) {
+		TClassRecord classRecord = classMapper.selectById(classId);
+		return classRecord;
+	}
+
 }

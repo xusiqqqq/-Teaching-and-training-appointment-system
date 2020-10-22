@@ -37,7 +37,7 @@
             <div class="ibox float-e-margins">
                 <div class="ibox-content" style="height: 190px;">
                     <div class="col-md-12">
-                        <img src="../../static/img/个性头像.png" alt="会员信息" class="img-circle" style="height: 150px;width: 150px; float: left; ">
+                        <img src="../../static/img/个性头像.png" alt="会员信息"  id= "member_img" class="img-circle" style="height: 150px;width: 150px; float: left; ">
                         <div style="float: left; padding-left: 15px">
                             <label>
                                 <h2><strong>测试宝宝</strong></h2>
@@ -47,7 +47,7 @@
                                 <p><span style="margin-right: 5px;">备注:</span>xxxxxxx</p>
                             </label>
                         </div>
-                        <a class="btn btn-success" data-toggle='modal' data-target='#details' type="button" style="float: right">编辑信息</a>
+                        <a class="btn btn-success" data-toggle='modal' onclick="saveID()" data-target='#details' type="button" style="float: right">编辑信息</a>
                     </div>
                 </div>
             </div>
@@ -81,7 +81,7 @@
                                             <th>可用次数</th>
                                             <th>到期时间</th>
                                             <th>状态</th>
-                                            <th>激活/停用</th>
+                                            <th>停用/激活</th>
                                             <th>操作</th>
                                         </tr>
                                         </thead>
@@ -222,13 +222,16 @@
                     <h4 class="modal-title">编辑会员</h4>
                 </div>
                 <div class="modal-body">
-                    <form method="get" class="form-horizontal">
+                    <form method="post" class="form-horizontal" id="updateForm">
                         <div class="form-group">
                             <label class="col-sm-2 control-label">
                                 <span class="text-danger">*</span>
                                 会员姓名</label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control" placeholder="会员姓名">
+                            <!-- 隐藏域 id -->
+								<input type="hidden" name="id" />
+								
+                                <input type="text" class="form-control" name="name" placeholder="会员姓名">
                             </div>
                         </div>
                         <div class="form-group">
@@ -236,7 +239,7 @@
                                 <span class="text-danger">*</span>
                                 手机号</label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control" placeholder="手机号">
+                                <input type="text" class="form-control" name="phone" placeholder="手机号">
                             </div>
                         </div>
                         <div class="form-group">
@@ -245,12 +248,12 @@
                                 性别</label>
                             <div class="col-sm-8">
                                 <label class="control-label">
-                                    <input type="radio" checked="checked" value="option1" name="optionsRadios">
+                                    <input type="radio" value="男" name="sex" id="man">
                                     <span>男</span>
                                 </label>&nbsp;&nbsp;
 
                                 <label class="control-label">
-                                    <input type="radio" value="option2" name="optionsRadios">
+                                    <input type="radio" value="女" name="sex" id="woman">
                                     <span>女</span>
                                 </label>
                             </div>
@@ -259,14 +262,14 @@
                             <label class="col-sm-2 control-label">
                                 出生日期</label>
                             <div class="col-sm-3">
-                                <input type="text" id="myDate" class="form-control" />
+                                <input type="text" id="myDate" name="birthday" class="form-control" />
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-sm-2 control-label">
                                 备注</label>
                             <div class="col-sm-8">
-                                <textarea class="col-sm-12 form-control" rows="5" placeholder="会员备注信息..."></textarea>
+                                <textarea class="col-sm-12 form-control" rows="5" name="note" placeholder="会员备注信息..."></textarea>
                             </div>
                         </div>
                     </form>
@@ -274,7 +277,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
-                    <button type="button" class="btn btn-primary">保存</button>
+                    <button type="button" id="edit_btn" class="btn btn-primary" onclick="saveEdit()">保存</button>
                 </div>
             </div>
         </div>
@@ -287,19 +290,23 @@
                     <h4 class="modal-title">充值</h4>
                 </div>
                 <div class="modal-body">
-                    <form method="get" class="form-horizontal">
+                    <form method="post" class="form-horizontal" id="rechargeForm">
                         <div class="form-group">
+                        <!-- 隐藏域，会员id，卡id -->
+                        <input type="hidden" name="memberId" id="recharge_memberId"/>
+                        <input type="hidden" name="cardId" id="recharge_cardId"/>
+                        
                             <label class="col-sm-2 control-label">
                                 充值次数</label>
                             <div class="col-sm-8">
-                                <input type="number" class="form-control" placeholder="0">
+                                <input type="number" class="form-control" name="addCount" placeholder="0"  value="0">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-sm-2 control-label">
                                 延长有效期</label>
                             <div class="col-sm-8">
-                                <input type="number" class="form-control" placeholder="0">
+                                <input type="number" class="form-control" name="addDay" placeholder="0"  value="0"> 
                             </div>
                         </div>
                         <div class="form-group">
@@ -308,7 +315,7 @@
                             <div class="col-sm-8">
                                 <div class="input-group">
                                     <div class="input-group-addon">￥</div>
-                                    <input type="text" class="form-control"  placeholder="金额">
+                                    <input type="number" name="receivedMoney" class="form-control"  placeholder="金额"  value="0">
                                     <div class="input-group-addon">元</div>
                                 </div>
                             </div>
@@ -317,9 +324,8 @@
                             <label class="col-sm-2 control-label">
                                 支付方式</label>
                             <div class="col-sm-8">
-                                <select class="form-control">
-                                    <option>在线</option>
-                                    <option>线下</option>
+                                <select class="form-control" name="payMode" id="payList">
+                                    <option value="">--请选择--</option>
                                 </select>
                             </div>
                         </div>
@@ -327,7 +333,7 @@
                             <label class="col-sm-2 control-label">
                                 备注</label>
                             <div class="col-sm-8">
-                                <textarea class="col-sm-12 form-control" rows="5" placeholder="备注支付信息..."></textarea>
+                                <textarea class="col-sm-12 form-control" name="note" rows="5" placeholder="备注支付信息..."></textarea>
                             </div>
                         </div>
                     </form>
@@ -335,7 +341,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
-                    <button type="button" class="btn btn-primary">保存</button>
+                    <button type="button" class="btn btn-primary" id="recharge_btn">保存</button>
                 </div>
             </div>
         </div>
@@ -348,26 +354,30 @@
                     <h4 class="modal-title">扣费</h4>
                 </div>
                 <div class="modal-body">
-                    <form method="get" class="form-horizontal">
+                    <form method="post" class="form-horizontal" id="consumeForm">
                         <div class="form-group">
+                        <!-- 隐藏域，会员id，卡id -->
+                        <input type="hidden" name="memberId" id="consume_memberId"/>
+                        <input type="hidden" name="cardId" id="consume_cardId"/>
+                        
                             <label class="col-sm-2 control-label">
                                 扣除次数</label>
                             <div class="col-sm-8">
-                                <input type="number" class="form-control" placeholder="0">
+                                <input type="number" name="cardCountChange" class="form-control" placeholder="0"  value="0">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-sm-2 control-label">
                                 扣除有效期</label>
                             <div class="col-sm-8">
-                                <input type="number" class="form-control" placeholder="0">
+                                <input type="number" name="cardDayChange" class="form-control" placeholder="0" value="0">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-sm-2 control-label">
                                 备注</label>
                             <div class="col-sm-8">
-                                <textarea class="col-sm-12 form-control" rows="5" placeholder="备注支付信息..."></textarea>
+                                <textarea class="col-sm-12 form-control" rows="5" name="note" placeholder="备注支付信息..."></textarea>
                             </div>
                         </div>
                     </form>
@@ -375,7 +385,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
-                    <button type="button" class="btn btn-primary">保存</button>
+                    <button type="button" class="btn btn-primary" id="consume_btn">保存</button>
                 </div>
             </div>
         </div>
@@ -450,291 +460,412 @@
 <script src="../../static/js/plugins/peity/jquery.peity.min.js" th:src="@{/static/js/plugins/peity/jquery.peity.min.js}"></script>
 
 <script>
+/*	支付方式	*/
+var	payListSave = [
+	{"id": 1, "name": "现金"},
+	{"id": 2, "name": "支付宝"},
+	{"id": 3, "name": "微信"},
+	{"id": 4, "name": "银行卡"}
+];
+var payList = payListSave;
+for(var i = 0; i < payList.length; i++){
+	$("#payList").append("<option  value='"+ payList[i].name +"'>"+ payList[i].name +"</option>");
+}			
+	
+/* 选中的列表项 - 支付方式 */
+$("#payList").change(function(){
+	var selectOne = $(this).val();
+	for(var i = 0; i < payListSave.length; i++){
+		$("option[value='"+ payListSave[i].name +"']").attr("selected","");
+		if(selectOne == payListSave[i].name){
+			$("option[value='"+ selectOne +"']").attr("selected","selected");	        						        							
+		}
+	}
+	console.log("pay: " + selectOne);
+});
+
+/* ------ 充值 ------- */
+//获取表单数据
+var rechargeForm = "";
+function toRecharge(memberId, cardId){
+	$("#recharge_btn").on("mouseenter",function(){
+		$("#recharge_memberId").val(memberId);
+		$("#recharge_cardId").val(cardId);
+		rechargeForm = $("#rechargeForm").serialize();
+		console.log(rechargeForm);
+	});
+}
+
+$("#recharge_btn").click(function(){
+	$.post("/xsap/card/rechargeOpt.do",rechargeForm,function(data){
+		window.location.reload();
+	});
+});
+
+/* ------ 扣费 ------- */
+var consumeForm = "";
+function toConsume(memberId, cardId){
+	$("#consume_btn").on("mouseenter",function(){
+		$("#consume_memberId").val(memberId);
+		$("#consume_cardId").val(cardId);
+		consumeForm = $("#consumeForm").serialize();
+		console.log(consumeForm);
+	});
+}
+
+$("#consume_btn").click(function(){
+	$.post("/xsap/card/consumeOpt.do",consumeForm,function(data){
+		window.location.reload();
+	});
+});
+
+
+/* 编辑框传参数id */
+function saveID(){
+		/* 编辑窗口数据填充 */
+	var mid = [[${ID}]]
+	$.ajax({
+		url: "[[${#request.getContextPath()}]]/member/x_member_edit.do",
+		type: "post",
+		data: {id:mid},
+		dataType: "json",
+		success:function(memberData){
+			var birthdayStr = "";
+			if(memberData.birthday != null){
+				birthdayStr = memberData.birthday.toString();
+			}
+			$("input[name='id']").val(memberData.id);
+			$("input[name='name']").val(memberData.name);
+			$("input[name='phone']").val(memberData.phone);
+			if(memberData.sex == "男"){
+				$("#man").prop("checked",true);						
+			}else if(memberData.sex == "女"){
+				$("#woman").prop("checked",true);						
+			}
+			$("input[name='birthday']").val(birthdayStr);
+			$("textarea[name='note']").text(memberData.note);
+		},error:function(){
+			alert("获取数据失败");
+			//重新加载页面
+			window.location.reload();
+		}
+	});
+}
+
+//获取表单数据
+var form = "";
+$("#edit_btn").on("mouseenter",function(){
+	form = $("#updateForm").serialize();
+	console.log(form);
+});
+
+/* 编辑保存操作 */
+function saveEdit(){
+	//移除重复提示
+	$("input[name='phone']").nextAll().remove();
+	//提交表单
+		$.ajax({
+			url: "[[${#request.getContextPath()}]]/member/memberEdit.do",
+			type: "post",
+			data: form,
+			success: function (data) {
+			    if (data.version == 4) {
+			        //刷新界面
+			        window.location.reload();
+			    }else{
+					$("input[name='phone']").after("<span class='text-danger'>"+ data.note +"</span>");	   				 	
+				}
+			},
+			error: function (jqXHR) {
+			    alert("更新失败, 请重新再试!");
+			}
+		
+		});
+}
 
 $(function () {
-
-    $('.dataTables-example.t1')
-        .on('init.dt',function () {
-            console.log("datatable初始化完成....");
-            /*多个滑动按钮同时存在不可少代码*/
-            var elems = Array.prototype.slice.call($('.js-switch'));
-            elems.forEach(function(html) {
-                var switchery = new Switchery(html);
-                //给这个 元素添加事件
-                $(html).on("change",function (event) {
-                   //通过event.target 来获取原 元素
-                    console.log(event.target.checked);
-                    //
-                    //发送AJAX请求到服务端
-                    $.ajax({
-                        url: "/xxx.do",  //此处要把 event.target.checked 的值传递回去, 设计一个请求参数，其值为  event.target.checked
-                        method: "GET",
-                        success: function (data) {
-                            //1. 更新 状态列的 文字信息, 这个 data 是由服务端传递回来的，如果改为 true, 则 data为 激活，否则为 停用
-                            $(html).parent("td").prev().text(data);
-                        },
-                        error: function (jqXHR) {
-                            //出错了：
-                            console.log(jqXHR.status+" : "+jqXHR.responseText);
-                        }
-                    })
-                })
-            });
-        })
-        .dataTable({
-        //注： 后面开发时，url的位置写 服务端控制器的 mapping值,服务端返回的将是json数据
-        ajax: {
-            url: './demo-data/memberCard.json',
-            dataSrc: ''  //注：如果json文件中的数据存在key的话，则此处写 key的名字
-        },
-        //行的定义
-        "columns": [
-            {"data": "clubCard"},
-            {"data": "cartType"},
-            {"data": "numberAvailable"},
-            {"data": "expirationTime"},
-            {"data": "cartState"},
-            {"data": null,
-                "orderable": false,
-                "render": function (data, type, row) {
-                    var id = '"' + row.id + '"';
-                    let html = " <input type='checkbox' class='js-switch' checked />";
-                    return html;
-                }},
-            {"data": null,"orderable": false,
-                "render": function (data, type, row) {
-                    var id = '"' + row.id + '"';
-                    var html = "<a href='javascript:void(0);'  class='btn btn-primary btn-xs' data-toggle='modal' data-target='#details_recharge'>充值<i class='fa fa-re'></i></a>&nbsp &nbsp"
-                    html += "<a href=''  class='btn btn-info btn-xs' data-toggle='modal' data-target='#details_deduction'> 扣费</a>&nbsp &nbsp"
-                    html += "<a href='#?id="+id+"'  class='delete btn btn-danger btn-xs' data-toggle='modal' data-target='#details_operating'> 操作记录</i></a>"
-                    return html;
-                }}
-        ],
-        //去掉搜索
-        searching: false,
-        lengthChange: false,
-        language: {
-            "decimal": "",//小数的小数位符号  比如“，”作为数字的小数位符号
-            "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
-            "info": "当前 _START_ 条到 _END_ 条 共 _TOTAL_ 条",//左下角的信息，变量可以自定义，到官网详细查看
-            /*  "infoEmpty": "无记录",//当没有数据时，左下角的信息*/
-            "infoFiltered": "(从 _MAX_ 条记录过滤)",//当表格过滤的时候，将此字符串附加到主要信息
-            "infoPostFix": "",//在摘要信息后继续追加的字符串
-            "thousands": ",",//千分位分隔符
-            "lengthMenu": "每页 _MENU_ 条记录",//用来描述分页长度选项的字符串
-            "loadingRecords": "加载中...",//用来描述数据在加载中等待的提示字符串 - 当异步读取数据的时候显示
-            "processing": "处理中...",//用来描述加载进度的字符串
-            "search": "搜索",//用来描述搜索输入框的字符串
-            "zeroRecords": "没有找到",//当没有搜索到结果时，显示
-            "paginate": {
-                "first": "首页",
-                "previous": "上一页",
-                "next": "下一页",
-                "last": "尾页"
-            }
-        }
-    });
+	//会员基本信息 - 预加载
+	$.post("/xsap/member/memberDetail.do",{id:[[${ID}]]},function(baseInfo){
+		if(baseInfo.birthday == null){
+			baseInfo.birthday = "";
+		};
+		if(baseInfo.avatarUrl == null){
+			baseInfo.avatarUrl = "user.png";
+		}
+		$("#member_img").attr("src", "../static/img/"+ baseInfo.avatarUrl);
+		$("label h2").html('<strong>' + baseInfo.name + '</strong>');
+		$("label p:nth-child(2)").html('<span style="margin-right: 15px;">性别:</span>' + baseInfo.sex);
+		$("label p:nth-child(3)").html('<span style="margin-right: 5px;">手机号:</span>' + baseInfo.phone);
+		$("label p:nth-child(4)").html('<span style="margin-right: 5px;">出生日期:</span>' + baseInfo.birthday);
+		$("label p:nth-child(5)").html('<span style="margin-right: 5px;">备注:</span>' + baseInfo.note);
+	});
+	
+	//会员卡信息 - 预加载
+	$.post("/xsap/member/cardInfo.do",{id:[[${ID}]]},function(cardInfo){
+		if(cardInfo.length < 1){
+			cardInfo = [];
+		};
+		 $('.dataTables-example.t1').on('init.dt',function () {
+	            console.log("datatable初始化完成....");
+	            /*多个滑动按钮同时存在不可少代码*/
+	            var elems = Array.prototype.slice.call($('.js-switch'));
+	            
+	            elems.forEach(function(html) {
+	                var switchery = new Switchery(html);
+	                //给这个 元素添加事件
+	                $(html).on("change",function (event) {
+	                   //通过event.target 来获取原 元素
+	                   var index = $(html).parents("tr").attr("data-index");
+	                   var statusVal = event.target.checked;
+	                   	if(statusVal == false){
+	                	   statusVal = 0;
+	                   	}else{
+	                   		statusVal = 1;
+	                   	}
+	                   	
+	                    //
+	                    //发送AJAX请求到服务端
+	                    $.ajax({
+	                        url: "/xsap/card/activeOpt.do",  //此处要把 event.target.checked 的值传递回去, 设计一个请求参数，其值为  event.target.checked
+	                        method: "post",
+	                        data: {memberId: [[${ID}]], cardId: cardInfo[index].bindCardId, status:statusVal},
+	                        success: function (data) {	                        	
+	                            //1. 更新 状态列的 文字信息, 这个 data 是由服务端传递回来的，如果改为 true, 则 data为 激活，否则为 停用
+	                            $(html).parent("td").prev().text(data.type);
+	                        },
+	                        error: function (jqXHR) {
+	                            //出错了：
+	                            console.log(jqXHR.status+" : "+jqXHR.responseText);
+	                        }
+	                    });
+	                });
+	                
+	            });
+	            
+	        }).dataTable({
+	        //注： 后面开发时，url的位置写 服务端控制器的 mapping值,服务端返回的将是json数据
+	       	"data": cardInfo,
+	       	"fnCreatedRow": function( nRow, aData, iDataIndex ){
+	             // Bold the grade for all 'A' grade browsers
+	       		// put the data-index attr into nRow
+	       		$(nRow).attr("data-index", iDataIndex);
+	       	},
+	        //行的定义
+	        "columns": [
+	            {"data": "name"},
+	            {"data": "type"},
+	            {"data": "totalCount"},
+	            {"data": "dueTime"},
+	            {"data": "activeStatus",
+	                "orderable": false,
+	                "render": function (data, type, row) {
+	                    var status = data;
+	                    if(status == 0){
+	                    	status = "未激活";
+	                    }else{
+	                    	status = "激活";
+	                    }
+	                    let html = "<td>"+ status +"</td>";
+	                    return html;
+	                }},
+	            {"data": "activeStatus",
+	                "orderable": false,
+	                "render": function (data, type, row) {
+						let id = row.id;//value='"+ id +"'
+	                	let html = " <input type='checkbox' class='js-switch' />";
+	                	if(data == 1){
+	                		html = " <input type='checkbox' checked class='js-switch' />";
+	                	}
+	                    return html;
+	                }},
+	            {"data": null,"orderable": false,
+	                "render": function (data, type, row) {
+	                    var id =  row.bindCardId ;
+	                    
+	                    var html = "<a href='#;' onclick='toRecharge("+ [[${ID}]] +","+ id +")' class='btn btn-primary btn-xs' data-toggle='modal' data-target='#details_recharge'>充值<i class='fa fa-re'></i></a>&nbsp &nbsp"
+	                    html += "<a href='#' onclick='toConsume("+ [[${ID}]] +","+ id +")' class='btn btn-info btn-xs' data-toggle='modal' data-target='#details_deduction'> 扣费</a>&nbsp &nbsp"
+	                    html += "<a href='#?id="+id+"' onclick='operateShow("+ [[${ID}]] +","+ id +")' class='delete btn btn-danger btn-xs' data-toggle='modal' data-target='#details_operating'> 操作记录</i></a>"
+	                    return html;
+	                }}
+	        ],
+	        //去掉搜索
+	        searching: false,
+	        lengthChange: false,
+	        language: {
+	            "decimal": "",//小数的小数位符号  比如“，”作为数字的小数位符号
+	            "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
+	            "info": "当前 _START_ 条到 _END_ 条 共 _TOTAL_ 条",//左下角的信息，变量可以自定义，到官网详细查看
+	            /*  "infoEmpty": "无记录",//当没有数据时，左下角的信息*/
+	            "infoFiltered": "(从 _MAX_ 条记录过滤)",//当表格过滤的时候，将此字符串附加到主要信息
+	            "infoPostFix": "",//在摘要信息后继续追加的字符串
+	            "thousands": ",",//千分位分隔符
+	            "lengthMenu": "每页 _MENU_ 条记录",//用来描述分页长度选项的字符串
+	            "loadingRecords": "加载中...",//用来描述数据在加载中等待的提示字符串 - 当异步读取数据的时候显示
+	            "processing": "处理中...",//用来描述加载进度的字符串
+	            "search": "搜索",//用来描述搜索输入框的字符串
+	            "zeroRecords": "没有找到",//当没有搜索到结果时，显示
+	            "paginate": {
+	                "first": "首页",
+	                "previous": "上一页",
+	                "next": "下一页",
+	                "last": "尾页"
+	            }
+	        }
+	    });
+		 
+	});
 
     //预约记录
-    $('.dataTables-example.t3').dataTable({
-        //通过 ajax 来指定服务端的数据URL
-        ajax: {
-            url: './demo-data/reservationRecord.json',
-            dataSrc: ''  //注：如果json文件中的数据存在key的话，则此处写 key的名字
-        },
-        //行的定义
-        "columns": [
-            {"data":"memberCourse"},
-            {"data": "memberSchooltime"},
-            {"data": "clubCard"},
-            {"data": "memberForwardCounting"},
-            {"data": "numberUse"},
-            {"data": "operationTime"},
-            {"data": "operator"},
-            {"data": "appointmentRemark"},
-            {"data": "operationRatings"}
-        ],
-        //去掉搜索
-        searching: true,
-        lengthChange: false,
-        "autoWidth": false,  //禁用自动宽度
-        language: {
-            "decimal": "",//小数的小数位符号  比如“，”作为数字的小数位符号
-            "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
-            "info": "当前 _START_ 条到 _END_ 条 共 _TOTAL_ 条",//左下角的信息，变量可以自定义，到官网详细查看
-            /*  "infoEmpty": "无记录",//当没有数据时，左下角的信息*/
-            "infoFiltered": "(从 _MAX_ 条记录过滤)",//当表格过滤的时候，将此字符串附加到主要信息
-            "infoPostFix": "",//在摘要信息后继续追加的字符串
-            "thousands": ",",//千分位分隔符
-            "lengthMenu": "每页 _MENU_ 条记录",//用来描述分页长度选项的字符串
-            "loadingRecords": "加载中...",//用来描述数据在加载中等待的提示字符串 - 当异步读取数据的时候显示
-            "processing": "处理中...",//用来描述加载进度的字符串
-            "search": "搜索",//用来描述搜索输入框的字符串
-            "zeroRecords": "没有找到",//当没有搜索到结果时，显示
-            "paginate": {
-                "first": "首页",
-                "previous": "上一页",
-                "next": "下一页",
-                "last": "尾页"
-            }
-        }
+    $.post("/xsap/member/reserveInfo.do",{id:[[${ID}]]},function(reserveInfo){
+    	if(reserveInfo.length < 1){
+    		reserveInfo = [];
+    	}
+    	 $('.dataTables-example.t3').dataTable({
+   	        //通过 ajax 来指定服务端的数据URL
+   	        "data": reserveInfo,
+   	        //行的定义
+   	        "columns": [
+   	            {"data":"courseName"},
+   	            {"data": "reserveTime"},
+   	            {"data": "cardName"},
+   	            {"data": "reserveNumbers"},
+   	            {"data": "timesCost"},
+   	            {"data": "operateTime"},
+   	            {"data": "operator"},
+   	            {"data": "reserveNote"},
+   	            {"data": "reserveStatus"}
+   	        ],
+   	        //去掉搜索
+   	        searching: true,
+   	        lengthChange: false,
+   	        "autoWidth": false,  //禁用自动宽度
+   	        language: {
+   	            "decimal": "",//小数的小数位符号  比如“，”作为数字的小数位符号
+   	            "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
+   	            "info": "当前 _START_ 条到 _END_ 条 共 _TOTAL_ 条",//左下角的信息，变量可以自定义，到官网详细查看
+   	            /*  "infoEmpty": "无记录",//当没有数据时，左下角的信息*/
+   	            "infoFiltered": "(从 _MAX_ 条记录过滤)",//当表格过滤的时候，将此字符串附加到主要信息
+   	            "infoPostFix": "",//在摘要信息后继续追加的字符串
+   	            "thousands": ",",//千分位分隔符
+   	            "lengthMenu": "每页 _MENU_ 条记录",//用来描述分页长度选项的字符串
+   	            "loadingRecords": "加载中...",//用来描述数据在加载中等待的提示字符串 - 当异步读取数据的时候显示
+   	            "processing": "处理中...",//用来描述加载进度的字符串
+   	            "search": "搜索",//用来描述搜索输入框的字符串
+   	            "zeroRecords": "没有找到",//当没有搜索到结果时，显示
+   	            "paginate": {
+   	                "first": "首页",
+   	                "previous": "上一页",
+   	                "next": "下一页",
+   	                "last": "尾页"
+   	            }
+   	        }
+   	    });
+    	
     });
 
     //上课记录
-    $('.dataTables-example.t2').dataTable({
-        //TODO json获取数据
-        ajax: {
-            url: './demo-data/classRecord.json',
-            dataSrc: ''  //注：如果json文件中的数据存在key的话，则此处写 key的名字
-        },
-        //行的定义
-        "columns": [
-            {"data": "memberCourse"},
-            {"data": "memberSchooltime"},
-            {"data": "teacherName"},
-            {"data": "clubCard"},
-            {"data": "memberForwardCounting"},
-            {"data": "numberUse"},
-            {"data": "teacherRatings"},
-            {"data": "checkStatus", "render": function (data, type, row) {
-                    //console.log(data + " -> "+type+" -> "+row);
-                    if(data == '已确认') {
-                        return '<span class="label label-success">'+data+'</span>';
-                    } else if(data == '未确认') {
-                        return '<span class="label label-danger">'+data+'</span>';
-                    } else {
-                        return '<span class="label label-default">'+data+'</span>';
-                    }
-                }}
-        ],
-        //去掉搜索
-        searching: true,
-        lengthChange: false,
-        "autoWidth": false,  //禁用自动宽度
-        language: {
-            "decimal": "",//小数的小数位符号  比如“，”作为数字的小数位符号
-            "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
-            "info": "当前 _START_ 条到 _END_ 条 共 _TOTAL_ 条",//左下角的信息，变量可以自定义，到官网详细查看
-            /*  "infoEmpty": "无记录",//当没有数据时，左下角的信息*/
-            "infoFiltered": "(从 _MAX_ 条记录过滤)",//当表格过滤的时候，将此字符串附加到主要信息
-            "infoPostFix": "",//在摘要信息后继续追加的字符串
-            "thousands": ",",//千分位分隔符
-            "lengthMenu": "每页 _MENU_ 条记录",//用来描述分页长度选项的字符串
-            "loadingRecords": "加载中...",//用来描述数据在加载中等待的提示字符串 - 当异步读取数据的时候显示
-            "processing": "处理中...",//用来描述加载进度的字符串
-            "search": "搜索",//用来描述搜索输入框的字符串
-            "zeroRecords": "没有找到",//当没有搜索到结果时，显示
-            "paginate": {
-                "first": "首页",
-                "previous": "上一页",
-                "next": "下一页",
-                "last": "尾页"
-            }
-        }
+    $.post("/xsap/member/classInfo.do",{id:[[${ID}]]},function(classInfo){
+    	if(classInfo.length < 1){
+    		classInfo = [];
+    	}
+	    $('.dataTables-example.t2').dataTable({
+	        //TODO json获取数据
+	        "data": classInfo,
+	        //行的定义
+	        "columns": [
+	            {"data": "courseName"},
+	            {"data": "classTime"},
+	            {"data": "teacherName"},
+	            {"data": "cardName"},
+	            {"data": "classNumbers"},
+	            {"data": "timesCost"},
+	            {"data": "comment"},
+	            {"data": "checkStatus", "render": function (data, type, row) {
+	                    //console.log(data + " -> "+type+" -> "+row);
+	                    if(data == '1') {
+	                        return '<span class="label label-success">已确认</span>';
+	                    } else if(data == '0') {
+	                        return '<span class="label label-danger">未确认</span>';
+	                    } 
+	                    /* else {
+	                        return '<span class="label label-default">'+data+'</span>';
+	                    } */
+	                }}
+	        ],
+	        //去掉搜索
+	        searching: true,
+	        lengthChange: false,
+	        "autoWidth": false,  //禁用自动宽度
+	        language: {
+	            "decimal": "",//小数的小数位符号  比如“，”作为数字的小数位符号
+	            "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
+	            "info": "当前 _START_ 条到 _END_ 条 共 _TOTAL_ 条",//左下角的信息，变量可以自定义，到官网详细查看
+	            /*  "infoEmpty": "无记录",//当没有数据时，左下角的信息*/
+	            "infoFiltered": "(从 _MAX_ 条记录过滤)",//当表格过滤的时候，将此字符串附加到主要信息
+	            "infoPostFix": "",//在摘要信息后继续追加的字符串
+	            "thousands": ",",//千分位分隔符
+	            "lengthMenu": "每页 _MENU_ 条记录",//用来描述分页长度选项的字符串
+	            "loadingRecords": "加载中...",//用来描述数据在加载中等待的提示字符串 - 当异步读取数据的时候显示
+	            "processing": "处理中...",//用来描述加载进度的字符串
+	            "search": "搜索",//用来描述搜索输入框的字符串
+	            "zeroRecords": "没有找到",//当没有搜索到结果时，显示
+	            "paginate": {
+	                "first": "首页",
+	                "previous": "上一页",
+	                "next": "下一页",
+	                "last": "尾页"
+	            }
+	        }
+	    });
+    	
     });
+    
     //消费记录
-    $('.dataTables-example.t4').dataTable({
-        //
-        ajax: {
-            url: './demo-data/consumeRecord.json',
-            dataSrc: ''  //注：如果json文件中的数据存在key的话，则此处写 key的名字
-        },
-        //行的定义
-        "columns": [
-            {"data": "clubCard"},
-            {"data": "operationTime"},
-            {"data": "cardChange"},
-            {"data": "validDayChange"},
-            {"data": "amountMoney"},
-            {"data": "operationRatings"},
-            {"data": "operator"},
-            {"data": "appointmentRemark"}
-        ],
-        //去掉搜索
-        searching: true,
-        lengthChange: false,
-        "autoWidth": false,  //禁用自动宽度
-        language: {
-            "decimal": "",//小数的小数位符号  比如“，”作为数字的小数位符号
-            "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
-            "info": "当前 _START_ 条到 _END_ 条 共 _TOTAL_ 条",//左下角的信息，变量可以自定义，到官网详细查看
-            /*  "infoEmpty": "无记录",//当没有数据时，左下角的信息*/
-            "infoFiltered": "(从 _MAX_ 条记录过滤)",//当表格过滤的时候，将此字符串附加到主要信息
-            "infoPostFix": "",//在摘要信息后继续追加的字符串
-            "thousands": ",",//千分位分隔符
-            "lengthMenu": "每页 _MENU_ 条记录",//用来描述分页长度选项的字符串
-            "loadingRecords": "加载中...",//用来描述数据在加载中等待的提示字符串 - 当异步读取数据的时候显示
-            "processing": "处理中...",//用来描述加载进度的字符串
-            "search": "搜索",//用来描述搜索输入框的字符串
-            "zeroRecords": "没有找到",//当没有搜索到结果时，显示
-            "paginate": {
-                "first": "首页",
-                "previous": "上一页",
-                "next": "下一页",
-                "last": "尾页"
-            }
-        }
+    $.post("/xsap/member/consumeInfo.do",{id:[[${ID}]]},function(consumeInfo){
+    	if(consumeInfo.length < 1){
+    		consumeInfo = [];
+    	}
+	    $('.dataTables-example.t4').dataTable({
+	        "data": consumeInfo,
+	        //行的定义
+	        "columns": [
+	            {"data": "cardName"},
+	            {"data": "operateTime"},
+	            {"data": "cardCountChange"},
+	            {"data": "timesRemainder"},
+	            {"data": "moneyCost"},
+	            {"data": "operateType"},
+	            {"data": "operator"},
+	            {"data": "note"}
+	        ],
+	        //去掉搜索
+	        searching: true,
+	        lengthChange: false,
+	        "autoWidth": false,  //禁用自动宽度
+	        language: {
+	            "decimal": "",//小数的小数位符号  比如“，”作为数字的小数位符号
+	            "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
+	            "info": "当前 _START_ 条到 _END_ 条 共 _TOTAL_ 条",//左下角的信息，变量可以自定义，到官网详细查看
+	            /*  "infoEmpty": "无记录",//当没有数据时，左下角的信息*/
+	            "infoFiltered": "(从 _MAX_ 条记录过滤)",//当表格过滤的时候，将此字符串附加到主要信息
+	            "infoPostFix": "",//在摘要信息后继续追加的字符串
+	            "thousands": ",",//千分位分隔符
+	            "lengthMenu": "每页 _MENU_ 条记录",//用来描述分页长度选项的字符串
+	            "loadingRecords": "加载中...",//用来描述数据在加载中等待的提示字符串 - 当异步读取数据的时候显示
+	            "processing": "处理中...",//用来描述加载进度的字符串
+	            "search": "搜索",//用来描述搜索输入框的字符串
+	            "zeroRecords": "没有找到",//当没有搜索到结果时，显示
+	            "paginate": {
+	                "first": "首页",
+	                "previous": "上一页",
+	                "next": "下一页",
+	                "last": "尾页"
+	            }
+	        }
+	    });
+   		
     });
-    $('.dataTables-example.t5').dataTable({
-        //TODO json获取数据
-        "data": [
-            {"id":10,
-                "operationTime":"2019-10-31 08:57:08",
-                "operationRatings":"扣费",
-                "numberAvailable":12,
-                "expirationTime":"2020-08-26 00:00:00",
-                "amountMoney": "0",
-                "operator":"梁婷",
-                "appointmentRemark":"送水杯",
-                "cartState":"激活"
-            },
-            {"id":10,
-                "operationTime":"2019-10-31 08:57:08",
-                "operationRatings":"扣费",
-                "numberAvailable":12,
-                "expirationTime":"2020-08-26 00:00:00",
-                "amountMoney": "0",
-                "operator":"梁婷",
-                "appointmentRemark":"送水杯",
-                "cartState":"激活"
-            }
-        ],
-        //行的定义
-        "columns": [
-            {"data": "operationTime"},
-            {"data": "operationRatings"},
-            {"data": "numberAvailable"},
-            {"data": "expirationTime"},
-            {"data": "amountMoney"},
-            {"data": "operator"},
-            {"data": "appointmentRemark"},
-            {"data": "cartState"}
-        ],
-        //去掉搜索
-        searching: false,
-        lengthChange: false,
-        language: {
-            "decimal": "",//小数的小数位符号  比如“，”作为数字的小数位符号
-            "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
-            "info": "当前 _START_ 条到 _END_ 条 共 _TOTAL_ 条",//左下角的信息，变量可以自定义，到官网详细查看
-            /*  "infoEmpty": "无记录",//当没有数据时，左下角的信息*/
-            "infoFiltered": "(从 _MAX_ 条记录过滤)",//当表格过滤的时候，将此字符串附加到主要信息
-            "infoPostFix": "",//在摘要信息后继续追加的字符串
-            "thousands": ",",//千分位分隔符
-            "lengthMenu": "每页 _MENU_ 条记录",//用来描述分页长度选项的字符串
-            "loadingRecords": "加载中...",//用来描述数据在加载中等待的提示字符串 - 当异步读取数据的时候显示
-            "processing": "处理中...",//用来描述加载进度的字符串
-            "search": "搜索",//用来描述搜索输入框的字符串
-            "zeroRecords": "没有找到",//当没有搜索到结果时，显示
-            "paginate": {
-                "first": "首页",
-                "previous": "上一页",
-                "next": "下一页",
-                "last": "尾页"
-            }
-        }
-    });
-
+    
     /*时间选择器配置*/
     $('#myDate').datepicker({
         language: "zh-CN",
@@ -746,8 +877,59 @@ $(function () {
         startDate: '1970-1-1', //与你自己设置的格式一致yyyy-mm-dd，未设置的话与默认格式一致mm/dd/yyyy
         endDate: '2070-1-1'
     });
+    
 });
 
+function operateShow(member_id,card_id){
+	console.log(member_id + " - " + card_id);
+		//操作记录
+    $.post("/xsap/card/operateRecord.do",{memberId:member_id,cardId:card_id},function(operateInfo){
+    	if(operateInfo.length < 1){
+    		operateInfo = [];
+    	};
+    	console.log(operateInfo);
+    	console.log($('.dataTables-example.t5'));
+	    $('.dataTables-example.t5').dataTable({
+	        //TODO json获取数据
+	        "data": operateInfo,
+	        //行的定义
+	        "columns": [
+	            {"data": "operateTime"},
+	            {"data": "operateType"},
+	            {"data": "validTimes"},
+	            {"data": "endToDate"},
+	            {"data": "involveMoney"},
+	            {"data": "operator"},
+	            {"data": "cardNote"},
+	            {"data": "status"}
+	        ],
+	        //去掉搜索
+	        searching: false,
+	        lengthChange: false,
+	        language: {
+	            "decimal": "",//小数的小数位符号  比如“，”作为数字的小数位符号
+	            "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
+	            "info": "当前 _START_ 条到 _END_ 条 共 _TOTAL_ 条",//左下角的信息，变量可以自定义，到官网详细查看
+	            /*  "infoEmpty": "无记录",//当没有数据时，左下角的信息*/
+	            "infoFiltered": "(从 _MAX_ 条记录过滤)",//当表格过滤的时候，将此字符串附加到主要信息
+	            "infoPostFix": "",//在摘要信息后继续追加的字符串
+	            "thousands": ",",//千分位分隔符
+	            "lengthMenu": "每页 _MENU_ 条记录",//用来描述分页长度选项的字符串
+	            "loadingRecords": "加载中...",//用来描述数据在加载中等待的提示字符串 - 当异步读取数据的时候显示
+	            "processing": "处理中...",//用来描述加载进度的字符串
+	            "search": "搜索",//用来描述搜索输入框的字符串
+	            "zeroRecords": "没有找到",//当没有搜索到结果时，显示
+	            "paginate": {
+	                "first": "首页",
+	                "previous": "上一页",
+	                "next": "下一页",
+	                "last": "尾页"
+	            }
+	        }
+	    }).fnDestroy();
+    	
+    });
+}
 
 </script>
 

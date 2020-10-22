@@ -17,6 +17,7 @@ import com.kclm.xsap.dto.ClassRecordDTO;
 import com.kclm.xsap.dto.ConsumeRecordDTO;
 import com.kclm.xsap.dto.MemberCardDTO;
 import com.kclm.xsap.dto.MemberDTO;
+import com.kclm.xsap.dto.MemberVO;
 import com.kclm.xsap.dto.ReserveRecordDTO;
 import com.kclm.xsap.dto.convert.ClassRecordConvert;
 import com.kclm.xsap.dto.convert.ConsumeRecordConvert;
@@ -128,9 +129,15 @@ public class MemberServiceImpl implements MemberService{
 	}
 
 	@Override
+	public TMember findByPhone(String phone) {
+		TMember member = memberMapper.selectOne(new QueryWrapper<TMember>().eq("phone", phone));
+		return member;
+	}
+	
+	@Override
 	public List<TMember> findByKeyword(String condition) {
 		List<TMember> memberList = memberMapper.selectList(new QueryWrapper<TMember>()
-				.like("phone", condition).or().like("name", condition));
+				.eq("phone", condition).or().like("name", condition));
 		return memberList;
 	}
 
@@ -170,7 +177,57 @@ public class MemberServiceImpl implements MemberService{
 
 	/* 待处理  - end*/
 	
+	//匹配视图的会员信息
 	@Override
+	public List<MemberVO> listMemberView(){
+		List<MemberVO> memberVoList = new ArrayList<MemberVO>();
+		
+		List<TMember> memberList = memberMapper.selectList(null);
+		for (int k = 0 ; k < memberList.size() ; k++) {
+				TMember member = memberList.get(k);
+				//查询到当前会员绑定的所有会员卡
+				List<TMemberBindRecord> bindList = bindMapper.selectList(new QueryWrapper<TMemberBindRecord>()
+						.eq("member_id", member.getId()));
+				//拼接会员卡名
+				TMemberBindRecord bindRecord = new TMemberBindRecord();
+				StringBuilder sb = new StringBuilder();
+				if(bindList == null || bindList.size() < 1) {
+					sb.append("无");
+					System.out.println("------当前会员没绑定任何卡");
+				}else {
+					for(int i = 0; i < bindList.size(); i++) {
+						bindRecord = bindList.get(i);
+						//获取每张会员卡信息
+						TMemberCard memberCard = cardMapper.selectById(bindRecord.getCardId());
+						if(memberCard != null) {
+							if(i>= 1 && i < bindList.size()) {
+								sb.append( " | ");
+							}
+							sb.append(memberCard.getName());							
+						}
+					}
+				}
+				
+				String cardHold = sb.toString();
+				System.out.println(member.getName()+"----绑卡信息：" + cardHold);
+				//组合字段：会员（手机号）
+				String namePhone = member.getName() +"("+member.getPhone() +")";
+				
+				MemberVO memberVo = new MemberVO();
+				memberVo.setId(member.getId());
+				memberVo.setNamePhone(namePhone);
+				memberVo.setGender(member.getSex());
+				memberVo.setBirthday(member.getBirthday());
+				memberVo.setCardHold(cardHold);
+				//组合VO
+				memberVoList.add(memberVo);
+		}
+		return memberVoList;
+	}
+	
+	//完整的会员详情信息
+	@Override
+	@Deprecated
 	public MemberDTO getMemberDetailById(Long id) {
 		TMember member = memberMapper.selectById(id);
 		if(member == null) {
@@ -178,7 +235,7 @@ public class MemberServiceImpl implements MemberService{
 			return null;
 		}
 		//会员卡信息
-		List<MemberCardDTO> cardRecords = findAllCardRecords(id);
+		List<MemberCardDTO> cardRecords = listCardRecords(id);
 		//上课记录
 		List<ClassRecordDTO> classRecords = listClassRecords(id);
 		//预约记录
@@ -204,7 +261,7 @@ public class MemberServiceImpl implements MemberService{
 	
 	//会员卡信息
 	@Override
-	public List<MemberCardDTO> findAllCardRecords(Long id) {
+	public List<MemberCardDTO> listCardRecords(Long id) {
 		System.out.println("---------- 会员卡信息 --------");
 		List<MemberCardDTO> cardDtoList = new ArrayList<>();
 		
@@ -222,24 +279,31 @@ public class MemberServiceImpl implements MemberService{
 			//会员卡可用次数
 			TMemberBindRecord bind = bindMapper.selectOne(new QueryWrapper<TMemberBindRecord>()
 					.eq("member_id", id).eq("card_id", bindRecord.getCardId()));
-			Integer validTimes = bind.getValidCount();
-			
+			if(bind == null) {
+				System.out.println("------当前会员没绑定任何卡");
+				return null;
+			}
 			//会员卡到期日
+			Integer	validTimes = bind.getValidCount();
 			LocalDateTime createTime = bind.getCreateTime();
-			LocalDateTime endTime = createTime.plusDays(bind.getValidDay());
+			LocalDateTime	endTime = null;					
+			if(createTime !=null) {
+				endTime = createTime.plusDays(bind.getValidDay());			
+			}
 			
 			//获取每张会员卡信息
 			TMemberCard memberCard = cardMapper.selectById(bindRecord.getCardId());
-			
-			//组成一条会员卡信息DTO
-			MemberCardDTO cardDto = new MemberCardDTO();
-			cardDto.setMemberCardId(memberCard.getId());
-			cardDto.setName(memberCard.getName());
-			cardDto.setType(memberCard.getType());
-			cardDto.setTotalCount(validTimes);
-			cardDto.setDueTime(endTime);
-			cardDto.setStatus(memberCard.getStatus());
-			cardDtoList.add(cardDto);
+			if(memberCard != null) {
+				//组成一条会员卡信息DTO
+				MemberCardDTO cardDto = new MemberCardDTO();
+				cardDto.setBindCardId(memberCard.getId());
+				cardDto.setName(memberCard.getName());
+				cardDto.setType(memberCard.getType());
+				cardDto.setTotalCount(validTimes);
+				cardDto.setDueTime(endTime);
+				cardDto.setActiveStatus(bind.getActiveStatus());
+				cardDtoList.add(cardDto);
+			}
 		}
 		return cardDtoList;
 	}
@@ -363,11 +427,14 @@ public class MemberServiceImpl implements MemberService{
 	public List<ConsumeRecordDTO> listConsumeRecords(Long id) {
 		System.out.println("---------- 消费记录 --------");
 		/* 查询前，先对上课记录进行消费录入 */
-		
+		List<TConsumeRecord> consumeCheck = consumeMapper.selectList(new QueryWrapper<TConsumeRecord>()
+				.eq("member_id", id));
+	
 		//查出所有确认已上课事务记录，进行消费记录的录入
 		List<TClassRecord> classList = classMapper.selectList(
 				new QueryWrapper<TClassRecord>().eq("check_status", 1).eq("member_id", id));
-		if(classList != null) {
+		//若该会员确认过的上课记录的条数比消费记录（未录入前）多时，才判定上课记录可以进行消费录入
+		if(classList != null && consumeCheck != null && classList.size() > consumeCheck.size()) {
 			for (TClassRecord classed : classList) {
 				TConsumeRecord consume = new TConsumeRecord();
 				
@@ -394,21 +461,26 @@ public class MemberServiceImpl implements MemberService{
 				//消费的次数
 				BigDecimal countCost = new BigDecimal(course.getTimesCost().toString());
 				consume.setMoneyCost(unitPrice.multiply(countCost));
+				
 				//录入一条消费记录
 				consumeMapper.insert(consume);
+				
 				//消费操作
 				TMemberBindRecord bindRecord = bindMapper.selectOne(new QueryWrapper<TMemberBindRecord>()
 						.eq("card_id", consume.getCardId()).eq("member_id", consume.getMemberId()));
+				if(bindRecord == null) {
+					System.out.println("------当前会员没绑定任何卡，不存在消费行为");
+					return null;
+				}
 				bindRecord.setValidCount(bindRecord.getValidCount() + consume.getCardCountChange());
 				bindRecord.setValidDay(bindRecord.getValidDay() + consume.getCardDayChange());
 				bindRecord.setReceivedMoney(bindRecord.getReceivedMoney().subtract(consume.getMoneyCost()));
 				bindMapper.update(bindRecord, new QueryWrapper<TMemberBindRecord>()
-						.eq("card_id", consume.getCardId()).eq("member_id", consume.getMemberId()));
+						.eq("card_id", consume.getCardId()).eq("member_id", consume.getMemberId()));					
 			}
 		}
 		
 		/* 以下是查询 */
-		
 		List<TConsumeRecord> consumeList = consumeMapper.selectList(new QueryWrapper<TConsumeRecord>()
 				.eq("member_id", id));
 		if(consumeList == null || consumeList.size() < 1) {
@@ -416,13 +488,12 @@ public class MemberServiceImpl implements MemberService{
 			return null;
 		}
 		
-		List<Long> idList = new ArrayList<>();
+		List<TMemberCard> cardList = new ArrayList<TMemberCard>();
 		for(int i = 0; i < consumeList.size(); i++) {
-			idList.add(consumeList.get(i).getCardId());
+			TMemberCard card = cardMapper.selectById(consumeList.get(i).getCardId());
+			cardList.add(card);
 		}
 		//根据每条消费记录查询到的会员卡信息
-		List<TMemberCard> cardList = cardMapper.selectBatchIds(idList);
-
 		List<ConsumeRecordDTO> consumeDtoList = new ArrayList<>();
 		for(int i = 0; i < consumeList.size(); i++) {
 			TConsumeRecord consumeRecord = new TConsumeRecord();
@@ -433,7 +504,11 @@ public class MemberServiceImpl implements MemberService{
 			 //查询剩余卡次
 			 TMemberBindRecord bindRecord = bindMapper.selectOne(new QueryWrapper<TMemberBindRecord>()
 					 .eq("card_id", memberCard.getId()).eq("member_id", id));
-			 Integer timesRemainder = bindRecord.getValidCount();
+			 if(bindRecord == null) {
+				 System.out.println("------当前会员没绑定任何卡，不存在消费行为");
+				return null;
+			 }
+			 Integer timesRemainder = bindRecord.getValidCount();				 
 			 //==========DTO存储
 			 ConsumeRecordDTO consumeDto = new ConsumeRecordDTO();
 			 consumeDto.setConsumeId(consumeRecord.getId());
@@ -451,4 +526,10 @@ public class MemberServiceImpl implements MemberService{
 		return consumeDtoList;
 	}
 
+	//根据id查询
+	@Override
+	public TMember getMember(Long id) {
+		TMember member = memberMapper.selectById(id);
+		return member;
+	}
 }

@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import lombok.Data;
@@ -38,7 +39,7 @@ public class TMemberCard extends BaseEntity implements Serializable{
     /**
     * 描述信息
     */
-    private String desc;
+    private String description;
 
     /**
     * 备注信息
@@ -61,8 +62,9 @@ public class TMemberCard extends BaseEntity implements Serializable{
     private Integer totalDay;
 
     /**
-    * 激活状态，1激活，0非激活
-    */
+     * 逻辑删除，1代表已删，非激活；0代表未删，激活
+     */
+     @TableLogic	//局部添加逻辑删除
     private Integer status;
 
 }

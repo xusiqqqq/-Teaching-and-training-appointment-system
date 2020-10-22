@@ -12,6 +12,8 @@ import com.kclm.xsap.XsapApplication;
 import com.kclm.xsap.entity.TMemberBindRecord;
 import com.kclm.xsap.mapper.TMemberBindRecordMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
 @SpringBootTest(classes = XsapApplication.class)
 public class JustTest {
 
@@ -33,6 +35,12 @@ public class JustTest {
 		TMemberBindRecord bindRecord = bindMapper.selectOne(new QueryWrapper<TMemberBindRecord>()
 				.eq("card_id", 1L).eq("member_id", 1L));
 		System.out.println("---"+ bindRecord);
+	}
+	
+	@Test
+	public void json() {
+
+
 	}
 	
 }

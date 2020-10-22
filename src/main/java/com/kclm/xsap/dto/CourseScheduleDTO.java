@@ -3,6 +3,8 @@ package com.kclm.xsap.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

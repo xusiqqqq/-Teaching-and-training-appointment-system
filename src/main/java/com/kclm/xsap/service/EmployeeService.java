@@ -17,7 +17,7 @@ public interface EmployeeService {
 	 * @param id
 	 * @return TEmployee。员工信息
 	 */
-	TEmployee findById(Integer id);
+	TEmployee findById(Long id);
 	
 	/**
 	 * 	通过手机号/邮箱找到用户信息

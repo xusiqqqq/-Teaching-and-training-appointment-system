@@ -29,7 +29,7 @@ public class MemberCardServiceTest {
 		TMemberCard card = new TMemberCard();
 		card.setName("体验卡");
 		card.setPrice(BigDecimal.valueOf(12.5));
-		card.setDesc("免费使用10次");
+		card.setDescription("免费使用10次");
 		card.setNote("值得拥有");
 		card.setType("有限次数100");
 		card.setTotalCount(30);
@@ -41,7 +41,7 @@ public class MemberCardServiceTest {
 
 	@Test
 	public void deleteById() {
-		cardService.deleteById(2L);
+		cardService.deleteById(14L);
 	}
 
 	@Test

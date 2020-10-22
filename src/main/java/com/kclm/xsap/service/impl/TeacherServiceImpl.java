@@ -56,7 +56,7 @@ public class TeacherServiceImpl implements TeacherService{
 
 	@Override
 	public boolean update(TEmployee emp) {
-		employeeMapper.updateById(emp);
+		employeeMapper.update(emp,new QueryWrapper<TEmployee>().eq("id",emp.getId()));
 		return true;
 	}
 

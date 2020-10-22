@@ -105,7 +105,7 @@ public class EmployeeServiceImpl implements EmployeeService{
 
 	//通过id查找员工信息
 	@Override
-	public TEmployee findById(Integer id) {
+	public TEmployee findById(Long id) {
 		TEmployee employee = employeeMapper.selectById(id);
 		return employee;
 	}

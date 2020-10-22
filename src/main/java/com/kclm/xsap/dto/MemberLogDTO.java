@@ -55,7 +55,7 @@ public class MemberLogDTO {
 	private String cardNote;
 	
 	/**
-	 * 会员卡激活状态， 来自于会员卡 实体类
+	 * 会员卡激活状态， 来自于会员绑定会员卡的记录
 	 */
 	private Integer status;
 	

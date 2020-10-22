@@ -30,8 +30,6 @@ public class ClassRecordDTO{
 	private Long courseId;
 
 	private Long scheduleId;
-
-	private Long cardId;
 	
 	private Long memberId;
 	

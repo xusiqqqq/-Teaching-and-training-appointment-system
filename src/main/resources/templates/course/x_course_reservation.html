@@ -23,21 +23,24 @@
     <div class="wrapper wrapper-content">
         <div class="row animated fadeInRight">
 <!--                <h1>团课预约操作 - 敬请期待...</h1>-->
-                <form action="#"  name="x_course_reservation" method="post" class="form-horizontal " >
+                <form action="#"  id="editForm" method="post" class="form-horizontal " >
 <!--                    预约开始时间-->
                     <div class="form-group">
                         <label class="col-sm-3 control-label">预约开始时间</label>
                         <div class="col-sm-9">
 <!--                            <div class="radio">-->
                                 <label>
-                                    <input type="radio" name="start" value="start" >
+                                	<!-- 隐藏域，id -->
+                                	<input type="hidden" name="id" value="1" th:value="${GLOBAL_SET.id}">
+                                	
+                                    <input type="radio" name="start" value="-1" id="start-0"  checked>
                                     不限制会员可提前预约课程的天数
                                 </label>
 <!--                            </div>-->
                             <br>
                                 <label>
-                                    <input type="radio" name="start" value="start" checked>
-                                   会员最多可以提前预约<input type="text" name="start" value="10" />天内的课程
+                                    <input type="radio" name="start" value="" id="start-1">
+                                   会员最多可以提前预约<input type="text" name="startDay" value="10" th:value="${GLOBAL_SET.startDay}" />天内的课程
                                 </label>
                         </div>
                     </div>
@@ -46,18 +49,19 @@
                         <label class="col-sm-3 control-label">预约截止时间</label>
                         <div class="col-sm-9">
                                 <label>
-                                    <input type="radio" name="end"  value="end" checked>
+                                    <input type="radio" name="end"  value="-1" id="end-0" checked>
                                     在上课前任意时间，均可预约
                                 </label>
                             <br>
                                 <label>
-                                    <input type="radio" name="end"  value="end" checked>
-                                    预约截止时间:上课前<input type="text" name="end" value="2">小时
+                                    <input type="radio" name="end"  value="endHour"  id="end-1">
+                                    预约截止时间:上课前<input type="text" name="endHour" value="2" th:value="${GLOBAL_SET.endHour}">小时
                                 </label>
                             <br>
                                 <label>
-                                    <input type="radio" name="end" value="end">
-                                    预约截止时间:上课前<input type="text" value="3">天的<input type="time" name="end" value="19:00:00">
+                                    <input type="radio" name="end" value="endDay"  id="end-2">
+                                    预约截止时间:上课前<input type="text" name="endDay" value="3" th:value="${GLOBAL_SET.endDay}">天的
+                                    <input type="time" name="endTime" value="19:00:00" th:value="${endTimeStr}">
                                 </label>
                         </div>
                     </div>
@@ -66,18 +70,19 @@
                         <label class="col-sm-3 control-label">取消预约时间</label>
                         <div class="col-sm-9">
                                 <label>
-                                    <input type="radio" name="cancel"  value="cancel" >
+                                    <input type="radio" name="cancel" id="cancel-0" value="-1" checked>
                                     在上课前任意时间，均可取消预约
                                 </label>
                             <br>
                                 <label>
-                                    <input type="radio" name="cancel"  value="cancel" checked>
-                                    预约预约截止时间:上课前<input type="text" name="cancel" value="2">小时
+                                    <input type="radio" name="cancel"  value="cancelHour" id="cancel-1">
+                                    预约预约截止时间:上课前<input type="text" name="cancelHour" value="2" th:value="${GLOBAL_SET.cancelHour}">小时
                                 </label>
                             <br>
                                 <label>
-                                    <input type="radio" name="cancel" value="cancel">
-                                    预约预约截止时间:上课前<input type="text" value="1">天的<input type="time" name="cancel" value="21:00:00">
+                                    <input type="radio" name="cancel" value="cancelDay" id="cancel-2">
+                                    预约预约截止时间:上课前<input type="text" name="cancelDay" value="1"  th:value="${GLOBAL_SET.cancelDay}">天的
+                                    <input type="time" name="cancelTime" value="21:00:00"  th:value="${cancelTimeStr}">
                                 </label>
                         </div>
                     </div>
@@ -85,13 +90,39 @@
                     <div class="form-group">
                         <label class="col-sm-3 control-label"></label>
                         <div class="col-sm-9">
-                            <button type="submit" class="btn btn-success"  id="save">保存</button>
+                            <button type="" class="btn btn-success"  id="save" >保存</button>
                         </div>
                     </div>
+                    
                 </form>
-
         </div>
     </div>
+<!-- 提示模态窗 -->
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="ibox float-e-margins">
+
+			<div class="modal inmodal fade" id="tip" tabindex="-1" role="dialog"  aria-hidden="true">
+		         <div class="modal-dialog modal-sm">
+		              <div class="modal-content">
+		                    <div class="modal-header">
+		                         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+		                         <h4 class="modal-title">全局预约设置更改</h4>
+		                    </div>
+		                    <div class="modal-body">
+			                    <div style="text-align: center; ">
+			                    	<h1 style="color: blue">修改成功</h1>
+			                    </div>
+		                    </div>
+		              </div>
+		         </div>
+			</div>
+
+			</div>
+		</div>
+	</div>
+</div>
 
 <!-- 全局js -->
 <script src="../../static/js/jquery.min.js?v=2.1.4" th:src="@{/static/js/jquery.min.js(v='2.1.4')}"></script>
@@ -105,7 +136,27 @@
 
     <!-- Peity -->
 <!--    <script src="../../static/js/demo/peity-demo.js"></script>-->
+<script type="text/javascript">
+$(function(){
+	 var formData = "";
+     $("#save").on("mouseenter",function(){
+     	formData = $("#editForm").serialize();
+ 		console.log(formData);
+     });
+     
+     
+     $(":submit").click(function(){
+    	  $.post("/xsap/globalSet/globalSetUpdate.do",formData,function(checkSet){
+    		 if(checkSet.version == 4){
+    			//弹窗提示
+           		alert("修改成功");
+				window.location.reload();
+    		 }
+    	 }); 
+     });
 
+});
+</script>
 
 </body>
 
