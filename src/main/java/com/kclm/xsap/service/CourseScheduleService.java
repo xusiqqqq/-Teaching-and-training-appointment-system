@@ -29,6 +29,12 @@ public interface CourseScheduleService {
 	boolean deleteById(Long id);
 
 	/**
+	 * 	获取所有的排课记录
+	 * @return
+	 */
+	List<CourseScheduleDTO> listScheduleAll();
+	
+	/**
 	 * 获取给定的日期范围内所有的排课记录
 	 * @param startDate 起始日期
 	 * @param endDate 结束日期

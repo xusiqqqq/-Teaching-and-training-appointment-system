@@ -33,6 +33,10 @@ public interface ClassService {
 	 */
 	boolean update(Long classId,Integer status);
 	
+	/**
+	 * 针对“未确认”上课，进行全部上课记录的更新
+	 * @return
+	 */
 	boolean updateAll();
 	
 	//删除单个上课记录
