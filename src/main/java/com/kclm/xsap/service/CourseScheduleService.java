@@ -18,6 +18,14 @@ public interface CourseScheduleService {
 
 	boolean save(TScheduleRecord schedule);
 	
+	/**
+	 * 	复制排课
+	 * @param sourseDate	原排课日程
+	 * @param targetDate	目标排课日程
+	 * @return
+	 */
+	boolean copySchedule(LocalDate sourceDate, LocalDate targetDate);
+	
 	boolean deleteById(Long id);
 
 	/**

@@ -45,6 +45,7 @@ public class IndexServiceImpl implements IndexService{
 	
 	@Override
 	public HomePageDTO queryByDate(LocalDate startDate, LocalDate endDate) {
+		
 		//==会员总数
 		List<TMember> memberList = memberMapper.selectList(null);
 		int totalMembers = memberList.size();
@@ -58,12 +59,18 @@ public class IndexServiceImpl implements IndexService{
 		LocalDateTime inOneMonth = nowTime.minusMonths(1);
 		reserveList = reserveMapper.selectList(new QueryWrapper<TReservationRecord>()
 				.between("create_time",inOneMonth , nowTime));
-		List<Long> idList = new ArrayList<>();
-		for(int i = 0 ;i < reserveList.size(); i++) {
-			 Long memberId = reserveList.get(i).getMemberId();
-			 idList.add(memberId);
+		int activeNums = reserveList.size();
+
+		if(startDate == null || endDate == null) {
+			//=========DTO存储
+			HomePageDTO homePageDto = new HomePageDTO();
+			homePageDto.setStartDate(startDate);
+			homePageDto.setEndDate(endDate);
+			homePageDto.setTotalMembers(totalMembers);
+			homePageDto.setActiveMembers(activeNums);
+			homePageDto.setTotalReservations(reserveNums);
+			return homePageDto;
 		}
-		int activeNums = idList.size();
 		
 		//==每日约课数量
 		List<Integer> reserveNumsList = new ArrayList<>();
@@ -75,7 +82,12 @@ public class IndexServiceImpl implements IndexService{
 		//计算输入日期的间隔天数endDate - startDate
 		Long getDays = endDate.toEpochDay() - startDate.toEpochDay();
 		
-		for(int i = 0; i< getDays; i++) {
+		//日期区间
+		List<LocalDate> dateList = new ArrayList<LocalDate>();
+		
+		for(int i = 0; i<= getDays; i++) {
+			//逐个保存日期
+			dateList.add(startDate.plusDays(i));
 			//当天的预约情况
 			reserveList = reserveMapper.selectList(new QueryWrapper<TReservationRecord>()
 					.eq("status", 1).between("create_time", changeDateTime, 
@@ -89,7 +101,7 @@ public class IndexServiceImpl implements IndexService{
 		//==每日新增会员数量
 		changeDateTime = startDateTime;
 		List<Integer> memberNumslist = new ArrayList<>();
-		for(int i = 0; i< getDays; i++) {
+		for(int i = 0; i<= getDays; i++) {
 			//当天的会员新增情况
 			List<TMember> memberNums = memberMapper.selectList(new QueryWrapper<TMember>()
 					.between("create_time", changeDateTime, 
@@ -108,6 +120,7 @@ public class IndexServiceImpl implements IndexService{
 		homePageDto.setTotalReservations(reserveNums);
 		homePageDto.setDailyReservations(reserveNumsList);
 		homePageDto.setDailyNewMembers(memberNumslist);
+		homePageDto.setDateList(dateList);
 		return homePageDto;
 	}
 
@@ -126,15 +139,10 @@ public class IndexServiceImpl implements IndexService{
 			TMemberCard card = 	cardList.get(i);
 			List<TMemberBindRecord> bindList = bindMapper.selectList(new QueryWrapper<TMemberBindRecord>()
 					.eq("card_id", card.getId()));
-			if(bindList == null || bindList.size() == 0) {
-				continue;
-			}
-			Map<String,Integer> data = new HashMap<String, Integer>();
-			data.put(card.getName(), bindList.size());
 			//=======DTO存储
 			ReportDTO reportDto = new ReportDTO();
-			System.out.println("会员卡绑定统计：" + data);
-			reportDto.setMemberCardBindingMap(data);
+			reportDto.setName(card.getName());
+			reportDto.setValue(bindList.size());
 			reportDtoList.add(reportDto);
 		}
 		return reportDtoList;

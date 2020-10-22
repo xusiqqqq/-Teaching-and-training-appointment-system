@@ -209,4 +209,36 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 		return scheduleDto;
 	}
 
+	//复制排课
+	@Override
+	public boolean copySchedule(LocalDate sourceDate, LocalDate targetDate) {
+		 List<TScheduleRecord> sourceList = scheduleMapper.selectList(new QueryWrapper<TScheduleRecord>()
+				.eq("start_date", sourceDate));
+		if(sourceList == null || sourceList.size() < 1) {
+			log.debug("--------当前日程无排课计划");
+			return false;
+		}
+		
+		//若目标日期在源日期或之前，非法
+		if(sourceDate.isEqual(targetDate) || sourceDate.isAfter(targetDate)) {
+			log.debug("--------日程范围错误");
+			return false;
+		}
+		List<TScheduleRecord> targetList = scheduleMapper.selectList(new QueryWrapper<TScheduleRecord>()
+				.eq("start_date", targetDate));
+		if(targetList.size() > 0) {
+			log.debug("--------目标日程已经排好课了");
+			return false;
+		}
+		for (TScheduleRecord source : sourceList) {
+			source.setStartDate(targetDate);
+			//创建时间
+			source.setCreateTime(LocalDateTime.now());
+			//数据变动版本
+			source.setVersion(1);
+			scheduleMapper.insert(source);			
+		}
+		return true;
+	}
+
 }
