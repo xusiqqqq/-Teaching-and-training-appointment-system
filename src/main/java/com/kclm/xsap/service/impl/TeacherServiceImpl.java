@@ -103,7 +103,7 @@ public class TeacherServiceImpl implements TeacherService{
 		 */
 		//1、获取上课记录，当用户确认已上课时，老师关于此位用户的上课记录才会产生。此处查找的是老师的上课记录
 		List<TClassRecord> classList = classMapper.selectList(new QueryWrapper<TClassRecord>()
-				.eq("check_status", 1).inSql("schedule_id",
+				.eq("check_status", 1).eq("reserve_check", 1).inSql("schedule_id",
 				"SELECT id FROM t_schedule_record WHERE teacher_id =" + id));
 		
 		if(classList == null || classList.size() < 1) {

@@ -55,7 +55,7 @@ public class TReservationRecord extends BaseEntity implements Serializable{
     private Integer status;
 
     /**
-     * 单次操作预约人数，默认 1
+     * 单次操作预约人数，默认 0
      */
     private Integer reserveNums;
     

@@ -85,22 +85,30 @@ public class CourseController {
 	/*========业务处理=======*/
 	//课程添加
 	@RequestMapping("/courseAdd.do")
-	public String courseAdd(TCourse course,@RequestParam(value = "cardListStr",required = false) List<Long> cardLists,Model model) {
+	public String courseAdd(TCourse course,@RequestParam(value = "cardListStr",required = false) List<Long> cardLists,Model model,
+			String limitAgeRadio,String limitCountsRadio) {
 		System.out.println("---------");
 		System.out.println(course);
 		System.out.println("---------");
 		
+		//会员卡列表
 		List<TMemberCard> cardSet = new ArrayList<>();
-		
 		if(cardLists != null && cardLists.size() > 0) {
 			for (Long caid : cardLists) {
 				TMemberCard card = cardService.findById(caid);
 				cardSet.add(card);
 			}
 		}
-		
 		//添加关联的会员卡
 		course.setCardList(cardSet);
+		//不限制年龄
+		if(limitAgeRadio.equals("-1")) {
+			course.setLimitAge(0);
+		}
+		//不限制性别
+		if(limitCountsRadio.equals("-1")) {
+			course.setLimitCounts(0);
+		}
 		
 		//数据录入
 		boolean result = courseService.save(course);
@@ -115,7 +123,8 @@ public class CourseController {
 	
 	//课程编辑
 	@RequestMapping("/courseEdit.do")
-	public String courseEdit(TCourse course,@RequestParam(value = "cardListStr",required = false) List<Long> cardLists,Model model) {
+	public String courseEdit(TCourse course,@RequestParam(value = "cardListStr",required = false) List<Long> cardLists,Model model,
+			String limitAgeRadio,String limitCountsRadio) {
 		Long id = course.getId();
 		System.out.println("---前端id："+id);
 		System.out.println("---前端数据："+course);
@@ -130,6 +139,15 @@ public class CourseController {
 		}
 		//添加关联的会员卡
 		course.setCardList(cardSet);
+		
+		//不限制年龄
+		if(limitAgeRadio.equals("-1")) {
+			course.setLimitAge(0);
+		}
+		//不限制性别
+		if(limitCountsRadio.equals("-1")) {
+			course.setLimitCounts(0);
+		}
 		
 		//保存原编辑值
 		TCourse oldCourse = courseService.findById(id);
@@ -166,10 +184,21 @@ public class CourseController {
 	public Map<String, List<CourseDTO>> toSearch() {
 		List<CourseDTO> courseList = new ArrayList<>();
 		courseList = courseService.findAll();
-		
+		System.out.println("------------");
+		for (CourseDTO courseDTO : courseList) {
+			System.out.println(courseDTO);			
+		}
+		System.out.println("------------");
 		Map<String , List<CourseDTO>> search = new HashMap<>();
 		search.put("value", courseList);
 		return search;
 	}
 	
+	//拿到一条课程的数据
+	@ResponseBody
+	@RequestMapping("/getOneCourse.do")
+	public TCourse getOneCourse(Long id) {
+		TCourse course = courseService.findById(id);
+		return course;
+	}
 }

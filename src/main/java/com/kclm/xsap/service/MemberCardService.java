@@ -44,12 +44,19 @@ public interface MemberCardService {
 	TMemberCard findByName(String name);
 	
 	/**
-	 * 	查询指定会员的绑卡信息
+	 * 	查询指定会员的绑卡信息 - 单条
 	 * @param memberId
 	 * @param cardId
 	 * @return
 	 */
 	TMemberBindRecord findBindRecord(Long memberId, Long cardId);
+	
+	/**
+	 * 	查询指定会员的绑卡信息 - 全部
+	 * @param memberId
+	 * @return
+	 */
+	List<TMemberBindRecord> memberBindCardList(Long memberId);
 	
 	/**
 	 * 	更新会员绑卡记录

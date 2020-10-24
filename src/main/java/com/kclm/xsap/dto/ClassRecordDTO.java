@@ -3,6 +3,7 @@
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.kclm.xsap.entity.TMember;
 
 import lombok.Data;
@@ -33,6 +34,8 @@ public class ClassRecordDTO{
 	
 	private Long memberId;
 	
+	private Long cardId;
+	
 	/**
 	 *  会员信息
 	 */
@@ -46,6 +49,7 @@ public class ClassRecordDTO{
 	/**
 	 * 上课时间
 	 */
+	 @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private LocalDateTime classTime;
 	
 	/**
@@ -91,6 +95,7 @@ public class ClassRecordDTO{
 	/**
 	 * 	操作记录
 	 */
+	 @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private LocalDateTime operateTime;
 	
 }

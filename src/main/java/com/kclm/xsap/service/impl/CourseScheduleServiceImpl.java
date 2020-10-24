@@ -82,13 +82,16 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 			//若距离上次上课结束1个小时内
 			if(findOne.getClassTime() != null) {
 				LocalTime inOneHour = findOne.getClassTime().plusHours(1L);
+				System.out.println("classTime" + classTime);
+				System.out.println("inOneHour  "+ inOneHour);
 				if(classTime.isBefore(inOneHour)){
 					System.out.println("相同一堂课不能在一小时内排两次！");
 					return false;
 				}				
+			}else {
+				System.out.println("此堂课没有具体的上课时间，排课无效！");
+				return false;				
 			}
-			System.out.println("此堂课没有具体的上课时间，排课无效！");
-			return false;
 		}
 		
 		scheduleMapper.insert(schedule);
@@ -172,13 +175,12 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 		
 		//获取当前课程对应的预约记录
 		List<ReserveRecordDTO> reserveDtoList = reserveService.listReserveRecords(scheduleId);
-		System.out.println("-------reserveDTO: "+reserveDtoList);
 		//获取当前课程对应的  已预约记录
 		List<ReserveRecordDTO> reservedList = reserveService.listReserved(scheduleId);
-		System.out.println("-------reservedDTO: "+reservedList);
 		
-		//==获取当前课程的上课数据
-		List<TClassRecord> classList = classMapper.selectList(new QueryWrapper<TClassRecord>().eq("schedule_id", scheduleId));
+		//==获取当前课程的上课数据（已预约时）
+		List<TClassRecord> classList = classMapper.selectList(new QueryWrapper<TClassRecord>()
+				.eq("schedule_id", scheduleId).eq("reserve_check", 1));
 		
 		List<ClassRecordDTO> classDtoList = new ArrayList<ClassRecordDTO>();
 		if(classList != null && classList.size() > 0) {
@@ -202,18 +204,22 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 				ClassRecordDTO classRecordDTO = new ClassRecordDTO();
 				//上课记录id
 				classRecordDTO.setClassRecordId(classed.getId());
+				//会员id
+				classRecordDTO.setMemberId(member.getId());
 				//	会员信息
 				classRecordDTO.setMember(member);
+				//会员卡id
+				classRecordDTO.setCardId(memberCard.getId());
 				//	会员卡名
 				classRecordDTO.setCardName(classed.getCardName());
 				//	消费次数
 				classRecordDTO.setTimesCost(course.getTimesCost());
 				//	消费金额
 				classRecordDTO.setInvolveMoney(involveMoney);
+				//确认状态
+				classRecordDTO.setCheckStatus(classed.getCheckStatus());
 				//	操作时间
 				classRecordDTO.setOperateTime(classed.getCreateTime());
-				System.out.println("-----上课记录："+classRecordDTO);
-				System.out.println("------------------");
 				//dto拼接
 				classDtoList.add(classRecordDTO);
 			}
@@ -222,6 +228,8 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 		CourseScheduleDTO scheduleDto = new CourseScheduleDTO();
 		//排课记录id
 		scheduleDto.setScheduleId(scheduleId);
+		//课程id
+		scheduleDto.setCourseId(course.getId());
 		//	课程名
 		scheduleDto.setCourseName(course.getName());
 		//	上课时间
@@ -245,6 +253,10 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 		scheduleDto.setTeacherName(teacherName);
 		//	上课容纳人数
 		scheduleDto.setClassNumbers(course.getContains());
+		// 已本堂课预约人数
+		scheduleDto.setOrderNums(schedule.getOrderNums());
+		//当前课程的需消耗次数
+		scheduleDto.setTimesCost(course.getTimesCost());
 		//已预约记录
 		scheduleDto.setReservedList(reservedList);
 		//	预约记录

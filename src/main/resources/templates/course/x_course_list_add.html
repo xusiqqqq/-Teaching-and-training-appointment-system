@@ -61,7 +61,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-sm-2 control-label">上课人数</label>
+                            <label class="col-sm-2 control-label">课堂容纳人数</label>
                             <div class="col-sm-3 col-md-2">
                                 <input type="number" class="form-control"  min="0" name="contains">
                             </div>
@@ -123,11 +123,11 @@
                             <label class="col-sm-2 control-label">限制年龄</label>
                             <div class="col-sm-6">
                                 <label>
-                                    <input type="radio" name="limitAgeRadio" checked value="">&nbsp;&nbsp;<span class="font-noraml">不限制</span>
+                                    <input type="radio" name="limitAgeRadio" checked value="-1">&nbsp;&nbsp;<span class="font-noraml">不限制</span>
                                 </label>
                                 <br/>
                                 <label>
-                                    <input type="radio" name="limitAgeRadio" style="float: left"> &nbsp;&nbsp;
+                                    <input type="radio" name="limitAgeRadio" style="float: left" value="0"> &nbsp;&nbsp;
                                     <span class="input-daterange input-group right" style="float: right">
                                         <span class="input-group-addon">大于</span>
                                         <input type="text" class="input-sm form-control" name="limitAge" value="5" style="width: 50px;"/>
@@ -140,11 +140,11 @@
                             <label class="col-sm-2 control-label">限制预约次数</label>
                             <div class="col-sm-6">
                                 <label>
-                                    <input type="radio" name="limitCountsRadio" checked value="">&nbsp;&nbsp;<span class="font-noraml">不限制</span>
+                                    <input type="radio" name="limitCountsRadio" checked value="-1">&nbsp;&nbsp;<span class="font-noraml">不限制</span>
                                 </label>
                                 <br/>
                                 <label>
-                                    <input type="radio" name="limitCountsRadio" style="float: left"> &nbsp;&nbsp;
+                                    <input type="radio" name="limitCountsRadio" style="float: left" value="0"> &nbsp;&nbsp;
                                     <span class="input-daterange input-group right" style="float: right">
                                         <span class="input-group-addon">每名会员最多可以预约本课程</span>
                                         <input type="text" class="input-sm form-control" name="limitCounts" value="2" style="width: 50px;"/>

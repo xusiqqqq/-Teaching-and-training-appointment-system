@@ -194,7 +194,11 @@ public class TeacherController {
 		public Map<String, List<TEmployee>> toSearch() {
 			List<TEmployee> teacherList = new ArrayList<>();
 			teacherList = teacherService.findAll();
-			
+			System.out.println("--------------");
+			for (TEmployee tEmployee : teacherList) {
+				System.out.println(tEmployee);
+			}
+			System.out.println("--------------");
 			Map<String , List<TEmployee>> search = new HashMap<>();
 			search.put("value", teacherList);
 			return search;

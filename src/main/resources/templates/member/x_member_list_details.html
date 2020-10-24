@@ -733,7 +733,18 @@ $(function () {
    	            {"data": "operateTime"},
    	            {"data": "operator"},
    	            {"data": "reserveNote"},
-   	            {"data": "reserveStatus"}
+   	            {"data": "reserveStatus",
+	                "orderable": false,
+	                "render": function (data, type, row) {
+	                    var status = data;
+	                    if(status == 1){
+	                    	status = "已预约";
+	                    }else{
+	                    	status = "未预约";
+	                    }
+	                    let html = "<td>"+ status +"</td>";
+	                    return html;
+	                }}
    	        ],
    	        //去掉搜索
    	        searching: true,
@@ -887,8 +898,6 @@ function operateShow(member_id,card_id){
     	if(operateInfo.length < 1){
     		operateInfo = [];
     	};
-    	console.log(operateInfo);
-    	console.log($('.dataTables-example.t5'));
 	    $('.dataTables-example.t5').dataTable({
 	        //TODO json获取数据
 	        "data": operateInfo,
@@ -926,7 +935,7 @@ function operateShow(member_id,card_id){
 	                "last": "尾页"
 	            }
 	        }
-	    }).fnDestroy();
+	    });
     	
     });
 }

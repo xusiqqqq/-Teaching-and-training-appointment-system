@@ -165,6 +165,10 @@ public class MemberCardServiceImpl implements MemberCardService{
 		if(consume != null) {
 			//查出会员卡的次数单价，取值四舍五入
 			TMemberCard card = cardMapper.selectById(consume.getCardId());
+			if(card == null) {
+				System.out.println("会员卡不存在，无消费行为");
+				return false;
+			}
 			BigDecimal price = new BigDecimal(card.getPrice().toString());
 			BigDecimal count = new BigDecimal(card.getTotalCount().toString());
 			BigDecimal unitPrice = price.divide(count, 2, RoundingMode.HALF_UP);
@@ -193,7 +197,11 @@ public class MemberCardServiceImpl implements MemberCardService{
 				validCount = 0;
 			}
 			bindRecord.setValidCount(validCount);
-			Integer validDay = bindRecord.getValidDay() - consume.getCardDayChange();
+			
+			Integer validDay = bindRecord.getValidDay();
+			if(consume.getCardDayChange() != null) {
+				validDay = bindRecord.getValidDay() - consume.getCardDayChange();				
+			}
 			if(validDay < 0) {
 				validDay = 0;
 			}
@@ -293,6 +301,13 @@ public class MemberCardServiceImpl implements MemberCardService{
 	public boolean updateBindRecord(TMemberBindRecord bind) {
 		bindMapper.updateById(bind);
 		return true;
+	}
+
+	//查询指定会员的绑卡信息 - 全部
+	@Override
+	public List<TMemberBindRecord> memberBindCardList(Long memberId) {
+		List<TMemberBindRecord> bindCardList = bindMapper.selectList(new QueryWrapper<TMemberBindRecord>().eq("member_id", memberId));
+		return bindCardList;
 	}
 
 }

@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -32,11 +34,13 @@ public class CourseScheduleDTO {
 	/**
 	 * 上课时间
 	 */
+	 @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private LocalDateTime startTime;
 	
 	/**
 	 * 下课时间
 	 */
+	 @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private LocalDateTime endTime;
 	
 	/**
@@ -65,9 +69,19 @@ public class CourseScheduleDTO {
 	private String teacherName;
 	
 	/**
-	 * 上课人数
+	 * 课堂容纳人数
 	 */
 	private Integer classNumbers;
+	
+	/**
+	 * 	已预约人数
+	 */
+	private Integer orderNums;
+	
+	/**
+	 * 	当前的课程需消耗次数
+	 */
+	private Integer timesCost;
 	
 	/**
 	 * 	已预约记录
