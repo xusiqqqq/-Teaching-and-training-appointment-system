@@ -6,6 +6,7 @@ import com.kclm.xsap.dto.ClassRecordDTO;
 import com.kclm.xsap.dto.ConsumeRecordDTO;
 import com.kclm.xsap.dto.MemberCardDTO;
 import com.kclm.xsap.dto.MemberDTO;
+import com.kclm.xsap.dto.MemberVO;
 import com.kclm.xsap.dto.ReserveRecordDTO;
 import com.kclm.xsap.entity.TMember;
 import com.kclm.xsap.entity.TMemberBindRecord;
@@ -25,35 +26,6 @@ public interface MemberService {
 	boolean deleteById(Long id);
 	
 	boolean update(TMember member);
-	
-	/**
-	 * 保存查询出的会员详情信息
-	 * @param id
-	 * @return MemberDTO
-	 */
-	MemberDTO getMemberDetailById(Long id);
-	
-	
-	/**
-	 *  获取所有会员信息
-	 * @return List<TMember>。会员信息的结果集
-	 */
-	List<TMember> findAll();
-	
-	/**
-	 *  分页查询。获取所有会员信息
-	 * @param currentPage 当前页码
-	 * @param pageSize 每页展示数据个数
-	 * @return List<TMember>。会员信息的结果集
-	 */
-	List<TMember> findAllByPage(Integer currentPage,Integer pageSize);
-	
-	/**
-	 * 根据条件搜索匹配的会员
-	 * @param condition 搜索条件
-	 * @return List<TMember>。匹配到的会员集合
-	 */
-	List<TMember> findByKeyword(String condition);
 	
 	/**
 	 *  绑定会员卡
@@ -76,12 +48,55 @@ public interface MemberService {
 	 */
 	boolean bindByBunble(String filePath);
 	
+	
+	/*====== 以下均为查询方法 ======= */
+	/**
+	 * 	根据id查询
+	 * @param id
+	 * @return
+	 */
+	TMember getMember(Long id);
+	
+	/**
+	 * 	根据手机号精确查询用户
+	 * @param phone
+	 * @return
+	 */
+	TMember findByPhone(String phone);
+	
+	/**
+	 *  获取所有会员信息
+	 * @return List<TMember>。会员信息的结果集
+	 */
+	List<TMember> findAll();
+	
+	/**
+	 * 匹配视图的所有会员信息
+	 * @return
+	 */
+	List<MemberVO> listMemberView();
+	
+	/**
+	 *  分页查询。获取所有会员信息
+	 * @param currentPage 当前页码
+	 * @param pageSize 每页展示数据个数
+	 * @return List<TMember>。会员信息的结果集
+	 */
+	List<TMember> findAllByPage(Integer currentPage,Integer pageSize);
+	
+	/**
+	 * 根据条件搜索匹配的会员
+	 * @param condition 搜索条件：手机号（唯一）/姓名
+	 * @return List<TMember>。匹配到的会员集合
+	 */
+	List<TMember> findByKeyword(String condition);
+	
 	/**
 	 * 当前会员绑定的所有会员卡信息
 	 * @param id 会员id
 	 * @return List<MemberCardDTO>。会员绑定记录结果集
 	 */
-	List<MemberCardDTO> findAllCardRecords(Long id);
+	List<MemberCardDTO> listCardRecords(Long id);
 
 	/**
 	 * 当前会员的上课记录(当预约状态为“已预约”时，则此预约记录表示上课记录)
@@ -104,5 +119,12 @@ public interface MemberService {
 	 */
 	List<ConsumeRecordDTO> listConsumeRecords(Long id);
 	
+	/**
+	 * 查询出的会员详情完整信息（耦合性高，不推荐）
+	 * @param id
+	 * @return MemberDTO
+	 */
+	@Deprecated
+	MemberDTO getMemberDetailById(Long id);
 	
 }

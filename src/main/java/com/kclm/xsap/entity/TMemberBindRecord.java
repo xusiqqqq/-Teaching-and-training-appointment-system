@@ -65,4 +65,8 @@ public class TMemberBindRecord extends BaseEntity implements Serializable{
     
     private String note;
 
+    /**
+     * 	当前会员绑定的某一张会员卡的激活状态（针对这一个会员）
+     */
+    private Integer activeStatus;
 }

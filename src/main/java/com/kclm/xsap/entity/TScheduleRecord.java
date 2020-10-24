@@ -5,8 +5,11 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -54,11 +57,13 @@ public class TScheduleRecord extends BaseEntity implements Serializable{
     /**
     * 上课日期
     */
+     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
 
     /**
     * 上课时间
     */
+     @DateTimeFormat(pattern = "HH:mm")
     private LocalTime classTime;
 
     /**

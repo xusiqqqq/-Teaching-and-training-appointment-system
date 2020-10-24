@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
 
@@ -11,13 +11,9 @@
     <meta name="keywords" content="后台bootstrap框架,会员中心主题,后台HTML,响应式后台">
     <meta name="description" content="完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术">
 
-   <link rel="shortcut icon" href="../../static/favicon.ico">
-    <link href="../../static/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
-    <link href="../../static/css/font-awesome.css?v=4.4.0" rel="stylesheet">
-
 <link rel="shortcut icon" href="../../static/favicon.ico" th:href="@{/static/favicon.ico}">
-    <link href="../../static/css/bootstrap.min.css?v=3.3.6" th:href="@{/static/css/bootstrap.min.css(v='3.3.6')}" rel="stylesheet">
-    <link href="../../static/css/font-awesome.css?v=4.4.0" th:href="@{/static/css/font-awesome.css(v='4.4.0')}" rel="stylesheet">
+    <link href="../../static/css/bootstrap.min.css?v=3.3.6" th:href="@{/static/css/bootstrap.min.css}" rel="stylesheet">
+    <link href="../../static/css/font-awesome.css?v=4.4.0" th:href="@{/static/css/font-awesome.css}" rel="stylesheet">
     <link href="../../static/css/animate.css" th:href="@{/static/css/animate.css}" rel="stylesheet">
     <link href="../../static/css/style.css?v=4.1.0" th:href="@{/static/css/style.css(v='4.1.0')}" rel="stylesheet">
     <link href="../../static/css/plugins/iCheck/custom.css" th:href="@{/static/css/plugins/iCheck/custom.css}" rel="stylesheet">
@@ -25,7 +21,7 @@
     <link rel="stylesheet" type="text/css" href="../../static/css/plugins/simditor/simditor.css" th:href="@{/static/css/plugins/simditor/simditor.css}"/>
 
     <link href="../../static/css/plugins/fullcalendar/fullcalendar.css" th:href="@{/static/css/plugins/fullcalendar/fullcalendar.css}" rel="stylesheet">
-    <link href="../../static/css/plugins/fullcalendar/fullcalendar.print.css" th:href="@{static/css/plugins/fullcalendar/fullcalendar.print.css}" rel="stylesheet" media='print'>
+    <link href="../../static/css/plugins/fullcalendar/fullcalendar.print.css" th:href="@{/static/css/plugins/fullcalendar/fullcalendar.print.css}" rel="stylesheet" media='print'>
     <link href="../../static/css/plugins/clockpicker/clockpicker.css" th:href="@{/static/css/plugins/clockpicker/clockpicker.css}" rel="stylesheet">
     <!-- 导入magicsuggest样式 -->
     <link href="../../static/css/plugins/magicsuggest/magicsuggest-min.css" th:href="@{/static/css/plugins/magicsuggest/magicsuggest-min.css}" rel="stylesheet">
@@ -34,6 +30,14 @@
         .clockpicker-popover {
             z-index: 999999!important;
         }
+        
+        /* 日程表字体设置 */
+        .fc-event-time,
+		.fc-event-title {
+    		color: white;
+    		padding: 0 1px;
+		}
+
     </style>
 </head>
 
@@ -67,12 +71,19 @@
             </div>
 
             <div class="modal-body" style="min-height: 400px;margin-top: 20px">
-                <form action="#" class="form-horizontal" method="post">
+                <form action="#" class="form-horizontal" method="post" id="addScheduleForm">
+					<div class="form-group" align="center">
+						<span id="add_tip" class="text-danger"></span>
+					</div>
                     <div class="form-group">
                         <label class="col-sm-3 control-label right">课程：</label>
                         <div class="col-sm-7">
                             <div class="input-group">
-                                <input type="text" class="form-control" id="courseName" placeholder="请选择课程">
+                            	<!-- 隐藏域，courseId -->
+                    			<input type="hidden" id="course" name="courseId">
+								
+                            	
+                                <input type="text" class="form-control" id="courseSearch" placeholder="请选择课程">
                                 <div class="input-group-btn" style="z-index:99999!important;">
                                     <button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
                                         <span class="caret"></span>
@@ -84,24 +95,28 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="col-sm-3 control-label right">上课人数：</label>
+                    <!-- 已被取代 -->
+                    <!-- <div class="form-group">
+                        <label class="col-sm-3 control-label right">课堂容纳人数：</label>
                         <div class="col-sm-7">
-                            <input type="number" class="form-control" name="author" placeholder="0" disabled>
+                            <input type="number" class="form-control" name="classNumbers" placeholder="0" disabled>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="form-group">
                         <label class="col-sm-3 control-label right">老师：</label>
                         <div class="col-sm-7">
                             <div class="input-group" style="z-index:99998!important;">
-                                <input type="number" class="form-control" name="teacher" id="teachers">
-                                <!--<div class="input-group-btn" >
+                           		<!-- 隐藏域，courseId -->
+                    			<input type="hidden" id="teacher" name="teacherId">
+                    			
+                                <input type="text" class="form-control" id="teacherSearch" placeholder="请选择老师">
+                                <div class="input-group-btn" >
                                     <button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
                                         <span class="caret"></span>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-right" role="menu">
                                     </ul>
-                                </div>-->
+                                </div>
                                 <!-- /btn-group -->
                             </div>
                         </div>
@@ -110,14 +125,14 @@
                     <div class="form-group">
                         <label class="col-sm-3 control-label right">日期：</label>
                         <div class="col-sm-7" style="z-index:99997!important; margin: 0 auto">
-                            <input type="text" class="form-control data-temple" name="date"  placeholder="选择具体上课日期">
+                            <input type="date" class="form-control data-temple" name="startDate"  placeholder="选择具体上课日期">
                         </div>
                     </div>
 
                     <div class="form-group" id="data_4">
                         <label class="col-sm-3 control-label right">上课时间</label>
                         <div class="col-sm-7 input-group clockpicker"  data-autoclose="true" style="padding-left: 15px">
-                            <input type="text" class="form-control" value="09:30" placeholder="选择上课具体时间">
+                            <input type="text" class="form-control" value="09:30" name="classTime" placeholder="选择上课具体时间">
                             <span class="input-group-addon">
                                 <span class="glyphicon glyphicon-time"></span>
                             </span>
@@ -133,20 +148,20 @@
                     <div class="form-group">
                         <label class="col-sm-3 control-label right">学生性别：</label>
                         <div class="col-sm-7">
-                            <input type="text" class="form-control" value="男" disabled="disabled"/>
+                            <input type="text" class="form-control" value="男" name="limitSex" disabled="disabled"/>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-3 control-label right">学生年龄：</label>
                         <div class="col-sm-7">
-                            <input type="text" class="form-control" value="不限制" disabled="disabled"/>
+                            <input type="text" class="form-control" value="不限制" name="limitAge" disabled="disabled"/>
                         </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-primary" data-dismiss="modal">关闭</button>
-                <button class="btn btn-primary" id="add_book">确定</button>
+                <button class="btn btn-primary" id="add_btn">确定</button>
             </div>
         </div>
     </div>
@@ -161,18 +176,21 @@
             </div>
 
             <div class="modal-body" style="min-height: 200px;margin-top: 30px">
-                <form action="#" class="form-horizontal" method="post">
+                <form action="#" class="form-horizontal" method="post" id="copyScheduleForm">
+					<div class="form-group" align="center">
+                    	<span id="copy_tip" class="text-danger"></span>
+					</div>
                     <div class="form-group">
                         <label class="col-sm-3 control-label right"><span class="text-danger">* </span>将 </label>
                         <div class="col-sm-7" style="z-index:99999!important;">
-                            <input type="text" class="form-control data-temple" name="my_course"  placeholder="选择日期">
+                            <input type="date" class="form-control data-temple" name="sourceDateStr"  placeholder="选择日期">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="col-sm-3 control-label right"><span class="text-danger">* </span>复制到 </label>
                         <div class="col-sm-7" style="z-index:99999!important;">
-                            <input type="text" class="form-control data-temple" name="other_course"
+                            <input type="date" class="form-control data-temple" name="targetDateStr"
                                    placeholder="选择日期">
                         </div>
                     </div>
@@ -181,7 +199,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-primary" data-dismiss="modal">关闭</button>
-                <button class="btn btn-primary" id="add_book2">确定</button>
+                <button class="btn btn-primary" id="copy_btn">确定</button>
             </div>
         </div>
     </div>
@@ -197,13 +215,13 @@
             </div>
 
             <div class="modal-body" style="min-height: 80px;margin-top: 20px">
-                <form action="#" class="form-horizontal" method="post">
+                <form action="#" class="form-horizontal" method="post" id="exportReserveListForm">
                     <div class="form-group " id="data_5">
                         <div class="input-daterange input-group" id="datepickers"
                              style="z-index:99999!important; margin: 0 auto">
-                            <input type="text" class="input-sm form-control" name="start"/>
+                            <input type="date" class="input-sm form-control" name="startDateStr"/>
                             <span class="input-group-addon">到</span>
-                            <input type="text" class="input-sm form-control" name="end"/>
+                            <input type="date" class="input-sm form-control" name="endDateStr"/>
                         </div>
                     </div>
                 </form>
@@ -211,42 +229,42 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-primary" data-dismiss="modal">关闭</button>
-                <button class="btn btn-primary" id="add_book3">确定</button>
+                <button class="btn btn-primary" id="reserveList_btn">确定</button>
             </div>
         </div>
     </div>
 </div>
 <!-- 全局js -->
-<script src="../../static/js/jquery.min.js?v=2.1.4" th:src="@{/static/js/jquery.min.js(v='2.1.4')}"></script>
-<script src="../../static/js/bootstrap.min.js?v=3.3.6" th:src="@{/static/js/bootstrap.min.js(v=3.3.6')}"></script>
+<script type="text/javascript" src="../../static/js/jquery.min.js?v=2.1.4" th:src="@{/static/js/jquery.min.js(v='2.1.4')}"></script>
+<script type="text/javascript" src="../../static/js/bootstrap.min.js?v=3.3.6" th:src="@{/static/js/bootstrap.min.js(v='3.3.6')}"></script>
 
 
 <!-- 自定义js -->
-<script src="../../static/js/content.js?v=1.0.0" th:src="@{/static/js/content.js(v=1.0.0')}"></script>
+<script type="text/javascript" src="../../static/js/content.js?v=1.0.0" th:src="@{/static/js/content.js(v='1.0.0')}"></script>
 
 
-<script src="../../static/js/jquery-ui.custom.min.js" th:src="@{/static/js/jquery-ui.custom.min.js}"></script>
+<script type="text/javascript" src="../../static/js/jquery-ui.custom.min.js" th:src="@{/static/js/jquery-ui.custom.min.js}"></script>
 
 <!-- iCheck -->
-<script src="../../static/js/plugins/iCheck/icheck.min.js" th:src="@{/static/js/plugins/iCheck/icheck.min.js}"></script>
+<script type="text/javascript" src="../../static/js/plugins/iCheck/icheck.min.js" th:src="@{/static/js/plugins/iCheck/icheck.min.js}"></script>
 
 <!-- Full Calendar -->
-<script src="../../static/js/plugins/fullcalendar/moment.min.js" th:src="@{/static/js/plugins/fullcalendar/moment.min.js}"></script>
-<script src="../../static/js/plugins/fullcalendar/fullcalendar.min.js" th:src="@{/static/js/plugins/fullcalendar/fullcalendar.min.js}"></script>
+<script type="text/javascript" src="../../static/js/plugins/fullcalendar/moment.min.js" th:src="@{/static/js/plugins/fullcalendar/moment.min.js}"></script>
+<script type="text/javascript" src="../../static/js/plugins/fullcalendar/fullcalendar.min.js" th:src="@{/static/js/plugins/fullcalendar/fullcalendar.min.js}"></script>
 
 <!--动态搜索-->
-<script src="../../static/js/plugins/suggest/bootstrap-suggest.min.js" th:src="@{/static/js/plugins/suggest/bootstrap-suggest.min.js}"></script>
+<script type="text/javascript" src="../../static/js/plugins/suggest/bootstrap-suggest.min.js" th:src="@{/static/js/plugins/suggest/bootstrap-suggest.min.js}"></script>
 
 <!-- Data picker -->
-<script src="../../static/js/plugins/datapicker/bootstrap-datepicker.js" th:src="@{/static/js/plugins/datapicker/bootstrap-datepicker.js}"></script>
+<script type="text/javascript" src="../../static/js/plugins/datapicker/bootstrap-datepicker.js" th:src="@{/static/js/plugins/datapicker/bootstrap-datepicker.js}"></script>
 <!-- Clock picker -->
-<script src="../../static/js/plugins/clockpicker/clockpicker.js" th:src="@{/static/js/plugins/clockpicker/clockpicker.js}"></script>
+<script type="text/javascript" src="../../static/js/plugins/clockpicker/clockpicker.js" th:src="@{/static/js/plugins/clockpicker/clockpicker.js}"></script>
 <!--margicSuggest-->
-<script src="../../static/js/plugins/magicsuggest/magicsuggest-min.js" th:src="@{/static/js/plugins/magicsuggest/magicsuggest-min.js}"></script>
+<script type="text/javascript" src="../../static/js/plugins/magicsuggest/magicsuggest-min.js" th:src="@{/static/js/plugins/magicsuggest/magicsuggest-min.js}"></script>
 
 
 
-<script>
+<script type="text/javascript">
     $(document).ready(function () {
 
 
@@ -256,7 +274,7 @@
         var d = date.getDate();
         var m = date.getMonth();
         var y = date.getFullYear();
-
+        
         $('#calendar').fullCalendar({
             editable: true,
             weekNumberCalculation: "ISO",
@@ -325,190 +343,184 @@
             },*/
             //自定义视图
             //TODO 通过json传过来的数据显示
-            events: [
-                {
-                    title: '日事件',
-                    start: new Date(y, m, 1),
-                    height: 300,
-                    color: "#ddee44",
-                    url: "x_course_schedule_detail.html"
+            events: {
+                url: '/xsap/schedule/scheduleList.do',
+                type: 'post',
+                error: function() {
+                    alert('there was an error while fetching events!');
                 },
-                {
-                    title: '长事件',
-                    start: new Date(y, m, d - 5),
-                    end: new Date(y, m, d - 2),
-                    url: "x_course_schedule_detail.html"
-                },
-                {
-                    id: 999,
-                    title: '重复事件',
-                    start: new Date(y, m, d - 3, 16, 0),
-                    allDay: false,
-                    url: "x_course_schedule_detail.html"
-                },
-                {
-                    id: 999,
-                    title: '重复事件',
-                    start: new Date(y, m, d + 4, 16, 0),
-                    allDay: false,
-                    url: "x_course_schedule_detail.html"
-                },
-                {
-                    title: '会议',
-                    start: new Date(y, m, d, 10, 30),
-                    allDay: false
-                },
-                {
-                    title: '午餐',
-                    start: new Date(y, m, d, 12, 0),
-                    end: new Date(y, m, d, 14, 0),
-                    allDay: false
-                },
-                {
-                    title: '生日',
-                    start: new Date(y, m, d + 1, 19, 0),
-                    end: new Date(y, m, d + 1, 22, 30),
-                    allDay: false
-                },
-                {
-                    title: '打开百度',
-                    start: new Date(y, m, 28),
-                    end: new Date(y, m, 29),
-                    url: 'http://baidu.com/'
-                }
-            ],
-        });
-
-
-    });
-</script>
-<script>
-    var testdataBsSuggest = $("#courseName").bsSuggest({
-        indexId: 2, //data.value 的第几个数据，作为input输入框的内容
-        indexKey: 1, //data.value 的第几个数据，作为input输入框的内容
-        //TODO 通过json显示数据
-        data: {
-            'value': [
-                {
-                    'id': '0',
-                    'word': '英语',
-                    'description': 'http://flyme.meizu.com'
-
-                },
-                {
-                    'id': '1',
-                    'word': '书法',
-                    'description': 'http://flyme.meizu.com'
-
-                },
-                {
-                    'id': '2',
-                    'word': '钢琴',
-                    'description': 'http://flyme.meizu.com'
-
-                },
-                {
-                    'id': '3',
-                    'word': 'flyme',
-                    'description': 'http://flyme.meizu.com'
-                }
-            ],
-            'defaults': 'http://lzw.me'
-        }
-    });
-    //data 数据中获取
-    var testdataBsSuggest = $("#test_data").bsSuggest({
-        indexId: 2, //data.value 的第几个数据，作为input输入框的内容
-        indexKey: 1, //data.value 的第几个数据，作为input输入框的内容
-        //TODO 通过json传过来的数据
-        data: {
-            'value': [
-                {
-                    'id': '0',
-                    'word': '刘德华',
-                    'description': '17770626678'
-                },
-                {
-                    'id': '1',
-                    'word': '李连杰',
-                    'description': '1985625122'
-                },
-                {
-                    'id': '2',
-                    'word': 'meizu',
-                    'description': 'http://www.meizu.com'
-                },
-                {
-                    'id': '3',
-                    'word': 'flyme',
-                    'description': 'http://flyme.meizu.com'
-                }
-            ],
-            'defaults': 'http://lzw.me'
-        }
-    });
-
-    //时间控件
-    $(function () {
-        $("#datepickers :input").datepicker({
-            language: "zh-CN",
-            autoclose: true,
-            format: "yyyy-mm-dd",
-            todayHighlight: true,
-        });
-        $("#datepicker :input").datepicker({
-            autoclose: true,
-            todayHighlight: true,
-            language: "zh-CN",
-            format: "yyyy-mm",
-            startView: 1,
-            minView: 1
-        });
-        $(".data-temple").datepicker({
-            autoclose: true,
-            format: "yyyy-mm-dd",
-            language: "zh-CN",
-            todayHighlight: true
-        });
-
-        /*$('#datepickers :input').each(function() {
-            $(this).datepicker('clearDates');
-        });*/
-        $('.clockpicker').clockpicker({
-            popover:"z-index:99999"
-        });
-    })
-    $(function () {
-        $('#teachers').magicSuggest({
-
-            data: [
-                {
-                    id: 1,
-                    name: "jack"
-                },
-                {
-                    id: 2,
-                    name: "peter"
-                },
-                {
-                    id: 3,
-                    name: "solo"
-                }
-            ],
-            style: "width:300px;",
-            allowFreeEntries: false,
-            editable: false,
-            placeholder: "请选择任课老师",
-            noSuggestionText: "无匹配老师",
-            renderer: function (data) {
-                return "<div class='text-success' style='z-index:99999!important;'><span style='margin-right: 15px;'>" + data.id + "</span><span>" + data.name + "</span></div>"
-            },
-            selectionRenderer: function (data) {
-                return "<span>" + data.name + "</span>";
+                textColor: 'white'
             }
         });
-    })
+
+
+    });
 </script>
+<script type="text/javascript">
+/* ---------排课详情-------- */
+$(function(){
+	//设置字体样式
+	$("span .fc-event-title").css("color","white");
+	
+//基本信息 - 加载
+	$.post("/xsap/schedule/scheduleList.do",function(baseInfo){
+		console.log(baseInfo);
+	});
+
+	/* 课程搜索 */
+	$("#courseSearch").bsSuggest({
+		url: "[[${#request.getContextPath()}]]/course/toSearch.do",
+		effectiveFieldsAlias: {id: "ID", name: "课程名称", contains: "可容纳人数"},
+		effectiveFields: ["id", "name", "contains"],
+		ignorecase: true,
+		showHeader: true,
+		showBtn: false, //不显示下拉按钮
+		delayUntilKeyup: true, //获取数据的方式为 firstByUrl 时，延迟到有输入/获取到焦点时才请求数据
+		idField: "id",
+		keyField: "name",
+		clearable: true
+	  })
+	  .on("onDataRequestSuccess", function(e, result) {
+		console.log("onDataRequestSuccess: ", result);
+	  })
+	  .on("onSetSelectValue", function(e, keyword) {
+		  var course_id = keyword.id;
+		  $("#course").val(course_id);
+		  //拿到课程的限制条件
+		  $.post("/xsap/course/getOneCourse.do",{id: course_id},function(result){
+			  var limitAge = result.limitAge;
+			  var limitSex = result.limitSex;
+			  $("input[name='limitSex']").val(limitSex);
+			  $("input[name='limitAge']").val(limitAge);
+		  });
+		console.log("onSetSelectValue: ", keyword);
+	  })
+	  .on("onUnsetSelectValue", function() {
+		console.log("onUnsetSelectValue");
+	  });
+
+	
+	/* 老师搜索 */
+	$("#teacherSearch").bsSuggest({
+		url: "[[${#request.getContextPath()}]]/employee/toSearch.do",
+		effectiveFieldsAlias: {id: "ID", name: "教师名称", sex: "性别", note: "专长科目"},
+		effectiveFields: ["id", "name", "sex", "note"],
+		ignorecase: true,
+		showHeader: true,
+		showBtn: false, //不显示下拉按钮
+		delayUntilKeyup: true, //获取数据的方式为 firstByUrl 时，延迟到有输入/获取到焦点时才请求数据
+		idField: "id",
+		keyField: "name",
+		clearable: true
+	  })
+	  .on("onDataRequestSuccess", function(e, result) {
+		console.log("onDataRequestSuccess: ", result);
+	  })
+	  .on("onSetSelectValue", function(e, keyword) {
+		  $("#teacher").val(keyword.id);
+		console.log("onSetSelectValue: ", keyword);
+	  })
+	  .on("onUnsetSelectValue", function() {
+		console.log("onUnsetSelectValue");
+	  });
+
+
+	/* 表单数据获取 -新增排课 */
+	var addScheduleForm = "";
+	$("#add_btn").on("mouseenter",function(){
+		addScheduleForm = $("#addScheduleForm").serialize();	
+		console.log("--------addScheduleForm---------");
+		console.log(addScheduleForm);
+	});
+
+	//提交表单
+	$("#add_btn").click(function(){
+		$.post("/xsap/schedule/scheduleAdd.do",addScheduleForm,function(result){
+			if(result.version == 4){
+				//刷新页面
+				window.location.reload();
+			}else{
+				$("#add_tip").html(result.limitSex);
+			}
+			
+		});
+	});
+
+	/* 表单数据获取 - 复制排课 */
+	var copyScheduleForm = "";
+	$("#copy_btn").on("mouseenter",function(){
+		copyScheduleForm = $("#copyScheduleForm").serialize();
+		console.log("-------copyScheduleForm--------");
+		console.log(copyScheduleForm);
+	});
+
+	//提交表单
+	$("#copy_btn").click(function(){
+		$.post("/xsap/schedule/scheduleCopy.do",copyScheduleForm,function(result){
+			if(result.version == 4){
+				//刷新页面
+				alert("ok")
+				window.location.reload();
+			}else{
+				$("#copy_tip").html(result.limitSex);
+			}
+		});
+	});
+
+	/* 表单数据获取 - 批量导出预约计划 */
+	var exportReserveListForm = "";
+	$("#reserveList_btn").on("mouseenter",function(){
+		exportReserveListForm = $("#exportReserveListForm").serialize();
+		console.log("--------exportReserveListForm----------");
+		console.log(exportReserveListForm);
+	});
+
+	//提交表单
+	$("#reserveList_btn").click(function(){
+		$.post("/xsap/reserve/exportReserveList.do",exportReserveListForm,function(result){
+			if(result == "yes"){
+				alert("yes");
+				window.location.reload();
+			}
+		});
+	});
+
+		//时间控件
+	    $(function () {
+	        $("#datepickers :input").datepicker({
+	            language: "zh-CN",
+	            autoclose: true,
+	            format: "yyyy-mm-dd",
+	            todayHighlight: true,
+	        });
+	        $("#datepicker :input").datepicker({
+	            autoclose: true,
+	            todayHighlight: true,
+	            language: "zh-CN",
+	            format: "yyyy-mm",
+	            startView: 1,
+	            minView: 1
+	        });
+	        $(".data-temple").datepicker({
+	            autoclose: true,
+	            format: "yyyy-mm-dd",
+	            language: "zh-CN",
+	            todayHighlight: true
+	        });
+
+	        /*$('#datepickers :input').each(function() {
+	            $(this).datepicker('clearDates');
+	        });*/
+	        $('.clockpicker').clockpicker({
+	            popover:"z-index:99999"
+	        });
+	    })
+	   
+
+});
+
+</script>
+
 </body>
 
 </html>

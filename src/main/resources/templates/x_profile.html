@@ -59,7 +59,7 @@
                         <div class="modal-body">
                             <!-- 表单定义 -->
                             <center>
-								<span th:if="${CHECK_PHONE_ERROR}" class="text-danger">手机号跟其它用户撞名了</span>
+								<span th:if="${CHECK_PHONE_EXIST}" class="text-danger">手机号跟其它用户撞名了</span>
                             </center>
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">用户名</label>
@@ -129,6 +129,8 @@
 <!-- Peity -->
 <script src="../static/js/plugins/peity/jquery.peity.min.js" th:src="@{/static/js/plugins/peity/jquery.peity.min.js}"></script>
 
+
+
 <!--头像上传 -->
 <script>
     // 头像预览
@@ -158,9 +160,9 @@
 				if(userData != null){
 					// 读取的URL结果：this.result	@{/static/img/{avatar}(avatar=${userInfo.avatarUrl})}
 					console.log("之后的图片信息："+userData.avatarUrl);
-					$("#avatar_img").attr("th:src", "@{/static/img/"+ userData.avatarUrl +"}");
+					$("#avatar_img").attr("src", "../static/img/"+ userData.avatarUrl);
 					//刷新界面
-					window.location.reload();
+					// window.location.reload();
 				}
 			},
 			error: function (jqXHR) {

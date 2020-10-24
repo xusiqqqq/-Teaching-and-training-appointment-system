@@ -29,7 +29,11 @@ public interface CourseScheduleService {
 	boolean deleteById(Long id);
 
 	/**
+<<<<<<< HEAD
 	 * 	获取所有的排课记录
+=======
+	 * 	所有的排课记录
+>>>>>>> b3286e860875dba3e734146520c65f0598ff525f
 	 * @return
 	 */
 	List<CourseScheduleDTO> listScheduleAll();

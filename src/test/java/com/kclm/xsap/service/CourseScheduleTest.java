@@ -1,6 +1,7 @@
 package com.kclm.xsap.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -44,6 +45,7 @@ public class CourseScheduleTest {
 		List<CourseScheduleDTO> listSchedule = scheduleService.listSchedule(startDate, endDate);
 		for (CourseScheduleDTO schedule : listSchedule) {
 			System.out.println("---: " + schedule);
+			System.out.println(schedule.getStartTime().toString());
 		}
 	}
 

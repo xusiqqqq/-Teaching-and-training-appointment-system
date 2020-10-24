@@ -73,7 +73,6 @@
             </div>
             <button type="button" class="btn btn-info" id="homeSearch" style="margin-left: 15px;margin-top: 15px">查询</button>
         </div>
-
         <!--    体部信息-->
         <div class="box" style="margin-left: 10px; width: 300px" >  
             <span style="font-size: 25px;" class="left" id="totalMembers"><strong>34</strong></span>
@@ -288,7 +287,6 @@
                 var myChartPie = echarts.init(document.getElementById('pie'));
 				$(function(){
 					$.post("[[${#request.getContextPath()}]]/index/report.do",function(reportData){
-						console.log(reportData);
 						var nameList = new Array();
 						//遍历报表数据
 						for(var i = 0; i < reportData.length; i++){

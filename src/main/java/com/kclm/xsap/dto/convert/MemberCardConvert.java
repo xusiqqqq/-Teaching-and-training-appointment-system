@@ -28,12 +28,11 @@ public interface MemberCardConvert {
 	 * @param validTimes	会员卡可用次数
 	 * @param endTime	会员卡到期时间
 	 * @param memberCard	会员卡实体类
-	 * @return	MemberCardDTO。显示会员卡的信息
+	 * @return	MemberCardDTO。显示会员绑定的会员卡的信息
 	 */
 	@Mappings({
 		@Mapping(source = "validTimes",target = "totalCount"),
 		@Mapping(source = "endTime",target = "dueTime"),
-		@Mapping(source = "memberCard.id", target = "memberCardId")
 	})
 	MemberCardDTO entity2Dto(Integer validTimes,LocalDateTime endTime,TMemberCard memberCard);
 

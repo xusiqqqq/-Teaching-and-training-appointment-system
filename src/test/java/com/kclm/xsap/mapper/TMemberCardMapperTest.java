@@ -29,7 +29,7 @@ public class TMemberCardMapperTest {
 		card.setName("一对四");
 		BigDecimal price = new BigDecimal(20.1);
 		card.setPrice(price);
-		card.setDesc("desc-1");
+		card.setDescription("desc-1");
 		card.setType("次数限制");
 		card.setStatus(0);
 		card.setTotalCount(1);
@@ -46,7 +46,7 @@ public class TMemberCardMapperTest {
 		card.setName("一对四十");
 		BigDecimal price = new BigDecimal(20.20);
 		card.setPrice(price);
-		card.setDesc("desc-1-1");
+		card.setDescription("desc-1-1");
 		card.setType("次数限制");
 		card.setStatus(0);
 		card.setTotalCount(11);

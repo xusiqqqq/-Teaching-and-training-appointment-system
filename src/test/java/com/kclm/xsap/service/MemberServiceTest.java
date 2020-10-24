@@ -44,6 +44,12 @@ public class MemberServiceTest {
 	}
 
 	@Test
+	public void findByPhone() {
+		TMember mber = memberService.findByPhone("11112");
+		System.out.println(mber);
+	}
+	
+	@Test
 	public void findAllByPage() {
 		List<TMember> list = memberService.findAllByPage(1, 3);
 		for (TMember member : list) {

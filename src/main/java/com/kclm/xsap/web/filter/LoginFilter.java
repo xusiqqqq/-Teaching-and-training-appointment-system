@@ -2,7 +2,9 @@ package com.kclm.xsap.web.filter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
@@ -16,6 +18,7 @@ import java.io.IOException;
  * @Description 认证过滤器【登录过滤器】
  */
 @Order(1)
+//@ServletComponentScan
 @WebFilter(urlPatterns = {"/function/*"},filterName = "loginFilter", dispatcherTypes =
         {DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.INCLUDE, DispatcherType.ASYNC})
 public class LoginFilter implements Filter {

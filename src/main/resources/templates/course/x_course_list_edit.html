@@ -46,30 +46,40 @@
                     </div>
                 </div>
                 <div class="ibox-content">
-                    <form method="get" class="form-horizontal">
+                    <form method="post" class="form-horizontal" th:action="@{/course/courseEdit.do}">
                         <div class="form-group">
                             <label class="col-sm-2 control-label"><i class="red">*</i>课程名称</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="course_name" placeholder="请输入课程名称" value="钢琴课" name="name">
+                            	<!-- 隐藏域，id -->
+                            	<input type="hidden" name="id" value="1" th:value="${courseMsg.id}"/>
+                            	
+                                <input type="text" class="form-control" id="course_name" placeholder="请输入课程名称" value="钢琴课"  th:value="${courseMsg.name}" name="name">
+                           		<span class="text-danger">[[${NAME_EXIST}]]</span>
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-sm-2 control-label">时长(分钟)</label>
                             <div class="col-sm-3 col-md-2">
-                                <input type="number" class="form-control" name="duration" value="45">
+                                <input type="number" class="form-control" name="duration" value="45" min="0" th:value="${courseMsg.duration}">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-sm-2 control-label">上课人数</label>
+                            <label class="col-sm-2 control-label">课堂容纳人数</label>
                             <div class="col-sm-3 col-md-2">
-                                <input type="number" class="form-control" name="contains" value="1">
+                                <input type="number" class="form-control" name="contains" value="1"  min="0" th:value="${courseMsg.contains}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">消耗次数/节</label>
+                            <div class="col-sm-3 col-md-2">
+                                <input type="number" class="form-control" name="timesCost" value="0" min="0" max="5"  th:value="${courseMsg.timesCost}">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-sm-2 control-label">课程颜色</label>
                             <div class="col-sm-3 col-md-2">
                                 <div class="input-group">
-                                    <input type="text" value="" class="form-control" readonly id="color_picker_kc"/>
+                                    <input type="text" name="color" value=""  th:value="${courseMsg.color}" class="form-control" readonly id="color_picker_kc"/>
                                 </div>
                             </div>
                         </div>
@@ -81,10 +91,9 @@
                                        id="support_program">
                                     <thead>
                                     <tr>
-                                        <th><input type="checkbox" name="input[]" id="check_all" class="i-checks"></th>
+                                        <th><input type="checkbox" name="cardListStr" id="check_all" class="i-checks"></th>
                                         <th>会员卡</th>
                                         <th>会员类型</th>
-                                        <th>收费情况(次卡)</th>
                                     </tr>
                                     </thead>
                                 </table>
@@ -95,7 +104,7 @@
                             <div class="col-sm-10">
                                 <div class="ibox float-e-margins">
                                     <div class="ibox-content">
-                                        <textarea id="editor" placeholder="这里输入内容" autofocus name="introduce"></textarea>
+                                        <textarea id="editor" placeholder="这里输入内容" autofocus name="introduce"  th:text="${courseMsg.introduce}"></textarea>
 
                                     </div>
                                 </div>
@@ -106,10 +115,10 @@
                             <hr/>
                             <label class="col-sm-2 control-label">限制性别</label>
                             <div class="col-sm-3 col-md-2">
-                                <select class="form-control">
-                                    <option value="全部">全部</option>
-                                    <option value="男">男</option>
-                                    <option value="女">女</option>
+                                <select class="form-control" name="limitSex">
+                                    <option th:attr="selected=${courseMsg.limitSex == '全部' ? true : false}" value="全部" >全部</option>
+                                    <option th:attr="selected=${courseMsg.limitSex == '男' ? true : false}" value="男">男</option>
+                                    <option th:attr="selected=${courseMsg.limitSex == '女' ? true : false}" value="女">女</option>
                                 </select>
                             </div>
                         </div>
@@ -122,10 +131,10 @@
                                 </label>
                                 <br/>
                                 <label>
-                                    <input type="radio" name="limitAgeRadio" style="float: left"> &nbsp;&nbsp;
+                                    <input type="radio" name="limitAgeRadio" style="float: left" value="0"> &nbsp;&nbsp;
                                     <span class="input-daterange input-group right" style="float: right">
                                         <span class="input-group-addon">大于</span>
-                                        <input type="text" class="input-sm form-control" name="limitAge" value="5" style="width: 50px;"/>
+                                        <input type="text" class="input-sm form-control" name="limitAge" value="5" th:value="${courseMsg.limitAge}" style="width: 50px;"/>
                                         <span class="input-group-addon">岁</span>
                                     </span>
                                 </label>
@@ -135,14 +144,14 @@
                             <label class="col-sm-2 control-label">限制预约次数</label>
                             <div class="col-sm-6">
                                 <label>
-                                    <input type="radio" name="limitCountsRadio" checked>&nbsp;&nbsp;<span class="font-noraml">不限制</span>
+                                    <input type="radio" name="limitCountsRadio" checked value="-1">&nbsp;&nbsp;<span class="font-noraml">不限制</span>
                                 </label>
                                 <br/>
                                 <label>
-                                    <input type="radio" name="limitCountsRadio" style="float: left"> &nbsp;&nbsp;
-                                    <span class="input-daterange input-group right" style="float: right">
+                                    <input type="radio" name="limitCountsRadio" style="float: left" value="0"> &nbsp;&nbsp;
+                                    <span class="input-daterange input-group right" style="float: right" >
                                         <span class="input-group-addon">每名会员最多可以预约本课程</span>
-                                        <input type="text" class="input-sm form-control" name="limitCounts" value="2" style="width: 50px;"/>
+                                        <input type="text" class="input-sm form-control" name="limitCounts" value="2" th:value="${courseMsg.limitCounts}" style="width: 50px;"/>
                                         <span class="input-group-addon">次</span>
                                     </span>
 
@@ -152,8 +161,8 @@
 
                         <div class="form-group">
                             <div class="col-sm-2 col-sm-offset-2">
-                                <button type="submit" class="btn btn-success">保存</button>
-                                <button type="submit" class="btn btn-white">取消</button>
+                                <button type="submit" class="btn btn-success" id="saveBtn">保存</button>
+                                <button type="reset" class="btn btn-white">取消</button>
                             </div>
                         </div>
                     </form>
@@ -197,49 +206,53 @@
 
 <script>
     $(document).ready(function () {
-        $('.supportMemberCardTable').dataTable({
-            //获取数据
-            /*TODO:此处为未来与后端进行交互的地方*/
-            "data": [
-                {"id": 1, "member_card": "12次大课", "member_card_type": "次卡(无限次)", "charge": 2},
-                {"id": 2, "member_card": "12课时一对一", "member_card_type": "次卡(无限次)", "charge": 1},
-                {"id": 3, "member_card": "96课时", "member_card_type": "次卡(无限次)", "charge": 3},
-                {"id": 4, "member_card": "48课时", "member_card_type": "次卡(无限次)", "charge": 1},
-                {"id": 5, "member_card": "12课时", "member_card_type": "次卡(无限次)", "charge": 0},
-                {"id": 6, "member_card": "包年", "member_card_type": "次卡(无限次)", "charge": 1}
-            ],
-            //行的定义
-            "columns": [
-                {
-                    "data": null, "render": function (data, type, row) {
-                        var id = '"' + row.id + '"';
-                        var html = "<input type='checkbox' name='input[]' id='check_all' class='i-checks'>";
-                        return html;
-                    }
+    	$("#saveBtn").on("mouseenter",function(){
+    		var editForm = $("form").serialize();
+    		console.log(editForm);
+    	});
+    	 //加载卡片信息
+        $.post("/xsap/card/cardList.do",function(cardList){
+        	console.log(cardList);
+        	$('.supportMemberCardTable').dataTable({
+                //获取数据
+                /*TODO:此处为未来与后端进行交互的地方*/
+                "data": cardList,
+                //行的定义
+                "columns": [
+                    {
+                        "data": "id", "render": function (data, type, row) {
+                            var id = data;
+                            var html = "<input type='checkbox' name='cardListStr' id='check_all' class='i-checks' value='"+ id +"'>";
+                            return html;
+                        }
+                    },
+                    {"data": "name"},
+                    {"data": "type"}
+                ],
+                language: {
+                    "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
+                    "loadingRecords": "加载中...",//用来描述数据在加载中等待的提示字符串 - 当异步读取数据的时候显示
+                    "processing": "处理中...",//用来描述加载进度的字符串
+                    "sInfo": ""
                 },
-                {"data": "member_card"},
-                {"data": "member_card_type"},
-                {
-                    "data": null, "render": function (data, type, row) {
-                        var html = "<span class='pie'>每节课收取&nbsp;<input type='text' class='form-control input-s-sm' value='" + row.charge + "'>次/人</span>";
-                        return html;
-                    }
-                }
-            ],
-            language: {
-                "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
-                "loadingRecords": "加载中...",//用来描述数据在加载中等待的提示字符串 - 当异步读取数据的时候显示
-                "processing": "处理中...",//用来描述加载进度的字符串
-                "sInfo": ""
-            },
-            searching: false,//是否开始本地搜索
-            lengthChange: false,//是否允许用户改变表格每页显示的记录数
-            paging: false,
-            columnDefs: [{
-                targets: 0,//编辑取消排序
-                "orderable": false
-            }]
-        })
+                searching: false,//是否开始本地搜索
+                lengthChange: false,//是否允许用户改变表格每页显示的记录数
+                paging: false,
+                columnDefs: [{
+                    targets: 0,//编辑取消排序
+                    "orderable": false
+                }]
+            });        	
+        	
+        	var card = [[${cardCarry}]]   		
+ 	   		console.log(card);
+ 	   		if(card != null){			
+ 	    		for(var i = 0; i < card.length; i++){
+ 	    			$("input[name='cardListStr'][value='"+ card[i] +"']").prop("checked",true);
+ 	    		}
+ 	   		}
+        });
+        
     });
 </script>
 <script>

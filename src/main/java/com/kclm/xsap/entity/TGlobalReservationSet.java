@@ -3,6 +3,8 @@ package com.kclm.xsap.entity;
 import java.io.Serializable;
 import java.time.LocalTime;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import lombok.Data;
@@ -29,7 +31,7 @@ public class TGlobalReservationSet extends BaseEntity implements Serializable{
 	/**
     * 可提前预约的天数
     */
-    private Integer startTime;
+    private Integer startDay;
 
     /**
      * 模式1：提前预约截止天数，上课前
@@ -39,6 +41,7 @@ public class TGlobalReservationSet extends BaseEntity implements Serializable{
     /**
      * 模式1：提前预约截止时间(24小时内)，上课前
      */
+    @DateTimeFormat(pattern = "HH:mm:ss")
     private LocalTime endTime;
     
     /**
@@ -54,6 +57,7 @@ public class TGlobalReservationSet extends BaseEntity implements Serializable{
     /**
      * 模式1：提前预约取消的时间限制（24小时内）
      */
+    @DateTimeFormat(pattern = "HH:mm:ss")
     private LocalTime cancelTime;
     
     /**

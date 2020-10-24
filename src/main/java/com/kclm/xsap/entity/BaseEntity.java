@@ -10,6 +10,8 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 import com.baomidou.mybatisplus.annotation.Version;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatTypes;
 
 /******************
  * @Author yejf
@@ -26,11 +28,13 @@ public class BaseEntity {
     /**
      * 创建时间
      */
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime createTime = LocalDateTime.now();
 
     /**
      * 修改时间
      */
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime lastModifyTime;
 
     /**
