@@ -82,8 +82,6 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 			//若距离上次上课结束1个小时内
 			if(findOne.getClassTime() != null) {
 				LocalTime inOneHour = findOne.getClassTime().plusHours(1L);
-				System.out.println("classTime" + classTime);
-				System.out.println("inOneHour  "+ inOneHour);
 				if(classTime.isBefore(inOneHour)){
 					System.out.println("相同一堂课不能在一小时内排两次！");
 					return false;
