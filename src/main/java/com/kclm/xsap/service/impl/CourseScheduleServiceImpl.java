@@ -187,8 +187,8 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 				TMemberCard memberCard = cardMapper.selectOne(new QueryWrapper<TMemberCard>()
 						.eq("name", classed.getCardName()));
 				if(memberCard == null) {
-					System.out.println("没有此会员卡！");
-					return null;
+					System.out.println("没有此会员卡！"+memberCard);
+					continue ;
 				}
 				BigDecimal price = new BigDecimal(memberCard.getPrice().toString());
 				BigDecimal count = new BigDecimal(memberCard.getTotalCount().toString());

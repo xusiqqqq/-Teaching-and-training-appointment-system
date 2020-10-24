@@ -219,6 +219,15 @@ public class MemberCardServiceImpl implements MemberCardService{
 	public List<MemberLogDTO> listOperateLog(Long memberId,Long cardId) {
 		TMemberCard memberCard = cardMapper.selectById(cardId);
 		
+		//获取到会员指定的会员卡的操作记录
+		List<TMemberLog> logList = logMapper.selectList(new QueryWrapper<TMemberLog>()
+				.eq("member_id", memberId).eq("card_id", cardId));
+		List<MemberLogDTO> logDtoList = new ArrayList<>();
+		if(logList == null || logList.size() < 1) {
+			System.out.println("-------当前用户的此张卡，无任何操作记录");
+			return null;
+		}
+		
 		String note = "待补充";
 		if(memberCard != null) {
 			//会员卡备注
@@ -239,14 +248,7 @@ public class MemberCardServiceImpl implements MemberCardService{
 			}
 		}
 		
-		//获取到会员指定的会员卡的操作记录
-		List<TMemberLog> logList = logMapper.selectList(new QueryWrapper<TMemberLog>()
-				.eq("member_id", memberId).eq("card_id", cardId));
-		List<MemberLogDTO> logDtoList = new ArrayList<>();
-		if(logList == null || logList.size() < 1) {
-			System.out.println("-------当前用户的此张卡，无任何操作记录");
-			return null;
-		}
+		
 		for (TMemberLog log : logList) {
 			//===========dto存储
 			MemberLogDTO logDto = new MemberLogDTO();

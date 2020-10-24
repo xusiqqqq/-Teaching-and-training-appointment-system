@@ -280,8 +280,8 @@ public class MemberServiceImpl implements MemberService{
 			TMemberBindRecord bind = bindMapper.selectOne(new QueryWrapper<TMemberBindRecord>()
 					.eq("member_id", id).eq("card_id", bindRecord.getCardId()));
 			if(bind == null) {
-				System.out.println("------当前会员没绑定任何卡");
-				return null;
+				System.out.println("------当前会员没绑定此卡"+ bindRecord.getCardId());
+				continue ;
 			}
 			//会员卡到期日
 			Integer	validTimes = bind.getValidCount();
@@ -452,8 +452,8 @@ public class MemberServiceImpl implements MemberService{
 			 TMemberBindRecord bindRecord = bindMapper.selectOne(new QueryWrapper<TMemberBindRecord>()
 					 .eq("card_id", memberCard.getId()).eq("member_id", id));
 			 if(bindRecord == null) {
-				 System.out.println("------当前会员没绑定任何卡，不存在消费行为");
-				return null;
+				 System.out.println("------当前会员没绑定此卡" + memberCard);
+				continue ;
 			 }
 			 Integer timesRemainder = bindRecord.getValidCount();				 
 			 //==========DTO存储
