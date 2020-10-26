@@ -69,7 +69,7 @@
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
         <div class="col-sm-12">
-            <form class="form-horizontal">
+            <form class="form-horizontal" th:action="@{/card/cardAdd.do}" id="addForm">
                 <div style="background-color: #FFFFFF;">
                     <div class="form-group">
                         <label for="inputCardName"
@@ -78,15 +78,16 @@
                         <div class="col-sm-8">
                             <input type="text" class="form-control margin_top" id="inputCardName" placeholder="会员卡名称" name="name"
                                    required>
+                            <span class="text-danger">[[${NAME_EXIST}]]</span>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="inputCardPrice" class="col-sm-2 control-label input_margin_top"><span
                                 style="color: red">*&nbsp;</span>价格</label>
-                        <div class="col-sm-2">
-                            <!--                            <input type="number" class="form-control input_margin_top" id="inputCardPrice"-->
-                            <!--                                   placeholder="价格" min="0"-->
-                            <!--                                   required>-->
+                        <div class="col-md-2">
+                            <!--  <input type="number" class="form-control input_margin_top" id="inputCardPrice"-->
+                            <!--    placeholder="价格" min="0"-->
+                            <!--    required>-->
                             <div class="input-group input_margin_top">
                                 <div class="input-group-addon">￥</div>
                                 <input type="number" class="form-control" placeholder="价格" id="inputCardPrice" min="0" name="price">
@@ -97,14 +98,14 @@
                     <div class="form-group">
                         <label for="inputCardDescribe" class="col-sm-2 control-label input_margin_top">描述信息</label>
                         <div class="col-sm-8">
-                            <textarea type="text" class="form-control input_margin_top" name="desc"
+                            <textarea  class="form-control input_margin_top" name="description"
                                       id="inputCardDescribe"></textarea>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="inputCardRemark" class="col-sm-2 control-label input_margin_top">备注信息</label>
                         <div class="col-sm-8">
-                            <textarea type="text" class="form-control input_margin_top margin_buttom" name="note"
+                            <textarea  class="form-control input_margin_top margin_buttom" name="note"
                                       id="inputCardRemark"></textarea>
                         </div>
                     </div>
@@ -155,7 +156,7 @@
                                    id="support_program">
                                 <thead>
                                 <tr>
-                                    <th><input type="checkbox" name="input[]" id="check_all" class="i-checks"></th>
+                                    <th><input type="checkbox" name="courseListStr" id="check_all" class="i-checks"></th>
                                     <th class="col-sm-7">课程</th>
                                     <th>收费情况(次卡)</th>
                                 </tr>
@@ -165,7 +166,7 @@
                     </div>
                     <div class="form-group">
                         <div class="col-sm-offset-2 col-sm-10 margin_buttom btn_margin_top">
-                            <button type="submit" class="btn btn-success">保存</button>
+                            <button type="submit" class="btn btn-success" id="saveBtn">保存</button>
                             <a href="x_member_card.html" type="button" class="btn btn-default">取消</a>
                         </div>
                     </div>
@@ -190,49 +191,56 @@
 <script src="../../static/js/plugins/iCheck/icheck.min.js" th:src="@{/static/js/plugins/iCheck/icheck.min.js}"></script>
 <script>
     $(function () {
-        $('.dataTables-example').dataTable({
-
-            //获取数据
-            /*TODO:此处为未来与后端进行交互的地方*/
-            "data": [
-                {"id": 1, "course": "钢琴大课", "charge": 1},
-                {"id": 2, "course": "钢琴一对一", "charge": 1},
-                {"id": 3, "course": "跳绳课", "charge": 1},
-                {"id": 4, "course": "搏击(6-8周岁)", "charge": 1},
-                {"id": 5, "course": "橄榄球(6-8周岁)", "charge": 1},
-                {"id": 6, "course": "篮球(6-8周岁)", "charge": 1}
-            ],
-            //行的定义
-            "columns": [
-                {
-                    "data": null, "render": function (data, type, row) {
-                        var id = '"' + row.id + '"';
-                        var html = "<input type='checkbox' name='input[]' class='i-checks' id='check_all'>";
-                        return html;
+    	$("#saveBtn").on("mouseenter",function(){
+    		var addForm = $("#addForm").serialize();
+    		console.log(addForm);
+    	});
+    	
+    	
+    	//获取所有的课程数据
+    	$.post("/xsap/course/courseList.do",function(courseData){
+    		console.log(courseData);
+    		$('.dataTables-example').dataTable({
+    			//获取数据
+                /*TODO:此处为未来与后端进行交互的地方*/
+                "data": courseData,
+                //行的定义
+                "columns": [
+                    {
+                        "data": "id", "render": function (data, type, row) {
+                        	/* 参数说明
+                        		data: 拿到的是左边指明的"data"的字段对应的全部值
+                        		row: 拿到的是dataTable的"data"属性获取到的每一行值
+                        	*/
+                            var id = data;
+                            var html = "<input type='checkbox' name='courseListStr' class='i-checks' id='check_all' value='"+id+"'>";
+                            return html;
+                        },bAutoWidth: "false", sWidth: "1%"
+                    },
+                    {"data": "name", sWidth: "15%"},
+                    {
+                        "data": "timesCost", "render": function (data, type, row) {
+                            var html = "<span class='pie'>每节课收取&nbsp;<input type='text' class='form-control input-sm' value='" + data + "'>次/人</span>";
+                            return html;
+                        }, sWidth: "15%"
                     }
+                ],
+                language: {
+                    "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
+                    "loadingRecords": "加载中...",//用来描述数据在加载中等待的提示字符串 - 当异步读取数据的时候显示
+                    "processing": "处理中...",//用来描述加载进度的字符串
+                    "sInfo": "",// 这样就可以隐藏了
                 },
-                {"data": "course"},
-                {
-                    "data": null, "render": function (data, type, row) {
-                        var html = "<span class='pie'>每节课收取&nbsp;<input type='text' class='form-control input-sm' value='" + row.charge + "'>次/人</span>";
-                        return html;
-                    }
-                }
-            ],
-            language: {
-                "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
-                "loadingRecords": "加载中...",//用来描述数据在加载中等待的提示字符串 - 当异步读取数据的时候显示
-                "processing": "处理中...",//用来描述加载进度的字符串
-                "sInfo": "",// 这样就可以隐藏了
-            },
-            searching: false,//是否开始本地搜索
-            paging: false,
-            lengthChange: false,//是否允许用户改变表格每页显示的记录数
-            columnDefs: [{
-                targets: 0,//编辑取消排序
-                "orderable": false
-            }]
-        })
+                searching: false,//是否开始本地搜索
+                paging: false,
+                lengthChange: false,//是否允许用户改变表格每页显示的记录数
+                columnDefs: [{
+                    targets: 0,//编辑取消排序
+                    "orderable": false
+                }]
+            });
+    	});
+        
     })
 </script>
 <script type="text/javascript">

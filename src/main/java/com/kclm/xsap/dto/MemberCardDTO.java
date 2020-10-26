@@ -2,6 +2,8 @@ package com.kclm.xsap.dto;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -17,7 +19,10 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=false)
 public class MemberCardDTO{
 
-	private Long memberCardId;
+	/**
+	 * 	对应绑定记录的id
+	 */
+	private Long bindCardId;
 	/**
 	 * 会员卡名称
 	 */
@@ -36,11 +41,12 @@ public class MemberCardDTO{
     /**
           * 到期时间
      */
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime dueTime;
     
     /**
-	 * 激活状态。1，已激活；0，未激活
-	 */
-	private Integer status;
+     * 	当前会员绑定的某一张会员卡的激活状态（针对这一个会员）
+     */
+    private Integer activeStatus;
 	
 }

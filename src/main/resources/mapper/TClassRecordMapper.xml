@@ -10,6 +10,7 @@
     <result column="note" jdbcType="VARCHAR" property="note" />
     <result column="comment" jdbcType="VARCHAR" property="comment" />
     <result column="check_status" jdbcType="INTEGER" property="checkStatus" />
+    <result column="reserve_check" jdbcType="INTEGER" property="reserveCheck" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
     <result column="version" jdbcType="INTEGER" property="version" />
@@ -44,7 +45,7 @@
   </resultMap>
   <sql id="TReservationRecord_Column_List">
     <!--@mbg.generated-->
-    id, `comment`, note, check_status, member_id, card_name, schedule_id, create_time, 
+    id, `comment`, note, check_status,reserve_check, member_id, card_name, schedule_id, create_time, 
     last_modify_time, version
   </sql>
   <sql id="member_sql">

@@ -3,6 +3,8 @@ package com.kclm.xsap.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -22,6 +24,7 @@ public class MemberLogDTO {
 	/**
 	 * 操作时间
 	 */
+	 @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private LocalDateTime operateTime;
 	
 	/**
@@ -37,6 +40,7 @@ public class MemberLogDTO {
 	/**
 	 * 卡到期日: 来自于 会员绑卡记录 实体， 它的值由 日期 createTime 加上 validDay【有效期，天】 得到
 	 */
+	 @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private LocalDateTime endToDate; 
 	
 	/**
@@ -55,7 +59,7 @@ public class MemberLogDTO {
 	private String cardNote;
 	
 	/**
-	 * 会员卡激活状态， 来自于会员卡 实体类
+	 * 会员卡激活状态， 来自于会员绑定会员卡的记录
 	 */
 	private Integer status;
 	

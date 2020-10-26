@@ -60,4 +60,11 @@ public class TClassRecord extends BaseEntity implements Serializable{
 	 */
 	private Integer checkStatus;
 	
+	/**
+	 * 预约状态检定。1，已预约；0，未预约
+	 */
+	private Integer reserveCheck;
+	
+	
+	
 }

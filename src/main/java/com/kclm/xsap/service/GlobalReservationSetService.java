@@ -17,6 +17,12 @@ public interface GlobalReservationSetService {
 	boolean update(TGlobalReservationSet glogal);
 	
 	/**
+	 * 	根据id查询全局设置
+	 * @return
+	 */
+	TGlobalReservationSet findOne(Long id);
+	
+	/**
 	 * 获取所有的全局预约设置信息
 	 * @return List<TGlobalReservationSet>。全局预约设置信息结果集
 	 */

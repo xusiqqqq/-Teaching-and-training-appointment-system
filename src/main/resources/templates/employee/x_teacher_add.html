@@ -36,7 +36,7 @@
                         </div>
                     </div>
                     <div class="ibox-content">
-                        <form method="get" class="form-horizontal">
+                        <form id="addForm" method="post" class="form-horizontal" th:action="@{/employee/teacherAdd.do}" >
                             <div class="form-group">
                                 <label class="col-sm-2 control-label"><i class="red">*</i>老师姓名</label>
                                 <div class="col-sm-10">
@@ -47,13 +47,14 @@
                                 <label class="col-sm-2 control-label"><i class="red">*</i>手机号</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control" placeholder="请输入手机号码" name="phone">
+                                	<span th:if="${CHECK_PHONE_EXIST}" class="text-danger">手机号跟其它用户撞名了</span>
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 <label class="col-sm-2 control-label"><i class="red">*</i>邮  箱</label>
                                 <div class="col-sm-10">
-                                    <input type="email" class="form-control" placeholder="请输入合法的邮箱" name="email">
+                                    <input type="email" class="form-control" placeholder="请输入合法的邮箱" name="roleEmail">
                                 </div>
                             </div>
 
@@ -112,13 +113,13 @@
 <script src="../../static/js/plugins/peity/jquery.peity.min.js" th:src="@{/static/js/plugins/peity/jquery.peity.min.js}"></script>
 
 <!-- Peity -->
-<script src="../../static/js/demo/peity-demo.js" th:src="@{/static/js/demo/peity-demo.js}"></script>
+<!-- <script src="../../static/js/demo/peity-demo.js" th:src="@{/static/js/demo/peity-demo.js}"></script> -->
 
 
 <!-- Data picker -->
 <script src="../../static/js/plugins/datapicker/bootstrap-datepicker.js" th:src="@{/static/js/plugins/datapicker/bootstrap-datepicker.js}"></script>
 <script src="../../static/js/plugins/datapicker/bootstrap-datepicker.zh-CN.min.js" th:src="@{/static/js/plugins/datapicker/bootstrap-datepicker.zh-CN.min.js}"></script>
-<script>
+<script type="text/javascript">
     $(function () {
         /*时间控件配置*/
         $('#myDate').datepicker({

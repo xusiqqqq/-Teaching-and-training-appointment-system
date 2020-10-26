@@ -18,7 +18,7 @@ public class GlobalReservationSetServiceTest {
 	@Test
 	public void update() {
 		TGlobalReservationSet global = new TGlobalReservationSet();
-		global.setStartTime(8);
+		global.setStartDay(8);
 		global.setEndHour(1);
 		global.setEndDay(2);
 		global.setCancelHour(14);

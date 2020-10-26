@@ -25,6 +25,7 @@ public class TCourse extends BaseEntity implements Serializable{
      */
     @TableField(exist = false)
     @ToString.Exclude
+    
     private List<TMemberCard> cardList; 
 	
     private String name;
@@ -35,7 +36,7 @@ public class TCourse extends BaseEntity implements Serializable{
     private Integer duration;
 
     /**
-    * 上课人数
+    * 课堂容纳人数
     */
     private Integer contains;
 
@@ -65,7 +66,7 @@ public class TCourse extends BaseEntity implements Serializable{
     private Integer limitAge;
 
     /**
-    * 限制预约次数
+    * 限制预约次数，-1 表示不限制
     */
     private Integer limitCounts;
 

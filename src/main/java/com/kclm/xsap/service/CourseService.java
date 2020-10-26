@@ -22,6 +22,27 @@ public interface CourseService {
 	boolean update(TCourse course);
 	
 	/**
+	 * 	根据id查询课程信息
+	 * @param id
+	 * @return	TCourse
+	 */
+	TCourse findById(Long id);
+	
+	/**
+	 * 	根据name查询课程信息
+	 * @param name
+	 * @return
+	 */
+	TCourse findByName(String name);
+	
+	/**
+	 * 	找到某个会员卡绑定的所有课程信息
+	 * @param cardId
+	 * @return
+	 */
+	List<TCourse> listByCardId(Long cardId);
+	
+	/**
 	 * 分页查询。获取所有的课程信息
 	 * @param currentPage 当前页码
 	 * @param pageSize 每页展示数据个数

@@ -26,7 +26,7 @@ public class TGlobalReservationSetMapperTest {
 	//增加一条记录
 		@Test
 		public void save() {
-		global.setStartTime(1);
+		global.setStartDay(1);
 		globalMapper.insert(global);
 		toPrint("增加", 1,null);
 		}
@@ -35,7 +35,7 @@ public class TGlobalReservationSetMapperTest {
 		@Test
 		public void updateOne() {
 		global = findById(1);
-		global.setStartTime(11);
+		global.setStartDay(11);
 		globalMapper.updateById(global);
 		toPrint("更新", 1,null);
 		}

@@ -4,9 +4,7 @@
 
 package com.kclm.xsap.web.controller;
 
-import java.io.File;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -14,8 +12,6 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.ResourceUtils;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -23,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.kclm.xsap.entity.TEmployee;
 import com.kclm.xsap.service.EmployeeService;
+import com.kclm.xsap.utils.FileUploadUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,8 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class EmployeeController {
 	
-	private static final String RESOURCE_PATH = "static/img";
-
 	//调用service层
 	@Autowired
 	private EmployeeService employeeService;
@@ -101,9 +96,12 @@ public class EmployeeController {
 	}
 	
 	//登录界面
-	@RequestMapping("/login.do")
+	@RequestMapping(value = "/login.do",produces = {"application/json;charset=UTF-8"})
 	public String login(String username,String password,Model model,HttpSession session) {
 		TEmployee loginUser = employeeService.login(username, password);
+		System.out.println("--------loginUser---------");
+		System.out.println(loginUser);
+		System.out.println("---------");
 		model.addAttribute("USER_NOT_EXIST", false);					
 		if(loginUser == null) {
 			model.addAttribute("USER_NOT_EXIST", true);			
@@ -177,15 +175,15 @@ public class EmployeeController {
 	//显示最近的更新信息
 	@RequestMapping("/showModify.do")
 	@ResponseBody
-	public TEmployee showModify(@RequestParam("id") Integer id) {
+	public TEmployee showModify(@RequestParam("id") Long id) {
 		TEmployee employee = employeeService.findById(id);
-		System.out.println("根据"+id+ "得到的图书信息：" +employee);
+		System.out.println("根据"+id+ "得到的员工信息：" +employee);
 		return employee;
 	}
 	
 	//修改用户信息
 	//1、修改图像信息
-	@RequestMapping(value = "/modifyUserImg.do")
+	@RequestMapping(value = "/modifyUserImg.do",produces = {"application/json;charset=UTF-8"})
 	@ResponseBody
 	public TEmployee modifyUserImg(@RequestParam("avatarFile") MultipartFile avatarFile,HttpSession session) {
 		log.debug("=====avatar: " + avatarFile);
@@ -195,7 +193,7 @@ public class EmployeeController {
 			//上传文件
 			String fileName;
 			try {
-				fileName = uploadFiles(avatarFile);
+				fileName = FileUploadUtil.uploadFiles(avatarFile);
 				//设置图片全名
 				oldEmp.setAvatarUrl(fileName);
 			} catch (Exception e) {
@@ -204,6 +202,9 @@ public class EmployeeController {
 			}
 		}
 		TEmployee employee = employeeService.update(oldEmp);
+		System.out.println("---------profile---------");
+		System.out.println(employee);
+		System.out.println("---------");
 		//更新Session域的信息
 		session.setAttribute("LOGIN_USER", employee);
 		return employee;
@@ -227,17 +228,14 @@ public class EmployeeController {
 			emp.setVersion(oldEmp.getVersion());
 			//判断新输入的手机号是否已存在
 			TEmployee checkPhone = employeeService.findByUser(emp.getPhone());
-			log.debug("-------原有电话："+emp.getPhone());
-			log.debug("-------库里的电话："+checkPhone.getPhone());
 			if(checkPhone != null) {
 				//校检手机号的提示信息
-				model.addAttribute("CHECK_PHONE_ERROR", false);
+				model.addAttribute("CHECK_PHONE_EXIST", false);
 				if(!checkPhone.getPhone().equals(oldEmp.getPhone()) ) {
-					model.addAttribute("CHECK_PHONE_ERROR", true);
-					log.debug("。。。手机号跟其它用户撞名了！。。。。。。");
+					model.addAttribute("CHECK_PHONE_EXIST", true);
+					//返回原值
+					return "forward:x_profile.do";
 				}
-				//返回原值
-				return "forward:x_profile.do";
 			}	
 		}
 		TEmployee employee = employeeService.update(emp);
@@ -268,36 +266,6 @@ public class EmployeeController {
 		}
 		//密码修改完，重新登录
 		return "redirect:logout.do";
-	}
-	
-	
-	/* ====================以下是公共方法区==================== */
-	
-	//文件上传
-	public String uploadFiles(MultipartFile uploadFile) throws Exception{
-		//定义文件名
-		String fileName = ""; 
-		//1.获取原始文件名 
-		String uploadFileName = uploadFile.getOriginalFilename(); 
-		//3.把文件加上随机数，防止文件重复 
-		String uuid = UUID.randomUUID().toString().replace("-", "").toUpperCase(); 
-		//4.判断是否输入了文件名 
-		fileName = uuid + "_"+ uploadFileName;
-		System.out.println(fileName);
-		//2.获取文件路径
-		String basePath = ResourceUtils.getURL("classpath:").getPath();
-		System.out.println("basePath: "+basePath);
-		//4.判断路径是否存在
-		File realPath = new File(basePath,RESOURCE_PATH);
-		System.out.println("filePath: "+realPath);
-		if(!realPath.exists()) {
-			System.out.println("创建目录结构。。。");
-			realPath.mkdirs(); 
-		} 
-		//5.使用MulitpartFile接口中方法，把上传的文件写到指定位置 
-		uploadFile.transferTo(new File(realPath,fileName)); 
-		System.out.println("图片名："+fileName);
-		return fileName;
 	}
 	
 }

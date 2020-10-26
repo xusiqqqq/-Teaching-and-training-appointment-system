@@ -29,5 +29,11 @@ public class GlobalReservationSetServiceImpl implements GlobalReservationSetServ
 		return globalList;
 	}
 
+	@Override
+	public TGlobalReservationSet findOne(Long id) {
+		TGlobalReservationSet getOne = globalMapper.selectById(id);
+		return getOne;
+	}
+
 
 }

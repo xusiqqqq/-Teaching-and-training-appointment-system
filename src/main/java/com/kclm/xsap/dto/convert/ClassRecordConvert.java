@@ -45,7 +45,6 @@ public interface ClassRecordConvert {
 		@Mapping(source = "course.id",target = "courseId"),
 		@Mapping(source = "member.id",target = "memberId"),
 		@Mapping(source = "schedule.id",target = "scheduleId"),
-		@Mapping(source = "card.id",target = "cardId"),
 		@Mapping(source = "schedule",target = "classTime"),
 		@Mapping(source = "classRecord.createTime",target = "operateTime")
 	})

@@ -36,24 +36,27 @@
                         </div>
                     </div>
                     <div class="ibox-content">
-                        <form method="get" class="form-horizontal">
+                        <form method="post" id="editForm" class="form-horizontal" th:action="@{/employee/teacherEdit.do}">
                             <div class="form-group">
                                 <label class="col-sm-2 control-label"><i class="red">*</i>老师姓名</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" value="张老师" name="name">
+                                	<!-- 隐藏字段 - 存放id -->
+                                	<input type="hidden" name="id" value="1" th:value="${teacherMsg.id}" class="form-control">
+                                    <input type="text" th:value="${teacherMsg.name}" class="form-control" value="张老师" name="name">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-2 control-label"><i class="red">*</i>手机号</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" value="13877996655" name="phone">
+                                    <input type="text" th:value="${teacherMsg.phone}" class="form-control" value="13877996655" name="phone">
+                               		<span th:if="${CHECK_PHONE_EXIST}" class="text-danger">手机号跟其它用户撞名了</span>
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 <label class="col-sm-2 control-label"><i class="red">*</i>邮  箱</label>
                                 <div class="col-sm-10">
-                                    <input type="email" class="form-control" value="misszhang@126.com" name="email">
+                                    <input type="email" th:value="${teacherMsg.roleEmail}" class="form-control" value="misszhang@126.com" name="roleEmail">
                                 </div>
                             </div>
 
@@ -61,10 +64,10 @@
                                 <label class="col-sm-2 control-label"><i class="red">*</i>性别</label>
                                 <div class="col-sm-10">
                                     <label class="checkbox-inline">
-                                        <input type="radio" name="sex" value="男"> 男
+                                        <input type="radio" name="sex" value="男" th:attr="checked=${teacherMsg.sex == '男'? true :false}"> 男
                                     </label>
                                     <label class="checkbox-inline">
-                                        <input type="radio" name="sex" value="女" checked> 女
+                                        <input type="radio" name="sex" value="女" checked th:attr="checked=${teacherMsg.sex == '女'? true :false}"> 女
                                     </label>
                                 </div>
                             </div>
@@ -72,19 +75,19 @@
                                 <label class="col-sm-2 control-label">
                                     出生日期</label>
                                 <div class="col-sm-3">
-                                    <input type="date" id="myDate" name="birthday" class="form-control" value="1998-12-12"/>
+                                    <input type="date" id="myDate" th:value="${birthdayStr}" name="birthday" class="form-control" value="1998-12-12"/>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-2 control-label">老师介绍</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control" name="introduce">非好有耐心的老师</textarea>
+                                    <textarea class="form-control"  name="introduce">[[${teacherMsg.introduce}]]</textarea>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-2 control-label">备注</label>
                                 <div class="col-sm-10">
-                                    <textarea class="form-control" name="note">好老师</textarea>
+                                    <textarea class="form-control" name="note">[[${teacherMsg.note}]]</textarea>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -111,9 +114,6 @@
 <!-- Peity -->
 <script src="../../static/js/plugins/peity/jquery.peity.min.js" th:src="@{/static/js/plugins/peity/jquery.peity.min.js}"></script>
 
-<!-- Peity -->
-<script src="../../static/js/demo/peity-demo.js" th:src="@{/static/js/demo/peity-demo.js}"></script>
-
 <!-- Data picker -->
 <script src="../../static/js/plugins/datapicker/bootstrap-datepicker.js" th:src="@{/static/js/plugins/datapicker/bootstrap-datepicker.js}"></script>
 <script src="../../static/js/plugins/datapicker/bootstrap-datepicker.zh-CN.min.js" th:src="@{/static/js/plugins/datapicker/bootstrap-datepicker.zh-CN.min.js}"></script>
@@ -130,7 +130,10 @@
             startDate: '1970-1-1', //与你自己设置的格式一致yyyy-mm-dd，未设置的话与默认格式一致mm/dd/yyyy
             endDate: '2070-1-1'
         });
+
     });
+    
+    
 </script>
 </body>
 

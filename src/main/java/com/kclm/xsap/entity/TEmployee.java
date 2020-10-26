@@ -3,6 +3,8 @@ package com.kclm.xsap.entity;
 import java.io.Serializable;
 import java.time.LocalDate;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -28,6 +30,7 @@ public class TEmployee extends BaseEntity implements Serializable{
 
     private String sex;
 
+    @DateTimeFormat(pattern="yyyy-MM-dd")
     private LocalDate birthday;
 
     /**

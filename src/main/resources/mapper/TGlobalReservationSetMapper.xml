@@ -4,7 +4,7 @@
   <resultMap id="TGlobalReservationSetMap" type="com.kclm.xsap.entity.TGlobalReservationSet">
     <!--@mbg.generated-->
     <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="start_time" jdbcType="INTEGER" property="startTime" />
+    <result column="start_day" jdbcType="INTEGER" property="startDay" />
     <result column="end_day" jdbcType="INTEGER" property="endDay" />
     <result column="end_time" jdbcType="TIME" property="endTime" />
     <result column="end_hour" jdbcType="INTEGER" property="endHour" />
@@ -17,7 +17,7 @@
   </resultMap>
   <sql id="TGlobalReservationSet_Column_List">
     <!--@mbg.generated-->
-    id, start_time, end_day, end_time, end_hour, cancel_day, cancel_time, cancel_hour, create_time, last_modify_time, version
+    id, start_day, end_day, end_time, end_hour, cancel_day, cancel_time, cancel_hour, create_time, last_modify_time, version
   </sql>
   
 </mapper>

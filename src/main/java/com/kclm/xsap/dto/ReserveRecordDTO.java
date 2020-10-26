@@ -2,6 +2,8 @@ package com.kclm.xsap.dto;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -32,6 +34,7 @@ public class ReserveRecordDTO{
 	/**
 	 * 预约时间
 	 */
+	 @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private LocalDateTime reserveTime;
 	
 	/**
@@ -62,6 +65,7 @@ public class ReserveRecordDTO{
 	/**
 	 * 操作时间
 	 */
+	 @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private LocalDateTime operateTime;
 	
 	/**
