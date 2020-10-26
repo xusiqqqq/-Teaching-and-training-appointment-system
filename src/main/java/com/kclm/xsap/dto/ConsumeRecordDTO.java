@@ -22,7 +22,7 @@ public class ConsumeRecordDTO{
 
 	private Long consumeId;
 
-	private Long cardId;
+	private Long memberBindId;
 
 	/**
 	 * 会员卡名

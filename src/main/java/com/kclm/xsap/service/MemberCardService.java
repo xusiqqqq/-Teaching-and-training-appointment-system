@@ -103,10 +103,9 @@ public interface MemberCardService {
 	
 	/**
 	 * 获取当前会员卡的所有操作记录
-	 * @param memberId 会员id
-	 * @param cardId 会员卡id
+	 * @param memberBindId 会员绑定id
 	 * @return List<TMemberLog>。会员卡操作记录结果集
 	 */
-	List<MemberLogDTO> listOperateLog(Long memberId,Long cardId);
+	List<MemberLogDTO> listOperateLog(Long memberBindId);
 	
 }

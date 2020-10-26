@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 
 import com.baomidou.mybatisplus.annotation.Version;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatTypes;
 
 /******************
  * @Author yejf

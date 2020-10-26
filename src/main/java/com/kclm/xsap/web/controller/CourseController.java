@@ -171,11 +171,16 @@ public class CourseController {
 	}
 	
 	//删除单个记录
+	@ResponseBody
 	@RequestMapping("/deleteOne.do")
 	public String deleteOneCard(Long id) {
 		System.out.println("delete id : " + id);
-			courseService.deleteById(id);
-		return "forward:x_course_list.do";
+		boolean result = courseService.deleteById(id);
+		if(result == false) {
+			return "no";
+		}
+		
+		return "yes";
 	}
 	
 	//课程搜索

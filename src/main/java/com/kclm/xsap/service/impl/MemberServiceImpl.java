@@ -110,9 +110,10 @@ public class MemberServiceImpl implements MemberService{
 	}
 
 	@Override
-	public boolean update(TMember member) {
+	public TMember update(TMember member) {
 		memberMapper.updateById(member);
-		return true;
+		TMember mber = memberMapper.selectById(member.getId());;
+		return mber;
 	}
 
 	@Override
@@ -152,8 +153,7 @@ public class MemberServiceImpl implements MemberService{
 		bindMapper.insert(cardBind);
 		//操作记录
 		TMemberLog log = new TMemberLog();
-		log.setMemberId(cardBind.getMemberId());
-		log.setCardId(cardBind.getCardId());
+		log.setMemberBindId(cardBind.getId());
 		log.setType("绑卡操作");
 		log.setOperator("系统处理");
 		log.setInvolveMoney(cardBind.getReceivedMoney());
@@ -426,10 +426,16 @@ public class MemberServiceImpl implements MemberService{
 	@Override
 	public List<ConsumeRecordDTO> listConsumeRecords(Long id) {
 		System.out.println("---------- 消费记录 --------");
+		List<TMemberBindRecord> bindList = bindMapper.selectList(new QueryWrapper<TMemberBindRecord>().eq("member_id", id));
+		
+		List<TConsumeRecord> consumeList = new ArrayList<TConsumeRecord>();
+		for (TMemberBindRecord bind : bindList) {
+			List<TConsumeRecord> consumeRecord = consumeMapper.selectList(new QueryWrapper<TConsumeRecord>()
+					.eq("member_bind_id", bind.getId()));
+			consumeList.addAll(consumeRecord);
+		}
 		
 		/* 以下是查询 */
-		List<TConsumeRecord> consumeList = consumeMapper.selectList(new QueryWrapper<TConsumeRecord>()
-				.eq("member_id", id));
 		if(consumeList == null || consumeList.size() < 1) {
 			log.debug("--------此会员没有任何消费记录");
 			return null;
@@ -437,7 +443,8 @@ public class MemberServiceImpl implements MemberService{
 		
 		List<TMemberCard> cardList = new ArrayList<TMemberCard>();
 		for(int i = 0; i < consumeList.size(); i++) {
-			TMemberCard card = cardMapper.selectById(consumeList.get(i).getCardId());
+			TMemberBindRecord bindRecord = bindMapper.selectById(consumeList.get(i).getMemberBindId());
+			TMemberCard card = cardMapper.selectById(bindRecord.getCardId());
 			cardList.add(card);
 		}
 		//根据每条消费记录查询到的会员卡信息
@@ -459,6 +466,7 @@ public class MemberServiceImpl implements MemberService{
 			 //==========DTO存储
 			 ConsumeRecordDTO consumeDto = new ConsumeRecordDTO();
 			 consumeDto.setConsumeId(consumeRecord.getId());
+			 consumeDto.setMemberBindId(bindRecord.getId());
 			 consumeDto.setCardName(memberCard.getName());
 			 consumeDto.setOperateTime(consumeRecord.getCreateTime());
 			 consumeDto.setCardCountChange(consumeRecord.getCardCountChange());

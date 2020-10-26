@@ -10,15 +10,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.kclm.xsap.dto.ClassRecordDTO;
 import com.kclm.xsap.dto.ConsumeRecordDTO;
 import com.kclm.xsap.dto.MemberCardDTO;
 import com.kclm.xsap.dto.MemberVO;
 import com.kclm.xsap.dto.ReserveRecordDTO;
+import com.kclm.xsap.entity.TEmployee;
 import com.kclm.xsap.entity.TMember;
 import com.kclm.xsap.service.MemberService;
+import com.kclm.xsap.utils.FileUploadUtil;
 
 @Controller
 @RequestMapping("/member")
@@ -183,6 +187,33 @@ public class MemberController {
 		System.out.println("delete id : " + id);
 			memberService.deleteById(id);
 		return "forward:x_member_list.do";
+	}
+	
+	//1、修改图像信息
+	@RequestMapping(value = "/modifyMemberImg.do",produces = {"application/json;charset=UTF-8"})
+	@ResponseBody
+	public TMember modifyMemberImg(@RequestParam("avatarFile") MultipartFile avatarFile,Long id) {
+		System.out.println("=====avatar: " + avatarFile);
+		System.out.println("=====id: " + id);
+		//查询到当前的员工信息
+		TMember oldMember = memberService.getMember(id);
+		if(!avatarFile.isEmpty()) {
+			//上传文件
+			String fileName;
+			try {
+				fileName = FileUploadUtil.uploadFiles(avatarFile);
+				//设置图片全名
+				oldMember.setAvatarUrl(fileName);
+			} catch (Exception e) {
+				System.out.println("-----------图片信息有误！-----------");
+				e.printStackTrace();
+			}
+		}
+		TMember member = memberService.update(oldMember);
+		System.out.println("---------member---------");
+		System.out.println(member);
+		System.out.println("---------");
+		return member;
 	}
 	
 	

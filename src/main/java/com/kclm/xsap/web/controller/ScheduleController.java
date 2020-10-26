@@ -202,13 +202,15 @@ public class ScheduleController {
 	//上课记录确认扣费
 	@ResponseBody
 	@RequestMapping("/consumeEnsure.do")
-	public TConsumeRecord consumeOpt(TConsumeRecord consume,Long classId,Long cardId	) {
+	public TConsumeRecord consumeOpt(TConsumeRecord consume,Long classId,Long cardId	,Long memberId) {
 		//提示用。version 4：成功
 		TConsumeRecord checkOnly = new TConsumeRecord();
 		
+		TMemberBindRecord bindRecord = cardService.findBindRecord(memberId, cardId);
+		
 		System.out.println("---------");
 		System.out.println(consume);
-		consume.setCardId(cardId);
+		consume.setMemberBindId(bindRecord.getId());
 		consume.setOperator("某某某操作");
 		consume.setOperateType("上课扣费");
 		
