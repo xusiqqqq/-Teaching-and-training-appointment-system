@@ -183,12 +183,8 @@ public class ClassServiceImpl implements ClassService{
 			
 			/* ------  进行消费统计 ------ */
 			TConsumeRecord consume = new TConsumeRecord();
-			//会员号
-			consume.setMemberId(classed.getMemberId());
-			//查出卡号
-			Long cardId = cardMapper.selectOne(new QueryWrapper<TMemberCard>()
-					.eq("name", classed.getCardName())).getId();
-			consume.setCardId(cardId);
+			//会员绑定号
+			consume.setMemberBindId(consume.getMemberBindId());
 			//查询出当前课程单次课需花费的次数
 			TScheduleRecord scheduleRecord = scheduleMapper.selectById(scheduleId);
 			TCourse course = courseMapper.selectById(scheduleRecord.getCourseId());
@@ -218,12 +214,8 @@ public class ClassServiceImpl implements ClassService{
 			classMapper.update(classed,new QueryWrapper<TClassRecord>().eq("id", classed.getId()));
 			/* ------  进行消费统计 ------ */
 			TConsumeRecord consume = new TConsumeRecord();
-			//会员号
-			consume.setMemberId(classed.getMemberId());
-			//查出卡号
-			Long cardId = cardMapper.selectOne(new QueryWrapper<TMemberCard>()
-					.eq("name", classed.getCardName())).getId();
-			consume.setCardId(cardId);
+			//会员绑定号
+			consume.setMemberBindId(consume.getMemberBindId());
 			//查询出当前课程单次课需花费的次数
 			TScheduleRecord scheduleRecord = scheduleMapper.selectById(classed.getScheduleId());
 			TCourse course = courseMapper.selectById(scheduleRecord.getCourseId());

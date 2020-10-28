@@ -137,21 +137,20 @@ public class MemberCardServiceImpl implements MemberCardService{
 		if(recharge != null) {
 			//把充值记录存入到操作记录表
 			TMemberLog memberLog = new TMemberLog();
-			memberLog.setMemberId(recharge.getMemberId());
-			memberLog.setCardId(recharge.getCardId());
+			memberLog.setMemberBindId(recharge.getMemberBindId());
 			memberLog.setType("充值");
 			memberLog.setInvolveMoney(recharge.getReceivedMoney());
 			memberLog.setOperator(recharge.getOperator());
 			logMapper.insert(memberLog);
 			//充值操作
 			TMemberBindRecord bindRecord = bindMapper.selectOne(new QueryWrapper<TMemberBindRecord>()
-					.eq("card_id", recharge.getCardId()).eq("member_id", recharge.getMemberId()));
+					.eq("id", recharge.getMemberBindId()));
 			if(bindRecord != null) {
 				bindRecord.setValidCount(bindRecord.getValidCount() + recharge.getAddCount());
 				bindRecord.setValidDay(bindRecord.getValidDay() + recharge.getAddDay());
 				bindRecord.setReceivedMoney(bindRecord.getReceivedMoney().add(recharge.getReceivedMoney()));
 				bindMapper.update(bindRecord, new QueryWrapper<TMemberBindRecord>()
-						.eq("card_id", recharge.getCardId()).eq("member_id", recharge.getMemberId()));			
+						.eq("id", recharge.getMemberBindId()));
 			}
 			return true;
 		}
@@ -164,7 +163,11 @@ public class MemberCardServiceImpl implements MemberCardService{
 	public boolean consume(TConsumeRecord consume) {
 		if(consume != null) {
 			//查出会员卡的次数单价，取值四舍五入
-			TMemberCard card = cardMapper.selectById(consume.getCardId());
+			TMemberBindRecord bindRecord = bindMapper.selectById(consume.getMemberBindId());
+			if(bindRecord == null) {
+				System.out.println("无绑定的卡，不存在消费行为");
+			}
+			TMemberCard card = cardMapper.selectById(bindRecord.getCardId());
 			if(card == null) {
 				System.out.println("会员卡不存在，无消费行为");
 				return false;
@@ -183,15 +186,12 @@ public class MemberCardServiceImpl implements MemberCardService{
 			
 			//把消费记录存入到操作记录表
 			TMemberLog memberLog = new TMemberLog();
-			memberLog.setMemberId(consume.getMemberId());
-			memberLog.setCardId(consume.getCardId());
+			memberLog.setMemberBindId(consume.getMemberBindId());
 			memberLog.setType(consume.getOperateType());
 			memberLog.setInvolveMoney(consume.getMoneyCost());
 			memberLog.setOperator(consume.getOperator());
 			logMapper.insert(memberLog);
 			//消费操作
-			TMemberBindRecord bindRecord = bindMapper.selectOne(new QueryWrapper<TMemberBindRecord>()
-					.eq("card_id", consume.getCardId()).eq("member_id", consume.getMemberId()));
 			Integer validCount = bindRecord.getValidCount() - consume.getCardCountChange();
 			if(validCount < 0) {
 				validCount = 0;
@@ -208,20 +208,21 @@ public class MemberCardServiceImpl implements MemberCardService{
 			bindRecord.setValidDay(validDay);
 			bindRecord.setReceivedMoney(bindRecord.getReceivedMoney().subtract(consume.getMoneyCost()));
 			bindMapper.update(bindRecord, new QueryWrapper<TMemberBindRecord>()
-					.eq("card_id", consume.getCardId()).eq("member_id", consume.getMemberId()));
-			return false;
+					.eq("id", consume.getMemberBindId()));
+			return true;
 		}
-		return true;
+		return false;
 	}
 
 	//查询操作记录
 	@Override
-	public List<MemberLogDTO> listOperateLog(Long memberId,Long cardId) {
-		TMemberCard memberCard = cardMapper.selectById(cardId);
+	public List<MemberLogDTO> listOperateLog(Long memberBindId) {
+		TMemberBindRecord bindRecord = bindMapper.selectById(memberBindId);
 		
+		TMemberCard memberCard = cardMapper.selectById(bindRecord.getCardId());
 		//获取到会员指定的会员卡的操作记录
 		List<TMemberLog> logList = logMapper.selectList(new QueryWrapper<TMemberLog>()
-				.eq("member_id", memberId).eq("card_id", cardId));
+				.eq("member_bind_id", memberBindId));
 		List<MemberLogDTO> logDtoList = new ArrayList<>();
 		if(logList == null || logList.size() < 1) {
 			System.out.println("-------当前用户的此张卡，无任何操作记录");
@@ -235,8 +236,6 @@ public class MemberCardServiceImpl implements MemberCardService{
 		}
 		
 		//会员卡可用次数
-		TMemberBindRecord bindRecord = bindMapper.selectOne(new QueryWrapper<TMemberBindRecord>()
-				.eq("member_id", memberId).eq("card_id", cardId));
 		Integer validTimes = 0;
 		LocalDateTime endTime = null;
 		if(bindRecord != null) {
@@ -253,6 +252,7 @@ public class MemberCardServiceImpl implements MemberCardService{
 			//===========dto存储
 			MemberLogDTO logDto = new MemberLogDTO();
 			logDto.setId(log.getId());
+			logDto.setMemberBindId(memberBindId);
 			logDto.setOperateTime(log.getCreateTime());
 			logDto.setOperateType(log.getType());
 			logDto.setValidTimes(validTimes);

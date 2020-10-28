@@ -1,5 +1,6 @@
 package com.kclm.xsap.web.controller;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -172,12 +173,39 @@ public class MemberCardController {
 		//充值操作
 		@ResponseBody
 		@RequestMapping("/rechargeOpt.do")
-		public TRechargeRecord rechargeOpt(TRechargeRecord recharge) {
+		public TRechargeRecord rechargeOpt(TRechargeRecord recharge,Long memberId, Long cardId) {
 			//提示用。version 4：成功
 			TRechargeRecord checkOnly = new TRechargeRecord();
 			
+			//充值次数未填
+			if(recharge.getAddCount() == null || recharge.getAddCount() == 0) {
+				checkOnly.setNote("充值次数未填");
+				return checkOnly;
+			}
+			
+			//充值天数未填
+			if(recharge.getAddDay() == null  || recharge.getAddDay() == 0) {
+				checkOnly.setNote("充值天数未填");
+				return checkOnly;
+			}
+			
+			//充值时，未缴费
+			if(recharge.getReceivedMoney() == null || recharge.getReceivedMoney() == BigDecimal.ZERO) {
+				checkOnly.setNote("充值时，未缴费");
+				return checkOnly;
+			}
+			
+			//未选择支付方式
+			if(recharge.getPayMode() == null || recharge.getPayMode().length() < 1) {
+				checkOnly.setNote("未选择支付方式");
+				return checkOnly;
+			}
+			
+			Long memberBindId = cardService.findBindRecord(memberId, cardId).getId();
+			
 			System.out.println("---------");
 			System.out.println(recharge);
+			recharge.setMemberBindId(memberBindId);
 			recharge.setOperator("某某某操作");
 			cardService.recharge(recharge);
 		
@@ -188,12 +216,27 @@ public class MemberCardController {
 		//扣费操作
 		@ResponseBody
 		@RequestMapping("/consumeOpt.do")
-		public TConsumeRecord consumeOpt(TConsumeRecord consume) {
+		public TConsumeRecord consumeOpt(TConsumeRecord consume,Long memberId, Long cardId) {
 			//提示用。version 4：成功
 			TConsumeRecord checkOnly = new TConsumeRecord();
+			Long memberBindId = cardService.findBindRecord(memberId, cardId).getId();
+			
+			//扣费时，未扣除次数
+			if(consume.getCardCountChange() == null || consume.getCardCountChange() == 0) {
+				checkOnly.setNote("扣费时，未扣除次数");
+				return checkOnly;
+			}
+			
+			//扣费时，未扣除天数
+			if(consume.getCardDayChange() == null || consume.getCardCountChange() == 0) {
+				checkOnly.setNote("扣费时，未扣除天数");
+				return checkOnly;
+			}
 			
 			System.out.println("---------");
 			System.out.println(consume);
+			consume.setMemberBindId(memberBindId);
+			consume.setOperateType("扣费");
 			consume.setOperator("某某某操作");
 			cardService.consume(consume);
 		
@@ -223,7 +266,8 @@ public class MemberCardController {
 		@ResponseBody
 		@RequestMapping("/operateRecord.do")
 		public List<MemberLogDTO> operateRecord(Long memberId,Long cardId) {
-			List<MemberLogDTO> operateLogList = cardService.listOperateLog(memberId, cardId);
+			Long memberBindId = cardService.findBindRecord(memberId, cardId).getId();
+			List<MemberLogDTO> operateLogList = cardService.listOperateLog(memberBindId);
 			return operateLogList;
 		}
 		

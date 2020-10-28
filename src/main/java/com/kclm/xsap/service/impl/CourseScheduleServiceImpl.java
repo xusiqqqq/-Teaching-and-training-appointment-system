@@ -292,6 +292,8 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 			return false;
 		}
 		for (TScheduleRecord source : sourceList) {
+			//对预约数清零
+			source.setOrderNums(0);
 			source.setStartDate(targetDate);
 			//创建时间
 			source.setCreateTime(LocalDateTime.now());

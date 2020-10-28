@@ -1,5 +1,7 @@
 package com.kclm.xsap.web.controller;
 
+import java.math.BigDecimal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,13 +56,13 @@ public class CardBindController {
 		}
 		
 		//绑卡时，未缴费
-		if(bind.getReceivedMoney() == null) {
+		if(bind.getReceivedMoney() == null || bind.getReceivedMoney() == BigDecimal.ZERO) {
 			checkBind.setNote("绑卡时，未缴费");
 			return checkBind;
 		}
 		
 		//未选择支付方式
-		if(bind.getPayMode() == null) {
+		if(bind.getPayMode() == null || bind.getPayMode().length() < 1) {
 			checkBind.setNote("未选择支付方式");
 			return checkBind;
 		}
@@ -81,6 +83,9 @@ public class CardBindController {
 	public TMemberBindRecord memberBindCard(TMemberBindRecord bind) {
 		//检测用。version 4：绑卡成功；
 		TMemberBindRecord checkBind = new TMemberBindRecord();
+		System.out.println("------------");
+		System.out.println(bind);
+		System.out.println("------------");
 		
 		TMemberBindRecord bindRecord = cardService.findBindRecord(bind.getMemberId(), bind.getCardId());
 		
@@ -92,6 +97,18 @@ public class CardBindController {
 		//未选择任何会员
 		if(bind.getMemberId() == null) {
 			checkBind.setNote("未选中任何会员，请选择！");
+			return checkBind;
+		}
+		
+		//绑卡时，未缴费
+		if(bind.getReceivedMoney() == null  || bind.getReceivedMoney() == BigDecimal.ZERO) {
+			checkBind.setNote("绑卡时，未缴费");
+			return checkBind;
+		}
+		
+		//未选择支付方式
+		if(bind.getPayMode() == null || bind.getPayMode().length() < 1) {
+			checkBind.setNote("未选择支付方式");
 			return checkBind;
 		}
 		

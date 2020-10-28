@@ -14,10 +14,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.kclm.xsap.dto.CourseDTO;
 import com.kclm.xsap.dto.convert.CourseConvert;
 import com.kclm.xsap.entity.CardCourseRecord;
+import com.kclm.xsap.entity.TClassRecord;
 import com.kclm.xsap.entity.TCourse;
 import com.kclm.xsap.entity.TMemberCard;
 import com.kclm.xsap.entity.TReservationRecord;
 import com.kclm.xsap.entity.TScheduleRecord;
+import com.kclm.xsap.mapper.TClassRecordMapper;
 import com.kclm.xsap.mapper.TCourseMapper;
 import com.kclm.xsap.mapper.TReservationRecordMapper;
 import com.kclm.xsap.mapper.TScheduleRecordMapper;
@@ -35,6 +37,9 @@ public class CourseServiceImpl implements CourseService{
 	
 	@Autowired
 	private TReservationRecordMapper reserveMapper;
+	
+	@Autowired
+	private TClassRecordMapper classMpper;
 	
 	@Autowired
 	private TScheduleRecordMapper scheduleMapper;
@@ -81,12 +86,31 @@ public class CourseServiceImpl implements CourseService{
 		//删除中间表关联的键
 		courseMapper.deleteBindCard(id);
 		
-		//删除关联的其它表的记录
-		//1、预约记录表
-		reserveMapper.delete(new QueryWrapper<TReservationRecord>()
+		//查询此门课有没有其它关联的记录
+		List<TReservationRecord> reserveList = reserveMapper.selectList(new QueryWrapper<TReservationRecord>()
 				.inSql("schedule_id", "select id from t_schedule_record WHERE course_id = " + id));
-		//2、排课表
-		scheduleMapper.delete(new QueryWrapper<TScheduleRecord>().eq("course_id", id));
+		
+		List<TClassRecord> classList = classMpper.selectList(new QueryWrapper<TClassRecord>()
+				.inSql("schedule_id", "select id from t_schedule_record WHERE course_id = " + id));
+		
+		List<TScheduleRecord> scheduleList = scheduleMapper.selectList(new QueryWrapper<TScheduleRecord>().eq("course_id", id));
+		
+		if(reserveList != null || classList != null || scheduleList != null) {
+			System.out.println("此课有其它关联记录，不宜删除！");
+			return false;
+		}
+		
+		//删除关联的其它表的记录 - 代价太大，改为提示
+//		//1、预约记录表
+//		reserveMapper.delete(new QueryWrapper<TReservationRecord>()
+//				.inSql("schedule_id", "select id from t_schedule_record WHERE course_id = " + id));
+//		
+//		//2、上课记录表
+//		classMpper.delete(new QueryWrapper<TClassRecord>().
+//				inSql("schedule_id", "select id from t_schedule_record WHERE course_id = " + id));
+//		
+//		//3、排课表
+//		scheduleMapper.delete(new QueryWrapper<TScheduleRecord>().eq("course_id", id));
 		
 		//本表
 		courseMapper.deleteById(id);
