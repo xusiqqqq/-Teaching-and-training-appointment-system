@@ -1,7 +1,5 @@
 package com.kclm.xsap.service.impl;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,11 +17,6 @@ import com.kclm.xsap.dto.MemberCardDTO;
 import com.kclm.xsap.dto.MemberDTO;
 import com.kclm.xsap.dto.MemberVO;
 import com.kclm.xsap.dto.ReserveRecordDTO;
-import com.kclm.xsap.dto.convert.ClassRecordConvert;
-import com.kclm.xsap.dto.convert.ConsumeRecordConvert;
-import com.kclm.xsap.dto.convert.MemberConvert;
-import com.kclm.xsap.dto.convert.ReserveRecordConvert;
-import com.kclm.xsap.dto.convert.MemberCardConvert;
 import com.kclm.xsap.entity.TClassRecord;
 import com.kclm.xsap.entity.TConsumeRecord;
 import com.kclm.xsap.entity.TCourse;
