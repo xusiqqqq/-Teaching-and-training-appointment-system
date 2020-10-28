@@ -71,8 +71,7 @@ public class MemberCardServiceTest {
 	@Test
 	public void recharge() {
 		TRechargeRecord recharge = new TRechargeRecord();
-		recharge.setMemberId(1L);
-		recharge.setCardId(1L);
+		recharge.setMemberBindId(1L);
 		recharge.setAddCount(5);
 		recharge.setAddDay(10);
 		recharge.setReceivedMoney(BigDecimal.valueOf(120.9));
@@ -84,8 +83,7 @@ public class MemberCardServiceTest {
 	@Test
 	public void consume() {
 		TConsumeRecord consume = new TConsumeRecord();
-		consume.setMemberId(2L);
-		consume.setCardId(1L);
+		consume.setMemberBindId(1L);
 		consume.setCardCountChange(3);
 		consume.setCardDayChange(6);
 		consume.setMoneyCost(BigDecimal.valueOf(9.9));
@@ -97,7 +95,7 @@ public class MemberCardServiceTest {
 	//-----涉及convert
 	@Test
 	public void listOperateLog() {
-		List<MemberLogDTO> operateLogList = cardService.listOperateLog(1L, 1L);
+		List<MemberLogDTO> operateLogList = cardService.listOperateLog(1L);
 		for (MemberLogDTO log : operateLogList) {
 			System.out.println("---------");
 			System.out.println(log);

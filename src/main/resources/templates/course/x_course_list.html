@@ -151,11 +151,15 @@ $(function(){
         	url: "[[${#request.getContextPath()}]]/course/deleteOne.do",
         	type: "post",
         	data: {id:cid},
-        	success:function(){
-        		//刷新界面
-        		setTimeout(function(){
-            		window.location.href="[[${#request.getContextPath()}]]/course/x_course_list.do";
-        		},1*1000);
+        	success:function(result){
+        		if(result == "yes"){
+	        		//刷新界面
+	        		setTimeout(function(){
+	            		window.location.href="[[${#request.getContextPath()}]]/course/x_course_list.do";
+	        		},1*1000);        			
+        		}else{
+        			alert("此课程已经生成了预约、上课、排课等记录，不可被删除！");
+        		}
         	}
         });
 	});

@@ -21,6 +21,9 @@ import lombok.EqualsAndHashCode;
 public class MemberLogDTO {
 
 	private Long id;
+	
+	private Long memberBindId;
+	
 	/**
 	 * 操作时间
 	 */

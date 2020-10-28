@@ -18,28 +18,16 @@ public class TConsumeRecord extends BaseEntity implements Serializable{
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 *	用来封装会员实体
-	 */
-	@TableField(exist = false)
-	@ToString.Exclude
-    private TMember member;
-	
-	/**
-	 * 	关联的会员
+    * 关联的会员绑定id
     */
-	private Long memberId;
+	private Long memberBindId;
 	
 	/**
-	 *  用来封装会员卡实体
+	 *  封装会员绑定实体数据
 	 */
 	@TableField(exist = false)
 	@ToString.Exclude
-	private TMemberCard card;
-	
-	/**
-	 * 关联的会员卡
-	 */
-	private Long cardId;
+    private TMemberBindRecord bindRecord;
 	
     /**
     * 操作类型

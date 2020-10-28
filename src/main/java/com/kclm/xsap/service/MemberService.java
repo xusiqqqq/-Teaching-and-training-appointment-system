@@ -25,7 +25,7 @@ public interface MemberService {
 	
 	boolean deleteById(Long id);
 	
-	boolean update(TMember member);
+	TMember update(TMember member);
 	
 	/**
 	 *  绑定会员卡
