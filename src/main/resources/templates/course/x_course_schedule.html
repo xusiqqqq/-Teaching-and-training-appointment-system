@@ -459,7 +459,7 @@ $(function(){
 		$.post("/xsap/schedule/scheduleCopy.do",copyScheduleForm,function(result){
 			if(result.version == 4){
 				//刷新页面
-				alert("ok")
+				alert("赋值成功")
 				window.location.reload();
 			}else{
 				$("#copy_tip").html(result.limitSex);
@@ -479,7 +479,7 @@ $(function(){
 	$("#reserveList_btn").click(function(){
 		$.post("/xsap/reserve/exportReserveList.do",exportReserveListForm,function(result){
 			if(result == "yes"){
-				alert("yes");
+				alert("导出成功");
 				window.location.reload();
 			}
 		});

@@ -4,21 +4,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.ConfigurationPropertiesBean.BindMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kclm.xsap.dto.ReserveRecordDTO;
-import com.kclm.xsap.dto.convert.ReserveRecordConvert;
-import com.kclm.xsap.entity.TCourse;
 import com.kclm.xsap.entity.TGlobalReservationSet;
-import com.kclm.xsap.entity.TMember;
 import com.kclm.xsap.entity.TMemberBindRecord;
 import com.kclm.xsap.entity.TMemberCard;
 import com.kclm.xsap.entity.TReservationRecord;
@@ -41,6 +35,10 @@ public class ReserveServiceImpl implements ReserveService{
 //	@Autowired
 //	private ReserveRecordConvert reserveRecordConvert;
 
+	//=====全局变量=====
+	private static final String reserve_source =  "店员预约";
+	
+	//===============
 	@Autowired
 	TReservationRecordMapper reserveMapper;
 	
@@ -108,6 +106,9 @@ public class ReserveServiceImpl implements ReserveService{
 			}
 		}
 		
+		//最晚预约时间
+		checkEnd = LocalDateTime.of(startDate, classTime);
+		
 		//预约截止时间	:	根据创建时间来判断
 		if(globalSet.getEndDay() > 0) {
 			checkEndDate = startDate.minusDays(globalSet.getEndDay());
@@ -119,6 +120,11 @@ public class ReserveServiceImpl implements ReserveService{
 		
 		//有预约截止时间限制
 		if(checkEndDate != null) {
+			//若晚于预约截止时间，预约无效
+			if(reserve.getCreateTime().isAfter(checkEnd)) {
+				return 2;
+			}
+		}else {
 			//若晚于预约截止时间，预约无效
 			if(reserve.getCreateTime().isAfter(checkEnd)) {
 				return 2;
@@ -154,6 +160,8 @@ public class ReserveServiceImpl implements ReserveService{
 		if(reserve == null) {
 			return -3;
 		}
+		//预约来源
+		reserve.setComment(reserve_source);
 		//检查状态
 		Integer check = reserveCheck(reserve);
 		//预约时间过早
@@ -183,7 +191,6 @@ public class ReserveServiceImpl implements ReserveService{
 			}
 		}
 		
-		
 		TScheduleRecord schedule = scheduleMapper.selectById(reserve.getScheduleId());
 		/*	
 		 * 对于年龄、性别的预约限制，暂且不写
@@ -199,7 +206,7 @@ public class ReserveServiceImpl implements ReserveService{
 			//预约人数增加
 			schedule.setOrderNums(totalNums);			
 		}
-		scheduleMapper.updateById(schedule);
+		
 		
 		//判断新增的预约曾经是否预约过
 		TReservationRecord checkResult = reserveMapper.selectOne(new QueryWrapper<TReservationRecord>()
@@ -210,6 +217,8 @@ public class ReserveServiceImpl implements ReserveService{
 				System.out.println("已经用过会员卡预约过当前课程，无法再次预约！");
 				return -1;
 			}
+			//排课更新，预约人数增加
+			scheduleMapper.updateById(schedule);
 			//同一堂课再次预约
 			reserve.setId(checkResult.getId());
 			reserve.setStatus(1);	
@@ -221,6 +230,8 @@ public class ReserveServiceImpl implements ReserveService{
 			return 0;
 		}
 		
+		//排课更新，预约人数增加
+		scheduleMapper.updateById(schedule);
 		//未预约，添加会员预约时，则设置状态为已预约
 		reserve.setStatus(1);		
 		reserveMapper.insert(reserve);
@@ -252,34 +263,13 @@ public class ReserveServiceImpl implements ReserveService{
 			System.out.println("对于这堂课可取消预约的次数已满");
 			return -1;
 		}
-		
-		//判断当卡用户对当前课程预约的次数
-		Integer limitCounts = courseMapper.selectById(schedule.getCourseId()).getLimitCounts();
-		//不限制预约次数：limitCounts = 0
-		if(limitCounts != 0) {
-			if(reserve.getCancelTimes() > limitCounts) {
-				System.out.println("当前课程预约次数已满，不可再进行预约");
-				return -1;
-			}			
-		}
-		//预约人数判断
-		Integer contains = courseMapper.selectById(schedule.getCourseId()).getContains();
-		Integer totalNums = schedule.getOrderNums() + reserve.getReserveNums();
-		if(totalNums > contains ) {
-			System.out.println("当前课程预约人数：" + schedule.getOrderNums());
-			System.out.println("人数超额！" + (totalNums - contains) + " 人 ");
-			return -2;
-		}
+
 		//预约人数变动
-		if(reserve.getStatus() == 1) {
-			schedule.setOrderNums(totalNums);			
-		}else {
-			Integer orderNums = schedule.getOrderNums() - reserve.getReserveNums();
-			if(orderNums < 0) {
-				orderNums = 0;
-			}
-			schedule.setOrderNums(orderNums);		
+		Integer orderNums = schedule.getOrderNums() - reserve.getReserveNums();
+		if(orderNums < 0) {
+			orderNums = 0;
 		}
+		schedule.setOrderNums(orderNums);		
 		scheduleMapper.updateById(schedule);
 		//预约人数满足条件时，进行更新
 		reserveMapper.updateById(reserve);

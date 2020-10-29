@@ -84,6 +84,11 @@ public class ReserveRecordDTO{
 	private Integer reserveStatus;
 	
 	/**
+	 * 	上课确认情况
+	 */
+	private Integer classCheck;
+	
+	/**
 	 * 教师评语
 	 */
 	private String comment;

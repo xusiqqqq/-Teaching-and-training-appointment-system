@@ -59,6 +59,7 @@
 	    <result column="times_cost" jdbcType="INTEGER" property="timesCost" />
 	    <result column="create_time" jdbcType="TIMESTAMP" property="operateTime" />
 	    <result column="operator" jdbcType="VARCHAR" property="operator" />
+	    <result column="comment" jdbcType="VARCHAR" property="comment" />
 	    <result column="note" jdbcType="VARCHAR" property="reserveNote" />
 	    <result column="status" jdbcType="INTEGER" property="reserveStatus" />
  	</resultMap>
@@ -66,7 +67,7 @@
   	<select id="listReserveRecordView" resultMap="reserveRecordViewMap">
 		SELECT reserve.`id`, mber.`id` member_id, course.`id` course_id, mber.`name` member_name,
 	 mber.`phone`, reserve.`card_name`, schedules.`order_nums`, course.`times_cost`,
-	 reserve.`create_time`, reserve.`operator`, reserve.`note`, reserve.`status`
+	 reserve.`create_time`, reserve.`operator`, reserve.`comment`, reserve.`note`, reserve.`status`
 	 FROM t_reservation_record reserve 
 	 LEFT JOIN t_member mber ON mber.`id` = reserve.`member_id`
 	 LEFT JOIN t_schedule_record schedules ON schedules.`id` = reserve.`schedule_id`
@@ -87,19 +88,23 @@
 	    <result column="create_time" jdbcType="TIMESTAMP" property="operateTime" />
 	    <result column="operator" jdbcType="VARCHAR" property="operator" />
 	    <result column="note" jdbcType="VARCHAR" property="reserveNote" />
+	    <result column="comment" jdbcType="VARCHAR" property="comment" />
 	    <result column="status" jdbcType="INTEGER" property="reserveStatus" />
+	    <result column="check_status" jdbcType="INTEGER" property="classCheck" />
   	</resultMap>
   
   	<select id="listReservedView" resultMap="listReservedViewMap">
   		SELECT reserve.`id`, mber.`id` member_id, course.`id` course_id, mber.`name` member_name,
-	 mber.`phone`, reserve.`card_name`, schedules.`order_nums`, course.`times_cost`,
-	 reserve.`create_time`, reserve.`operator`, reserve.`note`, reserve.`status`
+	 mber.`phone`, reserve.`card_name`, schedules.`order_nums`, course.`times_cost`,class.`check_status`,
+	 reserve.`create_time`, reserve.`operator`, reserve.`note`, reserve.`comment`, reserve.`status`
 	 FROM t_reservation_record reserve 
 	 LEFT JOIN t_member mber ON mber.`id` = reserve.`member_id`
 	 LEFT JOIN t_schedule_record schedules ON schedules.`id` = reserve.`schedule_id`
+	 LEFT JOIN t_class_record class ON class.`schedule_id` = schedules.`id`
 	 LEFT JOIN t_course course ON course.`id` = schedules.`course_id`
 	 LEFT JOIN t_member_card card ON card.`name` = reserve.`card_name`
-	 WHERE card.`status` = 0 AND mber.`is_deleted` = 0 AND reserve.`status` = 1
-	 AND reserve.`schedule_id` = #{scheduleId};
+	 WHERE card.`status` = 0 AND mber.`is_deleted` = 0 AND reserve.`status` = 1 
+	 AND class.`reserve_check` = 1 AND reserve.`schedule_id` = #{scheduleId} 
+	 GROUP BY reserve.`member_id`,reserve.`schedule_id`;
   	</select>
 </mapper>

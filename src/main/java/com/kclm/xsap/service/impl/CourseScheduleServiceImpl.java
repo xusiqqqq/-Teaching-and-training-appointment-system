@@ -103,10 +103,17 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 			System.out.println("-------无此条排课记录");
 			return false;
 		}
+		
+		List<TReservationRecord> reservationRecord = reserveMapper.selectList(new QueryWrapper<TReservationRecord>().eq("schedule_id", id));
+		List<TClassRecord> classRecord = classMapper.selectList(new QueryWrapper<TClassRecord>().eq("schedule_id", id));
+		if(reservationRecord != null || classRecord != null) {
+			return false;
+		}
+		/*----------不进行关联删除----------*/
 		//删除排课对应的预约记录
-		reserveMapper.delete(new QueryWrapper<TReservationRecord>().eq("schedule_id", id));
+//		reserveMapper.delete(new QueryWrapper<TReservationRecord>().eq("schedule_id", id));
 		//删除排课对应的上课记录
-		classMapper.delete(new QueryWrapper<TClassRecord>().eq("schedule_id", id));
+//		classMapper.delete(new QueryWrapper<TClassRecord>().eq("schedule_id", id));
 		
 		scheduleMapper.deleteById(id);
 		return true;
