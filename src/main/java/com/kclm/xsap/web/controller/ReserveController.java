@@ -80,6 +80,10 @@ public class ReserveController {
 			checkFor.setComment("预约过晚");
 			return checkFor;
 		}
+		if(result == 3) {
+			checkFor.setComment("当前会员卡已过期");
+			return checkFor;
+		}
 		
 		checkFor.setVersion(4);
 		return checkFor;

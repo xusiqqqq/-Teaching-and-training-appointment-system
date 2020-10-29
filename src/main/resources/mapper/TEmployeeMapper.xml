@@ -46,4 +46,24 @@
 		select * from t_employee where phone = #{phone} and role_password = #{rolePassword};
 	</select>
   
+  <!-- 上课记录 -->
+  <resultMap id="classViewMap" type="com.kclm.xsap.dto.ClassRecordDTO" >
+  	<id column="id" jdbcType="BIGINT" property="classRecordId" />
+ 	<result column="name" jdbcType="VARCHAR" property="courseName" />
+    <result column="start_date" jdbcType="DATE" property="startDate" />
+    <result column="class_time" jdbcType="TIME" property="startTime" />
+    <result column="card_name" jdbcType="VARCHAR" property="cardName" />
+    <result column="times_cost" jdbcType="INTEGER" property="timesCost" />
+  </resultMap>
+  
+  <select id="listClassView" resultMap="classViewMap">
+  	SELECT class.id, course.`name`, schedules.`start_date`, schedules.`class_time`,
+ class.`card_name`, course.times_cost
+ FROM t_class_record class 
+ LEFT JOIN t_schedule_record schedules ON class.`schedule_id` = schedules.`id` 
+ LEFT JOIN t_member_card card ON card.`name` = class.`card_name`
+ LEFT JOIN t_course course ON course.`id` = schedules.`course_id` 
+ WHERE card.`status` = 0 AND class.`reserve_check` = 1  
+ AND schedules.`teacher_id` = #{teacherId};
+  </select>
 </mapper>

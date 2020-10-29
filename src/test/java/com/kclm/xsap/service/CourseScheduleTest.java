@@ -37,6 +37,14 @@ public class CourseScheduleTest {
 		scheduleService.deleteById(2L);
 	}
 
+	@Test
+	public void listAll() {
+		List<CourseScheduleDTO> listScheduleAll = scheduleService.listScheduleAll();
+		for (CourseScheduleDTO courseScheduleDTO : listScheduleAll) {
+			System.out.println(courseScheduleDTO);
+		}
+	}
+	
 	//查询一段时间里的所有排课记录
 	@Test
 	public void listSchedule() {

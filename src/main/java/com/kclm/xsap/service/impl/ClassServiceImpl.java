@@ -1,7 +1,5 @@
 package com.kclm.xsap.service.impl;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -16,7 +14,6 @@ import com.kclm.xsap.entity.TConsumeRecord;
 import com.kclm.xsap.entity.TCourse;
 import com.kclm.xsap.entity.TMemberBindRecord;
 import com.kclm.xsap.entity.TMemberCard;
-import com.kclm.xsap.entity.TMemberLog;
 import com.kclm.xsap.entity.TReservationRecord;
 import com.kclm.xsap.entity.TScheduleRecord;
 import com.kclm.xsap.mapper.TClassRecordMapper;
@@ -91,10 +88,6 @@ public class ClassServiceImpl implements ClassService{
 	//根据预约id，进行单个上课记录的录入
 	@Override
 	public boolean saveByReserve(TReservationRecord reserve) {
-		if(reserve == null) {
-			System.out.println("-------未预约或此条预约记录不存在");
-			return false;
-		}
 		TClassRecord classed = new TClassRecord();
 		//存入会员id
 		classed.setMemberId(reserve.getMemberId());
@@ -119,42 +112,6 @@ public class ClassServiceImpl implements ClassService{
 		return true;
 	}
 	
-	//针对“已预约”状态，进行全部录入
-	@Override
-	@Deprecated
-	public boolean saveAll() {
-		//找出用户的预约记录，若其状态为“已预约”，则录入上课记录
-		List<TReservationRecord> reserveList = reserveMapper.selectList(
-				new QueryWrapper<TReservationRecord>().eq("status", 1));
-		if(reserveList == null || reserveList.size() < 1) {
-			System.out.println("无任何预约记录，无法生成上课记录。。。");
-			return false;
-		}
-		for (TReservationRecord reserve : reserveList) {
-			TClassRecord classed = new TClassRecord();
-			//存入会员id
-			classed.setMemberId(reserve.getMemberId());
-			//存入会员卡名
-			classed.setCardName(reserve.getCardName());
-			//存入排课计划id
-			classed.setScheduleId(reserve.getScheduleId());
-			//存入上课备注
-			classed.setNote(reserve.getClassNote());
-			//存入教师评语
-			classed.setComment(reserve.getComment());
-			//课程结束后，上课结束时间作为上课记录的创建时间
-			TScheduleRecord schedule = scheduleMapper.selectById(reserve.getScheduleId());
-			TCourse course = courseMapper.selectById(schedule.getCourseId());
-			LocalTime plusClassTime = schedule.getClassTime().plusMinutes(course.getDuration());
-			LocalDateTime endTime = LocalDateTime.of(schedule.getStartDate(),plusClassTime);
-			classed.setCreateTime(endTime);
-			//录入一条上课记录
-			classMapper.insert(classed);
-		}
-		
-		return true;
-	}
-
 	//单个上课记录更新
 	@Override
 	public boolean update(Long classId,Integer status) {

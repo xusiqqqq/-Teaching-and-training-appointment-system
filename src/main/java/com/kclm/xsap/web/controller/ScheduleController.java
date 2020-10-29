@@ -80,10 +80,10 @@ public class ScheduleController {
 			//3、拿到结束时间
 			String end = scheduleDTO.getEndTime().toString();
 			//4、拿到课程的显示颜色
-			TCourse course = courseService.findById(scheduleDTO.getCourseId());
+			String colorSet = scheduleDTO.getColor();
 			String color = "#60e374";	//默认颜色
-			if(course != null) {
-				color = course.getColor();				
+			if(colorSet != null) {
+				color = colorSet;				
 			}
 			//5、显示的字体颜色
 			String textColor = "#FFFFFF";	//默认颜色

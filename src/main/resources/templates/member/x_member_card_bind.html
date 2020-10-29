@@ -111,13 +111,16 @@
 		              <div class="modal-content">
 		                    <div class="modal-header">
 		                         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-		                         <h4 class="modal-title">编辑会员</h4>
+		                         <h4 class="modal-title">会员绑定</h4>
 		                    </div>
 		                    <div class="modal-body">
 			                    <div style="text-align: center; ">
 			                    	<h1 style="color: blue">绑定成功</h1>
 			                    </div>
 		                    </div>
+		                     <div class="modal-footer" align="center">
+                                 <a th:href="@{/member/x_member_list.do}"  class="btn btn-primary">前往会员页</a>
+                             </div>
 		              </div>
 		         </div>
 			</div>
@@ -245,9 +248,9 @@
    				//弹窗提示
            		$("#tip").modal("show");
            		//自动关闭
-           		setTimeout(function(){
+           		/* setTimeout(function(){
            			$("#tip").modal("hide");
-           		},2*1000);
+           		},2*1000); */
    			}else{
    				$("#selectList").after("<span class='text-danger'>"+ bindMsg.note +"</span>");
    			}

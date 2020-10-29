@@ -119,12 +119,4 @@ public interface MemberService {
 	 */
 	List<ConsumeRecordDTO> listConsumeRecords(Long id);
 	
-	/**
-	 * 查询出的会员详情完整信息（耦合性高，不推荐）
-	 * @param id
-	 * @return MemberDTO
-	 */
-	@Deprecated
-	MemberDTO getMemberDetailById(Long id);
-	
 }

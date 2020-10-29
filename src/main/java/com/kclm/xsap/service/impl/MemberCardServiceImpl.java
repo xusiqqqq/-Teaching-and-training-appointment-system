@@ -164,10 +164,12 @@ public class MemberCardServiceImpl implements MemberCardService{
 		if(consume != null) {
 			//查出会员卡的次数单价，取值四舍五入
 			TMemberBindRecord bindRecord = bindMapper.selectById(consume.getMemberBindId());
+			TMemberCard card = null;
 			if(bindRecord == null) {
 				System.out.println("无绑定的卡，不存在消费行为");
+			}else {
+				card = cardMapper.selectById(bindRecord.getCardId());				
 			}
-			TMemberCard card = cardMapper.selectById(bindRecord.getCardId());
 			if(card == null) {
 				System.out.println("会员卡不存在，无消费行为");
 				return false;

@@ -13,6 +13,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.kclm.xsap.dto.ClassRecordDTO;
+import com.kclm.xsap.dto.CourseScheduleDTO;
 import com.kclm.xsap.entity.TScheduleRecord;
 
 
@@ -23,6 +25,18 @@ public class TScheduleRecordMapperTest {
 	private TScheduleRecordMapper scheduleMapper;
 	
 	private TScheduleRecord schedule = new TScheduleRecord();
+	
+	@Test
+	public void oneScheduleView() {
+		CourseScheduleDTO oneScheduleView = scheduleMapper.oneScheduleView(1L);
+		toPrint("排课记录",1, oneScheduleView);
+	}
+
+	@Test
+	public void listClassView() {
+		List<ClassRecordDTO> listClassView = scheduleMapper.listClassView(28L);
+		toPrint("排课记录", listClassView.size(), listClassView);
+	}
 	
 	//增加一条记录
 		@Test

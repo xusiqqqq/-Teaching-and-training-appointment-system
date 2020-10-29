@@ -19,6 +19,16 @@ import lombok.EqualsAndHashCode;
 public class MemberVO {
 	
 	private Long id;
+
+	/**
+	 * 会员名
+	 */
+	private String name;
+	/**
+	 * 手机号
+	 */
+	private String phone;
+	
 	/**
 	 *  会员名称（手机号）
 	 */

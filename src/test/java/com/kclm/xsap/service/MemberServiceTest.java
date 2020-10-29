@@ -89,11 +89,5 @@ public class MemberServiceTest {
 		
 	}
 
-	//--------涉及到convert
-	@Test
-	public void getMemberDetailById() {
-		MemberDTO memberDto = memberService.getMemberDetailById(1L);
-		System.out.println("会员详情："+ memberDto);
-	}
 	
 }
