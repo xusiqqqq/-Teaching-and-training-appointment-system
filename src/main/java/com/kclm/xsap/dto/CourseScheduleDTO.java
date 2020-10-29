@@ -1,6 +1,9 @@
 package com.kclm.xsap.dto;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -32,10 +35,24 @@ public class CourseScheduleDTO {
 	private String courseName;
 	
 	/**
-	 * 上课时间
+	 * 	课程颜色
+	 */
+	private String color;
+	
+	/**
+	 * 上课准确时间
 	 */
 	 @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private LocalDateTime startTime;
+	 
+	 /**
+	  * 	上课日期（拼接用）
+	  */
+	 private LocalDate classDate;
+	 /**
+	  * 	上课时间（拼接用）
+	  */
+	 private LocalTime classTime;
 	
 	/**
 	 * 下课时间

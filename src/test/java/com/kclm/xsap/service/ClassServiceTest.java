@@ -28,12 +28,6 @@ public class ClassServiceTest {
 //		classService.saveByReserveId(1L);
 	}
 	
-	//针对“已预约”，进行全部录入
-	@Test
-	public void saveAll() {
-		classService.saveAll();
-	}
-	
 	//更新上课记录
 	@Test
 	public void update() {

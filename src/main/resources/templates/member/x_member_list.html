@@ -53,7 +53,7 @@
                                     <th>会员姓名(手机号)</th>
                                     <th>性别</th>
                                     <th>会员卡</th>
-                                    <th>备注</th>
+                                    <!-- <th>备注</th> -->
                                     <th>操作</th>
                                 </tr>
                             </thead>
@@ -167,7 +167,7 @@
 	                    {"data": "namePhone",bAutoWidth: "false", sWidth: "20%"},
 	                    {"data": "gender", sWidth: "10%"},
 	                    {"data": "cardHold", sWidth: "20%"},
-	                    {"data": "note", sWidth: "20%"},
+	                    /* {"data": "note", sWidth: "20%"}, */
 	                    {"data": null,"orderable": false, "render": function (data, type, row) {
 	                            var id = row.id;
 	                            var html = "<a href='#?id="+ id +"' onclick='saveID("+ id +")' class='btn btn-success btn-xs edit'  data-toggle='modal' data-target='#edit_model'> 编辑 <i class='fa fa-edit'></i></a>&nbsp &nbsp"

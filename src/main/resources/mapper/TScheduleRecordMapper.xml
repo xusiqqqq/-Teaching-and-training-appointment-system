@@ -50,18 +50,93 @@
 	    <result column="version" jdbcType="INTEGER" property="version" />
     </association>
   </resultMap>
-  <sql id="TScheduleRecord_Column_List">
-    <!--@mbg.generated-->
-    id, course_id, teacher_id, order_nums, start_date, class_time, limit_sex, limit_age, create_time, 
-    last_modify_time, version
-  </sql>
-  <sql id="course_sql">
-  	id, `name`, duration, `contains`, color, introduce, times_cost, limit_sex, limit_age, 
-    limit_counts, create_time, last_modify_time, version
-  </sql>
-  <sql id="employee_sql">
-  	id, `name`, phone, sex, birthday, introduce, avatar_url, note, role_name, role_password, role_type, 
-    role_email, is_deleted, create_time, last_modify_time, version
-  </sql>
+	<!-- 排课记录基本信息，有会员卡支持时 -->
+  <resultMap id="scheduleViewMap" type="com.kclm.xsap.dto.CourseScheduleDTO" >
+  	<id column="id" jdbcType="BIGINT" property="scheduleId" />
+    <result column="course_id" jdbcType="BIGINT" property="courseId" />
+    <result column="course_name" jdbcType="VARCHAR" property="courseName" />
+    <result column="color" jdbcType="VARCHAR" property="color" />
+	<result column="start_date" jdbcType="DATE" property="classDate" />
+	<result column="class_time" jdbcType="TIME" property="classTime" />
+    <result column="duration" jdbcType="INTEGER" property="duration" />
+    <result column="limit_sex" jdbcType="VARCHAR" property="limitSex" />
+    <result column="limit_age" jdbcType="INTEGER" property="limitAge" />
+    <result column="support_cards" jdbcType="VARCHAR" property="supportCards" />
+    <result column="teacher_name" jdbcType="VARCHAR" property="teacherName" />
+    <result column="contains" jdbcType="INTEGER" property="classNumbers" />
+    <result column="order_nums" jdbcType="INTEGER" property="orderNums" />
+    <result column="times_cost" jdbcType="INTEGER" property="timesCost" />
+  </resultMap>
   
+  <select id="oneScheduleView" resultMap="scheduleViewMap">
+  	SELECT schedules.`id`, course.id course_id,course.name course_name, course.color,schedules.`start_date`,
+  	schedules.`class_time`, course.`duration`, course.`limit_sex`, course.`limit_age`,
+ GROUP_CONCAT(card.`name` SEPARATOR ' | ') support_cards , teacher.`name` teacher_name, course.`contains`,
+ schedules.`order_nums`, course.`times_cost`
+ FROM t_course course LEFT JOIN t_schedule_record schedules ON course.`id` = schedules.`course_id`
+ LEFT JOIN t_course_card cocard ON cocard.`course_id` = schedules.`course_id` 
+ LEFT JOIN t_employee teacher ON  teacher.`id` = schedules.`teacher_id`
+ LEFT JOIN t_member_card card ON card.`id` = cocard.`card_id` WHERE  
+ teacher.`is_deleted` = 0 AND card.`status` = 0 AND schedules.`id` = #{scheduleId} GROUP BY course.`name`;
+  </select>
+  
+	<!-- 排课记录基本信息，没有会员卡支持 -->
+  <resultMap id="scheduleNoCardViewMap" type="com.kclm.xsap.dto.CourseScheduleDTO" >
+  	<id column="id" jdbcType="BIGINT" property="scheduleId" />
+    <result column="course_id" jdbcType="BIGINT" property="courseId" />
+    <result column="course_name" jdbcType="VARCHAR" property="courseName" />
+    <result column="color" jdbcType="VARCHAR" property="color" />
+	<result column="start_date" jdbcType="DATE" property="classDate" />
+	<result column="class_time" jdbcType="TIME" property="classTime" />
+    <result column="duration" jdbcType="INTEGER" property="duration" />
+    <result column="limit_sex" jdbcType="VARCHAR" property="limitSex" />
+    <result column="limit_age" jdbcType="INTEGER" property="limitAge" />
+    <result column="support_cards" jdbcType="VARCHAR" property="supportCards" />
+    <result column="teacher_name" jdbcType="VARCHAR" property="teacherName" />
+    <result column="contains" jdbcType="INTEGER" property="classNumbers" />
+    <result column="order_nums" jdbcType="INTEGER" property="orderNums" />
+    <result column="times_cost" jdbcType="INTEGER" property="timesCost" />
+  </resultMap>
+  
+  <select id="oneScheduleNoCardView" resultMap="scheduleNoCardViewMap">
+  	SELECT schedules.`id`, course.id course_id,course.name course_name, course.color,schedules.`start_date`,
+  	schedules.`class_time`, course.`duration`, course.`limit_sex`, course.`limit_age`,
+ teacher.`name` teacher_name, course.`contains`, schedules.`order_nums`, course.`times_cost`
+ FROM t_course course LEFT JOIN t_schedule_record schedules ON course.`id` = schedules.`course_id`
+ LEFT JOIN t_employee teacher ON  teacher.`id` = schedules.`teacher_id`
+ WHERE teacher.`is_deleted` = 0 AND  schedules.`id` = #{scheduleId} ;
+  </select>
+  
+  <!-- 上课记录 -->
+  <resultMap id="classViewMap" type="com.kclm.xsap.dto.ClassRecordDTO" >
+  	<id column="id" jdbcType="BIGINT" property="classRecordId" />
+    <result column="member_id" jdbcType="BIGINT" property="memberId" />
+    <result column="card_id" jdbcType="BIGINT" property="cardId" />
+    <result column="card_name" jdbcType="VARCHAR" property="cardName" />
+    <result column="price" jdbcType="DECIMAL" property="price" />
+    <result column="total_count" jdbcType="INTEGER" property="count" />
+    <result column="times_cost" jdbcType="INTEGER" property="timesCost" />
+    <result column="check_status" jdbcType="INTEGER" property="checkStatus" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="operateTime" />
+    <association property="member" javaType="TMember">
+    	<id column="member_id" jdbcType="BIGINT" property="id" />
+    	<result column="member_name" jdbcType="VARCHAR" property="name" />
+    	<result column="phone" jdbcType="VARCHAR" property="phone" />
+    	<result column="sex" jdbcType="VARCHAR" property="sex" />
+    	<result column="birthday" jdbcType="DATE" property="birthday" />
+    </association>
+  </resultMap>
+  
+  <select id="listClassView" resultMap="classViewMap">
+  	SELECT class.id, mber.id member_id,mber.`name` member_name, mber.phone, mber.`sex`,
+ mber.`birthday`, card.id card_id, card.name card_name, card.`price`,
+ card.`total_count`, course.times_cost, class.`check_status`, class.`create_time`
+ FROM t_class_record class 
+ LEFT JOIN t_schedule_record schedules ON class.`schedule_id` = schedules.`id` 
+ LEFT JOIN t_course course ON course.`id` = schedules.`course_id` 
+ LEFT JOIN t_member mber ON mber.`id` = class.`member_id` 
+ LEFT JOIN t_member_card card ON card.`name` = class.`card_name`
+ WHERE card.`status` = 0 AND mber.`is_deleted` = 0 AND class.`reserve_check` = 1  
+ AND schedules.`id` = #{scheduleId};
+  </select>
 </mapper>

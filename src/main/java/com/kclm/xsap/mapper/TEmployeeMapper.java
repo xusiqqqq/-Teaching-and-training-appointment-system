@@ -1,9 +1,12 @@
 package com.kclm.xsap.mapper;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.kclm.xsap.dto.ClassRecordDTO;
 import com.kclm.xsap.entity.TEmployee;
 
 @Mapper
@@ -24,4 +27,11 @@ public interface TEmployeeMapper extends BaseMapper<TEmployee> {
 	 */
 	TEmployee findByUserName(String roleName);
 
+	/**
+	 * 	上课记录
+	 * @param teacherId
+	 * @return
+	 */
+	List<ClassRecordDTO> listClassView(Long teacherId);
+	
 }

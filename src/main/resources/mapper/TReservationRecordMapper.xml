@@ -46,18 +46,60 @@
 	    <result column="version" jdbcType="INTEGER" property="version" />
     </association>
   </resultMap>
-  <sql id="TReservationRecord_Column_List">
-    <!--@mbg.generated-->
-    id,  `status`, reserve_nums ,cancel_times,`comment`, note, class_note, `operator`, member_id, card_name, schedule_id, create_time, 
-    last_modify_time, version
-  </sql>
-  <sql id="member_sql">
-  	id, `name`, sex, phone, birthday, note, avatar_url, is_deleted, create_time, last_modify_time, 
-    version
-  </sql>
-  <sql id="schedule_sql">
-  	id, course_id, teacher_id, order_nums, start_date, class_time, limit_sex, limit_age, create_time, 
-    last_modify_time, version
-  </sql>
+
+	<!-- 排课的全部预约记录 -->
+	<resultMap id="reserveRecordViewMap" type="com.kclm.xsap.dto.ReserveRecordDTO">
+	  	<id column="id" jdbcType="BIGINT" property="reserveId" />
+	    <result column="member_id" jdbcType="INTEGER" property="memberId" />
+	    <result column="course_id" jdbcType="INTEGER" property="courseId" />
+	    <result column="member_name" jdbcType="VARCHAR" property="memberName" />
+	    <result column="phone" jdbcType="TIMESTAMP" property="phone" />
+	    <result column="card_name" jdbcType="VARCHAR" property="cardName" />
+	    <result column="order_nums" jdbcType="INTEGER" property="reserveNumbers" />
+	    <result column="times_cost" jdbcType="INTEGER" property="timesCost" />
+	    <result column="create_time" jdbcType="TIMESTAMP" property="operateTime" />
+	    <result column="operator" jdbcType="VARCHAR" property="operator" />
+	    <result column="note" jdbcType="VARCHAR" property="reserveNote" />
+	    <result column="status" jdbcType="INTEGER" property="reserveStatus" />
+ 	</resultMap>
   
+  	<select id="listReserveRecordView" resultMap="reserveRecordViewMap">
+		SELECT reserve.`id`, mber.`id` member_id, course.`id` course_id, mber.`name` member_name,
+	 mber.`phone`, reserve.`card_name`, schedules.`order_nums`, course.`times_cost`,
+	 reserve.`create_time`, reserve.`operator`, reserve.`note`, reserve.`status`
+	 FROM t_reservation_record reserve 
+	 LEFT JOIN t_member mber ON mber.`id` = reserve.`member_id`
+	 LEFT JOIN t_schedule_record schedules ON schedules.`id` = reserve.`schedule_id`
+	 LEFT JOIN t_course course ON course.`id` = schedules.`course_id`
+	 LEFT JOIN t_member_card card ON card.`name` = reserve.`card_name`
+	 WHERE card.`status` = 0 AND mber.`is_deleted` = 0 AND reserve.`schedule_id` = #{scheduleId};
+	</select>
+	<!-- 排课的已预约记录 -->
+	<resultMap id="listReservedViewMap" type="com.kclm.xsap.dto.ReserveRecordDTO">
+	  	<id column="id" jdbcType="BIGINT" property="reserveId" />
+	    <result column="member_id" jdbcType="INTEGER" property="memberId" />
+	    <result column="course_id" jdbcType="INTEGER" property="courseId" />
+	    <result column="member_name" jdbcType="VARCHAR" property="memberName" />
+	    <result column="phone" jdbcType="TIMESTAMP" property="phone" />
+	    <result column="card_name" jdbcType="VARCHAR" property="cardName" />
+	    <result column="order_nums" jdbcType="INTEGER" property="reserveNumbers" />
+	    <result column="times_cost" jdbcType="INTEGER" property="timesCost" />
+	    <result column="create_time" jdbcType="TIMESTAMP" property="operateTime" />
+	    <result column="operator" jdbcType="VARCHAR" property="operator" />
+	    <result column="note" jdbcType="VARCHAR" property="reserveNote" />
+	    <result column="status" jdbcType="INTEGER" property="reserveStatus" />
+  	</resultMap>
+  
+  	<select id="listReservedView" resultMap="listReservedViewMap">
+  		SELECT reserve.`id`, mber.`id` member_id, course.`id` course_id, mber.`name` member_name,
+	 mber.`phone`, reserve.`card_name`, schedules.`order_nums`, course.`times_cost`,
+	 reserve.`create_time`, reserve.`operator`, reserve.`note`, reserve.`status`
+	 FROM t_reservation_record reserve 
+	 LEFT JOIN t_member mber ON mber.`id` = reserve.`member_id`
+	 LEFT JOIN t_schedule_record schedules ON schedules.`id` = reserve.`schedule_id`
+	 LEFT JOIN t_course course ON course.`id` = schedules.`course_id`
+	 LEFT JOIN t_member_card card ON card.`name` = reserve.`card_name`
+	 WHERE card.`status` = 0 AND mber.`is_deleted` = 0 AND reserve.`status` = 1
+	 AND reserve.`schedule_id` = #{scheduleId};
+  	</select>
 </mapper>
