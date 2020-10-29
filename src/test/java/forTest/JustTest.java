@@ -12,7 +12,6 @@ import com.kclm.xsap.XsapApplication;
 import com.kclm.xsap.entity.TMemberBindRecord;
 import com.kclm.xsap.mapper.TMemberBindRecordMapper;
 
-import lombok.extern.slf4j.Slf4j;
 
 @SpringBootTest(classes = XsapApplication.class)
 public class JustTest {
@@ -39,7 +38,7 @@ public class JustTest {
 	
 	@Test
 	public void json() {
-
+			System.out.println(LocalDateTime.now());
 
 	}
 	

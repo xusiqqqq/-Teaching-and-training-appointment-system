@@ -146,115 +146,34 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 	@Override
 	public CourseScheduleDTO findById(Long scheduleId) {
 		//获取当前选中的排课记录信息
-		TScheduleRecord schedule = scheduleMapper.selectById(scheduleId);
-		if(schedule == null) {
-			return null;
+		
+		//==获取当前课程的上课数据（已预约时）		
+		List<ClassRecordDTO> classDtoList = scheduleMapper.listClassView(scheduleId);
+		for (ClassRecordDTO classDto : classDtoList) {
+			BigDecimal price = new BigDecimal(classDto.getPrice().toString());
+			BigDecimal count = new BigDecimal(classDto.getCount().toString());
+			BigDecimal unitPrice = price.divide(count, 2, RoundingMode.HALF_UP);	
+			//消耗的次数
+			BigDecimal countCost = new BigDecimal(classDto.getTimesCost().toString());
+			BigDecimal involveMoney = unitPrice.multiply(countCost);
+			classDto.setInvolveMoney(involveMoney);
 		}
-		//根据排课记录获取到对应的课程信息
-		TCourse course = courseMapper.selectById(schedule.getCourseId());
 		
-		//根据课程id获取到支持的会员卡信息
-		List<TMemberCard> cardList = cardMapper.selectList(new QueryWrapper<TMemberCard>().inSql("id",
-				"SELECT card_id FROM t_course_card WHERE course_id = " + course.getId()));
-		//拼接会员卡名
-		StringBuilder sb = new StringBuilder();
-		TMemberCard card = new TMemberCard();
-		for(int i = 0; i < cardList.size() ; i++) {
-			card = cardList.get(i);
-			if(i>= 1 && i < cardList.size()) {
-				sb.append(" | ");
-			}
-			sb.append(card.getName());
+		//已预约记录
+		List<ReserveRecordDTO> reservedList = reserveMapper.listReservedView(scheduleId);
+		//预约记录
+		List<ReserveRecordDTO> reserveDtoList = reserveMapper.listReserveRecordView(scheduleId);
+		
+		CourseScheduleDTO scheduleDto = scheduleMapper.oneScheduleView(scheduleId);
+		//没有会员卡支持时
+		if(scheduleDto == null) {
+			scheduleDto = scheduleMapper.oneScheduleNoCardView(scheduleId);
 		}
-		String supportCards = sb.toString();
-		
-		//根据排课记录获取对应的老师信息
-		String teacherName = employeeMapper.selectById(schedule.getTeacherId()).getName();
-		
-		//获取当前课程对应的预约记录
-		List<ReserveRecordDTO> reserveDtoList = reserveService.listReserveRecords(scheduleId);
-		//获取当前课程对应的  已预约记录
-		List<ReserveRecordDTO> reservedList = reserveService.listReserved(scheduleId);
-		
-		//==获取当前课程的上课数据（已预约时）
-		List<TClassRecord> classList = classMapper.selectList(new QueryWrapper<TClassRecord>()
-				.eq("schedule_id", scheduleId).eq("reserve_check", 1));
-		
-		List<ClassRecordDTO> classDtoList = new ArrayList<ClassRecordDTO>();
-		if(classList != null && classList.size() > 0) {
-			for (TClassRecord classed : classList) {
-				//查出会员卡的次数单价，取值四舍五入
-				TMemberCard memberCard = cardMapper.selectOne(new QueryWrapper<TMemberCard>()
-						.eq("name", classed.getCardName()));
-				if(memberCard == null) {
-					System.out.println("没有此会员卡！"+memberCard);
-					continue ;
-				}
-				BigDecimal price = new BigDecimal(memberCard.getPrice().toString());
-				BigDecimal count = new BigDecimal(memberCard.getTotalCount().toString());
-				BigDecimal unitPrice = price.divide(count, 2, RoundingMode.HALF_UP);	
-				//消耗的次数
-				BigDecimal countCost = new BigDecimal(course.getTimesCost().toString());
-				BigDecimal involveMoney = unitPrice.multiply(countCost);
-				//获取会员信息
-				TMember member = memberMapper.selectById(classed.getMemberId());
-				//====== dto值存储
-				ClassRecordDTO classRecordDTO = new ClassRecordDTO();
-				//上课记录id
-				classRecordDTO.setClassRecordId(classed.getId());
-				//会员id
-				classRecordDTO.setMemberId(member.getId());
-				//	会员信息
-				classRecordDTO.setMember(member);
-				//会员卡id
-				classRecordDTO.setCardId(memberCard.getId());
-				//	会员卡名
-				classRecordDTO.setCardName(classed.getCardName());
-				//	消费次数
-				classRecordDTO.setTimesCost(course.getTimesCost());
-				//	消费金额
-				classRecordDTO.setInvolveMoney(involveMoney);
-				//确认状态
-				classRecordDTO.setCheckStatus(classed.getCheckStatus());
-				//	操作时间
-				classRecordDTO.setOperateTime(classed.getCreateTime());
-				//dto拼接
-				classDtoList.add(classRecordDTO);
-			}
-		}
-		//======dto值存储
-		CourseScheduleDTO scheduleDto = new CourseScheduleDTO();
-		//排课记录id
-		scheduleDto.setScheduleId(scheduleId);
-		//课程id
-		scheduleDto.setCourseId(course.getId());
-		//	课程名
-		scheduleDto.setCourseName(course.getName());
-		//	上课时间
-		scheduleDto.setStartTime(LocalDateTime.of(schedule.getStartDate(),schedule.getClassTime()));
-		//	计算下课时间
-		LocalTime plusClassTime = null;
-		if(schedule.getClassTime() != null) {			
-			plusClassTime = schedule.getClassTime().plusMinutes(course.getDuration());
-		}
-		LocalDateTime endTime = LocalDateTime.of(schedule.getStartDate(),plusClassTime);
-		scheduleDto.setEndTime(endTime);
-		//	时长
-		scheduleDto.setDuration(course.getDuration());
-		//	限制性别
-		scheduleDto.setLimitSex(course.getLimitSex());
-		//	限制年龄
-		scheduleDto.setLimitAge(course.getLimitAge());
-		//	支持的会员卡
-		scheduleDto.setSupportCards(supportCards);
-		//	上课老师
-		scheduleDto.setTeacherName(teacherName);
-		//	上课容纳人数
-		scheduleDto.setClassNumbers(course.getContains());
-		// 已本堂课预约人数
-		scheduleDto.setOrderNums(schedule.getOrderNums());
-		//当前课程的需消耗次数
-		scheduleDto.setTimesCost(course.getTimesCost());
+		//开始上课时间
+		scheduleDto.setStartTime(LocalDateTime.of(scheduleDto.getClassDate(),scheduleDto.getClassTime()));
+		//下课时间
+		scheduleDto.setEndTime(scheduleDto.getStartTime().plusMinutes(scheduleDto.getDuration()));
+
 		//已预约记录
 		scheduleDto.setReservedList(reservedList);
 		//	预约记录

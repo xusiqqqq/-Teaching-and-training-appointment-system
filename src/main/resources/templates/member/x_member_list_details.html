@@ -682,9 +682,20 @@ $(function () {
 	                        url: "/xsap/card/activeOpt.do",  //此处要把 event.target.checked 的值传递回去, 设计一个请求参数，其值为  event.target.checked
 	                        method: "post",
 	                        data: {memberId: [[${ID}]], cardId: cardInfo[index].bindCardId, status:statusVal},
-	                        success: function (data) {	                        	
+	                        success: function (data) {	    
 	                            //1. 更新 状态列的 文字信息, 这个 data 是由服务端传递回来的，如果改为 true, 则 data为 激活，否则为 停用
 	                            $(html).parent("td").prev().text(data.type);
+	                            if(data.type == "未激活"){
+	                            	$("button[name='recharge'][value='"+ cardInfo[index].bindCardId +"']")
+	    	        				.removeClass("btn-primary").addClass("btn-default").attr("disabled",true);
+	    	                		$("button[name='consume'][value='"+ cardInfo[index].bindCardId +"']")
+	    	        				.removeClass("btn-info").addClass("btn-default").attr("disabled",true);
+	                            }else{
+	                            	$("button[name='recharge'][value='"+ cardInfo[index].bindCardId +"']")
+	    	        				.removeClass("btn-default").addClass("btn-primary").attr("disabled",false);
+	    	                		$("button[name='consume'][value='"+ cardInfo[index].bindCardId +"']")
+	    	        				.removeClass("btn-default").addClass("btn-info").attr("disabled",false);
+	                            }
 	                        },
 	                        error: function (jqXHR) {
 	                            //出错了：
@@ -735,8 +746,8 @@ $(function () {
 	                "render": function (data, type, row) {
 	                    var id =  row.bindCardId ;
 	                    
-	                    var html = "<a href='#;' onclick='toRecharge("+ [[${ID}]] +","+ id +")' class='btn btn-primary btn-xs' data-toggle='modal' data-target='#details_recharge'>充值<i class='fa fa-re'></i></a>&nbsp &nbsp"
-	                    html += "<a href='#' onclick='toConsume("+ [[${ID}]] +","+ id +")' class='btn btn-info btn-xs' data-toggle='modal' data-target='#details_deduction'> 扣费</a>&nbsp &nbsp"
+	                    var html = "<button name='recharge' value='"+ id +"' onclick='toRecharge("+ [[${ID}]] +","+ id +")' class='btn btn-primary btn-xs' data-toggle='modal' data-target='#details_recharge'>充值<i class='fa fa-re'></i></button>&nbsp &nbsp"
+	                    html += "<button name='consume' value='"+ id +"' onclick='toConsume("+ [[${ID}]] +","+ id +")' class='btn btn-info btn-xs' data-toggle='modal' data-target='#details_deduction'> 扣费</button>&nbsp &nbsp"
 	                    html += "<a href='#?id="+id+"' onclick='operateShow("+ [[${ID}]] +","+ id +")' class='delete btn btn-danger btn-xs' data-toggle='modal' data-target='#details_operating'> 操作记录</i></a>"
 	                    return html;
 	                }}

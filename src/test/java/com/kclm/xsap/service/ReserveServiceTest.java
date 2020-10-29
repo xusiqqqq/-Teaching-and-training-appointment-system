@@ -36,7 +36,7 @@ public class ReserveServiceTest {
 
 	@Test
 	public void listReserved() {
-		List<ReserveRecordDTO> reserveList = reserveService.listReserved(1L);
+		List<ReserveRecordDTO> reserveList = reserveService.listReserved(28L);
 		for (ReserveRecordDTO reserve : reserveList) {
 			System.out.println("---"+ reserve);
 		}
@@ -45,7 +45,7 @@ public class ReserveServiceTest {
 	//-------涉及到convert
 	@Test
 	public void listReserveRecords() {
-		List<ReserveRecordDTO> reserveList = reserveService.listReserveRecords(1L);
+		List<ReserveRecordDTO> reserveList = reserveService.listReserveRecords(28L);
 		for (ReserveRecordDTO reserve : reserveList) {
 			System.out.println("---"+ reserve);
 		}

@@ -11,8 +11,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.kclm.xsap.dto.ReserveRecordDTO;
 import com.kclm.xsap.entity.TReservationRecord;
-
 
 @SpringBootTest
 public class TReservationRecordMapperTest {
@@ -21,6 +21,22 @@ public class TReservationRecordMapperTest {
 	private TReservationRecordMapper reserveMapper;
 	
 	private TReservationRecord reserve = new TReservationRecord();
+	
+	@Test
+	public void listReservedView() {
+		List<ReserveRecordDTO> listReservedView = reserveMapper.listReservedView(28L);
+		for (ReserveRecordDTO reserve : listReservedView) {
+			System.out.println(reserve);
+		}
+	}
+
+	@Test
+	public void listReserveRecordView() {
+		List<ReserveRecordDTO> listReserveRecordView = reserveMapper.listReserveRecordView(28L);
+		for (ReserveRecordDTO reserve : listReserveRecordView) {
+			System.out.println(reserve);
+		}
+	}
 	
 	//增加一条记录
 		@Test

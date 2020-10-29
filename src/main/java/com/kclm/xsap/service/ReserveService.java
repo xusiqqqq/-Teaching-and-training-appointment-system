@@ -24,7 +24,7 @@ public interface ReserveService {
 	Integer reserveCheck(TReservationRecord reserve);
 	
 	/**
-	 * 	共5种状态码：-2，预约超额；-1，已预约过；0，录入成功；1，预约时间过早；2，预约时间过晚
+	 * 	共6种状态码：-2，预约超额；-1，已预约过；0，录入成功；1，预约时间过早；2，预约时间过晚，3，卡片过期
 	 * @param reserve
 	 * @return
 	 */

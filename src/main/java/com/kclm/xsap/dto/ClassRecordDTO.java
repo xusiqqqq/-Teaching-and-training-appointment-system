@@ -1,7 +1,9 @@
 	package com.kclm.xsap.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.kclm.xsap.entity.TMember;
@@ -47,11 +49,21 @@ public class ClassRecordDTO{
 	private String courseName;
 	
 	/**
-	 * 上课时间
+	 * 上课准确时间
 	 */
 	 @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private LocalDateTime classTime;
 	
+	 /**
+	  *	上课日期（拼接用）
+	  */
+	private LocalDate startDate;
+	
+	/**
+	 *	上课时间（拼接用）
+	 */
+	private LocalTime startTime;
+	 
 	/**
 	 * 授课老师
 	 */
@@ -76,6 +88,15 @@ public class ClassRecordDTO{
 	 * 	涉及金额
 	 */
 	private BigDecimal involveMoney;
+	
+	/**
+	 * 价格（计算单价用）
+	 */
+	private BigDecimal price;
+	/**
+	 * 	次数（计算单价用）
+	 */
+	private BigDecimal count;
 	
 	/**
 	 * 上课备注

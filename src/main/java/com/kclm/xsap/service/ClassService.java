@@ -27,12 +27,6 @@ public interface ClassService {
 	 */
 	boolean saveByReserve(TReservationRecord reserve);
 	
-	/**
-	 * 	针对“已预约”，进行全部录入（考虑不周，暂且停用）
-	 * @return
-	 */
-	@Deprecated
-	boolean saveAll();
 	
 	/**
 	 * 	单个上课记录确认
@@ -43,11 +37,7 @@ public interface ClassService {
 	boolean update(Long classId,Integer status);
 	
 	/**
-<<<<<<< HEAD
-	 * 针对“未确认”上课，进行全部上课记录的更新
-=======
 	 * 	针对“未确认”上课，进行全部上课记录的更新，暂且用不上
->>>>>>> b3286e860875dba3e734146520c65f0598ff525f
 	 * @return
 	 */
 	boolean updateAll();

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationPropertiesBean.BindMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,15 +19,19 @@ import com.kclm.xsap.dto.convert.ReserveRecordConvert;
 import com.kclm.xsap.entity.TCourse;
 import com.kclm.xsap.entity.TGlobalReservationSet;
 import com.kclm.xsap.entity.TMember;
+import com.kclm.xsap.entity.TMemberBindRecord;
+import com.kclm.xsap.entity.TMemberCard;
 import com.kclm.xsap.entity.TReservationRecord;
 import com.kclm.xsap.entity.TScheduleRecord;
 import com.kclm.xsap.mapper.TClassRecordMapper;
 import com.kclm.xsap.mapper.TCourseMapper;
 import com.kclm.xsap.mapper.TGlobalReservationSetMapper;
+import com.kclm.xsap.mapper.TMemberBindRecordMapper;
 import com.kclm.xsap.mapper.TMemberMapper;
 import com.kclm.xsap.mapper.TReservationRecordMapper;
 import com.kclm.xsap.mapper.TScheduleRecordMapper;
 import com.kclm.xsap.service.ClassService;
+import com.kclm.xsap.service.MemberCardService;
 import com.kclm.xsap.service.ReserveService;
 
 @Service
@@ -55,7 +60,13 @@ public class ReserveServiceImpl implements ReserveService{
 	TGlobalReservationSetMapper globalMapper;
 	
 	@Autowired
+	TMemberBindRecordMapper bindMapper;
+	
+	@Autowired
 	ClassService classService;
+	
+	@Autowired
+	MemberCardService cardService;
 	
 	//查询一条预约记录
 	@Override
@@ -156,6 +167,23 @@ public class ReserveServiceImpl implements ReserveService{
 			return 2;
 		}
 		
+		//查看卡有没有过期
+		TMemberCard card = cardService.findByName(reserve.getCardName());
+		TMemberBindRecord bind = bindMapper.selectOne(new QueryWrapper<TMemberBindRecord>()
+				.eq("member_id", reserve.getMemberId()).eq("card_id", card.getId()));
+		if(card.getType() != "次卡(无期限)") {
+			LocalDateTime createTime = bind.getCreateTime();
+			LocalDateTime	endTime = null;					
+			if(createTime !=null) {
+				endTime = createTime.plusDays(bind.getValidDay());			
+			}
+			if(endTime.isBefore(LocalDateTime.now())) {
+				System.out.println("当前卡已过期！");
+				return 3;
+			}
+		}
+		
+		
 		TScheduleRecord schedule = scheduleMapper.selectById(reserve.getScheduleId());
 		/*	
 		 * 对于年龄、性别的预约限制，暂且不写
@@ -163,7 +191,7 @@ public class ReserveServiceImpl implements ReserveService{
 		if(schedule != null) {
 			Integer contains = courseMapper.selectById(schedule.getCourseId()).getContains();
 			Integer totalNums = schedule.getOrderNums() + reserve.getReserveNums();
-			if(totalNums >= contains ) {
+			if(totalNums > contains ) {
 				System.out.println("当前课程预约人数：" + schedule.getOrderNums());
 				System.out.println("人数超额！" + (totalNums - contains) + " 人 ");
 				return -2;
@@ -237,7 +265,7 @@ public class ReserveServiceImpl implements ReserveService{
 		//预约人数判断
 		Integer contains = courseMapper.selectById(schedule.getCourseId()).getContains();
 		Integer totalNums = schedule.getOrderNums() + reserve.getReserveNums();
-		if(totalNums >= contains ) {
+		if(totalNums > contains ) {
 			System.out.println("当前课程预约人数：" + schedule.getOrderNums());
 			System.out.println("人数超额！" + (totalNums - contains) + " 人 ");
 			return -2;
@@ -263,107 +291,14 @@ public class ReserveServiceImpl implements ReserveService{
 	//当前排课的已预约记录
 	@Override
 	public List<ReserveRecordDTO> listReserved(Long scheduleId) {
-		//1、获取到排课信息
-		TScheduleRecord schedule = scheduleMapper.selectById(scheduleId);
-		if(schedule == null) {
-			System.out.println("--------此排课信息不存在");
-			return null;
-		}
-		//2、根据排课计划id获取到对应的课程信息
-		TCourse course = courseMapper.selectById(schedule.getCourseId());
-		//3、根据scheduleId查询到对应的已预约记录
-		List<TReservationRecord> reserveList = reserveMapper.selectList(
-				new QueryWrapper<TReservationRecord>().eq("schedule_id", scheduleId).eq("status", 1));
-		
-		//不存在已预约记录
-		if(reserveList == null  || reserveList.size() < 1) {
-			return null;
-		}
-		//4、根据预约记录获取会员信息
-		List<TMember> memberList = new ArrayList<TMember>();
-		for (int i = 0; i < reserveList.size(); i++) {
-			TMember member = memberMapper.selectById(reserveList.get(i).getMemberId());
-			memberList.add(member);
-		}
-		
-		//5、组合成DTO数据信息
-		List<ReserveRecordDTO> reserveDtoList = new ArrayList<>();
-			//sql结果对应关系
-			//1个  排课号 =》 1门课（由会员指定1张会员卡） =》  n个  预约记录（1条 预约记录 =》 1个 会员号）
-			for(int i = 0; i < reserveList.size(); i++) {
-				TReservationRecord reserve =  reserveList.get(i);
-				TMember member  = memberList.get(i);
-				//========DTO存储
-				ReserveRecordDTO reserveRecordDTO = new ReserveRecordDTO();
-				reserveRecordDTO.setReserveId(reserve.getId());
-				reserveRecordDTO.setMemberId(member.getId());
-				reserveRecordDTO.setCourseId(course.getId());
-				reserveRecordDTO.setMemberName(member.getName());
-				reserveRecordDTO.setPhone(member.getPhone());
-				reserveRecordDTO.setCardName(reserve.getCardName());
-				reserveRecordDTO.setReserveNumbers(schedule.getOrderNums());
-				reserveRecordDTO.setTimesCost(course.getTimesCost());
-				reserveRecordDTO.setOperateTime(reserve.getCreateTime());
-				reserveRecordDTO.setOperator(reserve.getOperator());
-				reserveRecordDTO.setReserveNote(reserve.getNote());
-				reserveRecordDTO.setReserveStatus(reserve.getStatus());
-				//添加到预约记录集合
-				reserveDtoList.add(reserveRecordDTO);
-			}
-		
+		List<ReserveRecordDTO> reserveDtoList = reserveMapper.listReservedView(scheduleId);
 		return reserveDtoList;
 	}
 	
 	//当前排课的预约记录
 	@Override
 	public List<ReserveRecordDTO> listReserveRecords(Long scheduleId) {
-		//1、获取到排课信息
-		TScheduleRecord schedule = scheduleMapper.selectById(scheduleId);
-		if(schedule == null) {
-			return null;
-		}
-		//2、根据排课计划id获取到对应的课程信息
-		TCourse course = courseMapper.selectById(schedule.getCourseId());
-		//3、根据scheduleId查询到对应的预约记录
-		List<TReservationRecord> reserveList = reserveMapper.selectList(
-				new QueryWrapper<TReservationRecord>().eq("schedule_id", scheduleId));
-		
-		//不存在预约记录
-		if(reserveList == null || reserveList.size() < 1) {
-			return null;
-		}
-		//4、根据预约记录获取会员信息
-		List<TMember> memberList = new ArrayList<TMember>();
-		for (int i = 0; i < reserveList.size(); i++) {
-			TMember member = memberMapper.selectById(reserveList.get(i).getMemberId());
-			memberList.add(member);
-		}
-		
-		//5、组合成DTO数据信息
-		List<ReserveRecordDTO> reserveDtoList = new ArrayList<>();
-			//sql结果对应关系
-			//1个  排课号 =》 1门课（由会员指定1张会员卡） =》  n个  预约记录（1条 预约记录 =》 1个 会员号）
-			for(int i = 0; i < reserveList.size(); i++) {
-				TReservationRecord reserve =  reserveList.get(i);
-				TMember member = memberList.get(i);
-				//========DTO存储
-				ReserveRecordDTO reserveRecordDTO = new ReserveRecordDTO();
-				reserveRecordDTO.setReserveId(reserve.getId());
-				reserveRecordDTO.setMemberId(member.getId());
-				reserveRecordDTO.setCourseId(course.getId());
-				reserveRecordDTO.setMemberName(member.getName());
-				reserveRecordDTO.setPhone(member.getPhone());
-				reserveRecordDTO.setCardName(reserve.getCardName());
-				reserveRecordDTO.setReserveNumbers(schedule.getOrderNums());
-				reserveRecordDTO.setTimesCost(course.getTimesCost());
-				reserveRecordDTO.setOperateTime(reserve.getCreateTime());
-				reserveRecordDTO.setOperator(reserve.getOperator());
-				reserveRecordDTO.setReserveNote(reserve.getNote());
-				reserveRecordDTO.setReserveStatus(reserve.getStatus());
-				//添加到预约记录集合
-				reserveDtoList.add(reserveRecordDTO);
-			}
-		
+		List<ReserveRecordDTO> reserveDtoList = reserveMapper.listReserveRecordView(scheduleId);
 		return reserveDtoList;
 	}
 

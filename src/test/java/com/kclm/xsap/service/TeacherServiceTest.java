@@ -9,12 +9,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.kclm.xsap.dto.ClassRecordDTO;
 import com.kclm.xsap.entity.TEmployee;
+import com.kclm.xsap.mapper.TEmployeeMapper;
 
 @SpringBootTest
 public class TeacherServiceTest {
 
 	@Autowired
 	TeacherService teacherService;
+	
+	@Autowired
+	TEmployeeMapper employeeMapper;
 	
 	@Test
 	public void save() {
@@ -27,6 +31,14 @@ public class TeacherServiceTest {
 		emp.setIntroduce("刚入职的萌新老师");
 		emp.setNote("能力综合");
 		teacherService.save(emp);
+	}
+	
+	@Test
+	public void listClassView() {
+		List<ClassRecordDTO> listClassRecord = employeeMapper.listClassView(2L);
+		for (ClassRecordDTO classRecordDTO : listClassRecord) {
+			System.out.println(classRecordDTO);
+		}
 	}
 	
 	@Test
