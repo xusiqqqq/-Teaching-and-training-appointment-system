@@ -22,7 +22,7 @@
     <link href="../../static/css/plugins/cropper/cropper.min.css" th:href="@{/static/css/plugins/cropper/cropper.min.css}" rel="stylesheet">
     <link href="../../static/css/plugins/datapicker/datepicker3.css" th:href="@{/static/css/plugins/datapicker/datepicker3.css}" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="../../static/css/plugins/simditor/simditor.css" th:href="@{/static/css/plugins/simditor/simditor.css}"/>
-    
+
     <style type="text/css">
         .input_width {
             width: 50px;
@@ -157,7 +157,7 @@
                         <div class="form-group">
                             <div class="col-sm-2 col-sm-offset-2">
                                 <button type="submit" class="btn btn-success" id="saveBtn">保存</button>
-                                <button type="reset" class="btn btn-white">取消</button>
+                                <button type="button" cass="btn btn-white" onclick="javascript:window.history.go(-1)">取消</button>
                             </div>
                         </div>
                     </form>
@@ -207,12 +207,12 @@
             }
 
         });
-        
+
         $("#saveBtn").on("mouseenter",function(){
     		var editForm = $("form").serialize();
     		console.log(editForm);
     	});
-        
+
         //加载卡片信息
         $.post("/xsap/card/cardList.do",function(cardList){
         	console.log(cardList);
@@ -247,9 +247,9 @@
                     "orderable": false
                 }]
             });
-        	
+
         });
-        
+
     });
 </script>
 <script>
