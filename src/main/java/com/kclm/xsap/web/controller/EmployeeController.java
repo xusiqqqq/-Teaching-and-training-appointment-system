@@ -52,19 +52,19 @@ public class EmployeeController {
 	}
 	
 	//=》注册界面
-	@RequestMapping("/toRegister.do")
+	@RequestMapping("/toRegister")
 	public String toRegister() {
 		return "x_register";
 	}
 	
 	//=》账户认证页面
-	@RequestMapping("/toEnsureUser.do")
+	@RequestMapping("/toEnsureUser")
 	public String toEnsureUser() {
 		return "x_ensure_user";
 	}
 		
 	//=》重置密码页面
-	@RequestMapping("/gotoResetPwdPage.do")
+	@RequestMapping("/gotoResetPwdPage")
 	public String toRestPwdPage() {
 		return "x_reset_passward";
 	}
@@ -96,7 +96,7 @@ public class EmployeeController {
 	}
 	
 	//登录界面
-	@RequestMapping(value = "/login.do",produces = {"application/json;charset=UTF-8"})
+	@RequestMapping(value = "/login",produces = {"application/json;charset=UTF-8"})
 	public String login(String username,String password,Model model,HttpSession session) {
 		TEmployee loginUser = employeeService.login(username, password);
 		System.out.println("--------loginUser---------");
@@ -118,14 +118,14 @@ public class EmployeeController {
 	}
 	
 	//退出登录
-	@RequestMapping("/logout.do")
+	@RequestMapping("/logout")
 	public String logout(HttpSession session) {
 		session.invalidate();
 		return "redirect:toLogin";
 	}
 
 	//注册界面
-	@RequestMapping("/register.do")
+	@RequestMapping("/register")
 	public String register(String userName,String password,String pwd2,Model model) {
 		model.addAttribute("CHECK_TYPE_ERROR",-1);
 		if(!password.equals(pwd2)) {
@@ -139,7 +139,7 @@ public class EmployeeController {
 			return "x_register";
 		}
 		TEmployee emp = new TEmployee();
-		emp.setRoleName(userName);
+		emp.setPhone(userName);
 		emp.setRolePassword(password);
 		//设置默认真实姓名
 		emp.setName("user");
@@ -148,7 +148,7 @@ public class EmployeeController {
 	}
 	
 	//根据认证的用户名，发送邮件至其邮箱
-	@RequestMapping("/toResetPwd.do")
+	@RequestMapping("/toResetPwd")
 	public String toResetPassword(String userName,Model model,HttpServletRequest request) {
 		TEmployee employee = employeeService.findByUser(userName.trim());
 		model.addAttribute("CHECK_USER_ERROR",false);
@@ -165,11 +165,24 @@ public class EmployeeController {
 		
 		String email = employee.getRoleEmail();
 		System.out.println("目标邮箱："+ email);
-		String content = "<a href='"+url+"/gotoResetPwdPage.do'>前往重置密码页面</a>";
+		String content = "<a href='"+url+"/gotoResetPwdPage'>前往重置密码页面</a>";
 		Boolean isHtml = true;
 		employeeService.resetPwdByEmail(email, content, isHtml);
 		System.out.println("发送成功。。。");
 		return "send_mail_ok";
+	}
+	
+	@RequestMapping("/resetPassword")
+	public String resetPassward(String newPwd,String pwd2,Model model) {
+		model.addAttribute("CHECK_PWD_ERROR",-1);
+		if(!newPwd.equals(pwd2)) {
+			model.addAttribute("CHECK_PWD_ERROR",1);
+			return "x_reset_passward";
+		}
+		employeeService.resetPassward(global_username, newPwd);
+		
+		//密码修改完，重新登录
+		return "redirect:logout";
 	}
 	
 	//显示最近的更新信息
@@ -265,7 +278,7 @@ public class EmployeeController {
 			return "x_modify_password";
 		}
 		//密码修改完，重新登录
-		return "redirect:logout.do";
+		return "redirect:logout";
 	}
 	
 }

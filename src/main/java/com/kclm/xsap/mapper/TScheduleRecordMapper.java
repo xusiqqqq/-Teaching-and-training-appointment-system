@@ -13,6 +13,12 @@ import com.kclm.xsap.entity.TScheduleRecord;
 public interface TScheduleRecordMapper extends BaseMapper<TScheduleRecord> {
 
 	/**
+	 * 	全部排课信息
+	 * @return
+	 */
+	List<CourseScheduleDTO> listScheduleView();
+	
+	/**
 	 * 	基本排课信息 - 有会员卡支持
 	 * @param scheduleId
 	 * @return
