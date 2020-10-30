@@ -15,6 +15,7 @@
     <link href="../../static/css/font-awesome.css?v=4.4.0" th:href="@{/static/css/font-awesome.css(v='4.4.0')}" rel="stylesheet">
     <link href="../../static/css/animate.css" th:href="@{/static/css/animate.css}" rel="stylesheet">
     <link href="../../static/css/style.css?v=4.1.0" th:href="@{/static/css/style.css(v='4.1.0')}" rel="stylesheet">
+	<link href="../../static/css/plugins/sweetalert/sweetalert.css" th:href="@{/static/css/plugins/sweetalert/sweetalert.css}" rel="stylesheet">
     <style type="text/css">
         .line {
             line-height: 20px;
@@ -107,18 +108,16 @@
             <div class="ibox float-e-margins">
 
 			<div class="modal inmodal fade" id="tip" tabindex="-1" role="dialog"  aria-hidden="true">
-		         <div class="modal-dialog modal-sm">
+		         <div class="modal-dialog model-dialog-centered modal-sm " role="document">
 		              <div class="modal-content">
-		                    <div class="modal-header">
+		                    <div class="modal-header" style="text-align: left; background-color:lightsalmon ">
 		                         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-		                         <h4 class="modal-title">会员绑定</h4>
+		                         <h5 class="modal-title">会员绑定</h5>
 		                    </div>
-		                    <div class="modal-body">
-			                    <div style="text-align: center; ">
-			                    	<h1 style="color: blue">绑定成功</h1>
-			                    </div>
+		                    <div class="modal-body" style="text-align: center; background-color:lightpink "> 
+			                    <h2 style="color: steelblue">绑定成功</h2>
 		                    </div>
-		                     <div class="modal-footer" align="center">
+		                     <div class="modal-footer" style="text-align: center; background-color:lightsalmon ">
                                  <a th:href="@{/member/x_member_list.do}"  class="btn btn-primary">前往会员页</a>
                              </div>
 		              </div>
@@ -144,6 +143,7 @@
 <script src="../../static/js/content.js?v=1.0.0" th:src="@{/static/js/content.js(v='1.0.0')}"></script>
 <!-- Peity -->
 <script src="../../static/js/plugins/peity/jquery.peity.min.js" th:src="@{/static/js/plugins/peity/jquery.peity.min.js}"></script>
+<script src="../../static/js/plugins/sweetalert/sweetalert.min.js" th:src="@{/static/js/plugins/sweetalert/sweetalert.min.js}"></script>
 <!-- Peity -->
 <!-- <script src="../../static/js/demo/peity-demo.js" th:src="@{/static/js/demo/peity-demo.js}"></script> -->
 <!-- 搜索建议提示插件 -->
@@ -151,6 +151,7 @@
 </body>
 <script>
     $(function(){
+		
     	/* 会员搜索 */
     	$("#searchText").bsSuggest({
 			url: "[[${#request.getContextPath()}]]/member/toSearch.do",
@@ -240,21 +241,29 @@
 	/*===========表单数据提交===========*/
         /* 保存会员信息,绑定会员卡 */
    	$('#bind_confirm').click(function () {
-   		//数据请求
-   		$.post("[[${#request.getContextPath()}]]/cardBind/memberBindCard.do",formBind,function(bindMsg){
-    		//移除重复提示 - 绑卡
-            $("#selectList").nextAll().remove();
-   			if(bindMsg.version == 4){
-   				//弹窗提示
-           		$("#tip").modal("show");
-           		//自动关闭
-           		/* setTimeout(function(){
-           			$("#tip").modal("hide");
-           		},2*1000); */
-   			}else{
-   				$("#selectList").after("<span class='text-danger'>"+ bindMsg.note +"</span>");
-   			}
-   		});
+   		swal({
+		    title: "绑卡确认",
+		    type: "warning",
+		    showCancelButton: true,
+		    confirmButtonColor: "#DD6B55",
+		    confirmButtonText: "确认",
+		    closeOnConfirm: false
+		}, function () {
+			//数据请求
+	   		$.post("[[${#request.getContextPath()}]]/cardBind/memberBindCard.do",formBind,function(bindMsg){
+	    		//移除重复提示 - 绑卡
+	            $("#selectList").nextAll().remove();
+	   			if(bindMsg.version == 4){
+	   				swal("绑定成功！", "","success");
+	   				setTimeout(function(){
+				        window.location.href="/xsap/member/x_member_list.do";		        	
+			        },1*1000);
+	   			}else{
+	   				swal("绑定失败！", bindMsg.note,"info");
+	   			}
+	   		});
+		});
+   		
     });
         
 });

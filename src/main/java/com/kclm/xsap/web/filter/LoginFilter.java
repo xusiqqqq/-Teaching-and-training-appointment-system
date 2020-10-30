@@ -19,7 +19,7 @@ import java.io.IOException;
  */
 @Order(1)
 //@ServletComponentScan
-@WebFilter(urlPatterns = {"/function/*"},filterName = "loginFilter", dispatcherTypes =
+@WebFilter(urlPatterns = {"/*.do"},filterName = "loginFilter", dispatcherTypes =
         {DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.INCLUDE, DispatcherType.ASYNC})
 public class LoginFilter implements Filter {
 

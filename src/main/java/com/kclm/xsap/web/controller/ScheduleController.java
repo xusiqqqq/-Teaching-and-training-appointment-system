@@ -211,7 +211,6 @@ public class ScheduleController {
 		System.out.println("---------");
 		System.out.println(consume);
 		consume.setMemberBindId(bindRecord.getId());
-		consume.setOperator("某某某操作");
 		consume.setOperateType("上课扣费");
 		
 		//消费行为产生
@@ -233,11 +232,11 @@ public class ScheduleController {
 	//一键确认 -- 当期排课，所有”未确认“的上课记录确认扣费
 	@ResponseBody
 	@RequestMapping("/consumeEnsureAll.do")
-	public TConsumeRecord classCheckList(Long scheduleId) {
+	public TConsumeRecord classCheckList(Long scheduleId, String operator) {
 		//提示用。version 4：成功
 		TConsumeRecord checkOnly = new TConsumeRecord();
 		if(scheduleId != null){
-			classService.ensureByScheduleId(scheduleId);			
+			classService.ensureByScheduleId(scheduleId,operator);			
 			checkOnly.setVersion(4);			
 		}
 		
@@ -273,7 +272,10 @@ public class ScheduleController {
 //				cardService.updateBindRecord(bindRecord);
 //			}
 			//退还完成后，再进行排课计划的删除
-			scheduleServie.deleteById(id);
+			boolean result = scheduleServie.deleteById(id);
+			if(!result) {
+				return "no";
+			}
 		return "yes";
 	}
 	

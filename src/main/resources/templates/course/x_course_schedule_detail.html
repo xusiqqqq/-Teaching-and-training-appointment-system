@@ -275,7 +275,11 @@
             </div>
             <div class="modal-body">
                 <form class="form-horizontal" id="addReserveForm" method="get">
+                	<!-- 隐藏域，id -->
                 	<input type="hidden" name="scheduleId" value="1" th:value="${ID}"/>
+                	<!-- 隐藏域，管理员名 -->
+                	<input type="hidden" name="operator" value="admin" th:value="${session.LOGIN_USER.name}"/>
+                	
                 	 <div class="form-group" align="center">
                 	 	<span id="reserve_tip" class="text-danger"></span>
                 	 </div>
@@ -348,6 +352,8 @@
                         <input type="hidden" name="classId" id="classId"/>
                         <input type="hidden" name="memberId" id="consume_memberId"/>
                         <input type="hidden" name="cardId" id="consume_cardId"/>
+                        <!-- 隐藏域，管理员名 -->
+                	<input type="hidden" name="operator" value="admin" th:value="${session.LOGIN_USER.name}"/>
                         
                         <label class="col-sm-2 control-label">
                             扣除次数</label>
@@ -441,14 +447,14 @@ $(function(){
 	       $.ajax({
 	           url: "/xsap/schedule/consumeEnsureAll.do",
 	           method: "post",
-	           data: {scheduleId : [[${ID}]]},
+	           data: {scheduleId : [[${ID}]], operator: '[[${session.LOGIN_USER.name}]]'},
 	           success: function (data) {
 	        	   //成功
 	               if(data.version == 4){
 	            	   //将对应的“已预约”记录变为“不可操作”
 	            	   $("button[name='cancel_btn']")	//数据没问题，显示没体现
 	   				.removeClass("btn-warning").addClass("btn-default").attr("disabled",true);
-						alert("ok");                	   
+						alert("一键确认成功");                	   
 	                //重新加载本页面
 	                window.location.reload();                	   
 	               }else{
@@ -530,7 +536,7 @@ $(function () {
     $('.demo3').click(function () {
     	swal({
             title: "您确定要删除该课程么",
-            text: "注意:删除课程后，预约的会员将全部取消，消耗的次卡将退回至会员的会员卡",
+            text: "注意:若有过会员预约记录，则无法删除此课",
             type: "warning",
             showCancelButton: true,
             confirmButtonColor: "#DD6B55",
@@ -543,6 +549,8 @@ $(function () {
 		            setTimeout(function(){
 				        window.location.href="/xsap/schedule/x_course_schedule.do";		        	
 			        },1*1000);
+	        	}else{
+	        		 swal("删除失败！", "当前课程已有预约","info");
 	        	}
 	        });
         	
@@ -555,7 +563,7 @@ $(function () {
     $("#exportData").click(function () {
     	$.post("/xsap/reserve/exportReserve.do",{scheduleId: [[${ID}]]},function(result){
     		if(result == "yes"){
-    			alert("ok")
+    			alert("导出数据成功")
     		}else{
 		        alert("导出数据，暂未实现");    			
     		}
@@ -665,21 +673,13 @@ $(function () {
 	           {"data": "timesCost"},
 	           {"data": "operateTime"},
 	           {"data": "operator"},
+	           {"data": "comment"},
 	           {"data": "reserveNote"},
-	           {"data": "reserveStatus",
-	                "orderable": false,
-	                "render": function (data, type, row) {
-	                    var status = data;
-	                    if(status == 1){
-	                    	status = "已预约";
-	                    }else{
-	                    	status = "未预约";
-	                    }
-	                    let html = "<td>"+ status +"</td>";
-	                    return html;
-	           }},
 	           {"data": "reserveId","render": function (data,type,row) {
 	                   var html = "<button name='cancel_btn' onclick='cancel_btn("+ data +")' value='"+ data +"' class='btn btn-warning '>取消预约</button>&nbsp &nbsp";
+	                   if(row.classCheck == 1){
+	                	   html = "<button name='cancel_btn' class='btn btn-default' disabled >取消预约</button>&nbsp &nbsp";
+	                   }
 	                   return html;
 	               }
 	           }
@@ -711,7 +711,7 @@ $(document).ready(function () {
 	           {"data": "timesCost"},
 	           {"data": "operateTime"},
 	           {"data": "operator"},
-	           {"data": "reserveNote"},
+	           {"data": "comment"},
 	           {"data": "reserveStatus",
 	                "orderable": false,
 	                "render": function (data, type, row) {
@@ -719,7 +719,7 @@ $(document).ready(function () {
 	                    if(status == 1){
 	                    	status = "已预约";
 	                    }else{
-	                    	status = "未预约";
+	                    	status = "已取消";
 	                    }
 	                    let html = "<td>"+ status +"</td>";
 	                    return html;

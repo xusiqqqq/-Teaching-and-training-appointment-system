@@ -59,9 +59,10 @@ public interface ClassService {
 	/**
 	 * 根据当前排课id，针对“未确认”上课，进行全部上课记录的更新
 	 * @param scheduleId
+	 * @param operator
 	 * @return
 	 */
-	boolean ensureByScheduleId(Long scheduleId);
+	boolean ensureByScheduleId(Long scheduleId, String operator);
 	
 	/**
 	 * 	查找”已预约“记录对应的上课记录为”已确认“的一条数据 - 方法1

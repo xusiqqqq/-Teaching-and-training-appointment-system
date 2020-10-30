@@ -206,7 +206,6 @@ public class MemberCardController {
 			System.out.println("---------");
 			System.out.println(recharge);
 			recharge.setMemberBindId(memberBindId);
-			recharge.setOperator("某某某操作");
 			cardService.recharge(recharge);
 		
 			checkOnly.setVersion(4);			
@@ -237,7 +236,6 @@ public class MemberCardController {
 			System.out.println(consume);
 			consume.setMemberBindId(memberBindId);
 			consume.setOperateType("扣费");
-			consume.setOperator("某某某操作");
 			cardService.consume(consume);
 		
 			checkOnly.setVersion(4);			

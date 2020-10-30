@@ -127,13 +127,16 @@ public class ClassServiceImpl implements ClassService{
 
 	//根据当前排课id，针对“未确认”上课，进行全部上课记录的更新
 	@Override
-	public boolean ensureByScheduleId(Long scheduleId) {
+	public boolean ensureByScheduleId(Long scheduleId, String operator) {
 		List<TClassRecord> classList = classMapper.selectList(new QueryWrapper<TClassRecord>()
 				.eq("check_status", 0).eq("reserve_check", 1).eq("schedule_id", scheduleId));
 		System.out.println("---------classList------------");
 		System.out.println(classList);
 		System.out.println("---------------------");
-		
+		if(classList == null || classList.size() < 1) {
+			System.out.println("已全部确认");
+			return false;
+		}
 		for (TClassRecord classed : classList) {
 			classed.setCheckStatus(1);
 			classMapper.update(classed,new QueryWrapper<TClassRecord>().eq("id", classed.getId()));
@@ -151,7 +154,7 @@ public class ClassServiceImpl implements ClassService{
 			consume.setCardDayChange(0);
 			
 			consume.setOperateType("上课支出");
-			consume.setOperator("系统自动处理");
+			consume.setOperator(operator);
 			//消费处理
 			cardService.consume(consume);
 			/* ------  off ------ */
