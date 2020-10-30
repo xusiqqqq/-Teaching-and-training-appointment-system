@@ -30,6 +30,7 @@ public class EmployeeServiceImpl implements EmployeeService{
 	@Override
 	public boolean register(TEmployee emp) {
 		//新增用户信息
+		System.out.println("register........");
 		employeeMapper.insert(emp);
 		return true;
 	}

@@ -122,14 +122,14 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 	//所有的排课记录
 	@Override
 	public List<CourseScheduleDTO> listScheduleAll() {
-		List<TScheduleRecord> scheduleList = scheduleMapper.selectList(null);
-		List<CourseScheduleDTO> courseScheduleDtoList = new ArrayList<>();
-		for(int i = 0; i < scheduleList.size(); i++) {
-			Long id = scheduleList.get(i).getId();
-			CourseScheduleDTO courseScheduleDTO = findById(id);
-			courseScheduleDtoList.add(courseScheduleDTO);
+		List<CourseScheduleDTO> listScheduleView = scheduleMapper.listScheduleView();
+		for (CourseScheduleDTO courseSchedule : listScheduleView) {
+			//开始上课时间
+			courseSchedule.setStartTime(LocalDateTime.of(courseSchedule.getClassDate(),courseSchedule.getClassTime()));
+			//下课时间
+			courseSchedule.setEndTime(courseSchedule.getStartTime().plusMinutes(courseSchedule.getDuration()));
 		}
-		return courseScheduleDtoList;
+		return listScheduleView;
 	}
 	
 	//获取给定的日期范围内所有的排课记录
@@ -176,17 +176,19 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 		if(scheduleDto == null) {
 			scheduleDto = scheduleMapper.oneScheduleNoCardView(scheduleId);
 		}
-		//开始上课时间
-		scheduleDto.setStartTime(LocalDateTime.of(scheduleDto.getClassDate(),scheduleDto.getClassTime()));
-		//下课时间
-		scheduleDto.setEndTime(scheduleDto.getStartTime().plusMinutes(scheduleDto.getDuration()));
-
-		//已预约记录
-		scheduleDto.setReservedList(reservedList);
-		//	预约记录
-		scheduleDto.setReserveRecord(reserveDtoList);
-		//	上课数据
-		scheduleDto.setClassRecord(classDtoList);
+		if(scheduleDto != null) {
+			//开始上课时间
+			scheduleDto.setStartTime(LocalDateTime.of(scheduleDto.getClassDate(),scheduleDto.getClassTime()));
+			//下课时间
+			scheduleDto.setEndTime(scheduleDto.getStartTime().plusMinutes(scheduleDto.getDuration()));
+			
+			//已预约记录
+			scheduleDto.setReservedList(reservedList);
+			//	预约记录
+			scheduleDto.setReserveRecord(reserveDtoList);
+			//	上课数据
+			scheduleDto.setClassRecord(classDtoList);
+		}
 		
 		return scheduleDto;
 	}

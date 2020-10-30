@@ -33,7 +33,7 @@
 
             </div>
             <h3>输入手机号或邮箱重置密码</h3>
-            <form class="m-t" role="form" action="x_reset_passward.html" th:action="@{/user/toResetPwd.do}">
+            <form class="m-t" role="form" action="x_reset_passward.html" th:action="@{/user/toResetPwd}">
                 <div class="form-group">
                 	<span th:if="${CHECK_USER_ERROR}" class="text-danger">用户不存在！</span>
                     <input type="text" class="form-control" name="userName" placeholder="输入用户名/邮箱" required="">

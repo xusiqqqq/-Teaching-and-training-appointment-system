@@ -50,6 +50,25 @@
 	    <result column="version" jdbcType="INTEGER" property="version" />
     </association>
   </resultMap>
+  
+  <!-- 全部排课记录 -->
+  <resultMap id="listScheduleViewMap" type="com.kclm.xsap.dto.CourseScheduleDTO" >
+  	<id column="id" jdbcType="BIGINT" property="scheduleId" />
+    <result column="name" jdbcType="VARCHAR" property="courseName" />
+    <result column="color" jdbcType="VARCHAR" property="color" />
+	<result column="start_date" jdbcType="DATE" property="classDate" />
+	<result column="class_time" jdbcType="TIME" property="classTime" />
+    <result column="duration" jdbcType="INTEGER" property="duration" />
+  </resultMap>
+  
+  <select id="listScheduleView" resultMap="listScheduleViewMap">
+  	SELECT schedules.`id`,course.name,course.`color`,schedules.`start_date`, schedules.`class_time`,
+	 course.`duration`
+	 FROM t_schedule_record schedules
+	 LEFT JOIN t_course course ON course.`id` = schedules.`course_id`
+	 LEFT JOIN t_employee teacher ON  teacher.`id` = schedules.`teacher_id`
+	 WHERE teacher.`is_deleted` = 0;
+  </select>
 	<!-- 排课记录基本信息，有会员卡支持时 -->
   <resultMap id="scheduleViewMap" type="com.kclm.xsap.dto.CourseScheduleDTO" >
   	<id column="id" jdbcType="BIGINT" property="scheduleId" />
@@ -73,7 +92,8 @@
   	schedules.`class_time`, course.`duration`, course.`limit_sex`, course.`limit_age`,
  GROUP_CONCAT(card.`name` SEPARATOR ' | ') support_cards , teacher.`name` teacher_name, course.`contains`,
  schedules.`order_nums`, course.`times_cost`
- FROM t_course course LEFT JOIN t_schedule_record schedules ON course.`id` = schedules.`course_id`
+ FROM t_schedule_record schedules
+ LEFT JOIN t_course course ON course.`id` = schedules.`course_id`
  LEFT JOIN t_course_card cocard ON cocard.`course_id` = schedules.`course_id` 
  LEFT JOIN t_employee teacher ON  teacher.`id` = schedules.`teacher_id`
  LEFT JOIN t_member_card card ON card.`id` = cocard.`card_id` WHERE  
@@ -102,7 +122,8 @@
   	SELECT schedules.`id`, course.id course_id,course.name course_name, course.color,schedules.`start_date`,
   	schedules.`class_time`, course.`duration`, course.`limit_sex`, course.`limit_age`,
  teacher.`name` teacher_name, course.`contains`, schedules.`order_nums`, course.`times_cost`
- FROM t_course course LEFT JOIN t_schedule_record schedules ON course.`id` = schedules.`course_id`
+ FROM t_schedule_record schedules  
+ LEFT JOIN t_course course ON course.`id` = schedules.`course_id`
  LEFT JOIN t_employee teacher ON  teacher.`id` = schedules.`teacher_id`
  WHERE teacher.`is_deleted` = 0 AND  schedules.`id` = #{scheduleId} ;
   </select>
