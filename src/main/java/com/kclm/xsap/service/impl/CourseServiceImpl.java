@@ -95,7 +95,7 @@ public class CourseServiceImpl implements CourseService{
 		
 		List<TScheduleRecord> scheduleList = scheduleMapper.selectList(new QueryWrapper<TScheduleRecord>().eq("course_id", id));
 		
-		if(reserveList != null || classList != null || scheduleList != null) {
+		if(reserveList.size() > 0 || classList.size() > 0 || scheduleList.size() > 0) {
 			System.out.println("此课有其它关联记录，不宜删除！");
 			return false;
 		}

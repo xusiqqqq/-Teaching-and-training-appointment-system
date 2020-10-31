@@ -187,7 +187,8 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 		
 		List<TReservationRecord> reservationRecord = reserveMapper.selectList(new QueryWrapper<TReservationRecord>().eq("schedule_id", id));
 		List<TClassRecord> classRecord = classMapper.selectList(new QueryWrapper<TClassRecord>().eq("schedule_id", id));
-		if(reservationRecord != null && reservationRecord.size() < 1 || classRecord != null && classRecord.size() < 1) {
+		//对应的预约记录或上课记录存在时
+		if(reservationRecord.size() > 0 || classRecord.size() > 0) {
 			return false;
 		}
 		/*----------不进行关联删除----------*/
