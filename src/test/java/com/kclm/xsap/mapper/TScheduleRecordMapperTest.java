@@ -11,20 +11,80 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.kclm.xsap.XsapApplication;
 import com.kclm.xsap.dto.ClassRecordDTO;
 import com.kclm.xsap.dto.CourseScheduleDTO;
 import com.kclm.xsap.entity.TScheduleRecord;
 
 
-@SpringBootTest
+@SpringBootTest(classes = XsapApplication.class)
 public class TScheduleRecordMapperTest {
 
+	private static final Long minute_set = 45L ;
+	
 	@Autowired
 	private TScheduleRecordMapper scheduleMapper;
 	
 	private TScheduleRecord schedule = new TScheduleRecord();
+	
+	@Test
+	public void test_of() {
+		LocalTime testNow = LocalTime.of(11, 15);
+		LocalDate startDate = LocalDate.of(2020, 10, 30);
+		List<TScheduleRecord> findList = scheduleMapper.selectList(new QueryWrapper<TScheduleRecord>()
+				.eq("teacher_id", 1 ).eq("start_date", startDate).orderByAsc(true, "start_date","class_time"));
+		//判断当前时间是否有效。1，有效
+		Integer flag = 0;
+		for(int i = 0; i < findList.size() -1; i++) {
+			TScheduleRecord findOne = scheduleMapper.selectById(findList.get(i));
+			TScheduleRecord findNext = scheduleMapper.selectById(findList.get(i+1));		
+			LocalTime classTimeOne = findOne.getClassTime();
+			LocalTime classTimeNext = findNext.getClassTime();
+			//课程-前-指定分钟内不能新增排课
+			LocalTime preTimeOne = classTimeOne.minusMinutes(minute_set);
+			//课程-后-指定分钟内不能新增排课
+			LocalTime postTimeOne = classTimeOne.plusMinutes(minute_set);		
+			LocalTime preTimeNext = classTimeNext.minusMinutes(minute_set);
+			LocalTime postTimeNext = classTimeNext.plusMinutes(minute_set);
+			
+			//若当前时间在首个时间段之前，有效
+			if(i == 0 && testNow.isBefore(preTimeOne)) {
+				System.out.println("---" + testNow + " 在 " +  classTimeOne +" 之前有效");
+				//表明输入的时间有效
+				flag = 1;
+				break;
+			}
+			
+			//若当前时间在前面时间段之后，在后面时间段之前，则有效
+			if(testNow.isAfter(postTimeOne) && testNow.isBefore(preTimeNext)) {
+				System.out.println("------perfect------");
+				System.out.println("---" + testNow + " 在 " + classTimeOne +" ~ " + classTimeNext +" 之间有效");
+				System.out.println("-------===========------");
+				//表明输入的时间有效
+				flag = 1;
+				break;
+			}
+			
+			//若当前时间在最后一个时间段里面
+			if(i == findList.size() - 2 && testNow.isAfter(postTimeNext)) {
+				System.out.println("---" + testNow + " 在 " + classTimeNext +" 之后有效");
+				//表明输入的时间有效
+				flag = 1;
+				break;
+			}
+			
+		}
+		if(flag == 1) {
+			System.out.println("nice_time----------" + testNow);
+		}else {
+			System.out.println("bad_time------距离当前时间"+ minute_set +"分钟内已有课程安排----" + testNow);
+		}
+		
+	}
+	
 	
 	@Test
 	public void oneScheduleView() {
