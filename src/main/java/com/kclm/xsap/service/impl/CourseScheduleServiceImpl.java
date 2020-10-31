@@ -92,6 +92,13 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 		//查询结果按日期-时间“升序”排列
 		List<TScheduleRecord> findList = scheduleMapper.selectList(new QueryWrapper<TScheduleRecord>()
 				.eq("teacher_id", 1 ).eq("start_date", startDate).orderByAsc(true, "start_date","class_time"));
+		//不是当天的课，首次填入值时就有效
+		if(findList == null || findList.size() < 1) {
+			System.out.println("nice_time----------" + classTime);
+			scheduleMapper.insert(schedule);			
+			return true;
+		}
+		
 		//判断当前时间是否有效。1，有效
 		Integer flag = 0;
 		for(int i = 0; i < findList.size() -1; i++) {
@@ -132,6 +139,7 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 				break;
 			}
 		}
+		
 		//当前时间合适，允许填入数据库
 		if(flag == 1) {
 			System.out.println("nice_time----------" + classTime);
