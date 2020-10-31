@@ -91,13 +91,38 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 		//同一天内，同一位老师，距离上次上课结束45个分钟内，或当前课程时间与后面邻接时间有交叉，则该时间无效
 		//查询结果按日期-时间“升序”排列
 		List<TScheduleRecord> findList = scheduleMapper.selectList(new QueryWrapper<TScheduleRecord>()
-				.eq("teacher_id", 1 ).eq("start_date", startDate).orderByAsc(true, "start_date","class_time"));
+				.eq("teacher_id",  schedule.getTeacherId()).eq("start_date", startDate).orderByAsc(true, "start_date","class_time"));
 		//不是当天的课，首次填入值时就有效
 		if(findList == null || findList.size() < 1) {
 			System.out.println("nice_time----------" + classTime);
 			scheduleMapper.insert(schedule);			
 			return true;
 		}
+		
+		//数据库仅有一条记录时
+		if(findList != null && findList.size() == 1) {
+			//数据库仅有一条数据
+			TScheduleRecord findOne = scheduleMapper.selectById(findList.get(0));
+			LocalTime classTimeOne = findOne.getClassTime();
+			//课程-前-指定分钟内不能新增排课
+			LocalTime preTimeOne = classTimeOne.minusMinutes(minute_set);
+			//课程-后-指定分钟内不能新增排课
+			LocalTime postTimeOne = classTimeOne.plusMinutes(minute_set);	
+			//同已有课程之后的时间段不冲突
+			if(classTime.isAfter(postTimeOne)) {
+				System.out.println("nice_time----------" + classTime);
+				scheduleMapper.insert(schedule);							
+				return true;
+			}
+			//同已有课程之前的时间段不冲突
+			if(classTime.isBefore(preTimeOne)) {
+				System.out.println("nice_time----------" + classTime);
+				scheduleMapper.insert(schedule);							
+				return true;
+			}
+			return false;
+		}
+		
 		
 		//判断当前时间是否有效。1，有效
 		Integer flag = 0;
@@ -162,7 +187,7 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 		
 		List<TReservationRecord> reservationRecord = reserveMapper.selectList(new QueryWrapper<TReservationRecord>().eq("schedule_id", id));
 		List<TClassRecord> classRecord = classMapper.selectList(new QueryWrapper<TClassRecord>().eq("schedule_id", id));
-		if(reservationRecord != null || classRecord != null) {
+		if(reservationRecord != null && reservationRecord.size() < 1 || classRecord != null && classRecord.size() < 1) {
 			return false;
 		}
 		/*----------不进行关联删除----------*/

@@ -2,6 +2,8 @@ package forTest;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kclm.xsap.XsapApplication;
+import com.kclm.xsap.entity.TMember;
 import com.kclm.xsap.entity.TMemberBindRecord;
 import com.kclm.xsap.mapper.TMemberBindRecordMapper;
 
@@ -38,8 +41,14 @@ public class JustTest {
 	
 	@Test
 	public void json() {
-			System.out.println(LocalDateTime.now());
-
+			List<TMember> ss = new ArrayList<TMember>();
+			System.out.println(ss);
+			if(ss != null) {
+				System.out.println("null");
+			}
+			if(ss.size() <1) {
+				System.out.println("no value");
+			}
 	}
 	
 }
