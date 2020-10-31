@@ -42,47 +42,40 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 
 //	@Autowired
 //	private CourseScheduleConvert courseScheduleConvert;
-	
+
 //	@Autowired
 //	ClassRecordConvert classRecordConvert;
 
 	//------------时间间隔-------------
-	private static  Long minute_set = 45L;
+	//private static  Long minute_set = 45L;
 	//-------------------------
-	
+
 	@Autowired
 	XsapConfig xsapConfig;
-	
+
 	@Autowired
 	TScheduleRecordMapper scheduleMapper;
-	
+
 	@Autowired
 	TReservationRecordMapper reserveMapper;
-	
+
 	@Autowired
 	TCourseMapper courseMapper;
-	
+
 	@Autowired
 	TMemberCardMapper cardMapper;
-	
+
 	@Autowired
 	TEmployeeMapper employeeMapper;
-	
+
 	@Autowired
 	TClassRecordMapper classMapper;
-	
+
 	@Autowired
 	TMemberMapper memberMapper;
-	
+
 	@Autowired
 	ReserveServiceImpl reserveService;
-	
-	
-	public CourseScheduleServiceImpl() {
-		super();
-		System.out.println("----------------");
-		System.out.println("---gap_minute----"+ xsapConfig);
-	}
 
 	@Override
 	public boolean save(TScheduleRecord schedule) {
@@ -95,49 +88,50 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 		//不是当天的课，首次填入值时就有效
 		if(findList == null || findList.size() < 1) {
 			System.out.println("nice_time----------" + classTime);
-			scheduleMapper.insert(schedule);			
+			scheduleMapper.insert(schedule);
 			return true;
 		}
-		
+
 		//数据库仅有一条记录时
 		if(findList != null && findList.size() == 1) {
 			//数据库仅有一条数据
 			TScheduleRecord findOne = scheduleMapper.selectById(findList.get(0));
 			LocalTime classTimeOne = findOne.getClassTime();
 			//课程-前-指定分钟内不能新增排课
-			LocalTime preTimeOne = classTimeOne.minusMinutes(minute_set);
+			System.out.println("************课程间隔: "+xsapConfig.getGap_minute());
+			LocalTime preTimeOne = classTimeOne.minusMinutes(xsapConfig.getGap_minute());
 			//课程-后-指定分钟内不能新增排课
-			LocalTime postTimeOne = classTimeOne.plusMinutes(minute_set);	
+			LocalTime postTimeOne = classTimeOne.plusMinutes(xsapConfig.getGap_minute());
 			//同已有课程之后的时间段不冲突
 			if(classTime.isAfter(postTimeOne)) {
-				System.out.println("nice_time----------" + classTime);
-				scheduleMapper.insert(schedule);							
+				System.out.println("nice_time2----------" + classTime);
+				scheduleMapper.insert(schedule);
 				return true;
 			}
 			//同已有课程之前的时间段不冲突
 			if(classTime.isBefore(preTimeOne)) {
-				System.out.println("nice_time----------" + classTime);
-				scheduleMapper.insert(schedule);							
+				System.out.println("nice_time3----------" + classTime);
+				scheduleMapper.insert(schedule);
 				return true;
 			}
 			return false;
 		}
-		
-		
+
+
 		//判断当前时间是否有效。1，有效
 		Integer flag = 0;
 		for(int i = 0; i < findList.size() -1; i++) {
 			TScheduleRecord findOne = scheduleMapper.selectById(findList.get(i));
-			TScheduleRecord findNext = scheduleMapper.selectById(findList.get(i+1));		
+			TScheduleRecord findNext = scheduleMapper.selectById(findList.get(i+1));
 			LocalTime classTimeOne = findOne.getClassTime();
 			LocalTime classTimeNext = findNext.getClassTime();
 			//课程-前-指定分钟内不能新增排课
-			LocalTime preTimeOne = classTimeOne.minusMinutes(minute_set);
+			LocalTime preTimeOne = classTimeOne.minusMinutes(xsapConfig.getGap_minute());
 			//课程-后-指定分钟内不能新增排课
-			LocalTime postTimeOne = classTimeOne.plusMinutes(minute_set);		
-			LocalTime preTimeNext = classTimeNext.minusMinutes(minute_set);
-			LocalTime postTimeNext = classTimeNext.plusMinutes(minute_set);
-			
+			LocalTime postTimeOne = classTimeOne.plusMinutes(xsapConfig.getGap_minute());
+			LocalTime preTimeNext = classTimeNext.minusMinutes(xsapConfig.getGap_minute());
+			LocalTime postTimeNext = classTimeNext.plusMinutes(xsapConfig.getGap_minute());
+
 			//若当前时间在首个时间段之前，有效
 			if(i == 0 && classTime.isBefore(preTimeOne)) {
 				System.out.println("---" + classTime + " 在 " +  classTimeOne +" 之前有效");
@@ -145,7 +139,7 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 				flag = 1;
 				break;
 			}
-			
+
 			//若当前时间在前面时间段之后，在后面时间段之前，则有效
 			if(classTime.isAfter(postTimeOne) && classTime.isBefore(preTimeNext)) {
 				System.out.println("------perfect------");
@@ -155,7 +149,7 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 				flag = 1;
 				break;
 			}
-			
+
 			//若当前时间在最后一个时间段里面
 			if(i == findList.size() - 2 && classTime.isAfter(postTimeNext)) {
 				System.out.println("---" + classTime + " 在 " + classTimeNext +" 之后有效");
@@ -164,17 +158,17 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 				break;
 			}
 		}
-		
+
 		//当前时间合适，允许填入数据库
 		if(flag == 1) {
 			System.out.println("nice_time----------" + classTime);
-			scheduleMapper.insert(schedule);			
+			scheduleMapper.insert(schedule);
 			return true;
 		}else {
-			System.out.println("bad_time------距离当前时间"+ minute_set +"分钟内已有课程安排----" + classTime);
+			System.out.println("bad_time------距离当前时间"+ xsapConfig.getGap_minute() +"分钟内已有课程安排----" + classTime);
 			return false;
 		}
-		
+
 	}
 
 	@Override
@@ -184,7 +178,7 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 			System.out.println("-------无此条排课记录");
 			return false;
 		}
-		
+
 		List<TReservationRecord> reservationRecord = reserveMapper.selectList(new QueryWrapper<TReservationRecord>().eq("schedule_id", id));
 		List<TClassRecord> classRecord = classMapper.selectList(new QueryWrapper<TClassRecord>().eq("schedule_id", id));
 		//对应的预约记录或上课记录存在时
@@ -196,7 +190,7 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 //		reserveMapper.delete(new QueryWrapper<TReservationRecord>().eq("schedule_id", id));
 		//删除排课对应的上课记录
 //		classMapper.delete(new QueryWrapper<TClassRecord>().eq("schedule_id", id));
-		
+
 		scheduleMapper.deleteById(id);
 		return true;
 	}
@@ -213,7 +207,7 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 		}
 		return listScheduleView;
 	}
-	
+
 	//获取给定的日期范围内所有的排课记录
 	@Override
 	public List<CourseScheduleDTO> listSchedule(LocalDate startDate, LocalDate endDate) {
@@ -235,24 +229,24 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 	@Override
 	public CourseScheduleDTO findById(Long scheduleId) {
 		//获取当前选中的排课记录信息
-		
-		//==获取当前课程的上课数据（已预约时）		
+
+		//==获取当前课程的上课数据（已预约时）
 		List<ClassRecordDTO> classDtoList = scheduleMapper.listClassView(scheduleId);
 		for (ClassRecordDTO classDto : classDtoList) {
 			BigDecimal price = new BigDecimal(classDto.getPrice().toString());
 			BigDecimal count = new BigDecimal(classDto.getCount().toString());
-			BigDecimal unitPrice = price.divide(count, 2, RoundingMode.HALF_UP);	
+			BigDecimal unitPrice = price.divide(count, 2, RoundingMode.HALF_UP);
 			//消耗的次数
 			BigDecimal countCost = new BigDecimal(classDto.getTimesCost().toString());
 			BigDecimal involveMoney = unitPrice.multiply(countCost);
 			classDto.setInvolveMoney(involveMoney);
 		}
-		
+
 		//已预约记录
 		List<ReserveRecordDTO> reservedList = reserveMapper.listReservedView(scheduleId);
 		//预约记录
 		List<ReserveRecordDTO> reserveDtoList = reserveMapper.listReserveRecordView(scheduleId);
-		
+
 		CourseScheduleDTO scheduleDto = scheduleMapper.oneScheduleView(scheduleId);
 		//没有会员卡支持时
 		if(scheduleDto == null) {
@@ -263,7 +257,7 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 			scheduleDto.setStartTime(LocalDateTime.of(scheduleDto.getClassDate(),scheduleDto.getClassTime()));
 			//下课时间
 			scheduleDto.setEndTime(scheduleDto.getStartTime().plusMinutes(scheduleDto.getDuration()));
-			
+
 			//已预约记录
 			scheduleDto.setReservedList(reservedList);
 			//	预约记录
@@ -271,7 +265,7 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 			//	上课数据
 			scheduleDto.setClassRecord(classDtoList);
 		}
-		
+
 		return scheduleDto;
 	}
 
@@ -282,14 +276,14 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 			System.out.println("------输入参数不全");
 			return false;
 		}
-		
+
 		 List<TScheduleRecord> sourceList = scheduleMapper.selectList(new QueryWrapper<TScheduleRecord>()
 				.eq("start_date", sourceDate));
 		if(sourceList == null || sourceList.size() < 1) {
 			log.debug("--------当前日程无排课计划");
 			return false;
 		}
-		
+
 		//若目标日期在源日期或之前，非法
 		if(sourceDate.isEqual(targetDate) || sourceDate.isAfter(targetDate)) {
 			log.debug("--------日程范围错误");
@@ -309,7 +303,7 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 			source.setCreateTime(LocalDateTime.now());
 			//数据变动版本
 			source.setVersion(1);
-			scheduleMapper.insert(source);			
+			scheduleMapper.insert(source);
 		}
 		return true;
 	}

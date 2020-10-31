@@ -57,24 +57,19 @@
         <div class="form-group ">
             <div class="input-group date selecttime" >
                 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                <input name="startDate" id="startDate" type="text" class="form-control myDate" value="2020-09-09">
-                <script type="text/javascript">
-                    $("input").focus(function () {
-                        $("input").css("background-color","#ff0000"); 
-                    })
-                </script>
+                <input name="startDate" id="startDate" type="text" class="form-control myDate">
             </div>
         </div>
 		<!-- 终止时间 -->
         <div class="form-group " style="margin-top: -15px">
             <div class="input-group date selecttime" >
                 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                <input name="endDate" id="endDate" type="text" class="form-control myDate" value="2020-10-10">
+                <input name="endDate" id="endDate" type="text" class="form-control myDate">
             </div>
             <button type="button" class="btn btn-info" id="homeSearch" style="margin-left: 15px;margin-top: 15px">查询</button>
         </div>
         <!--    体部信息-->
-        <div class="box" style="margin-left: 10px; width: 300px" >  
+        <div class="box" style="margin-left: 10px; width: 300px" >
             <span style="font-size: 25px;" class="left" id="totalMembers"><strong>34</strong></span>
             <p class="left">会员总数</p>
         </div>
@@ -93,7 +88,7 @@
             <script type="text/javascript">
             var start_date = $("#startDate").val();
             var end_date = $("#endDate").val();
-           
+
     		$('.myDate').change(function(){
     			/* 首页数据查询 */
     			start_date = $("#startDate").val();
@@ -102,14 +97,14 @@
     			end_date = $("#endDate").val();
     			console.log(end_date);
     			//end_date = end_date.toString();
-    			
+
     		});
-    		
+
     		// 基于准备好的dom，初始化echarts实例
             var myChartLine = echarts.init(document.getElementById('broken_line'));
     		//图表参数设置
     		var option;
-    		
+
     		//首页统计数据
     		$("#homeSearch").click(function(){
                 if(start_date != null && start_date.length != 0 && end_date != null && end_date.length != 0){
@@ -120,8 +115,8 @@
 			                    text: '每日约课数量'
 			                },
 			                xAxis: {
-			                    type: 'category',
-			                    data:  indexData.dateList
+			                    data:  indexData.dateList,
+                                type: 'category'
 			                },
 			                yAxis: {
 			                    type: 'value'
@@ -130,19 +125,20 @@
 			                    data: indexData.dailyReservations,
 			                    type: 'line',
 			                    // areaStyle: {
-			                    //     color:'blue'	 
+			                    //     color:'blue'
 			                    // }
 			                }]
 			            };
-
+                        // 隐藏气泡
+                         myChartLine.hideLoading();
 			            // 使用刚指定的配置项和数据显示图表。
 			            myChartLine.setOption(option);
     				});
 	   		     }else{
-	   			 	alert("日期区间不能未空！");		    	 
+	   			 	alert("日期区间不能未空！");
 	   		     }
    			});
-			    		
+
     		// 指定图表的配置项和数据
             option = {
                 title: {
@@ -159,7 +155,7 @@
                     data: [],
                     type: 'line',
                     // areaStyle: {
-                    //     color:'blue'	 
+                    //     color:'blue'
                     // }
                 }]
             };
@@ -175,28 +171,26 @@
             <script type="text/javascript">
             var start_date = $("#startDate").val();
             var end_date = $("#endDate").val();
-           
+
     		$('.myDate').change(function(){
     			/* 首页数据查询 */
     			start_date = $("#startDate").val();
-    			console.log(start_date);
     			//start_date = start_date.toString();
     			end_date = $("#endDate").val();
-    			console.log(end_date);
     			//end_date = end_date.toString();
-    			
+
     		});
-    		
+
     		// 基于准备好的dom，初始化echarts实例
 	        var myChartLine2 = echarts.init(document.getElementById('ChartLine2'));
     		//图表参数设置
     		var option;
-    		
+
     		//首页统计数据
     		$("#homeSearch").click(function(){
     			 if(start_date != null && start_date.length != 0 && end_date != null && end_date.length != 0){
     				 $.get("[[${#request.getContextPath()}]]/index/homePage.do",{startDateStr:start_date,endDateStr:end_date},function(indexData){
-						
+
 						option = {
 			                  title:{
 			                    text: '每日新增会员数量',
@@ -231,14 +225,16 @@
 			                      }
 			                  ]
 			              };
+						//
+                         myChartLine2.hideLoading();
 				         // 使用刚指定的配置项和数据显示图表。
 				         myChartLine2.setOption(option);
     				});
     		     }else{
-    			 	alert("日期区间不能未空！");		    	 
+    			 	alert("日期区间不能未空！");
     		     }
     			});
-              
+
 	          option = {
                   title:{
                     text: '每日新增会员数量',
@@ -291,11 +287,11 @@
 						//遍历报表数据
 						for(var i = 0; i < reportData.length; i++){
 							var	key = reportData[i].name;
-							var val = reportData[i].value;			
+							var val = reportData[i].value;
 							//存放name到数组中
 							nameList.push(key);
 						}
-						
+
 						var option = {          //指定图表的配置项和数据
 		                    title: {
 		                        text: '会员卡统计',
@@ -335,7 +331,7 @@
 	              		myChartPie.setOption(option);
 					});
 				});
-               
+
             </script>
         </div>
 
@@ -352,9 +348,6 @@
 
     <!-- Peity -->
     <script src="../static/js/plugins/peity/jquery.peity.min.js" th:src="@{/static/js/plugins/peity/jquery.peity.min.js}"></script>
-    <!-- Peity -->
-    <!-- <script type="text/javascript" src="http://tajs.qq.com/stats?sId=9051096" charset="UTF-8"></script> -->
-    <!--统计代码，可删除-->
 
     <script>
 		/* 日期控件属性设置 */
@@ -368,7 +361,7 @@
             startDate: '1970-01-01', //与你自己设置的格式一致yyyy-mm-dd，未设置的话与默认格式一致mm/dd/yyyy
             endDate: '2070-01-01'
         });
-       
+
 		$(function(){
 			 $.post("[[${#request.getContextPath()}]]/index/homePage.do",function(indexData){
 				$("#totalMembers").html(indexData.totalMembers);
@@ -376,7 +369,7 @@
 				$("#totalReservations").html(indexData.totalReservations);
 			 });
 		});
-		
+
     </script>
 
 </body>
