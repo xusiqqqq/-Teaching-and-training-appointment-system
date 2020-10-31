@@ -4,9 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,8 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kclm.xsap.dto.HomePageDTO;
 import com.kclm.xsap.dto.ReportDTO;
-import com.kclm.xsap.dto.convert.HomePageConvert;
-import com.kclm.xsap.dto.convert.ReportConvert;
 import com.kclm.xsap.entity.TMember;
 import com.kclm.xsap.entity.TMemberBindRecord;
 import com.kclm.xsap.entity.TMemberCard;

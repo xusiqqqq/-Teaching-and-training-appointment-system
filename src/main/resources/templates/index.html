@@ -21,7 +21,7 @@
     <link href="../static/css/style.css?v=5.0" th:href="@{/static/css/style.css(v='5.0')}" rel="stylesheet">
 	<script src="../static/js/jquery.min.js?v=2.1.4" th:src="@{/static/js/jquery.min.js(v='2.1.4')}"></script>
 	<script src="../static/js/bootstrap.min.js?v=3.3.6" th:src="@{/static/js/bootstrap.min.js(v='3.3.6')}"></script>
-	
+
 </head>
 
 <body class="fixed-sidebar full-height-layout gray-bg" style="overflow:hidden">
@@ -47,9 +47,10 @@
                                 <li><a class="J_menuItem" href="x_modify_password.html" th:href="@{/user/x_modify_password.do}" target="_self">修改密码</a>
                                 </li>
                                 <li><a class="J_menuItem" href="x_profile.html" th:href="@{/user/x_profile.do}">个人资料</a>
-                                </li>	
+                                </li>
                                 <li class="divider"></li>
                                 <li><a href="x_login.html" th:href="@{/user/logout}">安全退出</a>	
+
                                 </li>
                             </ul>
                         </div>
@@ -226,7 +227,7 @@
 
             <!-- 我们要添加内容的区域 TODO  -->
             <div class="row J_mainContent" id="content-main">
-                <iframe class="J_iframe" name="iframe0" width="100%" height="100%" src="x_index_home.html?v=4.0" th:src="@{/index/x_index_home.do}" frameborder="0" data-id="x_index_home.html" seamless></iframe>
+                <iframe class="J_iframe" name="iframe0" id="iframe0" width="100%" height="100%" src="x_index_home.html?v=4.0" th:src="@{/index/x_index_home.do}" frameborder="0" data-id="x_index_home.html" seamless></iframe>
             </div>
 
             <div class="footer">

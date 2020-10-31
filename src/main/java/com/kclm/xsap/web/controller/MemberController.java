@@ -30,10 +30,10 @@ public class MemberController {
 
 	//文件夹名
 	private static final String folderName = "member/";
-	
+
 	@Autowired
 	MemberService memberService;
-	
+
 	/* ============会员操作========= */
 	/* =======页面跳转 */
 	//=》会员列表概览
@@ -51,20 +51,20 @@ public class MemberController {
 	public String x_member_import() {
 		return folderName + "x_member_import";
 	}
-	
+
 	//=》会员详情
 	@RequestMapping("/x_member_list_details.do")
 	public String x_member_list_details(Long id, Model model) {
 		model.addAttribute("ID", id);
 		return folderName + "x_member_list_details";
 	}
-	
+
 	/* =======业务处理 */
 	//会员信息概览 - 预加载
 	@ResponseBody
 	@RequestMapping("/memberList.do")
 	public List<MemberVO> memberList() {
-		List<MemberVO> memberList = memberService.listMemberView();;
+		List<MemberVO> memberList = memberService.listMemberView();
 		return memberList;
 	}
 
@@ -84,7 +84,7 @@ public class MemberController {
 		List<MemberCardDTO> cardRecords = memberService.listCardRecords(id);
 		return cardRecords;
 	}
-	
+
 	//预约记录 - 预加载
 	@ResponseBody
 	@RequestMapping("/reserveInfo.do")
@@ -92,7 +92,7 @@ public class MemberController {
 		 List<ReserveRecordDTO> reserveRecords = memberService.listReserveRecords(id);
 		return reserveRecords;
 	}
-	
+
 	//上课记录 - 预加载
 	@ResponseBody
 	@RequestMapping("/classInfo.do")
@@ -100,7 +100,7 @@ public class MemberController {
 		 List<ClassRecordDTO> classRecords = memberService.listClassRecords(id);
 		return classRecords;
 	}
-	
+
 	//消费记录 - 预加载
 	@ResponseBody
 	@RequestMapping("/consumeInfo.do")
@@ -108,9 +108,9 @@ public class MemberController {
 		 List<ConsumeRecordDTO> consumeRecords = memberService.listConsumeRecords(id);
 		return consumeRecords;
 	}
-	
+
 	//======= 会员完整信息项 - end
-	
+
 	//会员编辑 - 预加载
 	@ResponseBody
 	@RequestMapping("/x_member_edit.do")
@@ -118,18 +118,18 @@ public class MemberController {
 		TMember member = memberService.getMember(id);
 		return member;
 	}
-	
+
 	//会员添加
 	@ResponseBody
 	@RequestMapping("/memberAdd.do")
 	public TMember memberAdd(TMember member) {
 		//为了页面数据判断。version 4，数据更新成功；
 		TMember forCheck = new TMember();
-		
+
 		System.out.println("----------");
 		System.out.println(member);
 		System.out.println("----------");
-		
+
 		//手机号已存在的提示
 		TMember oldMember = null;
 		if(member.getPhone().length() > 0) {
@@ -139,28 +139,28 @@ public class MemberController {
 			forCheck.setNote("手机号跟其他会员重了");
 			return forCheck;
 		}
-		
+
 		//数据录入
 		memberService.save(member);
 		//拿到刚录入数据库的用户id
 		TMember findOne = memberService.findByPhone(member.getPhone());
-		
+
 		forCheck.setId(findOne.getId());
 		forCheck.setVersion(4);
 		return forCheck;
 	}
-	
+
 	//会员编辑
 	@ResponseBody
 	@RequestMapping("/memberEdit.do")
 	public TMember memberEdit(TMember member) {
 		//为了页面数据判断。version 4，数据更新成功；
 		TMember forCheck = new TMember();
-		
+
 		Long id = member.getId();;
-		System.out.println("---id " + id);		
+		System.out.println("---id " + id);
 		System.out.println("---前端表单数据 " + member);
-		
+
 		TMember oldMember = memberService.getMember(id);
 		member.setCreateTime(oldMember.getCreateTime());
 		member.setLastModifyTime(LocalDateTime.now());
@@ -174,13 +174,13 @@ public class MemberController {
 				//返回原值
 				return forCheck;
 			}
-		}	
+		}
 		memberService.update(member);
-		
+
 		forCheck.setVersion(4);
 		return forCheck;
 	}
-	
+
 	//单个会员删除
 	@RequestMapping("/deleteOne.do")
 	public String deleteOne(Long id) {
@@ -188,7 +188,7 @@ public class MemberController {
 			memberService.deleteById(id);
 		return "forward:x_member_list.do";
 	}
-	
+
 	//1、修改图像信息
 	@RequestMapping(value = "/modifyMemberImg.do",produces = {"application/json;charset=UTF-8"})
 	@ResponseBody
@@ -215,21 +215,21 @@ public class MemberController {
 		System.out.println("---------");
 		return member;
 	}
-	
-	
+
+
 	//会员搜索
 	@ResponseBody
 	@RequestMapping("/toSearch.do")
 	public Map<String, List<TMember>> toSearch(String condition) {
 		List<TMember> mberList = new ArrayList<TMember>();
 		if(condition != null) {
-			mberList = memberService.findByKeyword(condition);			
+			mberList = memberService.findByKeyword(condition);
 		}
 		mberList = memberService.findAll();
-		
+
 		Map<String , List<TMember>> search = new HashMap<>();
 		search.put("value", mberList);
 		return search;
 	}
-	
+
 }

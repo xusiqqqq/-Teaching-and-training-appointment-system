@@ -15,7 +15,7 @@
     <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
     <result column="version" jdbcType="INTEGER" property="version" />
   </resultMap>
-  
+
   <!-- 会员的VO数据 -->
   <resultMap id="MemberViewMap" type="com.kclm.xsap.dto.MemberVO">
   	<id column="id" jdbcType="BIGINT" property="id" />
@@ -26,14 +26,14 @@
     <result column="note" jdbcType="VARCHAR" property="note" />
     <result column="cardHold" jdbcType="VARCHAR" property="cardHold" />
   </resultMap>
-  
+
   <select id="listMemberView" resultMap="MemberViewMap">
   	SELECT m.id,m.name,m.sex,m.phone,m.birthday,m.note, GROUP_CONCAT(card.`name` SEPARATOR ' | ') cardHold
 	 FROM t_member m LEFT JOIN t_member_bind_record record ON m.id = record.member_id
 	 LEFT JOIN t_member_card card ON card.id = record.card_id WHERE m.is_deleted = 0
-	 GROUP BY m.name,m.sex,m.phone
+	 GROUP BY m.id, m.name,m.sex,m.phone,m.birthday,m.note
   </select>
-  
+
   <!-- 会员卡信息 -->
   <resultMap id="MemberCardViewMap" type="com.kclm.xsap.dto.MemberCardDTO">
   	<id column="id" jdbcType="BIGINT" property="bindCardId" />
@@ -46,12 +46,12 @@
 
   <select id="listMemberCardView" resultMap="MemberCardViewMap">
   	SELECT card.id,card.`name`,card.`type`,bind.`valid_count`,bind.`create_time`,
-     bind.`active_status` FROM t_member_card card LEFT JOIN 
-     t_member_bind_record bind ON card.`id` = 
-     bind.`card_id` WHERE card.`status` = 0 AND bind.`member_id` = #{memberId};	
+     bind.`active_status` FROM t_member_card card LEFT JOIN
+     t_member_bind_record bind ON card.`id` =
+     bind.`card_id` WHERE card.`status` = 0 AND bind.`member_id` = #{memberId};
   </select>
-  
-  <!-- 预约记录 -->  
+
+  <!-- 预约记录 -->
   <resultMap id="reserveRecordMap" type="com.kclm.xsap.dto.ReserveRecordDTO">
   	<id column="id" jdbcType="BIGINT" property="reserveId" />
     <result column="course_name" jdbcType="VARCHAR" property="courseName" />
@@ -64,16 +64,16 @@
     <result column="note" jdbcType="VARCHAR" property="reserveNote" />
     <result column="status" jdbcType="INTEGER" property="reserveStatus" />
   </resultMap>
-  
+
   <select id="listReserveView" resultMap="reserveRecordMap">
   	SELECT reserve.id, course.name course_name, reserve.create_time, reserve.card_name, schedules.order_nums,
  course.times_cost, reserve.last_modify_time, reserve.operator, reserve.note, reserve.status
  FROM t_reservation_record reserve LEFT JOIN t_schedule_record schedules ON reserve.`schedule_id`
- = schedules.`id` LEFT JOIN t_course course ON schedules.course_id = course.id 
+ = schedules.`id` LEFT JOIN t_course course ON schedules.course_id = course.id
  LEFT JOIN t_member_card card ON reserve.card_name = card.`name`
  WHERE card.`status` = 0 AND reserve.`member_id` = #{memberId};
   </select>
-  
+
   <!-- 上课记录 -->
   <resultMap id="classRecordMap" type="com.kclm.xsap.dto.ClassRecordDTO">
   	<id column="id" jdbcType="BIGINT" property="classRecordId" />
@@ -87,19 +87,19 @@
     <result column="comment" jdbcType="VARCHAR" property="comment" />
     <result column="check_status" jdbcType="INTEGER" property="checkStatus" />
   </resultMap>
-  
+
   <select id="listClassView" resultMap="classRecordMap">
-  	SELECT class.id, course.name, schedules.start_date, schedules.class_time, schedules.order_nums, 
- teacher.name teacher_name, class.card_name, course.times_cost, class.comment, class.check_status 
- FROM t_class_record class LEFT JOIN t_schedule_record schedules ON 
+  	SELECT class.id, course.name, schedules.start_date, schedules.class_time, schedules.order_nums,
+ teacher.name teacher_name, class.card_name, course.times_cost, class.comment, class.check_status
+ FROM t_class_record class LEFT JOIN t_schedule_record schedules ON
  class.`schedule_id` = schedules.id LEFT JOIN t_course course ON schedules.course_id = course.id
- LEFT JOIN t_employee teacher ON schedules.teacher_id = teacher.id LEFT JOIN t_member_card card 
- ON class.card_name = card.`name`  WHERE card.`status` = 0 
+ LEFT JOIN t_employee teacher ON schedules.teacher_id = teacher.id LEFT JOIN t_member_card card
+ ON class.card_name = card.`name`  WHERE card.`status` = 0
  AND class.`reserve_check` = 1 AND class.member_id = #{memberId};
   </select>
 
-  
-  <!-- 消费记录 -->  
+
+  <!-- 消费记录 -->
   <resultMap id="consumeRecordMap" type="com.kclm.xsap.dto.ConsumeRecordDTO">
   	<id column="id" jdbcType="BIGINT" property="consumeId" />
     <result column="member_bind_id" jdbcType="BIGINT" property="memberBindId" />
@@ -112,13 +112,13 @@
     <result column="operator" jdbcType="VARCHAR" property="operator" />
     <result column="note" jdbcType="VARCHAR" property="note" />
   </resultMap>
-  
+
   <select id="listConsumeView" resultMap="consumeRecordMap">
   	SELECT consume.id, bind.`id` member_bind_id, card.`name`, consume.`create_time`, consume.`card_count_change`,
  bind.`valid_count`, consume.`money_cost`, consume.`operate_type`, consume.`operator`, consume.`note`
- FROM t_consume_record consume LEFT JOIN t_member_bind_record bind ON 
+ FROM t_consume_record consume LEFT JOIN t_member_bind_record bind ON
  consume.`member_bind_id` = bind.`id` LEFT JOIN t_member_card card ON card.`id` = bind.`card_id`
  WHERE card.`status` = 0 AND bind.`member_id` = #{memberId}
   </select>
-  
+
 </mapper>
