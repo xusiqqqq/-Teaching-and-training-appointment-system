@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.kclm.xsap.config.XsapConfig;
 import com.kclm.xsap.dto.ClassRecordDTO;
 import com.kclm.xsap.dto.CourseScheduleDTO;
 import com.kclm.xsap.dto.ReserveRecordDTO;
@@ -45,6 +46,13 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 //	@Autowired
 //	ClassRecordConvert classRecordConvert;
 
+	//------------时间间隔-------------
+	private static  Long minute_set = 45L;
+	//-------------------------
+	
+	@Autowired
+	XsapConfig xsapConfig;
+	
 	@Autowired
 	TScheduleRecordMapper scheduleMapper;
 	
@@ -69,31 +77,71 @@ public class CourseScheduleServiceImpl implements CourseScheduleService{
 	@Autowired
 	ReserveServiceImpl reserveService;
 	
+	
+	public CourseScheduleServiceImpl() {
+		super();
+		System.out.println("----------------");
+		System.out.println("---gap_minute----"+ xsapConfig);
+	}
+
 	@Override
 	public boolean save(TScheduleRecord schedule) {
-		Long courseId = schedule.getCourseId();
-		Long teacherId = schedule.getTeacherId();
 		LocalDate startDate = schedule.getStartDate();
 		LocalTime classTime = schedule.getClassTime();
-		//同一天内，同一门课，同一位老师，距离上次上课结束1个小时内，不可二次排课
-		TScheduleRecord findOne = scheduleMapper.selectOne(new QueryWrapper<TScheduleRecord>()
-				.eq("course_id", courseId).eq("teacher_id", teacherId).eq("start_date", startDate));
-		if(findOne != null) {
-			//若距离上次上课结束1个小时内
-			if(findOne.getClassTime() != null) {
-				LocalTime inOneHour = findOne.getClassTime().plusHours(1L);
-				if(classTime.isBefore(inOneHour)){
-					System.out.println("相同一堂课不能在一小时内排两次！");
-					return false;
-				}				
-			}else {
-				System.out.println("此堂课没有具体的上课时间，排课无效！");
-				return false;				
+		//同一天内，同一位老师，距离上次上课结束45个分钟内，或当前课程时间与后面邻接时间有交叉，则该时间无效
+		//查询结果按日期-时间“升序”排列
+		List<TScheduleRecord> findList = scheduleMapper.selectList(new QueryWrapper<TScheduleRecord>()
+				.eq("teacher_id", 1 ).eq("start_date", startDate).orderByAsc(true, "start_date","class_time"));
+		//判断当前时间是否有效。1，有效
+		Integer flag = 0;
+		for(int i = 0; i < findList.size() -1; i++) {
+			TScheduleRecord findOne = scheduleMapper.selectById(findList.get(i));
+			TScheduleRecord findNext = scheduleMapper.selectById(findList.get(i+1));		
+			LocalTime classTimeOne = findOne.getClassTime();
+			LocalTime classTimeNext = findNext.getClassTime();
+			//课程-前-指定分钟内不能新增排课
+			LocalTime preTimeOne = classTimeOne.minusMinutes(minute_set);
+			//课程-后-指定分钟内不能新增排课
+			LocalTime postTimeOne = classTimeOne.plusMinutes(minute_set);		
+			LocalTime preTimeNext = classTimeNext.minusMinutes(minute_set);
+			LocalTime postTimeNext = classTimeNext.plusMinutes(minute_set);
+			
+			//若当前时间在首个时间段之前，有效
+			if(i == 0 && classTime.isBefore(preTimeOne)) {
+				System.out.println("---" + classTime + " 在 " +  classTimeOne +" 之前有效");
+				//表明输入的时间有效
+				flag = 1;
+				break;
+			}
+			
+			//若当前时间在前面时间段之后，在后面时间段之前，则有效
+			if(classTime.isAfter(postTimeOne) && classTime.isBefore(preTimeNext)) {
+				System.out.println("------perfect------");
+				System.out.println("---" + classTime + " 在 " + classTimeOne +" ~ " + classTimeNext +" 之间有效");
+				System.out.println("-------===========------");
+				//表明输入的时间有效
+				flag = 1;
+				break;
+			}
+			
+			//若当前时间在最后一个时间段里面
+			if(i == findList.size() - 2 && classTime.isAfter(postTimeNext)) {
+				System.out.println("---" + classTime + " 在 " + classTimeNext +" 之后有效");
+				//表明输入的时间有效
+				flag = 1;
+				break;
 			}
 		}
+		//当前时间合适，允许填入数据库
+		if(flag == 1) {
+			System.out.println("nice_time----------" + classTime);
+			scheduleMapper.insert(schedule);			
+			return true;
+		}else {
+			System.out.println("bad_time------距离当前时间"+ minute_set +"分钟内已有课程安排----" + classTime);
+			return false;
+		}
 		
-		scheduleMapper.insert(schedule);
-		return true;
 	}
 
 	@Override

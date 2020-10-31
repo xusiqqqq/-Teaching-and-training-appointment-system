@@ -128,7 +128,7 @@ public class ScheduleController {
 		
 		boolean result = scheduleServie.save(schedule);
 		if(!result) {
-			checkFor.setLimitSex("此堂课一小时内已经排过");
+			checkFor.setLimitSex("此老师这次的排课时间跟其当天已有课程冲突");
 			return checkFor;
 		}
 		checkFor.setVersion(4);
