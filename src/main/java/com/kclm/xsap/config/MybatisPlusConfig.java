@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.OptimisticLockerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.dialects.MySqlDialect;
+import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,10 +25,9 @@ import org.springframework.context.annotation.Profile;
  */
 @Configuration
 @MapperScan("com.kclm.xsap.mapper")
+@Slf4j
 public class MybatisPlusConfig {
 
-	private static final Logger log = LoggerFactory.getLogger(MybatisPlusConfig.class);
-	
     @Bean
     public PaginationInterceptor paginationInnerInterceptor() {
         log.debug("创建mybatis-plus的分页插件....");

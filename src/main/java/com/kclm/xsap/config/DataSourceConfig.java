@@ -8,6 +8,7 @@ import com.alibaba.druid.pool.DruidDataSource;
 
 import com.alibaba.druid.support.http.StatViewServlet;
 import com.alibaba.druid.support.http.WebStatFilter;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +30,8 @@ import javax.sql.DataSource;
  */
 @Configuration
 @ConfigurationProperties(prefix = "spring.datasource")
-//@PropertySource(value = "classpath:application-dev.properties")
+@Slf4j
 public class DataSourceConfig {
-
-	private static final Logger log = LoggerFactory.getLogger(DataSourceConfig.class);
 
     /**
      * 数据库地址

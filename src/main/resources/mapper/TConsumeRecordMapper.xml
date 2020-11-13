@@ -1,39 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kclm.xsap.mapper.TConsumeRecordMapper">
-  <resultMap id="TConsumeRecordMap" type="com.kclm.xsap.entity.TConsumeRecord">
-    <!--@mbg.generated-->
-    <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="operate_type" jdbcType="VARCHAR" property="operateType" />
-    <result column="card_count_change" jdbcType="INTEGER" property="cardCountChange" />
-    <result column="card_day_change" jdbcType="INTEGER" property="cardDayChange" />
-    <result column="money_cost" jdbcType="DECIMAL" property="moneyCost" />
-    <result column="operator" jdbcType="VARCHAR" property="operator" />
-    <result column="note" jdbcType="VARCHAR" property="note" />
-    <result column="member_bind_id" jdbcType="BIGINT" property="memberBindId" />
-    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
-    <result column="version" jdbcType="INTEGER" property="version" />
-    <!-- 关联"会员绑定表" -->
-    <association property="bindRecord" javaType="TMemberBindRecord">
-	    <id column="bind_id" jdbcType="BIGINT" property="id" />
-	    <result column="member_id" jdbcType="BIGINT" property="memberId" />
-	    <result column="card_id" jdbcType="BIGINT" property="cardId" />
-	    <result column="valid_count" jdbcType="INTEGER" property="validCount" />
-	    <result column="valid_day" jdbcType="INTEGER" property="validDay" />
-	    <result column="received_money" jdbcType="DECIMAL" property="receivedMoney" />
-	    <result column="pay_mode" jdbcType="VARCHAR" property="payMode" />
-	    <result column="bind_note" jdbcType="VARCHAR" property="note" />
-	    <result column="active_status" jdbcType="BOOLEAN" property="activeStatus" />
-	    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-	    <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
-	    <result column="version" jdbcType="INTEGER" property="version" />
-    </association>
-  </resultMap>
-  <sql id="TConsumeRecord_Column_List">
-    <!--@mbg.generated-->
-    id, operate_type, card_count_change, card_day_change,money_cost, `operator`, note, member_bind_id
-    create_time, last_modify_time, version
-  </sql>
+
   
 </mapper>

@@ -17,49 +17,6 @@ import com.kclm.xsap.service.IndexService;
 @RequestMapping("/index")
 public class IndexController {
 
-	@Autowired
-	private IndexService indexService;  
-	
-	/* 页面跳转 */
-	@RequestMapping("/x_index_home.do")
-	public String toHomePage() {
-		return "x_index_home";
-	}
-	
-	/* 页面数据处理 */
-	//首页基本数据
-	@RequestMapping("/homePage.do")
-	@ResponseBody
-	public HomePageDTO homePape(String startDateStr,String endDateStr) {
-		//test
-//		LocalDate startDate1 = LocalDate.of(2020, 9, 16);
-//		LocalDate endDate1 = LocalDate.of(2020, 10, 8);
-//		HomePageDTO homeDto = indexService.queryByDate(startDate1, endDate1);
-		//LocalDate转换
-		System.out.println("startDateStr " + startDateStr);
-		System.out.println("endDateStr " + endDateStr);
-		
-		LocalDate startDate = null;
-		LocalDate endDate = null;
-		
-		if(startDateStr != null || endDateStr != null) {
-			String format = "yyyy-MM-dd";
-			startDate = LocalDate.parse(startDateStr,DateTimeFormatter.ofPattern(format));
-			endDate = LocalDate.parse(endDateStr,DateTimeFormatter.ofPattern(format));
-		}
-		
-		HomePageDTO homeDto = indexService.queryByDate(startDate, endDate);
-		System.out.println("首页数据："+homeDto);
-		return homeDto;
-	}
-	
-	//报表数据
-	@RequestMapping("/report.do")
-	@ResponseBody
-	public List<ReportDTO> report() {
-		List<ReportDTO> reportDtoList = indexService.statistic();
-		System.out.println("报表数据：" + reportDtoList);
-		return reportDtoList;
-	}
+
 	
 }

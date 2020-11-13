@@ -7,10 +7,5 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/wechat")
 public class WeChatController {
 
-	/* ----------------页面跳转---------------- */
-	@RequestMapping("/x_wechat.do")
-	public String x_wechat() {
-		return "x_wechat";
-	}
-	
+
 }

@@ -1,60 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kclm.xsap.mapper.TClassRecordMapper">
-  <resultMap id="TClassRecordMap" type="com.kclm.xsap.entity.TClassRecord">
-    <!--@mbg.generated-->
-    <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="member_id" jdbcType="BIGINT" property="memberId" />
-    <result column="card_name" jdbcType="VARCHAR" property="cardName" />
-    <result column="schedule_id" jdbcType="BIGINT" property="scheduleId" />
-    <result column="note" jdbcType="VARCHAR" property="note" />
-    <result column="comment" jdbcType="VARCHAR" property="comment" />
-    <result column="check_status" jdbcType="INTEGER" property="checkStatus" />
-    <result column="reserve_check" jdbcType="INTEGER" property="reserveCheck" />
-    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
-    <result column="version" jdbcType="INTEGER" property="version" />
-    <!-- 关联会员 -->
-    <association property="member" javaType="TMember">
-    	<id column="member_id" jdbcType="BIGINT" property="id" />
-	    <result column="name" jdbcType="VARCHAR" property="name" />
-	    <result column="sex" jdbcType="VARCHAR" property="sex" />
-	    <result column="phone" jdbcType="VARCHAR" property="phone" />
-	    <result column="birthday" jdbcType="DATE" property="birthday" />
-	    <result column="member_note" jdbcType="VARCHAR" property="note" />
-	    <result column="avatar_url" jdbcType="VARCHAR" property="avatarUrl" />
-	    <result column="is_deleted" jdbcType="BOOLEAN" property="isDeleted" />
-	    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-	    <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
-	    <result column="version" jdbcType="INTEGER" property="version" />
-    </association>
-    <!-- 关联排课计划 -->
-    <association property="schedule" javaType="TScheduleRecord">
-    	<id column="schedule_id" jdbcType="BIGINT" property="id" />
-	    <result column="course_id" jdbcType="BIGINT" property="courseId" />
-	    <result column="teacher_id" jdbcType="BIGINT" property="teacherId" />
-	    <result column="order_nums" jdbcType="INTEGER" property="orderNums" />
-	    <result column="start_date" jdbcType="DATE" property="startDate" />
-	    <result column="class_time" jdbcType="TIME" property="classTime" />
-	    <result column="limit_sex" jdbcType="VARCHAR" property="limitSex" />
-	    <result column="limit_age" jdbcType="INTEGER" property="limitAge" />
-	    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-	    <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
-	    <result column="version" jdbcType="INTEGER" property="version" />
-    </association>
-  </resultMap>
-  <sql id="TReservationRecord_Column_List">
-    <!--@mbg.generated-->
-    id, `comment`, note, check_status,reserve_check, member_id, card_name, schedule_id, create_time, 
-    last_modify_time, version
-  </sql>
-  <sql id="member_sql">
-  	id, `name`, sex, phone, birthday, note, avatar_url, is_deleted, create_time, last_modify_time, 
-    version
-  </sql>
-  <sql id="schedule_sql">
-  	id, course_id, teacher_id, order_nums, start_date, class_time, limit_sex, limit_age, create_time, 
-    last_modify_time, version
-  </sql>
+
   
 </mapper>
