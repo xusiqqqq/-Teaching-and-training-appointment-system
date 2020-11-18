@@ -12,11 +12,11 @@ import lombok.ToString;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-@TableName(value = "t_course",resultMap = "TCourseMap")
+@TableName(value = "t_course")
 public class TCourse extends BaseEntity implements Serializable{
 
     /**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -25,9 +25,9 @@ public class TCourse extends BaseEntity implements Serializable{
      */
     @TableField(exist = false)
     @ToString.Exclude
-    
-    private List<TMemberCard> cardList; 
-	
+
+    private List<TMemberCard> cardList;
+
     private String name;
 
     /**

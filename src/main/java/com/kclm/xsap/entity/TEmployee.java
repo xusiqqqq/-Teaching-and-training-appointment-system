@@ -13,11 +13,11 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-@TableName(value = "t_employee",resultMap = "TEmployeeMap")
+@TableName(value = "t_employee")
 public class TEmployee extends BaseEntity implements Serializable{
 
     /**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -42,7 +42,7 @@ public class TEmployee extends BaseEntity implements Serializable{
      * 员工头像路径
      */
     private String avatarUrl;
-    
+
     private String note;
 
     /**
@@ -64,7 +64,7 @@ public class TEmployee extends BaseEntity implements Serializable{
      *  操作角色邮箱
      */
     private String roleEmail;
-    
+
     /**
     * 逻辑删除，1代表已删，无效；0代表未删，有效
     */

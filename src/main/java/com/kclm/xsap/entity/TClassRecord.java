@@ -11,11 +11,11 @@ import lombok.ToString;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-@TableName(value = "t_class_record",resultMap = "TClassRecordMap")
+@TableName(value = "t_class_record")
 public class TClassRecord extends BaseEntity implements Serializable{
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -23,48 +23,48 @@ public class TClassRecord extends BaseEntity implements Serializable{
 	 * 会员id
 	 */
 	private Long memberId;
-	
+
 	/**
 	 *  封装会员实体数据
 	 */
 	@TableField(exist = false)
 	@ToString.Exclude
     private TMember member;
-	
+
 	/**
 	 * 会员卡名
 	 */
 	private String cardName;
-	
+
 	/**
 	 * 排课记录id
 	 */
 	private Long scheduleId;
 
 	 /**
-	 *  封装排课计划实体数据 
+	 *  封装排课计划实体数据
 	 */
     @TableField(exist = false)
 	@ToString.Exclude
 	private TScheduleRecord schedule;
-	
+
 	private String note;
-	
+
 	/**
 	 * 教师评语
 	 */
 	private String comment;
-	
+
 	/**
 	 * 上课状态检定。1，已上课；0，未上课
 	 */
 	private Integer checkStatus;
-	
+
 	/**
 	 * 预约状态检定。1，已预约；0，未预约
 	 */
 	private Integer reserveCheck;
-	
-	
-	
+
+
+
 }

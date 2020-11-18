@@ -12,14 +12,14 @@ import lombok.ToString;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-@TableName(value = "t_member_bind_record",resultMap = "TMemberBindRecordMap")
+@TableName(value = "t_member_bind_record")
 public class TMemberBindRecord extends BaseEntity implements Serializable{
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
 	 * 关联的会员
 	 */
@@ -30,7 +30,7 @@ public class TMemberBindRecord extends BaseEntity implements Serializable{
 	@TableField(exist = false)
 	@ToString.Exclude
     private TMember member;
-	
+
     /**
      * 关联的会员卡
      */
@@ -42,7 +42,7 @@ public class TMemberBindRecord extends BaseEntity implements Serializable{
 	@ToString.Exclude
     private TMemberCard card;
 
-	
+
     /**
     * 可使用次数
     */
@@ -62,7 +62,7 @@ public class TMemberBindRecord extends BaseEntity implements Serializable{
      * 支付方式
      */
     private String payMode;
-    
+
     private String note;
 
     /**

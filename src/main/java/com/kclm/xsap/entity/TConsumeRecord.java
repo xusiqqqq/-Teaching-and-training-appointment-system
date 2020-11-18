@@ -12,7 +12,7 @@ import lombok.ToString;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-@TableName(value = "t_consume_record",resultMap = "TConsumeRecordMap")
+@TableName(value = "t_consume_record")
 public class TConsumeRecord extends BaseEntity implements Serializable{
 
 	private static final long serialVersionUID = 1L;
@@ -21,14 +21,14 @@ public class TConsumeRecord extends BaseEntity implements Serializable{
     * 关联的会员绑定id
     */
 	private Long memberBindId;
-	
+
 	/**
 	 *  封装会员绑定实体数据
 	 */
 	@TableField(exist = false)
 	@ToString.Exclude
     private TMemberBindRecord bindRecord;
-	
+
     /**
     * 操作类型
     */
@@ -43,7 +43,7 @@ public class TConsumeRecord extends BaseEntity implements Serializable{
     * 有效天数变化
     */
     private Integer cardDayChange;
-    
+
     /**
      *  花费的金额
      */

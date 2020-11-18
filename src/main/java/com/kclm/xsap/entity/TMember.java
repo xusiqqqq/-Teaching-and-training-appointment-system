@@ -13,11 +13,11 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-@TableName(value = "t_member",resultMap = "TMemberMap")
+@TableName(value = "t_member")
 public class TMember extends BaseEntity implements Serializable{
 
     /**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 

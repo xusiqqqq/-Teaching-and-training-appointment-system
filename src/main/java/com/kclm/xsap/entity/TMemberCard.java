@@ -14,11 +14,11 @@ import lombok.ToString;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-@TableName(value = "t_member_card",resultMap = "TMemberCardMap")
+@TableName(value = "t_member_card")
 public class TMemberCard extends BaseEntity implements Serializable{
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -28,9 +28,9 @@ public class TMemberCard extends BaseEntity implements Serializable{
 	@TableField(exist = false)
     @ToString.Exclude
 	private List<TCourse> courseList;
-	
+
     private String name;
-    
+
     /**
      * 单价
      */

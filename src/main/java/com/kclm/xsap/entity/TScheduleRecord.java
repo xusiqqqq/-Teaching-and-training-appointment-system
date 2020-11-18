@@ -16,11 +16,11 @@ import lombok.ToString;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-@TableName(value = "t_schedule_record",resultMap = "TScheduleRecordMap")
+@TableName(value = "t_schedule_record")
 public class TScheduleRecord extends BaseEntity implements Serializable{
 
     /**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -28,7 +28,7 @@ public class TScheduleRecord extends BaseEntity implements Serializable{
     * 关联的课程
     */
 	private Long courseId;
-	
+
 	/**
 	 *  封装课程实体数据
 	 */
@@ -40,7 +40,7 @@ public class TScheduleRecord extends BaseEntity implements Serializable{
     * 关联的教师
     */
     private Long teacherId;
-    
+
     /**
      *  封装教师实体数据
      */
@@ -52,7 +52,7 @@ public class TScheduleRecord extends BaseEntity implements Serializable{
      * 预约人数
      */
      private Integer orderNums;
-    
+
     /**
     * 上课日期
     */

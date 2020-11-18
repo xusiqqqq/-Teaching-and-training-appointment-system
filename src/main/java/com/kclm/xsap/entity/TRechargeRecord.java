@@ -12,11 +12,11 @@ import lombok.ToString;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-@TableName(value = "t_recharge_record",resultMap = "TRechargeRecordMap")
+@TableName(value = "t_recharge_record")
 public class TRechargeRecord extends BaseEntity implements Serializable{
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -24,14 +24,14 @@ public class TRechargeRecord extends BaseEntity implements Serializable{
     * 关联的会员绑定id
     */
 	private Long memberBindId;
-	
+
 	/**
 	 *  封装会员绑定实体数据
 	 */
 	@TableField(exist = false)
 	@ToString.Exclude
     private TMemberBindRecord bindRecord;
-	
+
     /**
     * 充值可用次数
     */
@@ -51,12 +51,12 @@ public class TRechargeRecord extends BaseEntity implements Serializable{
      * 支付方式
      */
     private String payMode;
-    
+
     /**
      * 操作员
      */
     private String operator;
-    
+
     private String note;
 
 }
