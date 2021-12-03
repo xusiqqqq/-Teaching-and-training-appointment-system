@@ -3,27 +3,20 @@
 #### 介绍
 X+ Student appointment platform, X+学员约课平台，主要是针对K12的培训机构的会员、课程、约课安排的管理平台，支持操作人员后台约课、排课、日程计划等工作，也支持微信公众号由客户在线预约处理。
 
-#### 软件架构
-软件架构说明
+#### 开发者
+方凯 -> 2021年12月3号
 
-
-#### 安装教程
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 使用说明
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
 
 #### 参与贡献
 
 1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
+```shell
+git clone -b dev_v7 https://gitee.com/stevenye/xsap.git
+```
+2.  进入你本的项目文件夹，新建 Feat_xxx 分支
+
 3.  提交代码
+
 4.  新建 Pull Request
 
 
