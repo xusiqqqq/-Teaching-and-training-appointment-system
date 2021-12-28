@@ -72,10 +72,11 @@
 <script src="../../static/js/plugins/sweetalert/sweetalert.min.js" th:src="@{/static/js/plugins/sweetalert/sweetalert.min.js}"></script>
 <script>
     $(document).ready(function () {
-    	$.post("[[${#request.getContextPath()}]]/card/cardList.do",function(cardList){
+
+    	$.post("[[${#request.getContextPath()}]]/card/cardList.do",function(data){
+    	    var cardList = data.data;
 	        $('.dataTables-example').dataTable({
 	            //获取数据
-	            /*TODO:此处为未来与后端进行交互的地方*/
 	            "data": cardList,
 	            //行的定义
 	            "columns":[
@@ -119,7 +120,6 @@
             confirmButtonText: "删除",
             closeOnConfirm: false
         }, function () {
-            //todo ...
             $.ajax({
             	url: "[[${#request.getContextPath()}]]/card/deleteOne.do",
             	type: "post",

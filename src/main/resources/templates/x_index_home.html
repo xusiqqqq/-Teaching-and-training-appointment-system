@@ -68,7 +68,7 @@
             </div>
             <button type="button" class="btn btn-info" id="homeSearch" style="margin-left: 15px;margin-top: 15px">查询</button>
         </div>
-        <!--    体部信息-->
+        <!--    头部信息-->
         <div class="box" style="margin-left: 10px; width: 300px" >
             <span style="font-size: 25px;" class="left" id="totalMembers"><strong>34</strong></span>
             <p class="left">会员总数</p>
@@ -107,8 +107,9 @@
 
     		//首页统计数据
     		$("#homeSearch").click(function(){
-                if(start_date != null && start_date.length != 0 && end_date != null && end_date.length != 0){
-    				 $.get("[[${#request.getContextPath()}]]/index/homePage.do",{startDateStr:start_date,endDateStr:end_date},function(indexData){
+                if(start_date != null && start_date.length !== 0 && end_date != null && end_date.length !== 0){
+                         $.get("[[${#request.getContextPath()}]]/index/homePage.do",{startDateStr:start_date,endDateStr:end_date},function(indexData){
+                             console.log(indexData);
 
     					 option = {
 			                title: {
@@ -116,6 +117,7 @@
 			                },
 			                xAxis: {
 			                    data:  indexData.dateList,
+                                // data: [1,2,3],
                                 type: 'category'
 			                },
 			                yAxis: {
@@ -123,6 +125,7 @@
 			                },
 			                series: [{
 			                    data: indexData.dailyReservations,
+                                // data: [4,5,6],
 			                    type: 'line',
 			                    // areaStyle: {
 			                    //     color:'blue'

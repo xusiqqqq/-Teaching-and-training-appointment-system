@@ -22,6 +22,7 @@
     <link href="../../static/css/plugins/cropper/cropper.min.css" th:href="@{/static/css/plugins/cropper/cropper.min.css}" rel="stylesheet">
     <link href="../../static/css/plugins/datapicker/datepicker3.css" th:href="@{/static/css/plugins/datapicker/datepicker3.css}" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="../../static/css/plugins/simditor/simditor.css" th:href="@{/static/css/plugins/simditor/simditor.css}"/>
+    <link href="../../static/css/plugins/sweetalert/sweetalert.css" rel="stylesheet" th:href="@{/static/css/plugins/sweetalert/sweetalert.css}">
  
      <style type="text/css">
         .input_width {
@@ -46,43 +47,54 @@
                     </div>
                 </div>
                 <div class="ibox-content">
-                    <form method="post" class="form-horizontal" th:action="@{/course/courseEdit.do}">
+                    <!--表单-->
+                    <!--<form method="post" class="form-horizontal" th:action="@{/course/courseEdit.do}">-->
+                    <form id="editForm" name="editForm" method="post" class="form-horizontal" >
+                        <!-- 隐藏域，课程 id -->
                         <div class="form-group">
                             <label class="col-sm-2 control-label"><i class="red">*</i>课程名称</label>
                             <div class="col-sm-10">
-                            	<!-- 隐藏域，id -->
-                            	<input type="hidden" name="id" value="1" th:value="${courseMsg.id}"/>
+                            	<input type="hidden" name="id" value="1" th:value="${courseInfo.id}"/>
                             	
-                                <input type="text" class="form-control" id="course_name" placeholder="请输入课程名称" value="钢琴课"  th:value="${courseMsg.name}" name="name">
+                                <input type="text" class="form-control" id="course_name" placeholder="请输入课程名称" value="钢琴课"  th:value="${courseInfo.name}" name="name">
                            		<span class="text-danger">[[${NAME_EXIST}]]</span>
                             </div>
                         </div>
+                        <!--课程时长-->
                         <div class="form-group">
                             <label class="col-sm-2 control-label">时长(分钟)</label>
                             <div class="col-sm-3 col-md-2">
-                                <input type="number" class="form-control" name="duration" value="45" min="0" th:value="${courseMsg.duration}">
+                                <input type="number" class="form-control" name="duration" value="45" min="0" th:value="${courseInfo.duration}">
                             </div>
                         </div>
+
+                        <!--课程容纳人数-->
                         <div class="form-group">
                             <label class="col-sm-2 control-label">课堂容纳人数</label>
                             <div class="col-sm-3 col-md-2">
-                                <input type="number" class="form-control" name="contains" value="1"  min="0" th:value="${courseMsg.contains}">
+                                <input type="number" class="form-control" name="contains" value="1"  min="0" th:value="${courseInfo.contains}">
                             </div>
                         </div>
+
+                        <!--每节消耗次数-->
                         <div class="form-group">
                             <label class="col-sm-2 control-label">消耗次数/节</label>
                             <div class="col-sm-3 col-md-2">
-                                <input type="number" class="form-control" name="timesCost" value="0" min="0" max="5"  th:value="${courseMsg.timesCost}">
+                                <input type="number" class="form-control" name="timesCost" value="0" min="0" max="5"  th:value="${courseInfo.timesCost}">
                             </div>
                         </div>
+
+                        <!--课程颜色-->
                         <div class="form-group">
                             <label class="col-sm-2 control-label">课程颜色</label>
                             <div class="col-sm-3 col-md-2">
                                 <div class="input-group">
-                                    <input type="text" name="color" value=""  th:value="${courseMsg.color}" class="form-control" readonly id="color_picker_kc"/>
+                                    <input type="text" name="color" value=""  th:value="${courseInfo.color}" class="form-control" readonly id="color_picker_kc"/>
                                 </div>
                             </div>
                         </div>
+
+                        <!--支持的会员卡-->
                         <div class="form-group">
                             <label for="support_program" class="col-sm-2 control-label input_margin_top">支持会员卡</label>
                             <div class="col-sm-8 input_margin_top">
@@ -91,7 +103,7 @@
                                        id="support_program">
                                     <thead>
                                     <tr>
-                                        <th><input type="checkbox" name="cardListStr" id="check_all" class="i-checks"></th>
+                                        <th><label for="check_all"></label><input type="checkbox" name="cardListStr" id="check_all" class="i-checks"></th>
                                         <th>会员卡</th>
                                         <th>会员类型</th>
                                     </tr>
@@ -99,30 +111,35 @@
                                 </table>
                             </div>
                         </div>
+
+                        <!--课程介绍-->
                         <div class="form-group">
                             <label class="col-sm-2 control-label">课程介绍</label>
                             <div class="col-sm-10">
                                 <div class="ibox float-e-margins">
                                     <div class="ibox-content">
-                                        <textarea id="editor" placeholder="这里输入内容" autofocus name="introduce"  th:text="${courseMsg.introduce}"></textarea>
+                                        <textarea id="editor" placeholder="这里输入内容" autofocus name="introduce"  th:text="${courseInfo.introduce}"></textarea>
 
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        <!--高级功能-->
                         <div class="form-group">
                             <h2 class="text-left" style="margin-left: 10%">高级功能(对预约会员的条件限制)</h2>
                             <hr/>
                             <label class="col-sm-2 control-label">限制性别</label>
                             <div class="col-sm-3 col-md-2">
                                 <select class="form-control" name="limitSex">
-                                    <option th:attr="selected=${courseMsg.limitSex == '全部' ? true : false}" value="全部" >全部</option>
-                                    <option th:attr="selected=${courseMsg.limitSex == '男' ? true : false}" value="男">男</option>
-                                    <option th:attr="selected=${courseMsg.limitSex == '女' ? true : false}" value="女">女</option>
+                                    <option th:attr="selected=${courseInfo.limitSex == '无限制' ? true : false}" value="无限制" >无限制</option>
+                                    <option th:attr="selected=${courseInfo.limitSex == '男' ? true : false}" value="男">男</option>
+                                    <option th:attr="selected=${courseInfo.limitSex == '女' ? true : false}" value="女">女</option>
                                 </select>
                             </div>
                         </div>
 
+                        <!--限制年龄-->
                         <div class="form-group">
                             <label class="col-sm-2 control-label">限制年龄</label>
                             <div class="col-sm-6">
@@ -134,12 +151,14 @@
                                     <input type="radio" name="limitAgeRadio" style="float: left" value="0"> &nbsp;&nbsp;
                                     <span class="input-daterange input-group right" style="float: right">
                                         <span class="input-group-addon">大于</span>
-                                        <input type="text" class="input-sm form-control" name="limitAge" value="5" th:value="${courseMsg.limitAge}" style="width: 50px;"/>
+                                        <input type="text" class="input-sm form-control" name="limitAge" value="5" th:value="${courseInfo.limitAge}" style="width: 50px;"/>
                                         <span class="input-group-addon">岁</span>
                                     </span>
                                 </label>
                             </div>
                         </div>
+
+                        <!--限制预约次数-->
                         <div class="form-group">
                             <label class="col-sm-2 control-label">限制预约次数</label>
                             <div class="col-sm-6">
@@ -151,7 +170,7 @@
                                     <input type="radio" name="limitCountsRadio" style="float: left" value="0"> &nbsp;&nbsp;
                                     <span class="input-daterange input-group right" style="float: right" >
                                         <span class="input-group-addon">每名会员最多可以预约本课程</span>
-                                        <input type="text" class="input-sm form-control" name="limitCounts" value="2" th:value="${courseMsg.limitCounts}" style="width: 50px;"/>
+                                        <input type="text" class="input-sm form-control" name="limitCounts" value="2" th:value="${courseInfo.limitCounts}" style="width: 50px;"/>
                                         <span class="input-group-addon">次</span>
                                     </span>
 
@@ -159,10 +178,11 @@
                             </div>
                         </div>
 
+                        <!--保存、取消-->
                         <div class="form-group">
                             <div class="col-sm-2 col-sm-offset-2">
                                 <button type="submit" class="btn btn-success" id="saveBtn">保存</button>
-                                <button type="reset" class="btn btn-white">取消</button>
+                                <button type="reset" id="cancelEditBtn" class="btn btn-white">取消</button>
                             </div>
                         </div>
                     </form>
@@ -201,28 +221,24 @@
 <script src="../../static/js/plugins/prettyfile/bootstrap-prettyfile.js" th:src="@{/static/js/plugins/prettyfile/bootstrap-prettyfile.js}"></script>
 <!-- iCheck -->
 <script src="../../static/js/plugins/iCheck/icheck.min.js" th:src="@{/static/js/plugins/iCheck/icheck.min.js}"></script>
+<script src="../../static/js/plugins/sweetalert/sweetalert.min.js" th:src="@{/static/js/plugins/sweetalert/sweetalert.min.js}"></script>
 
-<!--<script src="../../static/js/demo/form-advanced-demo.js"></script>-->
 
 <script>
     $(document).ready(function () {
-    	$("#saveBtn").on("mouseenter",function(){
-    		var editForm = $("form").serialize();
-    		console.log(editForm);
-    	});
     	 //加载卡片信息
-        $.post("/xsap/card/cardList.do",function(cardList){
+        $.post("/card/cardList.do",function(data){
+            var cardList = data.data;
         	console.log(cardList);
         	$('.supportMemberCardTable').dataTable({
                 //获取数据
-                /*TODO:此处为未来与后端进行交互的地方*/
                 "data": cardList,
                 //行的定义
                 "columns": [
                     {
                         "data": "id", "render": function (data, type, row) {
-                            var id = data;
-                            var html = "<input type='checkbox' name='cardListStr' id='check_all' class='i-checks' value='"+ id +"'>";
+                            const id = data;
+                            const html = "<input type='checkbox' name='cardListStr' id='check_all' class='i-checks' value='" + id + "'>";
                             return html;
                         }
                     },
@@ -242,19 +258,89 @@
                     targets: 0,//编辑取消排序
                     "orderable": false
                 }]
-            });        	
-        	
-        	var card = [[${cardCarry}]]   		
- 	   		console.log(card);
- 	   		if(card != null){			
- 	    		for(var i = 0; i < card.length; i++){
+            });
+
+            const card = [[${cardCarry}]];
+            console.log(card);
+ 	   		if(card !== null){
+ 	    		for(let i = 0; i < card.length; i++){
  	    			$("input[name='cardListStr'][value='"+ card[i] +"']").prop("checked",true);
  	    		}
  	   		}
         });
+
+
+        /*取消按钮*/
+        $('#cancelEditBtn').click(function () {
+            window.location.href="/course/x_course_list.do";
+        });
         
     });
 </script>
+
+<script>
+
+    /*异步提交编辑修改*/
+    $('#editForm').on('submit', function (e) {
+        e.preventDefault();
+        const serializeForm = $(this).serialize();
+
+        swal({
+            title: "您确定要更新该课程信息么？",
+            text: "注意:您正在更新课程信息！",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#0c63c0",
+            confirmButtonText: "更新",
+            closeOnConfirm: false
+        }, function () {
+            $.ajax({
+                url: '[[${#request.getContextPath()}]]/course/courseEdit.do',
+                type: 'post',
+                data: serializeForm,
+                dataType: 'json',
+                success: function (data) {
+                    if (data.code === 0) {
+                        swal(data.msg, "", "success");
+                        setTimeout(function () {
+                            window.location.href='[[${#request.getContextPath()}]]/course/x_course_list.do';
+                        }, 1000);
+                    } else {
+                        swal("更新失败！", data.msg, "info");
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 1000);
+                    }
+                },
+                error: function (data) {
+                    swal("未知错误", data.msg, "info")
+                }
+            });
+        });
+
+
+
+
+
+        /*$.ajax({
+            url: '[[${#request.getContextPath()}]]/course/courseEdit.do',
+            type: 'post',
+            data: serializeForm,
+            dataType: 'json',
+            success: function (data) {
+                if (data.code === 0) {
+                    alert(data.msg)
+                    window.location.href='[[${#request.getContextPath()}]]/course/x_course_list.do'
+                }
+            },
+            error: function (jqXHR) {
+                alert("更新失败, 请重新再试!");
+            }
+        })*/
+    })
+
+</script>
+
 <script>
     $(document).ready(function () {
         var editor = new Simditor({
@@ -293,9 +379,6 @@
         });
     });
 </script>
-
-<script type="text/javascript" src="http://tajs.qq.com/stats?sId=9051096" charset="UTF-8"></script>
-<!--统计代码，可删除-->
 
 </body>
 

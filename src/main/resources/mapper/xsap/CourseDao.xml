@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kclm.xsap.dao.CourseDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.kclm.xsap.entity.CourseEntity" id="courseMap">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="duration" column="duration"/>
+        <result property="contains" column="contains"/>
+        <result property="color" column="color"/>
+        <result property="introduce" column="introduce"/>
+        <result property="timesCost" column="times_cost"/>
+        <result property="limitSex" column="limit_sex"/>
+        <result property="limitAge" column="limit_age"/>
+        <result property="limitCounts" column="limit_counts"/>
+        <result property="createTime" column="create_time"/>
+        <result property="lastModifyTime" column="last_modify_time"/>
+        <result property="version" column="version"/>
+    </resultMap>
+    <select id="selectCourseList" resultType="com.kclm.xsap.entity.CourseEntity">
+        /*contains是关键字，mp使用   @TableField(value = "`contains`") */
+        select id,
+               name,
+               duration,
+               contains,
+               color,
+               introduce,
+               times_cost,
+               limit_sex,
+               limit_age,
+               limit_counts,
+               create_time,
+               last_modify_time,
+               version
+        from t_course
+    </select>
+
+
+</mapper>

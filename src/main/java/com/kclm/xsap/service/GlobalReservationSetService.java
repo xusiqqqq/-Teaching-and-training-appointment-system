@@ -1,30 +1,20 @@
 package com.kclm.xsap.service;
 
-import java.util.List;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.kclm.xsap.entity.GlobalReservationSetEntity;
+import com.kclm.xsap.utils.PageUtils;
 
-import com.kclm.xsap.entity.TGlobalReservationSet;
+import java.util.Map;
 
 /**
- * 
- * @author harima
- * @since JDK11.0
- * @CreateDate 2020年9月15日 下午3:54:43 
- * @description 此类用来描述了团课预约设置业务
+ * 全局预约设置表
  *
+ * @author fangkai
+ * @email fk_qing@163.com
+ * @date 2021-12-04 16:18:20
  */
-public interface GlobalReservationSetService {
+public interface GlobalReservationSetService extends IService<GlobalReservationSetEntity> {
 
-	boolean update(TGlobalReservationSet glogal);
-	
-	/**
-	 * 	根据id查询全局设置
-	 * @return
-	 */
-	TGlobalReservationSet findOne(Long id);
-	
-	/**
-	 * 获取所有的全局预约设置信息
-	 * @return List<TGlobalReservationSet>。全局预约设置信息结果集
-	 */
-	List<TGlobalReservationSet> findAll();
+    PageUtils queryPage(Map<String, Object> params);
 }
+

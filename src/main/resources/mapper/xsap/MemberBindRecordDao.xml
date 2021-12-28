@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kclm.xsap.dao.MemberBindRecordDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.kclm.xsap.entity.MemberBindRecordEntity" id="memberBindRecordMap">
+        <result property="id" column="id"/>
+        <result property="memberId" column="member_id"/>
+        <result property="cardId" column="card_id"/>
+        <result property="validCount" column="valid_count"/>
+        <result property="validDay" column="valid_day"/>
+        <result property="receivedMoney" column="received_money"/>
+        <result property="payMode" column="pay_mode"/>
+        <result property="note" column="note"/>
+        <result property="activeStatus" column="active_status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="lastModifyTime" column="last_modify_time"/>
+        <result property="version" column="version"/>
+    </resultMap>
+
+
+    <resultMap id="cardInfo" type="com.kclm.xsap.vo.CardInfoVo">
+        <id property="bindId" column="id"/>
+        <result property="name" column="name"/>
+        <result property="type" column="type"/>
+        <result property="totalCount" column="valid_count"/>
+        <result property="validDay" column="valid_day"/>
+        <result property="activeStatus" column="active_status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="lastModifyTime" column="last_modify_time"/>
+    </resultMap>
+    <update id="updateStatus">
+        update t_member_bind_record
+        set active_status    = #{status},
+            last_modify_time = now(),
+            version          = version + 1
+        where id = #{bindCardId}
+    </update>
+
+    <select id="selectCardInfo" resultMap="cardInfo">
+        select tmbr.id,
+               tmc.name,
+               tmc.type,
+               tmbr.valid_count,
+               tmbr.valid_day,
+               tmbr.active_status,
+               tmbr.create_time,
+               tmbr.last_modify_time
+        from t_member_bind_record tmbr
+                 left join t_member_card tmc on tmbr.card_id = tmc.id
+        where tmbr.member_id = #{id};
+    </select>
+
+
+</mapper>

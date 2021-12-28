@@ -1,15 +1,14 @@
 package com.kclm.xsap.dto.convert;
 
+import com.kclm.xsap.entity.MemberEntity;
+import com.kclm.xsap.entity.ReservationRecordEntity;
+import com.kclm.xsap.entity.ScheduleRecordEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
-import org.mapstruct.factory.Mappers;
 
 import com.kclm.xsap.dto.ReserveRecordDTO;
-import com.kclm.xsap.entity.TCourse;
-import com.kclm.xsap.entity.TMember;
-import com.kclm.xsap.entity.TReservationRecord;
-import com.kclm.xsap.entity.TScheduleRecord;
+import com.kclm.xsap.entity.CourseEntity;
 
 /**
  * 
@@ -45,6 +44,7 @@ public interface ReserveRecordConvert {
 		@Mapping(source = "member.id", target = "scheduleId"),
 		@Mapping(source = "reserve.id", target = "memberId")
 	})
-	ReserveRecordDTO entity2Dto(TCourse course,TScheduleRecord schedule,TReservationRecord reserve,TMember member);
+
+	ReserveRecordDTO entity2Dto(CourseEntity course, ScheduleRecordEntity schedule, ReservationRecordEntity reserve, MemberEntity member);
 
 }
