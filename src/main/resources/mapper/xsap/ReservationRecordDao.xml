@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kclm.xsap.dao.ReservationRecordDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.kclm.xsap.entity.ReservationRecordEntity" id="reservationRecordMap">
+        <result property="id" column="id"/>
+        <result property="status" column="status"/>
+        <result property="reserveNums" column="reserve_nums"/>
+        <result property="cancelTimes" column="cancel_times"/>
+        <result property="comment" column="comment"/>
+        <result property="note" column="note"/>
+        <result property="classNote" column="class_note"/>
+        <result property="operator" column="operator"/>
+        <result property="memberId" column="member_id"/>
+        <result property="cardName" column="card_name"/>
+        <result property="scheduleId" column="schedule_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="lastModifyTime" column="last_modify_time"/>
+        <result property="version" column="version"/>
+
+        <association property="memberEntity" javaType="com.kclm.xsap.entity.MemberEntity">
+            <id property="id" column="m_id"/>
+            <result property="name" column="m_name"/>
+            <result property="sex" column="m_sex"/>
+            <result property="phone" column="m_phone"/>
+            <result property="birthday" column="m_birthday"/>
+            <result property="note" column="m_note"/>
+            <result property="avatarUrl" column="m_avatar_url"/>
+            <result property="isDeleted" column="m_is_deleted"/>
+            <result property="createTime" column="m_create_time"/>
+            <result property="lastModifyTime" column="m_last_modify_time"/>
+            <result property="version" column="m_version"/>
+        </association>
+
+        <association property="scheduleRecordEntity" javaType="com.kclm.xsap.entity.ScheduleRecordEntity">
+            <id property="id" column="s_id"/>
+            <result property="courseId" column="s_course_id"/>
+            <result property="teacherId" column="s_teacher_id"/>
+            <result property="orderNums" column="s_order_nums"/>
+            <result property="startDate" column="s_start_date"/>
+            <result property="classTime" column="s_class_time"/>
+            <result property="limitSex" column="s_limit_sex"/>
+            <result property="limitAge" column="s_limit_age"/>
+            <result property="createTime" column="s_create_time"/>
+            <result property="lastModifyTime" column="s_last_modify_time"/>
+            <result property="version" column="s_version"/>
+        </association>
+
+        <association property="courseEntity" javaType="com.kclm.xsap.entity.CourseEntity">
+            <result property="id" column="c_id"/>
+            <result property="name" column="c_name"/>
+            <result property="duration" column="c_duration"/>
+            <result property="contains" column="c_contains"/>
+            <result property="color" column="c_color"/>
+            <result property="introduce" column="c_introduce"/>
+            <result property="timesCost" column="c_times_cost"/>
+            <result property="limitSex" column="c_limit_sex"/>
+            <result property="limitAge" column="c_limit_age"/>
+            <result property="limitCounts" column="c_limit_counts"/>
+            <result property="createTime" column="c_create_time"/>
+            <result property="lastModifyTime" column="c_last_modify_time"/>
+            <result property="version" column="c_version"/>
+        </association>
+    </resultMap>
+
+
+    <select id="selectNumberOfReservationByDay" resultType="com.kclm.xsap.entity.ReservationRecordEntity">
+        SELECT DATE_FORMAT(create_time, '%Y-%m-%d') AS day, COUNT(id) AS sumamount
+        FROM t_reservation_record
+        WHERE STATUS =
+              1
+          AND create_time &gt; #{startDateStr}
+          AND create_time
+            &lt; #{endDateStr}
+        GROUP BY create_time
+    </select>
+
+
+    <select id="selectReserveList" resultType="com.kclm.xsap.vo.ScheduleDetailReservedVo">
+        select tm.name          memberName,
+        tm.phone,
+        trr.card_name           cardName,
+        trr.reserve_nums        reserveNumbers,
+        tc.times_cost           timesCost,
+        trr.last_modify_time    operateTime,
+        trr.create_time         createTime,
+        trr.comment,
+        trr.note                reserveNote,
+        trr.id                  reserveId,
+        trr.operator,
+        trr.status              reserveStatus,
+        tsr.start_date,
+        tsr.class_time
+        from t_reservation_record trr
+        left join t_member tm on tm.id = trr.member_id
+        left join t_schedule_record tsr on tsr.id = trr.schedule_id
+        left join t_course tc on tc.id = tsr.course_id
+
+        <where>
+            <if test="flag != null">
+                and trr.`status` = 1
+            </if>
+            and trr.schedule_id = #{id}
+        </where>
+
+    </select>
+    <select id="selectReserveInfo" resultMap="reservationRecordMap">
+        select trr.id,
+               tc.name        c_name,
+               trr.status,
+               tsr.start_date s_start_date,
+               tsr.class_time s_class_time,
+               trr.card_name,
+               trr.reserve_nums,
+               tc.times_cost  c_times_cost,
+               trr.create_time,
+               trr.last_modify_time,
+               trr.operator
+        from t_reservation_record trr
+                 left join t_schedule_record tsr on trr.schedule_id = tsr.id
+                 left join t_course tc on tsr.course_id = tc.id
+        where trr.member_id = #{id}
+    </select>
+
+</mapper>

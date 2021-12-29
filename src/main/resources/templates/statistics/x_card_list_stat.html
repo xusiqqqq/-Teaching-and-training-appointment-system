@@ -18,9 +18,9 @@
     <link href="../../static/css/style.css?v=4.1.0" th:href="@{/static/css/style.css(v='4.1.0')}" rel="stylesheet">
 
     <!-- Data Tables -->
-    <link href="../../static/css/plugins/dataTables/dataTables.bootstrap.css" 
+    <link href="../../static/css/plugins/dataTables/dataTables.bootstrap.css"
      th:href="@{/static/css/plugins/dataTables/dataTables.bootstrap.css}" rel="stylesheet">
-    
+
 </head>
 
 <body class="gray-bg">
@@ -43,9 +43,9 @@
                         <tr>
                             <th>会员姓名</th>
                             <th>卡号</th>
-                            <th>总课时</th>
-                            <th>已用课时</th>
-                            <th>剩余课时</th>
+                            <th>总课次</th>
+                            <th>已用课次</th>
+                            <th>剩余课次</th>
                             <th>总额</th>
                             <th>已用金额</th>
                             <th>剩余金额</th>
@@ -56,8 +56,6 @@
                         <div id="main" style="height: 400px;" class="col-sm-4  col-sm-offset-1"></div>
                         <div id="main2" style="height: 400px;" class="col-sm-4  col-sm-offset-1"></div>
                     </div>
-
-
                 </div>
             </div>
         </div>
@@ -80,8 +78,13 @@
 
 <!-- Page-Level Scripts -->
 <script>
+
+    $(document).ready(function () {
+
+    });
+
     $(function () {
-        var dtConfig = {
+        /*var dtConfig = {
             "data":[
                 {"name":"张山","card":"17001","allhour":100,"usedhour":80,"lefthour":20,"allmoney":1000,"usedmoney":800,"leftmoney":200},
                 {"name":"李四","card":"17010","allhour":120,"usedhour":40,"lefthour":80,"allmoney":1200,"usedmoney":400,"leftmoney":800},
@@ -100,186 +103,115 @@
                 {"data":"leftmoney"}
             ]
         }
-        $('.dataTables-example').dataTable(dtConfig);
+         $('.dataTables-example').dataTable(dtConfig);
+    */
 
 
-        // 图表初始化
-        var chart = echarts.init(document.getElementById('main'));
-        // 指定图表的配置项和数据
-        var option = {
-            title: {
-                text: ''
-            },
-            tooltip: {},
-            legend: {
-                data:['总课时:6300']       //总课时 = 已用课时+剩余课时
-            },
-            series: [
-                {
-                    name: '课时',
-                    type: 'pie',    // 设置图表类型为饼图
-                    radius: '55%',  // 饼图的半径，外半径为可视区尺寸（容器高宽中较小一项）的 55% 长度。
-                    data:[          // 数据数组，name 为数据项名称，value 为数据项值
-                        {value:2300, name:'已用课时'},
-                        {value:4000, name:'剩余课时'}
-                    ],
-                    itemStyle:{
-                        normal:{
-                            label:{
-                                show: true,
-                                formatter: '{b} : {c} ({d}%)'
-                            },
-                            labelLine :{show:true}
-                        }
-                    }
-                }
-            ]
-        };
+        $.post("[[${#request.getContextPath()}]]/statistics/cardInfo.do", function (data) {
 
-        chart.setOption(option,true);
-        // 指定图表的配置项和数据
-        var option2 = {
-            title: {
-                text: ''
-            },
-            tooltip: {},
-            legend: {
-                data:['总金额:63000']      //   总金额=已用金额 +  剩余金额
-            },
-            series: [
-                {
-                    name: '金额',
-                    type: 'pie',    // 设置图表类型为饼图
-                    radius: '55%',  // 饼图的半径，外半径为可视区尺寸（容器高宽中较小一项）的 55% 长度。
-                    data:[          // 数据数组，name 为数据项名称，value 为数据项值
-                        {value:23000, name:'已用金额'},
-                        {value:40000, name:'剩余金额'}
-                    ],
-                    itemStyle:{
-                        normal:{
-                            label:{
-                                show: true,
-                                formatter: '{b} : {c} ({d}%)'
-                            },
-                            labelLine :{show:true},
-                            color : function (params) {
-                                var colorList = [
-                                    '#00FFFF', '#00FF00', '#FFFF00', '#FF8C00', '#FF0000', '#FE8463',
-                                ];
-                                return colorList[params.dataIndex]
+            var infoList = data.data;
+            $('.dataTables-example').dataTable({
+                "data": infoList.memberCardStatisticsVos,
+                "columns":[
+                    {"data":"memberName"},
+                    {"data":"bindCardId"},
+                    {"data":"totalClassTimes"},
+                    {"data":"usedClassTimes"},
+                    {"data":"remainingClassTimes"},
+                    {"data":"lumpSum"},
+                    {"data":"amountUsed"},
+                    {"data":"balance"}
+                ]
+            });
+            /*===============*/
+
+
+
+                // 图表初始化
+                var chart = echarts.init(document.getElementById('main'));
+                // 指定图表的配置项和数据--【课时】
+                var option = {
+                    title: {
+                        text: ''
+                    },
+                    tooltip: {},
+                    legend: {
+                        data:['总课时:' + infoList.totalCourseTimeAll]       //总课时 = 已用课时+剩余课时
+                    },
+                    series: [
+                        {
+                            name: '课时',
+                            type: 'pie',    // 设置图表类型为饼图
+                            radius: '55%',  // 饼图的半径，外半径为可视区尺寸（容器高宽中较小一项）的 55% 长度。
+                            data:[          // 数据数组，name 为数据项名称，value 为数据项值
+                                {value:infoList.usedCourseTimeAll, name:'已用课时'},
+                                {value:infoList.remainCourseTimeAll, name:'剩余课时'}
+                            ],
+                            itemStyle:{
+                                normal:{
+                                    label:{
+                                        show: true,
+                                        formatter: '{b} : {c} ({d}%)'
+                                    },
+                                    labelLine :{show:true}
+                                }
                             }
-                        },
-
-                        emphasis : {
-                            shadowBlur : 10,
-                            shadowOffsetX : 0,
-                            shadowColor : 'rgba(0, 0, 0, 0.5)'
                         }
-                    }
-                }
-            ]
-        };
-        var chart2 = echarts.init(document.getElementById('main2'));
-        chart2.setOption(option2,true);
+                    ]
+                };
 
+                chart.setOption(option,true);
+                // 指定图表的配置项和数据--【金额】
+                var option2 = {
+                    title: {
+                        text: ''
+                    },
+                    tooltip: {},
+                    legend: {
+                        data:['总金额:' + infoList.totalMoneyAll]      //   总金额=已用金额 +  剩余金额
+                    },
+                    series: [
+                        {
+                            name: '金额',
+                            type: 'pie',    // 设置图表类型为饼图
+                            radius: '55%',  // 饼图的半径，外半径为可视区尺寸（容器高宽中较小一项）的 55% 长度。
+                            data:[          // 数据数组，name 为数据项名称，value 为数据项值
+                                {value:infoList.usedMoneyAll, name:'已用金额'},
+                                {value:infoList.remainMoneyAll, name:'剩余金额'}
+                            ],
+                            itemStyle:{
+                                normal:{
+                                    label:{
+                                        show: true,
+                                        formatter: '{b} : {c} ({d}%)'
+                                    },
+                                    labelLine :{show:true},
+                                    color : function (params) {
+                                        var colorList = [
+                                            '#00FFFF', '#00FF00', '#FFFF00', '#FF8C00', '#FF0000', '#FE8463',
+                                        ];
+                                        return colorList[params.dataIndex]
+                                    }
+                                },
+
+                                emphasis : {
+                                    shadowBlur : 10,
+                                    shadowOffsetX : 0,
+                                    shadowColor : 'rgba(0, 0, 0, 0.5)'
+                                }
+                            }
+                        }
+                    ]
+                };
+                var chart2 = echarts.init(document.getElementById('main2'));
+                chart2.setOption(option2,true);
+
+
+            /*=============*/
+        });
 
     })
-    
-    
-    
-    $(document).ready(function () {
-    	$.post("[[${#request.getContextPath()}]]/course/courseList.do",function(courseList){
-	        $('.dataTables-example').dataTable({
-	            //TODO json获取数据
-	            "data": courseList,
-	            //行的定义
-	            "columns": [
-	                {"data": "name"},
-	                {"data": "duration"},
-	                {"data": "contains"},
-	                {"data": null,"orderable": false, "render": function (data, type, row) {
-	                    var id = row.id;
-	                    //TODO 将课程id传入到后台
-	                    var html = "<a href='/xsap/course/x_course_list_edit.do?id="+id+"'  class='btn btn-success btn-xs' > 编辑 <i class='fa fa-edit'></i></a>&nbsp &nbsp"
-	                    html += "<a href='#?id="+id+"' onclick='getID("+ id +")' class='btn btn-danger btn-xs' data-toggle='modal' data-target='#del_course'> 删除 <i class='fa fa-times'></i></a>"
-	                    return html;
-	                }}],
-	            /*href='x_course_list_edit.html?id="+id+"'*/
-	            //去掉搜索
-	            searching: false,
-	            lengthChange: false,
-	            language: {
-	                "decimal": "",//小数的小数位符号  比如“，”作为数字的小数位符号
-	                "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
-	                "info": "当前 _START_ 条到 _END_ 条 共 _TOTAL_ 条",//左下角的信息，变量可以自定义，到官网详细查看
-	                /*  "infoEmpty": "无记录",//当没有数据时，左下角的信息*/
-	                "infoFiltered": "(从 _MAX_ 条记录过滤)",//当表格过滤的时候，将此字符串附加到主要信息
-	                "infoPostFix": "",//在摘要信息后继续追加的字符串
-	                "thousands": ",",//千分位分隔符
-	                "lengthMenu": "每页 _MENU_ 条记录",//用来描述分页长度选项的字符串
-	                "loadingRecords": "加载中...",//用来描述数据在加载中等待的提示字符串 - 当异步读取数据的时候显示
-	                "processing": "处理中...",//用来描述加载进度的字符串
-	                "search": "搜索",//用来描述搜索输入框的字符串
-	                "zeroRecords": "没有找到",//当没有搜索到结果时，显示
-	                "paginate": {
-	                    "first": "首页",
-	                    "previous": "上一页",
-	                    "next": "下一页",
-	                    "last": "尾页"
-	                }
-	            }
-	        });
-	        
-    	});
-    });
-</script>
 
-<!--删除课程模态框-->
-<div class="modal fade" id="del_course" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-md" role="document" >
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title text-center text-danger"><i class="fa fa-warning"></i>确认删除</h4>
-            </div>
-            <div class="modal-body">
-            <p class="text-center">确认删除此课程嘛，删除后不能恢复</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
-                <button type="submit" class="btn btn-danger" id="add_book_submit">确定</button>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
-<script type="text/javascript">
-var cid = "";
-function getID(c_id){
-	cid = c_id;
-}
-//删除请求
-$(function(){
-	$("#add_book_submit").click(function(){
-		console.log(cid);
-		$.ajax({
-        	url: "[[${#request.getContextPath()}]]/course/deleteOne.do",
-        	type: "post",
-        	data: {id:cid},
-        	success:function(result){
-        		if(result == "yes"){
-	        		//刷新界面
-	        		setTimeout(function(){
-	            		window.location.href="[[${#request.getContextPath()}]]/course/x_course_list.do";
-	        		},1*1000);        			
-        		}else{
-        			alert("此课程已经生成了预约、上课、排课等记录，不可被删除！");
-        		}
-        	}
-        });
-	});
-});
 </script>
 
 </body>

@@ -6,13 +6,13 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.kclm.xsap.entity.TMember;
+//import com.kclm.xsap.entity.TMember;
+import com.kclm.xsap.entity.MemberEntity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
-	/**
+/**
  *
  * @author harima
  * @since JDK11.0
@@ -41,7 +41,7 @@ public class ClassRecordDTO{
 	/**
 	 *  会员信息
 	 */
-	private TMember member;
+	private MemberEntity member;
 
 	/**
 	 * 课程名

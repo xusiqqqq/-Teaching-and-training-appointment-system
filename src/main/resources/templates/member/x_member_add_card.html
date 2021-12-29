@@ -4,22 +4,29 @@
 <head>
 
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
 
     <title>X+约课系统 - 添加会员卡</title>
-    <meta name="keywords" content="后台bootstrap框架,会员中心主题,后台HTML,响应式后台">
-    <meta name="description" content="完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术">
+    <meta content="后台bootstrap框架,会员中心主题,后台HTML,响应式后台" name="keywords">
+    <meta content="完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术" name="description">
 
-	<link rel="shortcut icon" href="../../static/favicon.ico" th:href="@{/static/favicon.ico}">
-    <link href="../../static/css/bootstrap.min.css?v=3.3.6" th:href="@{/static/css/bootstrap.min.css(v='3.3.6')}" rel="stylesheet">
-    <link href="../../static/css/font-awesome.css?v=4.4.0" th:href="@{/static/css/font-awesome.css(v='4.4.0')}" rel="stylesheet">
-    <link href="../../static/css/animate.css" th:href="@{/static/css/animate.css}" rel="stylesheet">
-    <link href="../../static/css/style.css?v=4.1.0" th:href="@{/static/css/style.css(v='4.1.0')}" rel="stylesheet">
+    <link href="../../static/favicon.ico" rel="shortcut icon" th:href="@{/static/favicon.ico}">
+    <link href="../../static/css/bootstrap.min.css?v=3.3.6" rel="stylesheet"
+          th:href="@{/static/css/bootstrap.min.css(v='3.3.6')}">
+    <link href="../../static/css/font-awesome.css?v=4.4.0" rel="stylesheet"
+          th:href="@{/static/css/font-awesome.css(v='4.4.0')}">
+    <link href="../../static/css/animate.css" rel="stylesheet" th:href="@{/static/css/animate.css}">
+    <link href="../../static/css/style.css?v=4.1.0" rel="stylesheet" th:href="@{/static/css/style.css(v='4.1.0')}">
 
-    <link href="../../static/css/plugins/iCheck/custom.css" th:href="@{/static/css/plugins/iCheck/custom.css}" rel="stylesheet">
+    <link href="../../static/css/plugins/iCheck/custom.css" rel="stylesheet"
+          th:href="@{/static/css/plugins/iCheck/custom.css}">
     <!-- Data Tables -->
-    <link href="../../static/css/plugins/dataTables/dataTables.bootstrap.css" th:href="@{/static/css/plugins/dataTables/dataTables.bootstrap.css}" rel="stylesheet">
+    <link href="../../static/css/plugins/dataTables/dataTables.bootstrap.css"
+          rel="stylesheet" th:href="@{/static/css/plugins/dataTables/dataTables.bootstrap.css}">
+    <!-- Sweet Alert -->
+    <link href="../../static/css/plugins/sweetalert/sweetalert.css" th:href="@{/static/css/plugins/sweetalert/sweetalert.css}" rel="stylesheet">
+
 
     <style type="text/css">
         .margin_top {
@@ -69,58 +76,67 @@
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
         <div class="col-sm-12">
-            <form class="form-horizontal" th:action="@{/card/cardAdd.do}" id="addForm">
+            <form class="form-horizontal" id="addForm" method="post">
                 <div style="background-color: #FFFFFF;">
                     <div class="form-group">
-                        <label for="inputCardName"
-                               class="col-sm-2 control-label margin_top"><span
+                        <label class="col-sm-2 control-label margin_top"
+                               for="inputCardName"><span
                                 style="color: red">*&nbsp;</span>会员卡名称</label>
-                        <div class="col-sm-8">
-                            <input type="text" class="form-control margin_top" id="inputCardName" placeholder="会员卡名称" name="name"
-                                   required>
+                        <div class="col-sm-6">
+                            <input class="form-control margin_top" id="inputCardName" name="name" placeholder="会员卡名称"
+                                   required
+                                   type="text">
                             <span class="text-danger">[[${NAME_EXIST}]]</span>
                         </div>
+                        <div class="col-sm-4">
+                            <label class="control-label" tip="name"></label>
+                        </div>
                     </div>
+                    <!--价格-->
                     <div class="form-group">
-                        <label for="inputCardPrice" class="col-sm-2 control-label input_margin_top"><span
+                        <label class="col-sm-2 control-label input_margin_top" for="inputCardPrice"><span
                                 style="color: red">*&nbsp;</span>价格</label>
-                        <div class="col-md-2">
-                            <!--  <input type="number" class="form-control input_margin_top" id="inputCardPrice"-->
-                            <!--    placeholder="价格" min="0"-->
-                            <!--    required>-->
+                        <div class="col-md-4">
                             <div class="input-group input_margin_top">
                                 <div class="input-group-addon">￥</div>
-                                <input type="number" class="form-control" placeholder="价格" id="inputCardPrice" min="0" name="price">
+                                <input class="form-control" id="inputCardPrice" min="0" name="price"
+                                       placeholder="价格" step="0.01" type="number">
                                 <div class="input-group-addon">元</div>
                             </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="inputCardDescribe" class="col-sm-2 control-label input_margin_top">描述信息</label>
-                        <div class="col-sm-8">
-                            <textarea  class="form-control input_margin_top" name="description"
-                                      id="inputCardDescribe"></textarea>
+                        <div class="col-sm-4">
+                            <label class="control-label" tip="price"></label>
                         </div>
                     </div>
+                    <!--描述信息-->
                     <div class="form-group">
-                        <label for="inputCardRemark" class="col-sm-2 control-label input_margin_top">备注信息</label>
+                        <label class="col-sm-2 control-label input_margin_top" for="inputCardDescribe">描述信息</label>
                         <div class="col-sm-8">
-                            <textarea  class="form-control input_margin_top margin_buttom" name="note"
-                                      id="inputCardRemark"></textarea>
+                            <textarea class="form-control input_margin_top" id="inputCardDescribe"
+                                      name="description"></textarea>
+                        </div>
+                    </div>
+                    <!--备注信息-->
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label input_margin_top" for="inputCardRemark">备注信息</label>
+                        <div class="col-sm-8">
+                            <textarea class="form-control input_margin_top margin_buttom" id="inputCardRemark"
+                                      name="note"></textarea>
                         </div>
                     </div>
                 </div>
                 <div style="background-color: #FFFFFF;">
+                    <!--会员卡类型-->
                     <div class="form-group">
                         <div class="margin_top">
-                            <label for="member_card_type" class="col-sm-2 control-label ">会员卡类型</label>
-                            <div class="col-sm-8">
+                            <label class="col-sm-2 control-label " for="member_card_type">会员卡类型</label>
+                            <div class="col-sm-6">
                                 <div class="input-group">
-                                    <input type="text" class="form-control " id="test_data" name="type">
+                                    <input class="form-control " id="test_data" name="type" type="text">
                                     <div class="input-group-btn ">
-                                        <button type="button" class="btn btn-white dropdown-toggle "
+                                        <button class="btn btn-white dropdown-toggle " data-toggle="dropdown"
                                                 id="member_card_type"
-                                                data-toggle="dropdown">
+                                                type="button">
                                             <span class="caret"></span>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-right " role="menu">
@@ -128,35 +144,48 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-sm-4">
+                                <label class="control-label" tip="type"></label>
+                            </div>
                         </div>
                     </div>
 
+                    <!--可用次数-->
                     <div class="form-group">
-                        <label for="useTimes" class="col-sm-2 control-label input_margin_top"><span
+                        <label class="col-sm-2 control-label input_margin_top" for="useTimes"><span
                                 style="color: red">*&nbsp;</span>可用次数</label>
                         <div class="col-sm-2">
-                            <input type="number" class="form-control input_margin_top" id="useTimes" name="totalCount"
-                                   placeholder="可用次数" min="0"
-                                   required>
+                            <input class="form-control input_margin_top" id="useTimes" min="0" name="totalCount"
+                                   placeholder="可用次数" required
+                                   type="number">
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="control-label" tip="totalCount"></label>
                         </div>
                     </div>
+                    <!--可用天数-->
                     <div class="form-group">
-                        <label for="useDays" class="col-sm-2 control-label input_margin_top"><span
+                        <label class="col-sm-2 control-label input_margin_top" for="useDays"><span
                                 style="color: red">*&nbsp;</span>可用天数</label>
                         <div class="col-sm-2">
-                            <input type="number" class="form-control input_margin_top" id="useDays" name="totalDay"
-                                   placeholder="可用天数" min="0"
-                                   required>
+                            <input class="form-control input_margin_top" id="useDays" min="0" name="totalDay"
+                                   placeholder="可用天数" required
+                                   type="number">
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="control-label" tip="totalDay"></label>
                         </div>
                     </div>
+                    <!--支持课程-->
                     <div class="form-group">
-                        <label for="support_program" class="col-sm-2 control-label input_margin_top">支持课程</label>
+                        <label class="col-sm-2 control-label input_margin_top" for="support_program">支持课程</label>
                         <div class="col-sm-8 input_margin_top">
                             <table class="table table-striped table-bordered table-hover dataTables-example"
                                    id="support_program">
                                 <thead>
                                 <tr>
-                                    <th><input type="checkbox" name="courseListStr" id="check_all" class="i-checks"></th>
+                                    <th><input class="i-checks" id="check_all" name="courseListStr" type="checkbox">
+                                    </th>
                                     <th class="col-sm-7">课程</th>
                                     <th>收费情况(次卡)</th>
                                 </tr>
@@ -164,10 +193,11 @@
                             </table>
                         </div>
                     </div>
+                    <!--保存、取消-->
                     <div class="form-group">
                         <div class="col-sm-offset-2 col-sm-10 margin_buttom btn_margin_top">
-                            <button type="submit" class="btn btn-success" id="saveBtn">保存</button>
-                            <a href="x_member_card.html" type="button" class="btn btn-default">取消</a>
+                            <button class="btn btn-success" id="saveBtn" type="submit">保存</button>
+                            <a class="btn btn-default" href="x_member_card.html" type="button">取消</a>
                         </div>
                     </div>
                 </div>
@@ -183,39 +213,45 @@
 <!-- 自定义js -->
 <script src="../../static/js/content.js?v=1.0.0" th:src="@{/static/js/content.js(v='1.0.0')}"></script>
 <!-- Data Tables -->
-<script src="../../static/js/plugins/dataTables/jquery.dataTables.js" th:src="@{/static/js/plugins/dataTables/jquery.dataTables.js}"></script>
-<script src="../../static/js/plugins/dataTables/dataTables.bootstrap.js" th:src="@{/static/js/plugins/dataTables/dataTables.bootstrap.js}"></script>
+<script src="../../static/js/plugins/dataTables/jquery.dataTables.js"
+        th:src="@{/static/js/plugins/dataTables/jquery.dataTables.js}"></script>
+<script src="../../static/js/plugins/dataTables/dataTables.bootstrap.js"
+        th:src="@{/static/js/plugins/dataTables/dataTables.bootstrap.js}"></script>
 <!--suggest-->
-<script src="../../static/js/plugins/suggest/bootstrap-suggest.min.js" th:src="@{/static/js/plugins/suggest/bootstrap-suggest.min.js}"></script>
+<script src="../../static/js/plugins/suggest/bootstrap-suggest.min.js"
+        th:src="@{/static/js/plugins/suggest/bootstrap-suggest.min.js}"></script>
 <!-- iCheck -->
 <script src="../../static/js/plugins/iCheck/icheck.min.js" th:src="@{/static/js/plugins/iCheck/icheck.min.js}"></script>
+<!-- Sweet alert -->
+<script src="../../static/js/plugins/sweetalert/sweetalert.min.js" th:src="@{/static/js/plugins/sweetalert/sweetalert.min.js}"></script>
 <script>
     $(function () {
-    	$("#saveBtn").on("mouseenter",function(){
-    		var addForm = $("#addForm").serialize();
-    		console.log(addForm);
-    	});
-    	
-    	
-    	//获取所有的课程数据
-    	$.post("/xsap/course/courseList.do",function(courseData){
-    		console.log(courseData);
-    		$('.dataTables-example').dataTable({
-    			//获取数据
-                /*TODO:此处为未来与后端进行交互的地方*/
+        /*表单序列化*/
+        var addForm = "";
+        $("#saveBtn").on("mouseenter", function () {
+            addForm = $("#addForm").serialize();
+            console.log(addForm);
+        });
+
+
+        //获取所有的课程数据
+        $.post("/course/courseList.do", function (courseData) {
+            console.log(courseData);
+            $('.dataTables-example').dataTable({
+                //获取数据
                 "data": courseData,
                 //行的定义
                 "columns": [
                     {
                         "data": "id", "render": function (data, type, row) {
-                        	/* 参数说明
-                        		data: 拿到的是左边指明的"data"的字段对应的全部值
-                        		row: 拿到的是dataTable的"data"属性获取到的每一行值
-                        	*/
+                            /* 参数说明
+                                data: 拿到的是左边指明的"data"的字段对应的全部值
+                                row: 拿到的是dataTable的"data"属性获取到的每一行值
+                            */
                             var id = data;
-                            var html = "<input type='checkbox' name='courseListStr' class='i-checks' id='check_all' value='"+id+"'>";
+                            var html = "<input type='checkbox' name='courseListStr' class='i-checks' id='check_all' value='" + id + "'>";
                             return html;
-                        },bAutoWidth: "false", sWidth: "1%"
+                        }, bAutoWidth: "false", sWidth: "1%"
                     },
                     {"data": "name", sWidth: "15%"},
                     {
@@ -239,9 +275,80 @@
                     "orderable": false
                 }]
             });
-    	});
-        
-    })
+        });
+
+
+        //--异步保存编辑操作//todo swal
+        $('#addForm').on('submit', function (e) {
+            e.preventDefault();
+            var formData = $(this).serialize();
+
+            swal({
+                title: "确认保存",
+                text: "确认保存此会员卡信息吗? 您正在新建一张新的会员卡！",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#08c6d8",
+                confirmButtonText: "添加",
+                closeOnConfirm: true
+            }, function () {
+                $.ajax({
+                    url: '[[${#request.getContextPath()}]]/card/cardAdd.do',
+                    type: "post",
+                    data: formData,
+                    success: function (data) {
+                        if (data.code === 0) {
+                            swal(data.msg, "您已经保存了这一张新的会员卡。", "success");
+                            //刷新界面
+                            setTimeout(function () {
+                                window.location.href = '[[${#request.getContextPath()}]]/card/x_member_card.do'
+                            }, 1000);
+                        } else if (data.code === 400) {
+                            let errors = data.errorMap;
+                            for (const key in errors) {
+                                $(`[tip=${key}]`).html("");
+                                //错误提示回显
+                                $("<span class='text-danger'>" + errors[key] + "</span>").appendTo($("[tip=" + key + "]"));
+                            }
+                        }else {
+                            swal(data.msg, "未知错误", "info")
+                            setTimeout(function () {
+                                window.location.reload();
+                            });
+                        }
+                    },
+                    error: function () {
+                        swal("添加失败！", "未知错误。。。", "info");
+                        setTimeout(function () {
+                            window.location.reload();
+                        });
+                    }
+                });
+            });
+
+
+            /*$.ajax({
+                url: '[[${#request.getContextPath()}]]/card/cardAdd.do',
+                type: 'post',
+                data: formData,
+                dataType: 'json',
+                success: function (data) {
+                    console.log(data);
+                    if (data.code === 0) {
+                        //刷新界面
+                        alert(data.data)
+                        window.location.href = '[[${#request.getContextPath()}]]/card/x_member_card.do'
+                    }
+                },
+                error: function (data) {
+                    alert(data.data);
+                    window.location.reload();
+                }
+            });*/
+        })
+
+
+    });
 </script>
 <script type="text/javascript">
     //data 数据中获取

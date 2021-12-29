@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kclm.xsap.dao.CourseCardDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.kclm.xsap.entity.CourseCardEntity" id="courseCardMap">
+        <result property="cardId" column="card_id"/>
+        <result property="courseId" column="course_id"/>
+    </resultMap>
+    <insert id="saveCourseCard">
+        insert into t_course_card (card_id,course_id) values (#{cardId},#{courseId})
+    </insert>
+
+
+</mapper>

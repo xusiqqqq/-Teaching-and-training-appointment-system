@@ -2,13 +2,12 @@ package com.kclm.xsap.dto.convert;
 
 import java.time.LocalDateTime;
 
+import com.kclm.xsap.entity.MemberCardEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
-import org.mapstruct.factory.Mappers;
 
 import com.kclm.xsap.dto.MemberCardDTO;
-import com.kclm.xsap.entity.TMemberCard;
 
 /**
  * 
@@ -34,7 +33,7 @@ public interface MemberCardConvert {
 		@Mapping(source = "validTimes",target = "totalCount"),
 		@Mapping(source = "endTime",target = "dueTime"),
 	})
-	MemberCardDTO entity2Dto(Integer validTimes,LocalDateTime endTime,TMemberCard memberCard);
+	MemberCardDTO entity2Dto(Integer validTimes, LocalDateTime endTime, MemberCardEntity memberCard);
 
 }
 

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kclm.xsap.dao.RechargeRecordDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.kclm.xsap.entity.RechargeRecordEntity" id="rechargeRecordMap">
+        <result property="id" column="id"/>
+        <result property="addCount" column="add_count"/>
+        <result property="addDay" column="add_day"/>
+        <result property="receivedMoney" column="received_money"/>
+        <result property="payMode" column="pay_mode"/>
+        <result property="operator" column="operator"/>
+        <result property="note" column="note"/>
+        <result property="memberBindId" column="member_bind_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="lastModifyTime" column="last_modify_time"/>
+        <result property="version" column="version"/>
+    </resultMap>
+
+
+    <resultMap id="operateRecord" type="com.kclm.xsap.vo.OperateRecordVo">
+        <id property="id" column="id"/>
+        <result property="operateTime" column="log_create_time"/>
+        <result property="operateType" column="type"/>
+        <result property="validTimes" column="valid_count"/>
+        <result property="createTime" column="create_time"/>
+        <result property="lastModifyTime" column="last_modify_time"/>
+        <result property="involveMoney" column="involve_money"/>
+        <result property="operator" column="operator"/>
+        <result property="cardNote" column="note"/>
+        <result property="status" column="active_status"/>
+    </resultMap>
+
+    <!--todo 还要加上充值记录表和消费记录表-->
+    <select id="selectOperateRecord" resultMap="operateRecord">
+
+        select tml.id,
+               tml.create_time log_create_time,
+               tml.type,
+               tmbr.valid_count,
+               tmbr.valid_day,
+               tml.involve_money,
+               tml.operator,
+               tmbr.note,
+               tmbr.active_status,
+               tmbr.create_time,
+               tmbr.last_modify_time
+        from t_member_log tml
+                 left join t_member_bind_record tmbr on tml.member_bind_id = tmbr.id
+        left join t_recharge_record trr on tmbr.id = trr.member_bind_id
+        where tmbr.member_id = #{memberId}
+          and tml.member_bind_id = #{bindId}
+    </select>
+
+
+</mapper>

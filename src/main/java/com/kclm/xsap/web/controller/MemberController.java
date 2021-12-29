@@ -1,30 +1,357 @@
 package com.kclm.xsap.web.controller;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.kclm.xsap.entity.*;
+import com.kclm.xsap.service.*;
+import com.kclm.xsap.utils.R;
+import com.kclm.xsap.utils.exception.RRException;
+import com.kclm.xsap.vo.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
-import com.kclm.xsap.dto.ClassRecordDTO;
-import com.kclm.xsap.dto.ConsumeRecordDTO;
-import com.kclm.xsap.dto.MemberCardDTO;
-import com.kclm.xsap.dto.MemberVO;
-import com.kclm.xsap.dto.ReserveRecordDTO;
-import com.kclm.xsap.entity.TMember;
-import com.kclm.xsap.service.MemberService;
+import javax.validation.Valid;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
+
+/**
+ * 会员表
+ *
+ * @author fangkai
+ * @email fk_qing@163.com
+ * @date 2021-12-04 16:18:20
+ */
+@Slf4j
 @Controller
 @RequestMapping("/member")
 public class MemberController {
+    @Autowired
+    private MemberService memberService;
+
+    @Autowired
+    private MemberBindRecordService memberBindRecordService;
+
+    @Autowired
+    private MemberCardService memberCardService;
+
+    @Autowired
+    private ReservationRecordService reservationRecordService;
+
+    @Autowired
+    private ClassRecordService classRecordService;
+
+    @Autowired
+    private ConsumeRecordService consumeRecordService;
+
+    @Autowired
+    private RechargeRecordService rechargeRecordService;
+
+    /**
+     * 跳转会员列表页面
+     *
+     * @return x_member_list.html
+     */
+    @GetMapping("/x_member_list.do")
+    public String toMemberList() {
+        return "member/x_member_list";
+    }
+
+    /**
+     * 返回会员列表数据
+     *
+     * @return data
+     */
+    @PostMapping("/memberList.do")
+    @ResponseBody
+    public List<MemberVo> memberList() {
+        //is_deleted会自动加上
+        List<MemberEntity> memberEntityList = memberService.list();
+        //重写这个方法
+
+
+
+//---------------------------------------
+        List<Long> memberIds = memberEntityList.stream().map(MemberEntity::getId).collect(Collectors.toList());
+
+
+        List<MemberVo> memberVoList = memberEntityList.stream().map(memberEntity -> {
+            String[] cardName = memberBindRecordService.getCardName(memberEntity.getId());
+            MemberVo memberVo = new MemberVo()
+                    .setId(memberEntity.getId())
+                    .setMemberName(memberEntity.getName() + "(" + memberEntity.getPhone() + ")")
+                    .setGender(memberEntity.getSex())
+                    .setCardHold(cardName);
+            log.debug("每一次的memberVo{}", memberVo);
+            return memberVo;
+        }).collect(Collectors.toList());
+
+        log.debug("以下为打印memberVoList=========================");
+        memberVoList.forEach(System.out::println);
+
+
+        log.debug("\n传到前端的Vo:memberVoList：{}", memberVoList);
+        return memberVoList;
+    }
+
+
+    /**
+     * 异步请求返回要编辑的信息
+     *
+     * @param id 要查看的会员id
+     * @return 对应会员信息
+     */
+    @PostMapping("/x_member_edit.do")
+    @ResponseBody
+    public MemberEntity memberEdit(@RequestParam("id") Integer id) {
+
+        return memberService.getById(id);
+    }
+
+
+    /**
+     * 更新选中信息
+     *
+     * @param memberEntity 前端传入的要修改的会员的封装实体
+     * @return r
+     */
+    @PostMapping("/memberEdit.do")
+    @ResponseBody
+    public R memberEdit(MemberEntity memberEntity) {
+        Integer version = memberEntity.getVersion();
+        memberEntity.setVersion(version + 1);
+        boolean isUpdate = memberService.updateById(memberEntity);
+        if (isUpdate) {
+            return R.ok("更新成功！");
+//            return memberService.getById(memberEntity.getId());
+        } else {
+            return R.error("更新失败！！");
+//            return memberEntity;
+        }
+    }
+
+
+    /**
+     * todo 会员详情页没有做完
+     * 使用mva跳转查看详情
+     *
+     * @param id 要查看的id
+     * @return 详情页面
+     */
+    @GetMapping("/x_member_list_details.do")
+    public ModelAndView memberListDetails(@RequestParam("id") Integer id) {
+        log.debug("id:{}", id);
+        ModelAndView mv = new ModelAndView();
+        mv.addObject("ID", id);
+        mv.setViewName("member/x_member_list_details");
+        return mv;
+    }
+
+
+    /**
+     * 删除选中会员（逻辑删除）
+     *
+     * @param id 要删除的会员id
+     */
+    @PostMapping("/deleteOne.do")
+    @ResponseBody
+    public void deleteOne(@RequestParam("id") Integer id) {
+        boolean isDeleteMember = memberService.update(new UpdateWrapper<MemberEntity>().set("is_deleted", 1).set("last_modify_time", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)).setSql("version = version + 1").eq("id", id));
+        log.debug("\n==>注销会员是否成功==>{}", isDeleteMember);
+        if (isDeleteMember) {
+            log.debug("\n==>注销会员id={}成功！！",id);
+        } else {
+            //1001表示会员模块异常
+            throw new RRException("删除失败！！", 1001502);
+        }
+    }
+
+
+    /**
+     * 跳转添加会员页面
+     *
+     * @return 添加会员页面
+     */
+    @GetMapping("/x_member_add.do")
+    public String memberAdd() {
+        return "member/x_member_add";
+    }
+
+
+    /**
+     * 添加会员
+     *
+     * @param entity 前端传入的表单实体
+     * @return 新添加的对象
+     */
+    @PostMapping("/memberAdd.do")
+    @ResponseBody
+    public R memberBind(@Valid MemberEntity entity,
+                        BindingResult bindingResult) {
+        log.debug("\n==>会员添加表单传入的数据memberEntity==>{}", entity);
+        if (bindingResult.hasErrors()) {
+            HashMap<String, String> map = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(item -> {
+                String message = item.getDefaultMessage();
+                String field = item.getField();
+                map.put(field, message);
+            });
+            return R.error(400, "非法参数").put("errorMap", map);
+        }
+        //mp生成的save方法回自动将新插入的元素的id映射到entity上
+        entity.setCreateTime(LocalDateTime.now());
+        boolean isSaveEmployee = memberService.save(entity);
+        log.debug("\n==>会员添加是否成功==>{}", isSaveEmployee);
+        if (isSaveEmployee) {
+            return R.ok("添加成功").put("data", entity);
+        }
+        return R.error("添加失败,请重试");
+    }
+
+    /**
+     * 返回会员列表，前端使用bootstrap-suggest插件进行给出搜索建议
+     *
+     * @return 所有会员列表的分装对象
+     */
+    @GetMapping("/toSearch.do")
+    @ResponseBody
+    public R toSearch() {
+        List<MemberBindRecordEntity> allBindCards = memberBindRecordService.list(new QueryWrapper<MemberBindRecordEntity>().select("member_id"));
+        List<Long> allMemberIdWhoIsHasCards = allBindCards.stream().map(MemberBindRecordEntity::getMemberId).collect(Collectors.toList());
+        List<MemberEntity> allMemberList = memberService.listByIds(allMemberIdWhoIsHasCards);
+        List<SearchMemberToBindVo> searchMemberToBindVoList = allMemberList.stream().map(member ->
+                new SearchMemberToBindVo()
+                        .setId(member.getId())
+                        .setName(member.getName())
+                        .setSex(member.getSex())
+                        .setPhone(member.getPhone())
+        ).collect(Collectors.toList());
+        log.debug("\n==>返回给前端的封装会员信息列表：searchMemberToBindVoList：=>{}", searchMemberToBindVoList);
+
+        return new R().put("value", searchMemberToBindVoList);
+
+    }
+
+    /**
+     * 会员详情页的会员详情的预加载
+     *
+     * @param id
+     * @return
+     */
+    @PostMapping("/memberDetail.do")
+    @ResponseBody
+    public R memberDetail(@RequestParam("id") Long id) {
+        MemberEntity memberById = memberService.getById(id);
+        log.debug("\n==>根据传入id查询到的会员详情信息：==>{}", memberById);
+        return new R().put("data", memberById);
+    }
+
+
+    /**
+     * 会员详情页的会员卡信息的预加载
+     * 绑定记录才是真正的会员卡
+     * @param id 前台传入的会员id
+     * @return r -> 该会员的所有会员卡list
+     * todo 到期时间！ // 不用管
+     */
+    @PostMapping("/cardInfo.do")
+    @ResponseBody
+    public R cardInfo(@RequestParam("id") Long id) {
+
+        //绑定记录才是真正的会员卡信息，我们应该操作绑定记录     这个方法是查询绑定记录表返回vo的list
+        List<CardInfoVo> cardInfoVos = memberBindRecordService.getCardInfo(id);
+        for (CardInfoVo vo : cardInfoVos) {
+            vo.setDueTime(vo.getLastModifyTime() == null ? vo.getCreateTime() : vo.getLastModifyTime());
+        }
+
+        log.debug("\n==>后端封装的会员详情页的【会员卡】信息vo -list==>{}", cardInfoVos);
+
+        return new R().put("data", cardInfoVos);
+
+    }
+
+
+    /**
+     * 会员详情页的预约记录的预加载
+     *
+     * @param id 会员id
+     * @return r -> 该会员的所有预约记录
+     */
+    @PostMapping("/reserveInfo.do")
+    @ResponseBody
+    public R reserveInfo(@RequestParam("id") Long id) {
+        List<ReservationRecordEntity> reserveList = reservationRecordService.getReserveInfo(id);
+        log.debug("\n==>从数据库查出的预约记录信息==>{}", reserveList);
+        List<MemberDetailReservedVo> memberDetailReservedVoList = reserveList.stream().map(reserve ->
+                new MemberDetailReservedVo()
+                        .setReserveId(reserve.getId())
+                        .setCourseName(reserve.getCourseEntity().getName())
+                        .setReserveTime(LocalDateTime.of(reserve.getScheduleRecordEntity().getStartDate(), reserve.getScheduleRecordEntity().getClassTime()))
+                        .setCardName(reserve.getCardName())
+                        .setReserveNumbers(reserve.getReserveNums())
+                        .setTimesCost(reserve.getCourseEntity().getTimesCost())
+                        .setOperateTime(null == reserve.getLastModifyTime() ? reserve.getCreateTime() : reserve.getLastModifyTime())
+                        .setOperator(reserve.getOperator())
+                        .setReserveNote(reserve.getNote())
+                        .setReserveStatus(reserve.getStatus())
+        ).collect(Collectors.toList());
+        log.debug("\n==>后端封装的会员详情页的【预约】信息的vo-list==>{}", memberDetailReservedVoList);
+        return new R().put("data", memberDetailReservedVoList);
+    }
+
+
+    /**
+     * 会员详情页的上课信息的预加载
+     * @param id 会员id
+     * @return r-> 上课信息的vo
+     */
+    @PostMapping("/classInfo.do")
+    @ResponseBody
+    public R classInfo(@RequestParam("id") Long id) {
+        log.debug("会员详情页的上课记录的数据返回...");
+        List<ClassInfoVo> classInfoVoList = classRecordService.getClassInfo(id);
+        List<ClassInfoVo> classInfoVos = classInfoVoList.stream().map(info ->
+                info.setClassTime(LocalDateTime.of(info.getScheduleStartDate(), info.getScheduleStartTime()))
+        ).collect(Collectors.toList());
+        log.debug("\n==>后台封装的会员详情页的【上课】信息的vo- list==>{}", classInfoVos);
+
+        return new R().put("data", classInfoVos);
+    }
+
+
+    /**
+     * 会员详情页的消费记录
+     * @param id 会员id
+     * @return r -> 消费记录数据
+     */
+    @PostMapping("/consumeInfo.do")
+    @ResponseBody
+    public R consumeInfo(@RequestParam("id")Long id) {
+        List<ConsumeInfoVo> consumeInfoVoList = consumeRecordService.getConsumeInfo(id);
+        for (ConsumeInfoVo vo : consumeInfoVoList) {
+            vo.setOperateTime(vo.getLastModifyTime() == null ? vo.getCreateTime() : vo.getLastModifyTime());
+        }
+//        List<ConsumeInfoVo> consumeInfoVos = consumeInfoVoList.stream().map(vo -> {
+//            ConsumeInfoVo infoVo = new ConsumeInfoVo();
+//            BeanUtils.copyProperties(vo, infoVo);
+//            infoVo.setOperateTime(vo.getLastModifyTime() == null ? vo.getCreateTime() : vo.getLastModifyTime());
+//            return infoVo;
+//        }).collect(Collectors.toList());
+
+        log.debug("\n==>后台封装的会员详情页的【消费记录】信息的vo-list==>{}", consumeInfoVoList);
+
+        return new R().put("data", consumeInfoVoList);
+    }
+
+
 
 
 }

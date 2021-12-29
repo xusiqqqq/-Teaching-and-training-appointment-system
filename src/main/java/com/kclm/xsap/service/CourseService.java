@@ -1,58 +1,32 @@
 package com.kclm.xsap.service;
 
-import java.util.List;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.kclm.xsap.entity.CourseEntity;
+import com.kclm.xsap.utils.PageUtils;
 
-import com.kclm.xsap.dto.CourseDTO;
-import com.kclm.xsap.entity.TCourse;
+import java.util.List;
+import java.util.Map;
 
 /**
- * 
- * @author harima
- * @since JDK11.0
- * @CreateDate 2020年9月15日 下午3:27:52 
- * @description 此类用来描述了团课管理业务
+ * 课程表
  *
+ * @author fangkai
+ * @email fk_qing@163.com
+ * @date 2021-12-04 16:18:21
  */
-public interface CourseService {
+public interface CourseService extends IService<CourseEntity> {
 
-	boolean save(TCourse course);
-	
-	boolean deleteById(Long id);
-	
-	boolean update(TCourse course);
-	
-	/**
-	 * 	根据id查询课程信息
-	 * @param id
-	 * @return	TCourse
-	 */
-	TCourse findById(Long id);
-	
-	/**
-	 * 	根据name查询课程信息
-	 * @param name
-	 * @return
-	 */
-	TCourse findByName(String name);
-	
-	/**
-	 * 	找到某个会员卡绑定的所有课程信息
-	 * @param cardId
-	 * @return
-	 */
-	List<TCourse> listByCardId(Long cardId);
-	
-	/**
-	 * 分页查询。获取所有的课程信息
-	 * @param currentPage 当前页码
-	 * @param pageSize 每页展示数据个数
-	 * @return List<CourseDTO>。课程信息结果集
-	 */
-	List<CourseDTO> findAllByPage(Integer currentPage,Integer pageSize);
-	
-	/**
-	 * 获取所有的课程信息
-	 * @return List<TCourse>。课程信息结果集
-	 */
-	List<CourseDTO> findAll();
+    /**
+     * 分页
+     * @param params
+     * @return
+     */
+    PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 获取课程信息列表
+     * @return 课程信息
+     */
+    List<CourseEntity> getCourseList();
 }
+

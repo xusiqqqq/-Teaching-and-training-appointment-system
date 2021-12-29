@@ -1,13 +1,12 @@
 package com.kclm.xsap.dto.convert;
 
+import com.kclm.xsap.entity.MemberCardEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
-import org.mapstruct.factory.Mappers;
 
 import com.kclm.xsap.dto.ConsumeRecordDTO;
-import com.kclm.xsap.entity.TConsumeRecord;
-import com.kclm.xsap.entity.TMemberCard;
+import com.kclm.xsap.entity.ConsumeRecordEntity;
 
 /**
  * 
@@ -28,14 +27,14 @@ public interface ConsumeRecordConvert {
 	 * @return	ConsumeRecordDTO。消费记录要展示的信息
 	 */
 	@Mappings({
-		@Mapping(source = "consume.id", target = "consumeId"),
-		@Mapping(source = "card.id", target = "cardId"),
+		@Mapping(source = "consume.id", target = "consumeId"),//??没有id?
+//		@Mapping(source = "card.id", target = "cardId"),
 		@Mapping(source = "card.name",target = "cardName"),
 		@Mapping(source = "consume.createTime",target = "operateTime"),
 		//以消费记录的note为映射依据
 		@Mapping(source = "consume.note",target = "note")
 	})
-	ConsumeRecordDTO entity2Dto(TConsumeRecord consume,TMemberCard card,Integer timesRemainder);
+	ConsumeRecordDTO entity2Dto(ConsumeRecordEntity consume, MemberCardEntity card, Integer timesRemainder);
 	
 	
 	
