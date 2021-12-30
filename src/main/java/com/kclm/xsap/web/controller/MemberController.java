@@ -6,16 +6,21 @@ import com.kclm.xsap.entity.*;
 import com.kclm.xsap.service.*;
 import com.kclm.xsap.utils.R;
 import com.kclm.xsap.utils.exception.RRException;
+import com.kclm.xsap.utils.file.UploadImg;
 import com.kclm.xsap.vo.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.validator.cfg.defs.LengthDef;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -34,6 +39,9 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/member")
 public class MemberController {
+    private static final String UPLOAD_IMAGES_MEMBER_IMG = "upload/images/member_img/";
+
+
     @Autowired
     private MemberService memberService;
 
@@ -75,12 +83,12 @@ public class MemberController {
     public List<MemberVo> memberList() {
         //is_deleted会自动加上
         List<MemberEntity> memberEntityList = memberService.list();
-        //重写这个方法
+        //todo 重写这个方法
 
 
 
 //---------------------------------------
-        List<Long> memberIds = memberEntityList.stream().map(MemberEntity::getId).collect(Collectors.toList());
+//        List<Long> memberIds = memberEntityList.stream().map(MemberEntity::getId).collect(Collectors.toList());
 
 
         List<MemberVo> memberVoList = memberEntityList.stream().map(memberEntity -> {
@@ -102,6 +110,31 @@ public class MemberController {
         return memberVoList;
     }
 
+    @PostMapping("/modifyMemberImg.do")
+    @ResponseBody
+    public R modifyMemberImg(@RequestParam("id") Long id,
+                             @RequestParam("avatarFile") MultipartFile file) {
+        log.debug("\n==>前台传入的老师id==>{}", id);
+
+        if (file.isEmpty()) {
+            return R.error("文件没有上传,请重新上传");
+        }
+        String fileName = UploadImg.uploadImg(file, UPLOAD_IMAGES_MEMBER_IMG);
+        if (StringUtils.isBlank(fileName)) {
+            return R.error("文件上传失败");
+        }
+        boolean isUpdateImg = memberService.update(new UpdateWrapper<MemberEntity>()
+                .set("avatar_url", fileName)
+                .set("last_modify_time", LocalDateTime.now())
+                .setSql("version = version + 1")
+                .eq("id", id));
+        log.debug("\n==>打印更新会员头像是否成功==>{}", isUpdateImg);
+        if (!isUpdateImg) {
+            return R.error("更新会员头像失败！");
+        }
+        return R.ok("更新会员头像成功！").put("avatarUrl", fileName);
+    }
+
 
     /**
      * 异步请求返回要编辑的信息
@@ -111,9 +144,12 @@ public class MemberController {
      */
     @PostMapping("/x_member_edit.do")
     @ResponseBody
-    public MemberEntity memberEdit(@RequestParam("id") Integer id) {
+    public R memberEdit(@RequestParam("id") Integer id) {
 
-        return memberService.getById(id);
+        MemberEntity entityById = memberService.getById(id);
+
+        log.debug("\n==>根据id查出的要返回的会员信息==>{}", entityById);
+        return R.ok().put("data", entityById);
     }
 
 
@@ -131,10 +167,8 @@ public class MemberController {
         boolean isUpdate = memberService.updateById(memberEntity);
         if (isUpdate) {
             return R.ok("更新成功！");
-//            return memberService.getById(memberEntity.getId());
         } else {
             return R.error("更新失败！！");
-//            return memberEntity;
         }
     }
 
@@ -163,11 +197,24 @@ public class MemberController {
      */
     @PostMapping("/deleteOne.do")
     @ResponseBody
+    @Transactional
     public void deleteOne(@RequestParam("id") Integer id) {
         boolean isDeleteMember = memberService.update(new UpdateWrapper<MemberEntity>().set("is_deleted", 1).set("last_modify_time", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)).setSql("version = version + 1").eq("id", id));
         log.debug("\n==>注销会员是否成功==>{}", isDeleteMember);
         if (isDeleteMember) {
             log.debug("\n==>注销会员id={}成功！！",id);
+
+            //找出该会员持有的所有会员卡
+            List<MemberBindRecordEntity> allBindListFromMemberId = memberBindRecordService.list(new QueryWrapper<MemberBindRecordEntity>().select("id").eq("member_id", id));
+            allBindListFromMemberId.forEach(bind -> {
+                int i = memberBindRecordService.updateStatus(bind.getId(), 0);
+                if (i < 0) {
+                    log.debug("\n==>更新该会员持有的会员卡为非激活是否成功==>{}", i);
+                } else {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                }
+            });
+
         } else {
             //1001表示会员模块异常
             throw new RRException("删除失败！！", 1001502);
@@ -216,28 +263,62 @@ public class MemberController {
         return R.error("添加失败,请重试");
     }
 
+
     /**
-     * 返回会员列表，前端使用bootstrap-suggest插件进行给出搜索建议
      *
-     * @return 所有会员列表的分装对象
+     * @return 所有会员
      */
-    @GetMapping("/toSearch.do")
+    @GetMapping("/toSearcherAll.do")
     @ResponseBody
-    public R toSearch() {
-        List<MemberBindRecordEntity> allBindCards = memberBindRecordService.list(new QueryWrapper<MemberBindRecordEntity>().select("member_id"));
-        List<Long> allMemberIdWhoIsHasCards = allBindCards.stream().map(MemberBindRecordEntity::getMemberId).collect(Collectors.toList());
-        List<MemberEntity> allMemberList = memberService.listByIds(allMemberIdWhoIsHasCards);
-        List<SearchMemberToBindVo> searchMemberToBindVoList = allMemberList.stream().map(member ->
+    public R toSearchWithAllMember() {
+        List<MemberEntity> allMemberList = memberService.list();
+        List<SearchMemberToBindVo> allMemberVos = allMemberList.stream().map(member ->
+                //借用这个vo
                 new SearchMemberToBindVo()
                         .setId(member.getId())
                         .setName(member.getName())
                         .setSex(member.getSex())
                         .setPhone(member.getPhone())
         ).collect(Collectors.toList());
-        log.debug("\n==>返回给前端的封装会员信息列表：searchMemberToBindVoList：=>{}", searchMemberToBindVoList);
+        return R.ok().put("value", allMemberVos);
+    }
 
-        return new R().put("value", searchMemberToBindVoList);
+    /**
+     * 返回会员列表，前端使用bootstrap-suggest插件进行给出搜索建议
+     *
+     * @return 所有拥有会员卡的会员列表的分装对象    【返回有会员卡的会员】
+     */
+    @GetMapping("/toSearch.do")
+    @ResponseBody
+    public R toSearch() {
 
+        //初始化值
+        List<SearchMemberToBindVo> searchMemberToBindVoList = null;
+
+        //查出所有会员【的id】
+        List<MemberBindRecordEntity> allBindCards = memberBindRecordService.list(new QueryWrapper<MemberBindRecordEntity>().select("member_id"));
+        //将所有会员的id取出来收集到Long集合
+        List<Long> allMemberIdWhoIsHasCardIds = allBindCards.stream().map(MemberBindRecordEntity::getMemberId).collect(Collectors.toList());
+
+        //如果没有会员信息，listByIds会报错,判断一下【少用mp】
+        if (!allMemberIdWhoIsHasCardIds.isEmpty() ) {
+            List<MemberEntity> memberList = memberService.listByIds(allMemberIdWhoIsHasCardIds);
+            searchMemberToBindVoList = memberList.stream().map(member ->
+                    new SearchMemberToBindVo()
+                            .setId(member.getId())
+                            .setName(member.getName())
+                            .setSex(member.getSex())
+                            .setPhone(member.getPhone())
+            ).collect(Collectors.toList());
+            log.debug("\n==>返回给前端的封装会员信息列表：searchMemberToBindVoList：=>{}", searchMemberToBindVoList);
+        }
+
+        //如果没有会员信息时
+        if (null == searchMemberToBindVoList || searchMemberToBindVoList.isEmpty()) {
+            return R.error("还没有会员信息").put("value", null);
+        }
+
+        return R.ok().put("value", searchMemberToBindVoList);
     }
 
     /**
@@ -339,12 +420,6 @@ public class MemberController {
         for (ConsumeInfoVo vo : consumeInfoVoList) {
             vo.setOperateTime(vo.getLastModifyTime() == null ? vo.getCreateTime() : vo.getLastModifyTime());
         }
-//        List<ConsumeInfoVo> consumeInfoVos = consumeInfoVoList.stream().map(vo -> {
-//            ConsumeInfoVo infoVo = new ConsumeInfoVo();
-//            BeanUtils.copyProperties(vo, infoVo);
-//            infoVo.setOperateTime(vo.getLastModifyTime() == null ? vo.getCreateTime() : vo.getLastModifyTime());
-//            return infoVo;
-//        }).collect(Collectors.toList());
 
         log.debug("\n==>后台封装的会员详情页的【消费记录】信息的vo-list==>{}", consumeInfoVoList);
 

@@ -15,9 +15,9 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -86,7 +86,7 @@ public class MemberCardController {
      */
     @GetMapping("/x_member_card.do")
     public String memberCard() {
-        return "/member/x_member_card";
+        return "member/x_member_card";
     }
 
 
@@ -125,8 +125,8 @@ public class MemberCardController {
         map.addAttribute("cardMsg", cardById);
         map.addAttribute("courseCarry", courseIds);
 
-        ModelAndView mv = new ModelAndView("/member/x_member_card_edit", map);
-        log.debug("mv 跳转==> /member/x_member_card_edit，携带数据");
+        ModelAndView mv = new ModelAndView("member/x_member_card_edit", map);
+        log.debug("mv 跳转==> member/x_member_card_edit，携带数据");
         return mv;
     }
 
@@ -139,7 +139,7 @@ public class MemberCardController {
      */
     @PostMapping("/cardEdit.do")
     @ResponseBody
-    @Transactional  //加入事务
+    @Transactional  //加入事务      //jsr303
     public R cardEdit(@NonNull MemberCardEntity cardEntity, String courseListStr) {
 
 
@@ -171,9 +171,9 @@ public class MemberCardController {
             //将这个string数组转为long数组（courseId）
             List<Long> courseIdList = Arrays.stream(split).map(Long::valueOf).sorted(Long::compareTo).collect(Collectors.toList());
             //courseId的Long型数组，再将这个数组流式赋值，返回CourseCardEntity的集合
-            List<CourseCardEntity> courseCardEntityList = courseIdList.stream().map(item -> {
-                return new CourseCardEntity().setCardId(cardEntity.getId()).setCourseId(item);
-            }).collect(Collectors.toList());
+            List<CourseCardEntity> courseCardEntityList = courseIdList.stream().map(item ->
+                    new CourseCardEntity().setCardId(cardEntity.getId()).setCourseId(item)
+            ).collect(Collectors.toList());
 
             //逻辑：删除再按照前端传入的信息重建
             if (isNotEmpty) {
@@ -207,17 +207,26 @@ public class MemberCardController {
 
     /**
      * 根据传入的会员卡id删除
+     *
      * @param id 前台传入的会员卡id
      */
     @PostMapping("/deleteOne.do")
     @ResponseBody
     @Transactional  //加入事务
     public void deleteOne(Integer id) {
-        //外键约束
-        boolean isDeleteCourseCard = courseCardService.removeById(id);
-        log.debug("由于外键约束：\n 先通过前端传入id删除课程会员卡中间表信息是否成功：isDeleteCourseCard==>{}", isDeleteCourseCard);
+        //先查有没有外键约束
+        int existCourseBind = courseCardService.count(new QueryWrapper<CourseCardEntity>().eq("card_id", id));
+        if (existCourseBind > 0) {
+            //删除外键约束
+            boolean isDeleteCourseCard = courseCardService.removeById(id);
+            log.debug("由于外键约束：\n 先通过前端传入id删除课程会员卡中间表信息是否成功：isDeleteCourseCard==>{}", isDeleteCourseCard);
+        }
+        //再删除会员卡信息
         boolean isDeleteMemberCard = memberCardService.removeById(id);
         log.debug("\n 通过前端传入id删除会员卡是否成功：isDelete：{}", isDeleteMemberCard);
+        if (!isDeleteMemberCard) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+        }
     }
 
 
@@ -257,21 +266,27 @@ public class MemberCardController {
             log.debug("\n 前端传入的courseListStr==>{}", courseListStr);
             //将前端传入的courseListStr流式转成course的id集合
             List<Long> courseIds = Arrays.stream(courseListStr.split(",")).map(Long::valueOf).collect(Collectors.toList());
+            if (courseIds.contains(-1L)) {
+                log.debug("\n==>用户勾选了全选支持的课程【全选会在第一个位置传入-1】");
+                boolean remove = courseIds.remove(-1L);
+                log.debug("\n==>删除-1是否成功：==>{}", remove);
+            }
             log.debug("courseListStr转成List<Long> courseIds==>{}", courseIds);
-            List<CourseCardEntity> toSaveCourseCardEntityList = courseIds.stream().map(id -> {
-                return new CourseCardEntity().setCardId(memberCardEntity.getId()).setCourseId(id);
-            }).collect(Collectors.toList());
+            List<CourseCardEntity> toSaveCourseCardEntityList = courseIds.stream().map(id ->
+                    new CourseCardEntity().setCardId(memberCardEntity.getId()).setCourseId(id)
+            ).collect(Collectors.toList());
 
             boolean isSaveCourseCard = courseCardService.saveCourseCard(toSaveCourseCardEntityList);
             log.debug("会员卡关联可支持的课程保存是否成功：isSaveCourseCard==>{}", isSaveCourseCard);
             if (isSaveCourseCard) {
-                //return R.ok("保存成功");
-                return new R().put("data", "保存成功！");
+                return R.ok("创建卡成功！");
             } else {
-                return new R().put("data", "保存失败！！");
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return R.error("创建新卡失败！");
             }
         } else {
-            return new R().put("data", "会员信息保存成功，关联课程为空");
+            log.debug("\n==>为提交课程信息");
+            return R.ok("添加成功");
         }
     }
 
@@ -304,7 +319,7 @@ public class MemberCardController {
     /**
      * 封装返回会员预约课程时的表单上的信息：1.会员卡剩余次数、2.每节课每人消耗次数
      *
-     * @param bindCardId     前台传入的会员卡id
+     * @param bindCardId 前台传入的会员卡id
      * @param scheduleId 前台传入的排课记录id
      * @return 返回一个封装这些信息的vo
      */
@@ -365,30 +380,33 @@ public class MemberCardController {
      *
      * @param entity   充值表单提交的在充值记录表中存在的该属性的数据
      * @param memberId 表单提交的充值 记录表没有的属性
-     * @param bindId   表单提交的会员绑定id【绑定id即为实际的会员卡id】
+     *                 param bindId   表单提交的会员绑定id【绑定id即为实际的会员卡id】
      * @return r-> 充值是否成功
      */
     @PostMapping("/rechargeOpt.do")
     @ResponseBody
     @Transactional
-    public R rechargeOpt(RechargeRecordEntity entity,
-                         @RequestParam("memberId") Long memberId,
-                         @RequestParam("cardId") Long bindId) {
-        log.debug("\n==>前端传入的会员id和==>{}\n会员绑定id是==>{}\n前端传入的充值信息封装为==>{}", memberId, bindId, entity);
-        //根据前端传入的会员id和会员卡id查询绑定信息
-        entity.setMemberBindId(bindId).setCreateTime(LocalDateTime.now());
+    public R rechargeOpt(@Valid RechargeRecordEntity entity,
+                         BindingResult bindingResult,
+                         @RequestParam("memberId") Long memberId
+            /*@RequestParam("cardId") Long bindId*/) {
+        log.debug("\n==>前端传入的会员id和==>{}\n会员绑定id是==>{}\n前端传入的充值信息封装为==>{}", memberId, entity.getMemberBindId(), entity);
 
-        //1.添加充值记录
-        boolean isSaveRecharge = rechargeRecordService.save(entity);
-        log.debug("\n==>充值1:添加充值记录是否成功==>{}", isSaveRecharge);
-        if (!isSaveRecharge) {
-            return R.error("添加充值记录失败");
+        if (bindingResult.hasErrors()) {
+            HashMap<String, String> map = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(item -> {
+                String message = item.getDefaultMessage();
+                String field = item.getField();
+                map.put(field, message);
+            });
+            return R.error(400, "非法参数").put("errorMap", map);
         }
-        //2.添加操作记录日志
+
+        //1.添加操作记录日志
         MemberLogEntity operateLog = new MemberLogEntity().setType(OperateType.RECHARGE_OPERATION.getMsg())
                 .setInvolveMoney(entity.getReceivedMoney())
                 .setOperator(entity.getOperator())
-                .setMemberBindId(bindId)
+                .setMemberBindId(entity.getMemberBindId())
                 .setCreateTime(LocalDateTime.now())
                 .setCardCountChange(entity.getAddCount())
                 .setCardDayChange(entity.getAddDay())
@@ -396,21 +414,37 @@ public class MemberCardController {
         boolean isSaveMemberLog = memberLogService.save(operateLog);
         log.debug("\n==>充值2：添加操作记录日志是否成功==>{}", isSaveMemberLog);
         if (!isSaveMemberLog) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return R.error("添加操作记录日志失败");
         }
 
+        //2.添加充值记录
+        entity.setCreateTime(LocalDateTime.now()).setLogId(operateLog.getId());
+        boolean isSaveRecharge = rechargeRecordService.save(entity);
+        log.debug("\n==>充值1:添加充值记录是否成功==>{}", isSaveRecharge);
+        if (!isSaveRecharge) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return R.error("添加充值记录失败");
+        }
+
+
         //3.修改会员卡（绑定表，会员和会员卡关联表才是真正的会员卡，会员卡表只是个模板作用）
-        MemberBindRecordEntity bind = memberBindRecordService.getById(bindId);
-        bind.setId(bindId)
-                .setValidCount(bind.getValidCount() + entity.getAddCount())
+        MemberBindRecordEntity bind = memberBindRecordService.getById(entity.getMemberBindId());
+        log.debug("\n==>Bind: ValidCount==>{} ==> Entity: addCount=> {}", bind.getValidCount(), entity.getAddCount());
+        bind.setValidCount(bind.getValidCount() + entity.getAddCount())
                 .setValidDay(bind.getValidDay() + entity.getAddDay())
                 .setPayMode(entity.getPayMode())
                 .setReceivedMoney(bind.getReceivedMoney().add(entity.getReceivedMoney()))
                 .setLastModifyTime(LocalDateTime.now())
-                .setValidCount(bind.getVersion() + 1);
+                .setVersion(bind.getVersion() + 1);
+        log.debug("\n==>bind==>{}", bind);
+        log.debug("\n==>entity==>{}", entity);
+        log.debug("\n==>bind.getVCount{}==>entity.getAddCount==>{}", bind.getValidCount(), entity.getAddCount());
+        log.debug("\n==>+++==>{}", bind.getValidCount() + entity.getAddCount());
         boolean isUpdateBinding = memberBindRecordService.updateById(bind);
         log.debug("\n==>充值3：更新会员绑定表是否成功==>{}", isUpdateBinding);
         if (!isUpdateBinding) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return R.error("更新绑定表失败");
         }
 
@@ -420,9 +454,10 @@ public class MemberCardController {
 
     /**
      * 会员详情页扣费操作
-     * @param entity 扣费表单提交的信息
+     *
+     * @param entity   扣费表单提交的信息
      * @param memberId 会员id
-     * @param bindId 会员卡实体信息
+     * @param bindId   会员卡实体信息
      * @return r -> 扣费结果
      */
     @PostMapping("/consumeOpt.do")
@@ -431,19 +466,13 @@ public class MemberCardController {
     public R consumeOpt(ConsumeRecordEntity entity,
                         @RequestParam("memberId") Long memberId,
                         @RequestParam("cardId") Long bindId) {
+        log.debug("\n==>打印扣费表单提交的消费记录==>{}", entity);
         MemberBindRecordEntity bindById = memberBindRecordService.getById(bindId);
         if (bindById.getValidCount() < entity.getCardCountChange()) {
             return R.error("剩余次数不足,请充值后扣费");
         }
 
-        entity.setMemberBindId(bindId).setOperateType(OperateType.CLASS_DEDUCTION.getMsg()).setCreateTime(LocalDateTime.now());
-        //扣费1、添加消费记录
-        boolean isSaveConsumeRecord = consumeRecordService.save(entity);
-        log.debug("\n==>添加消费记录是否成功==>{}", isSaveConsumeRecord);
-        if (!isSaveConsumeRecord) {
-            return R.error("添加消费记录失败!");
-        }
-        //扣费2、添加操作记录
+        //扣费1、添加操作记录
         MemberLogEntity logEntity = new MemberLogEntity()
                 .setType(OperateType.CLASS_DEDUCTION.getMsg())
                 .setOperator(entity.getOperator())
@@ -455,8 +484,20 @@ public class MemberCardController {
         boolean isSaveLog = memberLogService.save(logEntity);
         log.debug("\n==>添加操作记录日志是否成功==>{}", isSaveLog);
         if (!isSaveLog) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return R.error("添加操作记录日志失败！");
         }
+
+        entity.setMemberBindId(bindId).setOperateType(OperateType.CLASS_DEDUCTION.getMsg()).setCreateTime(LocalDateTime.now()).setLogId(logEntity.getId());
+        //扣费2、添加消费记录
+        log.debug("\n==>打印要添加的消费记录==>{}", entity);
+        boolean isSaveConsumeRecord = consumeRecordService.save(entity);
+        log.debug("\n==>添加消费记录是否成功==>{}", isSaveConsumeRecord);
+        if (!isSaveConsumeRecord) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return R.error("添加消费记录失败!");
+        }
+
         //扣费3、更新实体会员卡的信息
         bindById.setValidCount(bindById.getValidCount() - entity.getCardCountChange())
                 .setValidDay(bindById.getValidDay() - entity.getCardDayChange())
@@ -464,6 +505,7 @@ public class MemberCardController {
                 .setVersion(bindById.getVersion() + 1);
         boolean isUpdateBindRecord = memberBindRecordService.updateById(bindById);
         if (!isUpdateBindRecord) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return R.error("更新会员卡信息失败");
         }
 
@@ -482,12 +524,18 @@ public class MemberCardController {
     @ResponseBody
     public R operateRecord(@RequestParam("memberId") Long memberId,
                            @RequestParam("cardId") Long bindId) {
+        log.debug("\n==>前台传入的会员id==>{}\n ==>前台传入的绑定id ==>{}", memberId, bindId);
         List<OperateRecordVo> operateRecordVos = rechargeRecordService.getOperateRecord(memberId, bindId);
+        //给到期时间赋值
         for (OperateRecordVo vo : operateRecordVos) {
-            vo.setEndToDate(vo.getLastModifyTime() == null ? vo.getCreateTime() : vo.getLastModifyTime());
+//            vo.setEndToDate(vo.getLastModifyTime() == null ? vo.getCreateTime().plusDays(vo.getValidDay()) : vo.getLastModifyTime().plusDays(vo.getValidDay()));
+            vo.setChangeCount(vo.getCardCountChange() == null ? vo.getAddCount() : vo.getCardCountChange());
+            vo.setChangeMoney(vo.getReceivedMoney() == null ? vo.getMoneyCost() : vo.getReceivedMoney());
         }
 
-        return new R().put("data", operateRecordVos);
+        log.debug("\n==>打印查出来的操作记录的vo信息==>{}", operateRecordVos);
+        return R.ok().put("data", operateRecordVos);
+//        return new R().put("data", operateRecordVos);
     }
 
 }

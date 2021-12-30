@@ -21,6 +21,11 @@
     <link href="../../static/css/plugins/dataTables/dataTables.bootstrap.css"
      th:href="@{/static/css/plugins/dataTables/dataTables.bootstrap.css}" rel="stylesheet">
 
+
+    <!--sweetalert.css-->
+    <link href="../../static/css/plugins/sweetalert/sweetalert.css" rel="stylesheet"
+          th:href="@{/static/css/plugins/sweetalert/sweetalert.css}">
+
 </head>
 
 <body class="gray-bg">
@@ -75,6 +80,10 @@
 <script src="../../static/js/plugins/dataTables/dataTables.bootstrap.js" th:src="@{/static/js/plugins/dataTables/dataTables.bootstrap.js}"></script>
 <script src="../../static/js/plugins/echarts/echarts-all.js"></script>
 
+<!--sweetalert-->
+<script src="../../static/js/plugins/sweetalert/sweetalert.min.js"
+        th:src="@{/static/js/plugins/sweetalert/sweetalert.min.js}"></script>
+
 
 <!-- Page-Level Scripts -->
 <script>
@@ -84,32 +93,16 @@
     });
 
     $(function () {
-        /*var dtConfig = {
-            "data":[
-                {"name":"张山","card":"17001","allhour":100,"usedhour":80,"lefthour":20,"allmoney":1000,"usedmoney":800,"leftmoney":200},
-                {"name":"李四","card":"17010","allhour":120,"usedhour":40,"lefthour":80,"allmoney":1200,"usedmoney":400,"leftmoney":800},
-                {"name":"王五","card":"18001","allhour":80,"usedhour":80,"lefthour":0,"allmoney":800,"usedmoney":800,"leftmoney":0},
-                {"name":"赵六","card":"16001","allhour":200,"usedhour":80,"lefthour":120,"allmoney":2000,"usedmoney":800,"leftmoney":1200},
-                {"name":"张山","card":"19001","allhour":100,"usedhour":80,"lefthour":20,"allmoney":1000,"usedmoney":800,"leftmoney":200},
-            ],
-            "columns":[
-                {"data":"name"},
-                {"data":"card"},
-                {"data":"allhour"},
-                {"data":"usedhour"},
-                {"data":"lefthour"},
-                {"data":"allmoney"},
-                {"data":"usedmoney"},
-                {"data":"leftmoney"}
-            ]
-        }
-         $('.dataTables-example').dataTable(dtConfig);
-    */
-
 
         $.post("[[${#request.getContextPath()}]]/statistics/cardInfo.do", function (data) {
 
+
+
             var infoList = data.data;
+            if (data.code === 400) {
+                swal(data.msg,"","info");
+                infoList = [];
+            }
             $('.dataTables-example').dataTable({
                 "data": infoList.memberCardStatisticsVos,
                 "columns":[
@@ -123,7 +116,6 @@
                     {"data":"balance"}
                 ]
             });
-            /*===============*/
 
 
 

@@ -55,7 +55,7 @@ public class MemberBindRecordController {
      */
     @GetMapping("/x_member_card_bind.do")
     public String memberCardBind() {
-        return "/member/x_member_card_bind";
+        return "member/x_member_card_bind";
     }
 
     /**

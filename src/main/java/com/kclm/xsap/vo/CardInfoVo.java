@@ -1,5 +1,6 @@
 package com.kclm.xsap.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.kclm.xsap.entity.MemberCardEntity;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -39,6 +40,7 @@ public class CardInfoVo {
     /**
      * 到期时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private LocalDateTime dueTime;
     /**
      * 激活状态

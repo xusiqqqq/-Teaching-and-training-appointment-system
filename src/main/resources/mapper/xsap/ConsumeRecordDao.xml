@@ -24,7 +24,7 @@
         <result property="createTime" column="create_time"/>
         <result property="lastModifyTime" column="last_modify_time"/>
         <result property="cardCountChange" column="card_count_change"/>
-        <result property="timesRemainder" column="total_count"/>
+        <result property="timesRemainder" column="valid_count"/>
         <result property="moneyCost" column="money_cost"/>
         <result property="operateType" column="operate_type"/>
         <result property="operator" column="operator"/>
@@ -37,7 +37,7 @@
                tcr.create_time,
                tcr.last_modify_time,
                tcr.card_count_change,
-               tmc.total_count,
+               tmbr.valid_count,
                tcr.money_cost,
                tcr.operate_type,
                tcr.operator,

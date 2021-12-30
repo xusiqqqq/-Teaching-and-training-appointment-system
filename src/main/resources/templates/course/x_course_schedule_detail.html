@@ -221,8 +221,8 @@
                                             <th>会员卡</th>
                                             <th>性别</th>
                                             <th>出生日期</th>
-                                            <th>消费次数</th>
-                                            <!--<th>消费金额</th>-->
+                                            <th>课程消费次数(单人)</th>
+                                            <th>听课人数</th>
                                             <th>操作时间</th>
                                             <th>状态</th>
                                             <th>操作</th>
@@ -372,7 +372,7 @@
                         <label class="col-sm-2 control-label">
                             扣除次数</label>
                         <div class="col-sm-6">
-                            <input class="form-control" name="cardCountChange" placeholder="1" type="number" value="1">
+                            <input class="form-control" id="cardCountChange" name="cardCountChange" placeholder="1" type="number" value="1">
                         </div>
 
                         <div class="col-sm-4">
@@ -435,10 +435,11 @@
         console.log(consumeForm);
     });
 
-    function toConsume(member_id, card_id, class_id, schedule_id) {
+    function toConsume(member_id, card_id, class_id, timesCost, reserveNums, schedule_id) {
         $("#consume_memberId").val(member_id);
         $("#consume_cardId").val(card_id);
         $("#classId").val(class_id);
+        $("#cardCountChange").val(timesCost * reserveNums);
 
         var reserve_id = "";
         $("#consume_btn").on("mouseenter", function () {
@@ -610,6 +611,7 @@
             });
 
         });
+
 
 
         /*------------导出数据----------*/
@@ -811,7 +813,7 @@
                     {"data": "memberSex"},
                     {"data": "memberBirthday"},
                     {"data": "timesCost"},
-                    /*{"data": "involveMoney"},*/
+                    {"data": "reserveNums"},
                     {"data": "operateTime"},
                     {
                         "data": "checkStatus", "render": function (data, type, row) {
@@ -829,7 +831,7 @@
                             if (data == '1') {
                                 return "<button  class='btn btn-default btn-xs' disabled>确认扣费</button>";
                             } else {
-                                return "<button  class='btn btn-primary btn-xs' onclick='toConsume(" + row.memberId + "," + row.cardId + "," + row.classRecordId + "," + schedule_id + ")' data-toggle='modal' data-target='#details_deduction'>确认扣费</button>";
+                                return "<button  class='btn btn-primary btn-xs' onclick='toConsume(" + row.memberId + "," + row.cardId + "," + row.classRecordId + "," + row.timesCost + "," + row.reserveNums + "," + schedule_id + ")' data-toggle='modal' data-target='#details_deduction'>确认扣费</button>";
                             }
                         }
                     }

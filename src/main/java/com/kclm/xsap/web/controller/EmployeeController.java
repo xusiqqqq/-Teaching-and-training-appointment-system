@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kclm.xsap.entity.*;
 import com.kclm.xsap.service.*;
 import com.kclm.xsap.utils.R;
+import com.kclm.xsap.utils.file.UploadImg;
 import com.kclm.xsap.vo.TeacherClassRecordVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -17,13 +18,10 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.io.File;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -41,15 +39,11 @@ import java.util.stream.Stream;
 @RequestMapping("/user")
 public class EmployeeController {
 
-//    private static final String FILEPATH = "upload/images/avatar_img/";
-    private static final String FILEPATH = "src/main/resources/static/img/";
+    private static final String UPLOAD_IMAGES_TEACHER_IMG = "upload/images/teacher_img/";
 
 
     @Autowired
     private EmployeeService employeeService;
-
-    @Autowired
-    private ClassRecordService classRecordService;
 
     @Autowired
     private ScheduleRecordService scheduleRecordService;
@@ -213,19 +207,21 @@ public class EmployeeController {
     @PostMapping("/teacherDetail.do")
     @ResponseBody
     public R teacherDetail(@RequestParam("tid") Long id) {
-        EmployeeEntity byId = employeeService.getById(id);
-        return new R().put("data", byId);
+        EmployeeEntity teacherInfo = employeeService.getById(id);
+        log.debug("\n==>打印返回到前端的老师详情信息==>{}", teacherInfo);
+        return R.ok().put("data", teacherInfo);
     }
 
 
     /**
      * 封装老师管理中的上课记录信息
-     * @param id
+     * @param id 老师id
      * @return
      */
     @PostMapping("/teacherClassRecord.do")
     @ResponseBody
     public R teacherClassRecord(@RequestParam("tid") Long id) {
+        log.debug("\n==>传入的teacherId==>{}", id);
 
         List<ScheduleRecordEntity> scheduleForTeacher = scheduleRecordService.list(new QueryWrapper<ScheduleRecordEntity>().eq("teacher_id", id));
         log.debug("\n==>该老师的所有排课计划==>{}", scheduleForTeacher);
@@ -233,19 +229,17 @@ public class EmployeeController {
             Long courseId = entity.getCourseId();
             CourseEntity courseById = courseService.getById(courseId);
             String courseName = courseById.getName();
-            log.debug("\n==>课程名==>{}", courseName);
             LocalDateTime classTime = LocalDateTime.of(entity.getStartDate(), entity.getClassTime());
-            log.debug("\n==>上课时间==>{}", classTime);
             List<Long> cardIdList = courseCardService.list(new QueryWrapper<CourseCardEntity>().eq("course_id", courseId)).stream().map(CourseCardEntity::getCardId).collect(Collectors.toList());
             Stream<String> cardNameList = memberCardService.listByIds(cardIdList).stream().map(MemberCardEntity::getName);
             String[] cardName = cardNameList.toArray(String[]::new);
-            log.debug("\n==>会员卡名集合==>{}\n会员卡名数组{}", cardNameList, cardName);
             Integer timesCost = courseById.getTimesCost();
-            log.debug("\n==>使用次数==>{}", timesCost);
 
             TeacherClassRecordVo vo = new TeacherClassRecordVo().setCourseName(courseName).setClassTime(classTime).setCardName(Arrays.toString(cardName)).setTimesCost(timesCost);
             return vo;
         }).collect(Collectors.toList());
+
+        log.debug("\n==>打印返回到前台的老师上课记录信息是：==>{}", teacherClassRecordVos);
 
         return new R().put("data", teacherClassRecordVos);
     }
@@ -265,7 +259,8 @@ public class EmployeeController {
 
         if (!file.isEmpty()) {
             log.debug("\n==>文件上传...");
-            String fileName = uploadImg(file);
+//            String fileName = uploadImg(file);
+            String fileName = UploadImg.uploadImg(file, UPLOAD_IMAGES_TEACHER_IMG);
             if (StringUtils.isNotBlank(fileName)) {
                 EmployeeEntity entity = new EmployeeEntity().setId(id).setAvatarUrl(fileName).setVersion(+1);
                 boolean isUpdateAvatarUrl = employeeService.updateById(entity);
@@ -278,48 +273,6 @@ public class EmployeeController {
         }
         return R.error("文件未上传");
 
-    }
-
-    /**
-     * 文件上传的方法
-     * @param file 传入的文件流
-     * @return uuid修改的文件名
-     */
-    private String uploadImg(MultipartFile file) {
-        String projectDir = System.getProperty("user.dir");
-        log.debug("\n==>文件上传中打印工程目录==>{}", projectDir);
-
-        //获取原始文件名
-        String originalFilename = file.getOriginalFilename();
-        log.debug("\n==>上传图片的原始名字==>{}", originalFilename);
-        //生成一个uuid作为文件的新名字
-        String fileName = UUID.randomUUID().toString();
-
-        //获取原始文件的扩展名
-        assert originalFilename != null;
-        String suffix = originalFilename.substring(originalFilename.lastIndexOf('.'));
-        log.debug("\n==>原始文件的缀名==>{}", suffix);
-        //拼接文件新名字
-        fileName += suffix;
-        log.debug("\n==>上传图片的新名字==>{}", fileName);
-
-        //io
-        try {
-            File realPath = new File(projectDir, FILEPATH);
-            log.debug("\n==>文件的存放地址==>{}", realPath);
-            if (!realPath.exists()) {
-                log.debug("创建文件目录结构");
-                realPath.mkdirs();
-            }
-
-            File fileFullPath = new File(realPath, fileName);
-            file.transferTo(fileFullPath);
-            log.debug("\n==>文件上传成功! ==>文件名：{};文件地址：==>{}", fileName, fileFullPath);
-        } catch (IOException e) {
-            log.error("头像上传失败！");
-            throw new RuntimeException(e);
-        }
-        return fileName;
     }
 
 
@@ -378,6 +331,23 @@ public class EmployeeController {
             log.debug("\n==>删除老师失败");
             throw new RuntimeException("删除失败！");
         }
+    }
+
+
+    /**
+     * 携带数据跳转老师更新页面
+     * @param id 老师id
+     * @return x_teacher_update.html（携带老师信息）
+     */
+    @GetMapping("/x_teacher_update")
+    public ModelAndView updateTeacher(@RequestParam("id") Long id) {
+        EmployeeEntity teacherById = employeeService.getById(id);
+
+        ModelAndView mv = new ModelAndView();
+        mv.addObject("teacherMsg",teacherById);
+        mv.setViewName("employee/x_teacher_update");
+
+        return mv;
     }
 
 }

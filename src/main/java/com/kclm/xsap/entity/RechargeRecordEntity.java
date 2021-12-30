@@ -15,6 +15,9 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 /**
  * 充值记录
  * 
@@ -37,18 +40,22 @@ public class RechargeRecordEntity implements Serializable {
 	/**
 	 * 充值可用次数
 	 */
+	@NotNull(message = "请输入充值次数")
 	private Integer addCount;
 	/**
 	 * 延长有效天数
 	 */
+	@NotNull(message = "请输入演唱天数")
 	private Integer addDay;
 	/**
 	 * 实收金额
 	 */
+	@NotNull(message = "请输入实收金额")
 	private BigDecimal receivedMoney;
 	/**
 	 * 支付方式
 	 */
+	@NotBlank(message = "请确认支付方式")
 	private String payMode;
 	/**
 	 * 操作员

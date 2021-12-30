@@ -19,6 +19,11 @@ public interface ScheduleRecordService extends IService<ScheduleRecordEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
 
+    /**
+     * 获取指定日期的所有排课
+     * @param startDate
+     * @return
+     */
     List<ScheduleRecordEntity> getSameDateSchedule(LocalDate startDate);
 }
 

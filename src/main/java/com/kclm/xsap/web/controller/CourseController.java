@@ -72,7 +72,7 @@ public class CourseController {
     @GetMapping("/x_course_list_add.do")
     public String courseListAdd() {
         log.debug("\n==>跳转到课程添加页面...==>");
-        return "/course/x_course_list_add";
+        return "course/x_course_list_add";
     }
 
 
@@ -83,7 +83,7 @@ public class CourseController {
      */
     @GetMapping("/x_course_list.do")
     public String courseList() {
-        return "/course/x_course_list";
+        return "course/x_course_list";
     }
 
     /**
@@ -109,7 +109,7 @@ public class CourseController {
         map.addAttribute("courseInfo", courseEntityById);
 
 
-        ModelAndView mv = new ModelAndView("/course/x_course_list_edit", map);
+        ModelAndView mv = new ModelAndView("course/x_course_list_edit", map);
         log.debug("\n==>跳转课程编辑页面==>x_course_list_edit.html");
         return mv;
     }
@@ -119,7 +119,7 @@ public class CourseController {
      * 异步添加保存提交的课程信息
      *
      * @param courseEntity 表单提交的课程信息
-     * @param cardListStr 表单提交的支持的会员卡
+     * @param cardListStr  表单提交的支持的会员卡
      * @return r -> 添加结果
      */
     @PostMapping("/courseAdd.do")
@@ -282,6 +282,12 @@ public class CourseController {
             isRemoveCourse = courseService.removeById(id);
 
             log.debug("\n==>删除课程信息是否成功==>{}", isRemoveCourse);
+
+            if (isRemoveCourse) {
+                return R.ok("删除成功！即将跳转课程列表");
+            } else {
+                return R.error("删除失败");
+            }
         } catch (Exception e) {
             Throwable cause = e.getCause();
             if (cause instanceof SQLIntegrityConstraintViolationException) {
@@ -291,17 +297,7 @@ public class CourseController {
                 }
             }
         }
-
-        /*if (!isRemoveCourse) {
-            return R.error("删除失败!此课程已经生成了预约、上课、排课等记录，不可被删除！");
-        }*/
-
-        if (!isRemoveCourse) {
-            return R.ok("删除成功！即将跳转课程列表");
-        }
-
-        return R.error("删除失败");
-
+        return R.error("未知错误！请联系管理员");
     }
 
 

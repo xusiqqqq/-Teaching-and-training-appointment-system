@@ -1,5 +1,6 @@
 package com.kclm.xsap.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -25,6 +26,7 @@ public class MemberDetailReservedVo {
     /**
      * 预约的课程时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
     private LocalDateTime reserveTime;
     /**
      * 预约使用的会员卡
@@ -41,6 +43,7 @@ public class MemberDetailReservedVo {
     /**
      * 操作时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
     private LocalDateTime operateTime;
     /**
      * 操作人

@@ -25,6 +25,15 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class Test {
 
+
+    @org.junit.jupiter.api.Test
+    void test16() {
+        Integer integer = (1);
+        integer= null;
+        System.out.println(integer);
+    }
+
+
     @org.junit.jupiter.api.Test
     void test15(){
         Date date = new Date();

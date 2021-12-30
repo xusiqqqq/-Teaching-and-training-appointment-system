@@ -16,16 +16,6 @@ import java.time.LocalDateTime;
 @Data
 @Accessors
 public class OperateRecordVo {
-    /*
-    "operateTime"}
-"operateType"}
-"validTimes"},
-"endToDate"},
-"involveMoney"
-"operator"},
-"cardNote"},
-": "status",
-     */
     /**
      * 操作记录id
      */
@@ -40,17 +30,40 @@ public class OperateRecordVo {
      */
     private String operateType;
     /**
-     * 可用次数
+     * 消费的卡次数
      */
-    private Integer validTimes;
+    private Integer cardCountChange;
+    /**
+     * 充值的卡次数
+     */
+    private Integer addCount;
+
+    /**
+     * 变化的次数
+     */
+    private Integer changeCount;
+
+    /**
+     * 有效期
+     */
+//    private Integer validDay;
     /**
      * 卡到期日
      */
-    private LocalDateTime endToDate;
+//    private LocalDateTime endToDate;
     /**
-     * 金额
+     * 消费金额
      */
-    private BigDecimal involveMoney;
+    private BigDecimal moneyCost;
+    /**
+     * 充值金额
+     */
+    private BigDecimal receivedMoney;
+    /**
+     * 变化的金额
+     */
+    private BigDecimal changeMoney;
+
     /**
      * 操作人
      */

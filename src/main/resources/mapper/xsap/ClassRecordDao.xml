@@ -61,6 +61,7 @@
                tm.birthday mbirthday,
 #        tcre.card_count_change,
 #        tcre.money_cost,
+               trr.reserve_nums,
                tc.times_cost,
                tcr.create_time,
                tcr.last_modify_time,
@@ -101,16 +102,17 @@
                tc.times_cost    courseTimeCost,
                tcr.comment      classComment,
                tcr.check_status classCheckStatus
-        from t_class_record tcr,
+        from t_reservation_record trr,
              t_schedule_record tsr,
              t_course tc,
              t_employee te,
-             t_reservation_record trr
-        where tcr.schedule_id = tsr.id
+             t_class_record tcr
+        where trr.member_id = #{id}
+          and trr.schedule_id = tsr.id
           and tsr.course_id = tc.id
           and tsr.teacher_id = te.id
-          and trr.schedule_id = tsr.id
-          and tcr.member_id = #{id}
+          and tsr.id = tcr.schedule_id
+          and tcr.member_id = trr.member_id
     </select>
 
 

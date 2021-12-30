@@ -18,5 +18,10 @@ import java.util.List;
 @Mapper
 public interface ScheduleRecordDao extends BaseMapper<ScheduleRecordEntity> {
 
+    /**
+     * 获取指定日期的所有排课
+     * @param startDate
+     * @return
+     */
     List<ScheduleRecordEntity> selectSameDateSchedule(@Param("startDate") LocalDate startDate);
 }

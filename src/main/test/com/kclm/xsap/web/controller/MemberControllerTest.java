@@ -8,6 +8,7 @@ import com.kclm.xsap.consts.OperateType;
 import com.kclm.xsap.entity.*;
 import com.kclm.xsap.service.*;
 import com.kclm.xsap.vo.ClassRecordVo;
+import com.kclm.xsap.vo.indexStatistics.IndexPieChartVo;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -63,6 +65,59 @@ class MemberControllerTest {
 
     @Autowired
     private CourseService courseService;
+
+    @Autowired
+    private MemberBindRecordService memberBindRecordService;
+
+    @Autowired
+    private MemberCardController memberCardController;
+
+
+    @Test
+    void test22() {
+        memberCardController.deleteOne(44);
+
+    }
+
+
+    @Test
+    void test21() {
+        List<MemberCardEntity> cardEntityList = memberCardService.list(new QueryWrapper<MemberCardEntity>().select("id","name"));
+        List<Long> cardIds = cardEntityList.stream().map(MemberCardEntity::getId).collect(Collectors.toList());
+
+        List<IndexPieChartVo> collect = cardEntityList.stream().map(cardEntity -> {
+//            List<MemberBindRecordEntity> card_id = memberBindRecordService.list(new QueryWrapper<MemberBindRecordEntity>().eq("card_id", cardEntity.getId()));
+            log.debug("\n==>打印ka==>{}",cardEntity);
+
+            int nums = memberBindRecordService.count(new QueryWrapper<MemberBindRecordEntity>().eq("card_id", cardEntity.getId()));
+//            HashMap<String, Integer> tempMap = new HashMap<>();
+//            tempMap.put(cardEntity.getName(), card_id);
+
+            log.debug("\n==>打印数量==>{}", nums);
+
+            IndexPieChartVo vo = new IndexPieChartVo();
+            vo.setName(cardEntity.getName()).setValue(nums);
+            return vo;
+        }).collect(Collectors.toList());
+
+
+
+        collect .forEach(System.out::println);
+    }
+
+    @Test
+    void test20() {
+        List<MemberEntity> currentMonthLogoutMemberInfo = memberService.getCurrentMonthLogoutMemberInfo(LocalDate.now().getYear(),LocalDate.now().getMonthValue());
+        currentMonthLogoutMemberInfo.forEach(System.out::println);
+    }
+
+
+    @Test
+    void test19() {
+        List<MemberEntity> allSurvive = memberService.list(new QueryWrapper<MemberEntity>().likeRight("create_time", LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"))).orderByDesc("create_time"));
+
+        allSurvive.forEach(System.out::println);
+    }
 
 
     @Test

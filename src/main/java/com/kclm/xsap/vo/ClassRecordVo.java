@@ -25,8 +25,10 @@ public class ClassRecordVo {
 
     //会员卡名
     private String cardName;
-    //消费次数
+    //消费次数/一节课/一个人
     private Integer timesCost;
+    //参加人数
+    private Integer reserveNums;
     //消费金额
     private BigDecimal involveMoney;
     //操作时间

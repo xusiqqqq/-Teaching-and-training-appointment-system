@@ -17,7 +17,7 @@ import java.io.IOException;
 @Order(1)
 //@ServletComponentScan
 @Slf4j
-@WebFilter(urlPatterns = {"*.do","/index.html","/index"},filterName = "loginFilter", dispatcherTypes =
+@WebFilter(urlPatterns = {"*.do","/index.html","/index", "" ,"/"},filterName = "loginFilter", dispatcherTypes =
         {DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.INCLUDE, DispatcherType.ASYNC})
 public class LoginFilter implements Filter {
 

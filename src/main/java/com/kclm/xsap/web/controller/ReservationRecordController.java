@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -48,9 +49,6 @@ public class ReservationRecordController {
 
     @Autowired
     private ClassRecordService classRecordService;
-
-    @Autowired
-    private MemberBindRecordService memberBindRecordService;
 
 
     /**
@@ -145,6 +143,8 @@ public class ReservationRecordController {
      */
     private R updateOfCancel(ReservationRecordEntity entity) {
 
+        //todo 考虑扣费后直接不显示
+
         //判断该节课是否已经扣费成功【因为扣费操作是原子操作，这里通过判断用户是否确认上课为据】
         QueryWrapper<ClassRecordEntity> queryWrapper = new QueryWrapper<ClassRecordEntity>().eq("member_id", entity.getMemberId()).eq("card_name", entity.getCardName()).eq("schedule_id", entity.getScheduleId());
 
@@ -170,8 +170,6 @@ public class ReservationRecordController {
             Integer contains = courseService.getById(scheduleById.getCourseId()).getContains();
             log.debug("\n==>该课程可容纳的人数==>{}", contains);
             //查出该课程已经预约了多少人
-//            int reservedCount = reservationRecordService.count(new QueryWrapper<ReservationRecordEntity>().eq("schedule_id", scheduleId).eq("status", 1));
-//            log.debug("\n==>该课程目前已经预约的人数==>{}", reservedCount);
             Integer currentOrderNums = scheduleById.getOrderNums();
             log.debug("\n==>该课程当前已经预约的人数==>{}", currentOrderNums);
             boolean isUpdateReserveNums = scheduleRecordService.update(new UpdateWrapper<ScheduleRecordEntity>().eq("id", scheduleId).set("order_nums", currentOrderNums - entity.getReserveNums()));
@@ -241,7 +239,7 @@ public class ReservationRecordController {
             } else {
                 //未达到三次，采取更新//todo 预约取消的时候要更新取消次数
                 log.debug("\n==>存在预约记录,且取消次数未超过三次==>即将更新记录");
-                existOne.setLastModifyTime(LocalDateTime.now());
+                existOne.setLastModifyTime(LocalDateTime.now()).setReserveNums(entity.getReserveNums()).setNote(entity.getNote());
                 return addOrUpdateReservation(existOne);
             }
         }
@@ -405,7 +403,7 @@ public class ReservationRecordController {
         }
         //到这里说明，在预约开始和截止时间都不做限制时的添加,需要满足至少在课程开始之前
         if (nowOperationTime.isBefore(classStartTimeOfSchedule)) {
-            log.debug("\n执行appointment_start_mode 1 + appointment_deadline_mode 1的模式 \n 需要至少满足在课程开始之前");
+            log.debug("\n执行appointment_start_mode 1 + appointment_deadline_mode 1的模式 \n 需要至少满足在课程开始之前...即将添加预约");
             return addReservation(entity);
 
         } else {
@@ -422,29 +420,29 @@ public class ReservationRecordController {
      */
     @Transactional
     public R addReservation(ReservationRecordEntity entity) {
-        log.debug("\n数据库更新操作...");
+        log.debug("\n数据库更新操作...\n传入的预约记录封装的entity是==>{}", entity);
+        //取出预约记录的排课记录id
+        Long scheduleId = entity.getScheduleId();
+        //根据排课记录id查出排课记录完整信息
+        ScheduleRecordEntity scheduleById = scheduleRecordService.getById(scheduleId);
+        //查出该课程的容纳人数
+        Integer contains = courseService.getById(scheduleById.getCourseId()).getContains();
+        //查出该课程已经预约了多少人
+        Integer currentOrderNums = scheduleById.getOrderNums();
+        log.debug("\n==>该课程可容纳的人数==>{}\n==>该课程当前已经预约的人数==>{} \n==>本次添加的人数==>{}", contains, currentOrderNums, entity.getReserveNums());
+        if (contains < currentOrderNums + entity.getReserveNums()) {
+            return R.error("该课程容量已满");
+        }
         //更新或保存预约记录
         boolean isAddReserve = reservationRecordService.saveOrUpdate(entity);
         if (isAddReserve) {
-            //取出预约记录的排课记录id
-            Long scheduleId = entity.getScheduleId();
-            //根据排课记录id查出排课记录完整信息
-            ScheduleRecordEntity scheduleById = scheduleRecordService.getById(scheduleId);
-            //查出该课程的容纳人数
-            Integer contains = courseService.getById(scheduleById.getCourseId()).getContains();
-            log.debug("\n==>该课程可容纳的人数==>{}", contains);
-            //查出该课程已经预约了多少人
-//            int reservedCount = reservationRecordService.count(new QueryWrapper<ReservationRecordEntity>().eq("schedule_id", scheduleId).eq("status", 1));
-//            log.debug("\n==>该课程目前已经预约的人数==>{}", reservedCount);
-            Integer currentOrderNums = scheduleById.getOrderNums();
-            log.debug("\n==>该课程当前已经预约的人数==>{}", currentOrderNums);
+
             boolean isUpdateReserve = scheduleRecordService.update(new UpdateWrapper<ScheduleRecordEntity>()
                     .eq("id", scheduleId)
-                    .set(contains >= currentOrderNums + entity.getReserveNums(), "order_nums", currentOrderNums + entity.getReserveNums()));
+                    .set("order_nums", currentOrderNums + entity.getReserveNums()));
             if (isUpdateReserve) {
                 //课堂容量够用，可以继续预约
                 //先查出使用的绑定会员卡id,即会员卡实体的id       这里的cardId已经改成了会员卡实体id了，即为bindId
-//                Long bindId = memberBindRecordService.getOne(new QueryWrapper<MemberBindRecordEntity>().eq("member_id", entity.getMemberId()).eq("card_id", entity.getCardId())).getId();
                 Long bindId = entity.getCardId();
 
                 //添加上课信息
@@ -456,6 +454,7 @@ public class ReservationRecordController {
                         .setNote("正常预约客户");
                 ClassRecordEntity existClassRecord = classRecordService.getOne(new QueryWrapper<ClassRecordEntity>().eq("member_id", entity.getMemberId()).eq("card_name", entity.getCardName()).eq("schedule_id", entity.getScheduleId()));
                 if (null != existClassRecord && null != existClassRecord.getId()) {
+                    //存在上课记录还要考虑嘛？
                     classRecordEntity.setLastModifyTime(LocalDateTime.now()).setVersion(existClassRecord.getVersion() + 1);
                     classRecordEntity = existClassRecord;
                 } else {
@@ -465,21 +464,22 @@ public class ReservationRecordController {
                 boolean isSaveClassRecord = classRecordService.saveOrUpdate(classRecordEntity);
                 log.debug("\n==>添加上课信息是否成功==>{}", isSaveClassRecord);
                 if (!isSaveClassRecord) {
+                    //手动回滚
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     return R.error("添加上课信息失败");
                 }
-
                 return R.ok("预约成功！");
-            } else {
-                return R.error("该课程容量已满");
             }
-        } else {
-            return R.error("预约失败");
         }
+        //手动回滚
+        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+        return R.error("预约失败");
     }
 
 
     /**
      * 用于获取预约id  【上课确认扣费--鼠标离开按钮事件】
+     *
      * @param memberId
      * @param scheduleId
      * @return

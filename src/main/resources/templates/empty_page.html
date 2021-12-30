@@ -17,6 +17,11 @@
     <link href="../static/css/animate.css" th:href="@{/static/css/animate.css}" rel="stylesheet">
     <link href="../static/css/style.css?v=4.1.0" th:href="@{/static/css/style.css(v='4.1.0')}" rel="stylesheet">
 
+
+    <!-- ECharts -->
+    <script src="../static/js/plugins/echarts/echarts-all.js"
+            th:src="@{/static/js/plugins/echarts/echarts-all.js}"></script>
+
 </head>
 
 <body class="gray-bg">
@@ -39,7 +44,7 @@
         </div>
     </div>
 
-    <div class="wrapper wrapper-content">
+    <!--<div class="wrapper wrapper-content">
         <div class="row">
             <div class="col-sm-12">
                 <div class="middle-box text-center animated fadeInRightBig">
@@ -52,6 +57,62 @@
                 </div>
             </div>
         </div>
+    </div>-->
+    <div>
+        <script type="text/javascript">
+            var echarts = require('echarts');
+
+            var chartDom = document.getElementById('main');
+            var myChart = echarts.init(chartDom);
+            var option;
+
+            option = {
+                title: {
+                    text: 'Step Line'
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: ['新增', '流失']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                toolbox: {
+                    feature: {
+                        saveAsImage: {}
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'aa']
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        name: '新增',
+                        type: 'line',
+                        step: 'start',
+                        data: [120, 132, 101, 134, 90, 230, 210]
+                    },
+                    {
+                        name: '流失',
+                        type: 'line',
+                        step: 'middle',
+                        data: [220, 282, 201, 234, 290, 430, 410, 56]
+                    }
+                ]
+            };
+
+            option && myChart.setOption(option);
+
+        </script>
     </div>
 
     <!-- 全局js -->

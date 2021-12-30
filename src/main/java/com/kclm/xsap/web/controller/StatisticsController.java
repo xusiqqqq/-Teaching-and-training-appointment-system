@@ -127,7 +127,14 @@ public class StatisticsController {
         剩余：相减或者查bind表                   剩余金额
          */
 
-        List<MemberBindRecordEntity> allMemberWithCard = memberBindRecordService.list();
+        List<MemberBindRecordEntity> allMemberWithCard = memberBindRecordService.list(new QueryWrapper<MemberBindRecordEntity>().eq("active_status", 1));
+
+        log.debug("\n==>empth==>{}", allMemberWithCard.isEmpty());
+        log.debug("\n==>all==>{}", allMemberWithCard);
+
+        if (allMemberWithCard.isEmpty()) {
+            return R.error("还没有会员绑卡信息");
+        }
         List<MemberCardStatisticsVo> memberCardStatisticsVos = allMemberWithCard.stream().map(entity -> {
             //会员id
             Long memberId = entity.getMemberId();
@@ -238,6 +245,10 @@ public class StatisticsController {
         //过滤出月统计模式和季度统计模式---根据指定年份查出所有消费记录的时间和消费金额
         List<ConsumeRecordEntity> consumeInfoWithTimeAndMoneyForMonthAndQuarter = consumeInfoWithTimeAndMoney.stream()
                 .filter(consume -> consume.getCreateTime().getYear() == yearOfSelect).collect(Collectors.toList());
+
+        if (consumeInfoWithTimeAndMoneyForMonthAndQuarter.isEmpty()) {
+            return R.error("选中统计时段没有消费记录");
+        }
 
 
         //创建一个盛放月份和当月花费的map
@@ -361,11 +372,19 @@ public class StatisticsController {
         List<EmployeeEntity> teacherInfoWithIdAndName = employeeService.list(new QueryWrapper<EmployeeEntity>().select("id", "name").eq("is_deleted", 0));
         log.debug("\n==>打印所有存在【未被删除】的老师的信息【只查询id,name】==>{}", teacherInfoWithIdAndName);
 
+        if (teacherInfoWithIdAndName.isEmpty()) {
+            return R.error("没有老师信息");
+        }
+
         //查询出所有已经上了的课（通过超过当前时间过滤）的排课信息【只查询了courseId,teacherId,orderNums,startDate】,按照startDate倒序【为了取出最大月份或季度从而确定柱状图的最大项】
         List<ScheduleRecordEntity> allClassAlreadyTaken = scheduleRecordService.list(new QueryWrapper<ScheduleRecordEntity>().select("course_id", "teacher_id", "order_nums", "start_date", "class_time").orderByDesc("start_date")).stream().filter(schedule -> {
             LocalDateTime classLocalDateTime = LocalDateTime.of(schedule.getStartDate(), schedule.getClassTime());
             return classLocalDateTime.isBefore(LocalDateTime.now());
         }).collect(Collectors.toList());
+
+        if (allClassAlreadyTaken.isEmpty()) {
+            return R.error("指定时间内没有上课信息");
+        }
 
 
         //创建一个map存放不同老师(id)对应的在不同统计条件下的课消次数,即在mapT中存放另一个mapTeacherOne:mapT = {key = teacherId, value = map={key = 统计条件, value = 该条件下的课消次数}}
@@ -385,14 +404,20 @@ public class StatisticsController {
             if (unit == 1) {
                 //如果前台选择的统计模式是按月统计：
                 /*获取当前老师上的当前课程的课消次数；由于使用月份作为map的key,所以相同开课月份的不同课程的课消次数都会被加在一起；遍历完所有课程之后即获取了当前老师的所有课消次数
-                 todo 注意：这里的课消次数有问题，只计算了每节课程的消耗次数timesCost，没有考虑该课程的预约人数【因为添加预约时的该课程的预约总人数(order_nums)没有做好】
+                 todo 注意：这里的课消次数有问题，只计算了每节课程的消耗次数timesCost，没有考虑该课程的预约人数【因为添加预约时的该课程的预约总人数(order_nums)没有做好】==> 已完成
                  */
                 classAlreadyTakenForCurrentTeacherForMonthOrQuarter.forEach(scheduleRecordEntity -> {
                     //查出当前记录的上课时间的月份
                     int monthValue = scheduleRecordEntity.getStartDate().getMonthValue();
                     log.debug("\n==>打印当前排课的上课日期的月份==>{}", monthValue);
-                    Integer timesCost = courseService.getById(scheduleRecordEntity.getCourseId()).getTimesCost();//todo 总人数
-                    mapTeacherCurrent.put(monthValue, mapTeacherCurrent.getOrDefault(monthValue, 0) + timesCost);
+                    //单位课程次数
+                    Integer timesCost = courseService.getById(scheduleRecordEntity.getCourseId()).getTimesCost();
+                    //课程预约人数
+                    Integer orderNums = scheduleRecordEntity.getOrderNums();
+                    log.debug("\n==>打印当前课程单位人数所需次数==>{}\n 打印当前课程的预约人数==>{}", timesCost, orderNums);
+                    //如果人数为0，则置为1（用于和单位次数相乘得总次数）
+                    Integer orderNumForTotal = orderNums == 0 ? 1 : orderNums;
+                    mapTeacherCurrent.put(monthValue, mapTeacherCurrent.getOrDefault(monthValue, 0) + timesCost * orderNumForTotal);
                     log.debug("\n==>打印当前的老师id=> {}及其对应的mapTeacherCurrent【key=月份,value=课消次数】=>{}", scheduleRecordEntity.getTeacherId(), mapTeacherCurrent);
                 });
                 //以老师id作为key, 以另一个map(以月份作为key,对应课消次数作为value)做为value放进mapT
@@ -403,8 +428,16 @@ public class StatisticsController {
                     //取得当前记录上课时间的季度
                     int quarter = (scheduleRecordEntity.getStartDate().getMonthValue() - 1) / 3 + 1;
                     log.debug("\n==>打印当前排课的上课日期的季度==>{}", quarter);
+                    //单位课程次数
                     Integer timesCost = courseService.getById(scheduleRecordEntity.getCourseId()).getTimesCost();
-                    mapTeacherCurrent.put(quarter, mapTeacherCurrent.getOrDefault(quarter, 0) + timesCost);//todo 总人数
+                    //课程预约人数
+                    Integer orderNums = scheduleRecordEntity.getOrderNums();
+                    log.debug("\n==>打印当前课程单位人数所需次数==>{}\n 打印当前课程的预约人数==>{}", timesCost, orderNums);
+                    //如果人数为0，则置为1（用于和单位次数相乘得总次数）
+                    Integer orderNumForTotal = orderNums == 0 ? 1 : orderNums;
+
+                    mapTeacherCurrent.put(quarter, mapTeacherCurrent.getOrDefault(quarter, 0) + timesCost * orderNumForTotal);// 总人数
+
                     log.debug("\n==>打印当前的老师id=> {}及其对应的mapTeacherCurrent【key=季度,value=课消次数】=>{}", scheduleRecordEntity.getTeacherId(), mapTeacherCurrent);
                 });
                 //以老师id作为key, 以另一个map(以季度作为key,对应课消次数作为value)做为value放进mapT
@@ -413,12 +446,24 @@ public class StatisticsController {
                 //按起始和结束年份统计        //todo 要不要将流合并
                 List<ScheduleRecordEntity> classAlreadyTakenForCurrentTeacherForYear = allClassAlreadyTaken.stream().filter(schedule -> schedule.getTeacherId().equals(teacher.getId()) && schedule.getStartDate().getYear() >= beginYear && schedule.getStartDate().getYear() <= endYear).collect(Collectors.toList());
 
+                if (classAlreadyTakenForCurrentTeacherForYear.isEmpty()) {
+                    return R.error("指定时间内没有排课记录");
+                }
+
                 classAlreadyTakenForCurrentTeacherForYear.forEach(scheduleRecordEntity -> {
                     //取得当前上课记录的上课时间的年份
                     int year = scheduleRecordEntity.getStartDate().getYear();
                     log.debug("\n==>打印当前排课记录的上课日期的年份==>{}", year);
+
+                    //单位课程次数
                     Integer timesCost = courseService.getById(scheduleRecordEntity.getCourseId()).getTimesCost();
-                    mapTeacherCurrent.put(year, mapTeacherCurrent.getOrDefault(year, 0) + timesCost); //todo 总人数
+                    //课程预约人数
+                    Integer orderNums = scheduleRecordEntity.getOrderNums();
+                    log.debug("\n==>打印当前课程单位人数所需次数==>{}\n 打印当前课程的预约人数==>{}", timesCost, orderNums);
+                    //如果人数为0，则置为1（用于和单位次数相乘得总次数）
+                    Integer orderNumForTotal = orderNums == 0 ? 1 : orderNums;
+
+                    mapTeacherCurrent.put(year, mapTeacherCurrent.getOrDefault(year, 0) + timesCost * orderNumForTotal);
                     log.debug("\n==>打印当前的老师id=> {}及其对应的mapTeacherCurrent【key=年份,value=课消次数】=>{}", scheduleRecordEntity.getTeacherId(), mapTeacherCurrent);
                 });
                 //以老师id作为key, 以另一个map(以年度作为key,对应课消次数作为value)做为value放进mapT
@@ -551,6 +596,11 @@ public class StatisticsController {
             //查出所有指定年份的所有排课记录【包含id，课程id，预约人数，上课日期】,按日期倒序
             List<ScheduleRecordEntity> scheduleRecordForSpecifyYear = scheduleRecordService.list(new QueryWrapper<ScheduleRecordEntity>().select("id", "course_id", "order_nums", "start_date").likeRight("start_date", yearOfSelect).orderByDesc("start_date"));
             log.debug("\n==>打印指定年份的排课信息【包含id，课程id，预约人数，上课日期】==>");
+
+            if (scheduleRecordForSpecifyYear.isEmpty()) {
+                return R.error("指定时间内没有排课记录");
+            }
+
             scheduleRecordForSpecifyYear.forEach(System.out::println);
             scheduleRecordForSpecifyYear.forEach(schedule -> {
                 //获取当前流中的上课记录的所在月份
@@ -591,6 +641,11 @@ public class StatisticsController {
             //查出所有指定年份的所有排课记录【包含id，课程id，预约人数，上课日期】,按日期倒序
             List<ScheduleRecordEntity> scheduleRecordForSpecifyYear = scheduleRecordService.list(new QueryWrapper<ScheduleRecordEntity>().select("id", "course_id", "order_nums", "start_date").likeRight("start_date", yearOfSelect).orderByDesc("start_date"));
             log.debug("\n==>打印指定年份的排课信息【包含id，课程id，预约人数，上课日期==>");
+
+            if (scheduleRecordForSpecifyYear.isEmpty()) {
+                return R.error("指定时间内没有排课记录");
+            }
+
             scheduleRecordForSpecifyYear.forEach(System.out::println);
             scheduleRecordForSpecifyYear.forEach(schedule -> {
                 //获取当前流中记录的上课时间所在的季度
@@ -635,6 +690,11 @@ public class StatisticsController {
                     .le("start_date", LocalDate.of(endYear, 12, 31)));
             log.debug("\n==>打印指定年份的排课信息【包含id，课程id，预约人数，上课日期==>");
             scheduleRecordForBeginYearAndEndYear.forEach(System.out::println);
+
+            if (scheduleRecordForBeginYearAndEndYear.isEmpty()) {
+                return R.error("指定时间内没有排课记录");
+            }
+
             //遍历
             scheduleRecordForBeginYearAndEndYear.forEach(schedule -> {
                 //获取当前流中记录的上课时间所在的季度
@@ -666,6 +726,12 @@ public class StatisticsController {
     }
 
 
+    /**
+     * 新增与流失统计页面数据
+     *
+     * @param vo 前台传入的表单数据
+     * @return r -> 页面数据
+     */
     @PostMapping("/addAndStreamCountMonthOrSeasonOrYear")
     @ResponseBody
     public R addAndStreamInfo(StatisticsOfCardCostVo vo) {
@@ -675,6 +741,7 @@ public class StatisticsController {
         Integer yearOfSelect = vo.getYearOfSelect();
         Integer beginYear = vo.getBeginYear();
         Integer endYear = vo.getEndYear();
+
 
         //创建要返回到前台的vo
         CardCostVo cardCountVo = new CardCostVo();
@@ -686,16 +753,23 @@ public class StatisticsController {
         //创建返回vo的y轴list
         List<Integer> yDataList2 = new ArrayList<>();
 
+        if(null == yearOfSelect) {
+            yearOfSelect = -1;
+        }
 
         if (unit == 1) {
 
             //所有还存活的会员  //.eq("is_deleted", 0) mp会默认加上
-            List<MemberEntity> memberSurviveForMonthList = memberService.list(new QueryWrapper<MemberEntity>().select("create_time").likeRight("create_time", yearOfSelect).orderByDesc("create_time"));
+            List<MemberEntity> memberSurviveForMonthList = memberService.list(new QueryWrapper<MemberEntity>().select("create_time").likeRight(null != yearOfSelect,"create_time", yearOfSelect).orderByDesc("create_time"));
             log.debug("\n==>打印指定年份里所有还存活的会员信息==>{}", memberSurviveForMonthList);
 
             //所有注销的员工   //注意逻辑删除后的数据mp查不出来
-            List<MemberEntity> memberLogOutForMonthList = memberService.getMemberLogOutInSpecifyYear(endYear);
+            List<MemberEntity> memberLogOutForMonthList = memberService.getMemberLogOutInSpecifyYear(yearOfSelect);
             log.debug("\n==>打印指定年份里所有注销的会员信息==>{}", memberLogOutForMonthList);
+
+            if (memberLogOutForMonthList.isEmpty() && memberSurviveForMonthList.isEmpty()) {
+                return R.error("选中时间没有新增会员和注销会员信息");
+            }
 
 
             //创建一个盛放月份和当月新增会员数量的map
@@ -743,7 +817,7 @@ public class StatisticsController {
             log.debug("\n==>打印指定年份里所有还存活的会员信息==>{}", memberSurviveForQuarterList);
 
             //所有注销的员工   //注意逻辑删除后的数据mp查不出来
-            List<MemberEntity> memberLogOutForQuarterList = memberService.getMemberLogOutInSpecifyYear(endYear);
+            List<MemberEntity> memberLogOutForQuarterList = memberService.getMemberLogOutInSpecifyYear(yearOfSelect);
             log.debug("\n==>打印指定年份里所有注销的会员信息==>{}", memberLogOutForQuarterList);
 
 
@@ -792,9 +866,9 @@ public class StatisticsController {
             log.debug("\n==>打印在beginYear和endYear之间的所有存活的会员信息==>{}", memberSurviveForYearList);
 
             List<MemberEntity> memberLogOutForYearList = memberService.getMemberLogOutFromBeginYearToEndYear().stream().filter(member ->
-                            member.getLastModifyTime().isAfter(LocalDateTime.of(2021, 1, 1, 0, 0))
+                    member.getLastModifyTime().isAfter(LocalDateTime.of(beginYear, 1, 1, 0, 0))
                             &&
-                            member.getLastModifyTime().isBefore(LocalDateTime.of(2021, 12, 31, 23, 59)))
+                            member.getLastModifyTime().isBefore(LocalDateTime.of(endYear, 12, 31, 23, 59)))
                     .collect(Collectors.toList());
             log.debug("\n==>打印在beginYear和endYear之间的所有所有已经注销的会员信息==>{}", memberLogOutForYearList);
 
@@ -811,8 +885,8 @@ public class StatisticsController {
 
             //遍历beginYear和endYear之间注销的会员信息
             memberLogOutForYearList.forEach(member -> {
-                        int year = member.getLastModifyTime().getYear();
-                        memberLogOutYearMap.put(year, memberLogOutYearMap.getOrDefault(year, 0) + 1);
+                int year = member.getLastModifyTime().getYear();
+                memberLogOutYearMap.put(year, memberLogOutYearMap.getOrDefault(year, 0) + 1);
             });
 
             log.debug("\n==>年度和当前年度新增会员数量的map==>{}\n==>年度和当前年度注销会员数量的map==>{}", memberSurviveYearMap, memberLogOutYearMap);

@@ -92,11 +92,14 @@
         trr.operator,
         trr.status              reserveStatus,
         tsr.start_date,
-        tsr.class_time
+        tsr.class_time,
+        tcr.check_status        classCheck
+
         from t_reservation_record trr
         left join t_member tm on tm.id = trr.member_id
         left join t_schedule_record tsr on tsr.id = trr.schedule_id
         left join t_course tc on tc.id = tsr.course_id
+        left join t_class_record tcr on tm.id = tcr.member_id and tsr.id = tcr.schedule_id
 
         <where>
             <if test="flag != null">

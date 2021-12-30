@@ -184,7 +184,7 @@
                                    id="support_program">
                                 <thead>
                                 <tr>
-                                    <th><input class="i-checks" id="check_all" name="courseListStr" type="checkbox">
+                                    <th><input class="i-checks" id="check_all" name="courseListStr" type="checkbox" value="-1">
                                     </th>
                                     <th class="col-sm-7">课程</th>
                                     <th>收费情况(次卡)</th>
@@ -298,7 +298,7 @@
                     data: formData,
                     success: function (data) {
                         if (data.code === 0) {
-                            swal(data.msg, "您已经保存了这一张新的会员卡。", "success");
+                            swal(data.msg, "您已经创建了这一张新的会员卡。", "success");
                             //刷新界面
                             setTimeout(function () {
                                 window.location.href = '[[${#request.getContextPath()}]]/card/x_member_card.do'
@@ -314,7 +314,7 @@
                             swal(data.msg, "未知错误", "info")
                             setTimeout(function () {
                                 window.location.reload();
-                            });
+                            },1200);
                         }
                     },
                     error: function () {
@@ -325,26 +325,6 @@
                     }
                 });
             });
-
-
-            /*$.ajax({
-                url: '[[${#request.getContextPath()}]]/card/cardAdd.do',
-                type: 'post',
-                data: formData,
-                dataType: 'json',
-                success: function (data) {
-                    console.log(data);
-                    if (data.code === 0) {
-                        //刷新界面
-                        alert(data.data)
-                        window.location.href = '[[${#request.getContextPath()}]]/card/x_member_card.do'
-                    }
-                },
-                error: function (data) {
-                    alert(data.data);
-                    window.location.reload();
-                }
-            });*/
         })
 
 
