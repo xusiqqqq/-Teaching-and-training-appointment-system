@@ -193,7 +193,7 @@ public class IndexController {
         }
 
         //给返回的vo赋值
-        infoVo.setTitle("当月每日收费统计")
+        infoVo.setTitle("当月每日消费统计")
                 .setXname("日")
                 .setTime(xStrList)
                 .setData(yDataList);
