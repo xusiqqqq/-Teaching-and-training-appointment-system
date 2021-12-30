@@ -13,6 +13,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.validator.cfg.defs.LengthDef;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -195,11 +197,24 @@ public class MemberController {
      */
     @PostMapping("/deleteOne.do")
     @ResponseBody
+    @Transactional
     public void deleteOne(@RequestParam("id") Integer id) {
         boolean isDeleteMember = memberService.update(new UpdateWrapper<MemberEntity>().set("is_deleted", 1).set("last_modify_time", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)).setSql("version = version + 1").eq("id", id));
         log.debug("\n==>注销会员是否成功==>{}", isDeleteMember);
         if (isDeleteMember) {
             log.debug("\n==>注销会员id={}成功！！",id);
+
+            //找出该会员持有的所有会员卡
+            List<MemberBindRecordEntity> allBindListFromMemberId = memberBindRecordService.list(new QueryWrapper<MemberBindRecordEntity>().select("id").eq("member_id", id));
+            allBindListFromMemberId.forEach(bind -> {
+                int i = memberBindRecordService.updateStatus(bind.getId(), 0);
+                if (i < 0) {
+                    log.debug("\n==>更新该会员持有的会员卡为非激活是否成功==>{}", i);
+                } else {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                }
+            });
+
         } else {
             //1001表示会员模块异常
             throw new RRException("删除失败！！", 1001502);

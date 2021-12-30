@@ -127,7 +127,14 @@ public class StatisticsController {
         剩余：相减或者查bind表                   剩余金额
          */
 
-        List<MemberBindRecordEntity> allMemberWithCard = memberBindRecordService.list();
+        List<MemberBindRecordEntity> allMemberWithCard = memberBindRecordService.list(new QueryWrapper<MemberBindRecordEntity>().eq("active_status", 1));
+
+        log.debug("\n==>empth==>{}", allMemberWithCard.isEmpty());
+        log.debug("\n==>all==>{}", allMemberWithCard);
+
+        if (allMemberWithCard.isEmpty()) {
+            return R.error("还没有会员绑卡信息");
+        }
         List<MemberCardStatisticsVo> memberCardStatisticsVos = allMemberWithCard.stream().map(entity -> {
             //会员id
             Long memberId = entity.getMemberId();
