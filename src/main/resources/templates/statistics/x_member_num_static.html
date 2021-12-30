@@ -22,6 +22,11 @@
     <link href="../../static/css/plugins/datapicker/datepicker3.css"
           rel="stylesheet" th:href="@{/static/css/plugins/datapicker/datepicker3.css}">
 
+    <!--sweetalert.css-->
+    <link href="../../static/css/plugins/sweetalert/sweetalert.css" rel="stylesheet"
+          th:href="@{/static/css/plugins/sweetalert/sweetalert.css}">
+
+
 </head>
 
 <body class="gray-bg">
@@ -110,6 +115,11 @@
         th:src="@{/static/js/plugins/datapicker/bootstrap-datepicker.zh-CN.min.js}"></script>
 <script src="../../static/js/plugins/echarts/echarts-all.js"
         th:src="@{/static/js/plugins/echarts/echarts-all.js}"></script>
+
+<!--sweetalert-->
+<script src="../../static/js/plugins/sweetalert/sweetalert.min.js"
+        th:src="@{/static/js/plugins/sweetalert/sweetalert.min.js}"></script>
+
 <script type="text/javascript">
     $(function () {
         /*时间控件配置*/
@@ -166,15 +176,21 @@
                 url: "/statistics/addAndStreamCountMonthOrSeasonOrYear",
                 data: $(form).serialize(),
                 success: function (data) {
-                    var info = data.data;
-                    console.log(info);
 
-                    option.title.text = info.title;
-                    option.xAxis.data = info.time;
-                    option.xAxis.name = info.xname;
-                    option.series[0].data = info.data;
-                    option.series[1].data = info.data2;
-                    chart.setOption(option, true);
+                    if (data.code === 0) {
+
+                        var info = data.data;
+                        console.log(info);
+
+                        option.title.text = info.title;
+                        option.xAxis.data = info.time;
+                        option.xAxis.name = info.xname;
+                        option.series[0].data = info.data;
+                        option.series[1].data = info.data2;
+                        chart.setOption(option, true);
+                    } else {
+                        swal(data.msg, "", "info");
+                    }
                 }
             });
             return false;

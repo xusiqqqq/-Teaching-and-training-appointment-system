@@ -8,8 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -49,14 +47,20 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
     }
 
     @Override
-    public List<MemberEntity> getMemberLogOutInSpecifyYear(Integer endYear) {
-        return baseMapper.selectMemberLogOutSpecifyYear(endYear);
+    public List<MemberEntity> getMemberLogOutInSpecifyYear(Integer yearOfSelect) {
+        return baseMapper.selectMemberLogOutSpecifyYear(yearOfSelect);
     }
 
     @Override
     public List<MemberEntity> getMemberLogOutFromBeginYearToEndYear() {
 
         return baseMapper.getMemberLogOutFromBeginYearToEndYear();
+    }
+
+    @Override
+    public List<MemberEntity> getCurrentMonthLogoutMemberInfo(Integer currentYear,Integer currentMonth) {
+
+        return baseMapper.selectCurrentMonthLogoutMemberInfo(currentYear,currentMonth);
     }
 
 

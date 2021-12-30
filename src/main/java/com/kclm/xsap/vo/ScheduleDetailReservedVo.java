@@ -23,6 +23,10 @@ public class ScheduleDetailReservedVo {
      */
     private Integer reserveStatus;
     /**
+     * 上课确认状态
+     */
+    private Integer classCheck;
+    /**
      * 会员名
      */
     private String memberName;

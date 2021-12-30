@@ -24,8 +24,24 @@ public interface MemberService extends IService<MemberEntity> {
     List<MemberVo> getMemberVoList();
 
 
-    List<MemberEntity> getMemberLogOutInSpecifyYear(Integer endYear);
+    /**
+     * 查询指定年份的所有注销用户，按注销时间倒序
+     * @param endYear 指定年份
+     * @return 所有注销用户
+     */
+    List<MemberEntity> getMemberLogOutInSpecifyYear(Integer yearOfSelect);
 
+    /**
+     *
+     * @return 所有注销用户；按注销时间倒序
+     */
     List<MemberEntity> getMemberLogOutFromBeginYearToEndYear();
+
+    /**
+     *
+     * @param currentMonth 当前月份的字符串 "yyyy-MM"
+     * @return 返回所有当前月份的注销用户信息
+     */
+    List<MemberEntity> getCurrentMonthLogoutMemberInfo(Integer currentYear, Integer currentMonth);
 }
 

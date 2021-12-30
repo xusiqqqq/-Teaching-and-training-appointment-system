@@ -16,7 +16,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @Create 2020-09-04 9:07
  */
 
-//@Configuration
+@Configuration
 @Slf4j
 public class WebMvcConfig implements WebMvcConfigurer {
     private final String UPLOAD_IMAGE_URL;
@@ -25,6 +25,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         log.debug("虚拟映射路径处理");
         String homeDir = System.getProperty("user.dir");
         UPLOAD_IMAGE_URL = "file:" + homeDir + "\\upload\\images\\";
+//        UPLOAD_IMAGE_URL = "file:" + homeDir + "\\src\\main\\resources\\static\\img";
         log.debug("\n----> 上传的图片映射路径：{}",UPLOAD_IMAGE_URL);
     }
 
@@ -34,6 +35,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         //添加一个文件上传的静态路径映射, 如果是文件目录，则需要以 file: 开头
         registry.addResourceHandler("/images/**").addResourceLocations(UPLOAD_IMAGE_URL);
+//        registry.addResourceHandler("/img/**").addResourceLocations(UPLOAD_IMAGE_URL);
     }
 
 

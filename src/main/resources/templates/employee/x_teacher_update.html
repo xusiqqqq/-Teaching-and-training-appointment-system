@@ -19,6 +19,9 @@
     <!-- bootstrap-datepicker -->
     <link href="../../static/css/plugins/datapicker/datepicker3.css" th:href="@{/static/css/plugins/datapicker/datepicker3.css}" rel="stylesheet">
 
+    <link href="../../static/css/plugins/sweetalert/sweetalert.css"
+          rel="stylesheet" th:href="@{/static/css/plugins/sweetalert/sweetalert.css}">
+
 </head>
 
 <body class="gray-bg">
@@ -117,6 +120,9 @@
 <!-- Data picker -->
 <script src="../../static/js/plugins/datapicker/bootstrap-datepicker.js" th:src="@{/static/js/plugins/datapicker/bootstrap-datepicker.js}"></script>
 <script src="../../static/js/plugins/datapicker/bootstrap-datepicker.zh-CN.min.js" th:src="@{/static/js/plugins/datapicker/bootstrap-datepicker.zh-CN.min.js}"></script>
+
+<script src="../../static/js/plugins/sweetalert/sweetalert.min.js"
+        th:src="@{/static/js/plugins/sweetalert/sweetalert.min.js}"></script>
 </body>
 <script>
 
@@ -124,14 +130,47 @@
         $('#editForm').on('submit', function (e) {
             e.preventDefault();
             const serializeFormUpdate = $(this).serialize();
-            $.ajax({
+
+            swal({
+                title: "您确定要更新老师信息么",
+                text: "注意:您正在更新老师的信息",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确认",
+                closeOnConfirm: false
+            }, function () {
+                $.ajax({
+                    url: '[[${#request.getContextPath()}]]/user/teacherEdit.do',
+                    type: 'post',
+                    data: serializeFormUpdate,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.code === 0) {
+                            swal(data.msg, "", "success");
+                            setTimeout(function () {
+                                window.location.href='[[${#request.getContextPath()}]]/user/x_teacher_list.do'
+                            }, 1000);
+                        } else {
+                            swal(data.msg, "", "info");
+                        }
+                    },
+                    error: function (jqXHR) {
+                        // 失败
+                        alert("更新失败！,请联系管理员！！");
+                    }
+                });
+            });
+
+
+            /*$.ajax({
                 url: '[[${#request.getContextPath()}]]/user/teacherEdit.do',
                 type: 'post',
                 data: serializeFormUpdate,
                 dataType: 'json',
                 success: function (data) {
                     if (data.code === 0) {
-                        alert(data.msg);
+
                         window.location.href='[[${#request.getContextPath()}]]/user/x_teacher_list.do'
                     }
                 },
@@ -139,7 +178,7 @@
                     alert(data.msg);
                 }
 
-            });
+            });*/
         })
 
         $('#reset').click(function () {

@@ -276,7 +276,8 @@
             type: "post",
             data: {id: mid},
             dataType: "json",
-            success: function (memberData) {
+            success: function (data) {
+                var memberData = data.data;
                 var birthdayStr = "";
                 if (memberData.birthday != null) {
                     birthdayStr = memberData.birthday.toString();
@@ -343,24 +344,6 @@
                 }
             });
         });
-
-        /*//移除重复提示
-        $("input[name='phone']").nextAll().remove();
-        //提交表单
-        $.ajax({
-            url: "[[${#request.getContextPath()}]]/member/memberEdit.do",
-            type: "post",
-            data: form,
-            success: function (data) {
-
-                alert("保存成功！")
-                window.location.reload();
-            },
-            error: function (jqXHR) {
-                alert("更新失败, 请重新再试!");
-            }
-
-        });*/
     }
 
 

@@ -336,10 +336,10 @@
 
         /* 填充下拉列表 - 会员卡 */
         var cardListSave = "";
-        $.post("[[${#request.getContextPath()}]]/card/cardList.do", function (cardList) {
-            cardListSave = cardList;
-            for (var i = 0; i < cardList.length; i++) {
-                $("#selectList").append("<option  value='" + cardList[i].id + "'>" + cardList[i].name + "</option>");
+        $.post("[[${#request.getContextPath()}]]/card/cardList.do", function (data) {
+            cardListSave = data.data;
+            for (var i = 0; i < cardListSave.length; i++) {
+                $("#selectList").append("<option  value='" + cardListSave[i].id + "'>" + cardListSave[i].name + "</option>");
             }
 
         });
@@ -385,7 +385,6 @@
         /* 保存会员信息,绑定会员卡 */
         $('.btn.btn-success').click(function () {
             //添加会员检验
-            // $.post("[[${#request.getContextPath()}]]/member/memberAdd.do",formAdd,function(memberMsg){
             $.post("[[${#request.getContextPath()}]]/member/memberAdd.do", formAdd, function (data) {
 
                 if (data.code === 0) {

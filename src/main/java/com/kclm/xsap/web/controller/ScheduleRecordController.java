@@ -12,6 +12,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -84,7 +85,7 @@ public class ScheduleRecordController {
     @GetMapping("/x_course_schedule.do")
     public String courseSchedule() {
         log.debug("\n==>跳转到排课课程表==>");
-        return "/course/x_course_schedule";
+        return "course/x_course_schedule";
     }
 
 
@@ -94,6 +95,7 @@ public class ScheduleRecordController {
      *
      * @return vo数据
      */
+    //todo 重写方法 用R统一返回
     @PostMapping("/scheduleList.do")
     @ResponseBody
     public List<CourseScheduleVo> scheduleList() {
@@ -157,11 +159,11 @@ public class ScheduleRecordController {
             LocalTime startTime = entity.getClassTime();
             //获取课程时长
             Long courseDuration = entity.getCourseDuration();
+            //计算课程结束时间
             LocalTime endTime = startTime.plusMinutes(courseDuration);
             //只要新增的课程的开始和结束时间不在其他课程的开始结束时间之内就可以无冲添加
             log.debug("\n==>提交的课程的开始时间==>{}\n提交的课程的结束时间==>{}", startTime, endTime);
 
-//            List<ScheduleRecordEntity> sameDateSchedule = scheduleRecordService.list(new QueryWrapper<ScheduleRecordEntity>().eq("start_date", startDate));
             List<ScheduleRecordEntity> sameDateScheduleList = scheduleRecordService.getSameDateSchedule(startDate);
             if (!sameDateScheduleList.isEmpty()) {
                 log.debug("\n==>打印当天的所有课程【此日志用于排查排课时间冲突】==>{}", sameDateScheduleList);
@@ -169,7 +171,9 @@ public class ScheduleRecordController {
                 for (ScheduleRecordEntity sameDateSchedule : sameDateScheduleList) {
                     LocalTime sameDateClassStartTime = sameDateSchedule.getClassTime();
                     LocalTime sameDateClassEndTime = sameDateClassStartTime.plusMinutes(sameDateSchedule.getCourseEntity().getDuration());
-                    if ((startTime.isAfter(sameDateClassStartTime) && startTime.isBefore(sameDateClassEndTime)) || (endTime.isAfter(sameDateClassStartTime) && endTime.isBefore(sameDateClassEndTime))) {
+                    //加上10分钟：表示可以在10下课十分钟之后继续添加课程
+                    if ((startTime.isAfter(sameDateClassStartTime) && startTime.isBefore(sameDateClassEndTime.plusMinutes(10))) || (endTime.isAfter(sameDateClassStartTime) && endTime.isBefore(sameDateClassEndTime.plusMinutes(10)))) {
+                        log.debug("\n==>添加课程->添加时间冲突【我们默认设置下课十分钟后可以继续添加新的课程】");
                         return R.error("排课时间冲突");
                     }
                 }
@@ -450,13 +454,19 @@ public class ScheduleRecordController {
 
 
         for (ReservationRecordEntity entity : reservationListByScheduleId) {
-            //获取当前会员id
+            /*//获取当前会员id
             Long memberId = entity.getMemberId();
             //获取当前会员使用的会员卡
             Long cardId = entity.getCardId();
             //获取会员卡实体的id
             MemberBindRecordEntity currentCardBindRecord = memberBindRecordService.getOne(new QueryWrapper<MemberBindRecordEntity>().eq("member_id", memberId).eq("card_id", cardId));
-            Long bindId = currentCardBindRecord.getId();
+            Long bindId = currentCardBindRecord.getId();*/
+
+            //获取当前会员id
+            Long memberId = entity.getMemberId();
+            //获取会员卡实体的id
+            Long bindId = entity.getCardId();
+            MemberBindRecordEntity currentCardBindRecord = memberBindRecordService.getById(bindId);
 
             //获取此卡单次预约的人数（用于和一节课消耗次数相乘求此卡减去的次数）
             Integer reserveNums = entity.getReserveNums();
@@ -471,6 +481,7 @@ public class ScheduleRecordController {
             boolean isSaveLog = memberLogService.save(logEntity);
             log.debug("\n==>添加操作记录是否成功==>{}", isSaveLog);
             if (!isSaveLog) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return R.error("一键确认扣费失败");
             }
 
@@ -485,18 +496,19 @@ public class ScheduleRecordController {
             boolean isSaveConsumeRecord = consumeRecordService.save(consume);
             log.debug("\n==>添加消费记录是否成功==>{}", isSaveConsumeRecord);
             if (!isSaveConsumeRecord) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return R.error("一键确认扣费失败！");
             }
 
 
             //3.更新会员卡信息
-//            MemberBindRecordEntity bindById = memberBindRecordService.getById(bindId);
             currentCardBindRecord.setValidCount(currentCardBindRecord.getValidCount() - reserveNums * timesCost)
                     .setLastModifyTime(LocalDateTime.now())
                     .setVersion(currentCardBindRecord.getVersion() + 1);
             boolean isUpdateBind = memberBindRecordService.updateById(currentCardBindRecord);
             log.debug("\n==>更新会员卡信息是否成功==>{}", isUpdateBind);
             if (!isUpdateBind) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return R.error("一键确认扣费失败！");
             }
 
@@ -507,6 +519,7 @@ public class ScheduleRecordController {
                     .set("last_modify_time", LocalDateTime.now()));
             log.debug("\n==>更新上课记录是否成功==>{}", isUpdateClassRecord);
             if (!isUpdateClassRecord) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return R.error("一键确认扣费失败！");
             }
 
@@ -553,6 +566,7 @@ public class ScheduleRecordController {
         boolean isSaveLog = memberLogService.save(memberLogEntity);
         log.debug("\n==>添加操作记录是否成功==>{}", isSaveLog);
         if (!isSaveLog) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             log.debug("单次确认上课中的添加操作记录失败");
             return R.error("确认上课失败！");
         }
@@ -570,6 +584,7 @@ public class ScheduleRecordController {
         boolean isSaveConsumeRecord = consumeRecordService.save(consumeRecordEntity);
         log.debug("\n==>添加消费记录是否成功==>{}", isSaveConsumeRecord);
         if(!isSaveConsumeRecord) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             log.debug("单次确认上课中的添加消费记录失败");
             return R.error("确认上课失败！");
         }
@@ -583,6 +598,7 @@ public class ScheduleRecordController {
         boolean isUpdateBind = memberBindRecordService.updateById(bindRecordById);
         log.debug("\n==>更新会员卡实体信息是否成功==>{}", isUpdateBind);
         if (!isUpdateBind) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             log.debug("单次确认上课中添加操作记录失败！");
             return R.error("确认上课失败！");
         }
@@ -590,6 +606,7 @@ public class ScheduleRecordController {
         boolean isUpdateClassRecord = classRecordService.update(new UpdateWrapper<ClassRecordEntity>().eq("id", consumeFormVo.getClassId()).set("check_status", 1));
         log.debug("\n==>更新上课信息是否成功==>{}", isUpdateClassRecord);
         if (!isUpdateClassRecord) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             log.debug("单次确认上课中更新上课信息失败!");
             return R.error("确认上课失败");
         }
