@@ -115,6 +115,7 @@
                                 }
                             },
                             xAxis: {
+                                name: infoVo.xname,
                                 type: 'category',
                                 data: infoVo.time
                             },
@@ -191,11 +192,13 @@
                                 }
                             },
                             xAxis: {
+                                name: info.xname,
                                 type: 'category',
                                 boundaryGap: false,
                                 data: info.time
                             },
                             yAxis: {
+                                name: '收费金额',
                                 type: 'value'
                             },
                             series: [
@@ -314,11 +317,11 @@
                                 {
                                     name: 'Nightingale Chart',
                                     type: 'pie',
-                                    radius: [60, 200],
+                                    radius: [50, 200],
                                     center: ['50%', '50%'],
                                     roseType: 'area',
                                     itemStyle: {
-                                        borderRadius: 20
+                                        borderRadius: 10
                                     },
                                     data: info
                                 }

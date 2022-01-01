@@ -293,7 +293,8 @@
                     if (data.code === 0) {
                         swal("绑定成功！", "", "success");
                         setTimeout(function () {
-                            window.location.href = "[[${#request.getContextPath()}]]/member/x_member_list.do";
+                            // window.location.href = "[[${#request.getContextPath()}]]/member/x_member_list.do";
+                            window.location.reload();
                         }, 1000);
                     } else if (data.code === 400) {
                         //参数校验错误回显

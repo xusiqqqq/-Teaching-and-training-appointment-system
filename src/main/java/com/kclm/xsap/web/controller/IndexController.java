@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -41,8 +42,8 @@ public class IndexController {
     @Autowired
     private ReservationRecordService reservationRecordService;
 
-    @Autowired
-    private ConsumeRecordService consumeRecordService;
+    @Resource(name = "rechargeRecordService")
+    private RechargeRecordService rechargeRecordService;
 
     @Autowired
     private MemberCardService memberCardService;
@@ -163,34 +164,39 @@ public class IndexController {
         //创建返回vo的y轴list
         List<Integer> yDataList = new ArrayList<>();
 
-        //查询当月所有消费记录
-        List<ConsumeRecordEntity> allConsumeRecordInfoCurrent = consumeRecordService.list(new QueryWrapper<ConsumeRecordEntity>()
-                .select("money_cost", "create_time")
+        //查询当前月的所有充值记录【对商家来说即为收费记录】
+        List<RechargeRecordEntity> allChargeRecordListForCurrentMonth = rechargeRecordService.list(new QueryWrapper<RechargeRecordEntity>()
+                .select("received_money", "create_time")
                 .likeRight("create_time", LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM")))
                 .orderByDesc("create_time"));
 
-        if (allConsumeRecordInfoCurrent.isEmpty()) {
-            return R.error("本月还没有消费记录");
+        log.debug("\n==>打印查出来的当前月份的所有充值记录【收费记录】==>{}", allChargeRecordListForCurrentMonth);
+
+        if (allChargeRecordListForCurrentMonth.isEmpty()) {
+            return R.error("当前月份还没有收费记录");
         }
 
-        //创建一个 '日期' --> '当日消费金额' 的map
-        HashMap<Integer, Integer> currentAmountOfConsumptionMap = new HashMap<>();
+        //创建一个 '日期' --> '当日收费金额' 的map
+        HashMap<Integer, Integer> currentAmountOfChargeMap = new HashMap<>();
 
-        allConsumeRecordInfoCurrent.forEach(consume -> {
-            //取出每次消费的金额//todo double?
-            int moneyCost = consume.getMoneyCost().intValue();
+        allChargeRecordListForCurrentMonth.forEach(recharge -> {
+            //取出每次收费的金额//todo double?
+            int rechargeOfOnce = recharge.getReceivedMoney().intValue();
             //取出每次消费的日期的日
-            int dayOfMonth = consume.getCreateTime().getDayOfMonth();
+            int dayOfMonth = recharge.getCreateTime().getDayOfMonth();
 
-            currentAmountOfConsumptionMap.put(dayOfMonth, currentAmountOfConsumptionMap.getOrDefault(dayOfMonth, 0) + moneyCost);
+            currentAmountOfChargeMap.put(dayOfMonth, currentAmountOfChargeMap.getOrDefault(dayOfMonth, 0) + rechargeOfOnce);
         });
+
 
         //今天
         int today = LocalDate.now().getDayOfMonth();
-        for (int i = 1; i < today; i++) {
+        for (int i = 1; i <= today; i++) {
             xStrList.add(String.valueOf(i));
-            yDataList.add(currentAmountOfConsumptionMap.getOrDefault(i, 0));
+            yDataList.add(currentAmountOfChargeMap.getOrDefault(i, 0));
         }
+
+        log.debug("\n==>返回第二幅图echarts的x轴数据时==>{}\n ==>返回e第二幅图charts的y轴数据是==>{}", xStrList, yDataList);
 
         //给返回的vo赋值
         infoVo.setTitle("当月每日消费统计")

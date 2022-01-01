@@ -37,6 +37,15 @@ import java.util.stream.Collectors;
 @RequestMapping("/statistics")
 public class StatisticsController {
 
+    //代表老师上的课的时间的可能的最大月份
+    private static final Long MAX_MONTH = -11111L;
+    //代表老师上的课的时间的可能的最大季度
+    private static final Long MAX_QUARTER = -22222L;
+
+    int i = 0;
+
+
+
     @Autowired
     private MemberBindRecordService memberBindRecordService;
 
@@ -382,6 +391,8 @@ public class StatisticsController {
             return classLocalDateTime.isBefore(LocalDateTime.now());
         }).collect(Collectors.toList());
 
+        log.debug("\n==>测试打印指定时间内已经上了的课程==>{}", allClassAlreadyTaken);
+
         if (allClassAlreadyTaken.isEmpty()) {
             return R.error("指定时间内没有上课信息");
         }
@@ -389,7 +400,8 @@ public class StatisticsController {
 
         //创建一个map存放不同老师(id)对应的在不同统计条件下的课消次数,即在mapT中存放另一个mapTeacherOne:mapT = {key = teacherId, value = map={key = 统计条件, value = 该条件下的课消次数}}
         //HashMap<Long, Object> mapT = new HashMap<>();
-        HashMap<Long, HashMap<Integer, Integer>> mapT = new HashMap<>();
+//        HashMap<Long, HashMap<Integer, Integer>> mapT = new HashMap<>();
+        HashMap<Long, Object> mapT = new HashMap<>();
 
 
         //遍历老师信息==> 获取每个老师的排课记录==> 获取每个老师的课消信息
@@ -404,7 +416,6 @@ public class StatisticsController {
             if (unit == 1) {
                 //如果前台选择的统计模式是按月统计：
                 /*获取当前老师上的当前课程的课消次数；由于使用月份作为map的key,所以相同开课月份的不同课程的课消次数都会被加在一起；遍历完所有课程之后即获取了当前老师的所有课消次数
-                 todo 注意：这里的课消次数有问题，只计算了每节课程的消耗次数timesCost，没有考虑该课程的预约人数【因为添加预约时的该课程的预约总人数(order_nums)没有做好】==> 已完成
                  */
                 classAlreadyTakenForCurrentTeacherForMonthOrQuarter.forEach(scheduleRecordEntity -> {
                     //查出当前记录的上课时间的月份
@@ -415,10 +426,11 @@ public class StatisticsController {
                     //课程预约人数
                     Integer orderNums = scheduleRecordEntity.getOrderNums();
                     log.debug("\n==>打印当前课程单位人数所需次数==>{}\n 打印当前课程的预约人数==>{}", timesCost, orderNums);
-                    //如果人数为0，则置为1（用于和单位次数相乘得总次数）
-                    Integer orderNumForTotal = orderNums == 0 ? 1 : orderNums;
-                    mapTeacherCurrent.put(monthValue, mapTeacherCurrent.getOrDefault(monthValue, 0) + timesCost * orderNumForTotal);
-                    log.debug("\n==>打印当前的老师id=> {}及其对应的mapTeacherCurrent【key=月份,value=课消次数】=>{}", scheduleRecordEntity.getTeacherId(), mapTeacherCurrent);
+                    mapTeacherCurrent.put(monthValue, mapTeacherCurrent.getOrDefault(monthValue, 0) + timesCost * orderNums);
+
+                    log.debug("\n==>打印当前的老师id=> {}==>及其对应的mapTeacherCurrent【key=月份,value=课消次数】=>{}", scheduleRecordEntity.getTeacherId(), mapTeacherCurrent);
+                    //将上课时间的月份最大的月份放进去,以MAX_MONTH存放//避免魔法值
+                    mapT.put(MAX_MONTH, monthValue > (int) mapT.getOrDefault(MAX_MONTH, 1) ? monthValue : mapT.get(MAX_MONTH));
                 });
                 //以老师id作为key, 以另一个map(以月份作为key,对应课消次数作为value)做为value放进mapT
                 mapT.put(teacher.getId(), mapTeacherCurrent);
@@ -433,10 +445,10 @@ public class StatisticsController {
                     //课程预约人数
                     Integer orderNums = scheduleRecordEntity.getOrderNums();
                     log.debug("\n==>打印当前课程单位人数所需次数==>{}\n 打印当前课程的预约人数==>{}", timesCost, orderNums);
-                    //如果人数为0，则置为1（用于和单位次数相乘得总次数）
-                    Integer orderNumForTotal = orderNums == 0 ? 1 : orderNums;
 
-                    mapTeacherCurrent.put(quarter, mapTeacherCurrent.getOrDefault(quarter, 0) + timesCost * orderNumForTotal);// 总人数
+                    mapTeacherCurrent.put(quarter, mapTeacherCurrent.getOrDefault(quarter, 0) + timesCost * orderNums);
+                    //将所有上过的课程的时间的最大季度放进map,并以MAX_QUARTER存放
+                    mapT.put(MAX_QUARTER, quarter > (int) mapT.getOrDefault(MAX_QUARTER, 1) ? quarter : mapT.get(MAX_QUARTER));
 
                     log.debug("\n==>打印当前的老师id=> {}及其对应的mapTeacherCurrent【key=季度,value=课消次数】=>{}", scheduleRecordEntity.getTeacherId(), mapTeacherCurrent);
                 });
@@ -444,10 +456,18 @@ public class StatisticsController {
                 mapT.put(teacher.getId(), mapTeacherCurrent);
             } else {
                 //按起始和结束年份统计        //todo 要不要将流合并
+
+                if (i > allClassAlreadyTaken.size()) {
+                    return R.error("指定时间内没有排课记录");
+                }
+
                 List<ScheduleRecordEntity> classAlreadyTakenForCurrentTeacherForYear = allClassAlreadyTaken.stream().filter(schedule -> schedule.getTeacherId().equals(teacher.getId()) && schedule.getStartDate().getYear() >= beginYear && schedule.getStartDate().getYear() <= endYear).collect(Collectors.toList());
+                log.debug("\n==>d打印测试起始结束年份的所有当前老师的上课记录==>{}", classAlreadyTakenForCurrentTeacherForYear);
+
 
                 if (classAlreadyTakenForCurrentTeacherForYear.isEmpty()) {
-                    return R.error("指定时间内没有排课记录");
+                    i++;
+                    break;
                 }
 
                 classAlreadyTakenForCurrentTeacherForYear.forEach(scheduleRecordEntity -> {
@@ -460,10 +480,8 @@ public class StatisticsController {
                     //课程预约人数
                     Integer orderNums = scheduleRecordEntity.getOrderNums();
                     log.debug("\n==>打印当前课程单位人数所需次数==>{}\n 打印当前课程的预约人数==>{}", timesCost, orderNums);
-                    //如果人数为0，则置为1（用于和单位次数相乘得总次数）
-                    Integer orderNumForTotal = orderNums == 0 ? 1 : orderNums;
 
-                    mapTeacherCurrent.put(year, mapTeacherCurrent.getOrDefault(year, 0) + timesCost * orderNumForTotal);
+                    mapTeacherCurrent.put(year, mapTeacherCurrent.getOrDefault(year, 0) + timesCost * orderNums);
                     log.debug("\n==>打印当前的老师id=> {}及其对应的mapTeacherCurrent【key=年份,value=课消次数】=>{}", scheduleRecordEntity.getTeacherId(), mapTeacherCurrent);
                 });
                 //以老师id作为key, 以另一个map(以年度作为key,对应课消次数作为value)做为value放进mapT
@@ -472,10 +490,13 @@ public class StatisticsController {
             }
         }
 
-        log.debug("\n==>打印保存【mapT={key=teacherId, value=mapTeacherCurrent(key=季度,value=课消次数)】==>{}", mapT);
+        log.debug("\n==>打印保存【mapT={key=teacherId, value=mapTeacherCurrent(key=统计时间单位,value=课消次数)】==>{}", mapT);
 
         //获取当前mapT的key的set集合：即teacherId,进而查出对应的老师名字;因为不同统计时间下的老师可能不同，所以没有直接使用开头查出的所有老师
         Set<Long> teacherSet = mapT.keySet();
+        if (teacherSet.isEmpty()) {
+            return R.error("选中时间内没有老师信息");
+        }
         //获取老师name
         List<String> teacherNames = employeeService.listByIds(teacherSet).stream().map(EmployeeEntity::getName).collect(Collectors.toList());
 
@@ -485,18 +506,19 @@ public class StatisticsController {
         ArrayList<List<Integer>> yDataList = new ArrayList<>();
 
         if (unit == 1) {
-            //获取最大月份(默认为12)
-            HashMap<String, Integer> maxMonthMap = new HashMap<>();
-            for (Long teacherId : teacherSet) {
-                HashMap<Integer, Integer> monthAndClassCost = mapT.get(teacherId);
-                maxMonthMap.put("maxMonth", monthAndClassCost.isEmpty() ? 0 : monthAndClassCost.keySet().iterator().next());
-            }
+
+            //取出最大月份
+            int maxMonth = (int) mapT.get(MAX_MONTH);
+            log.debug("\n==>打印最大月份==>{}", maxMonth);
+            //取出后需要删除这个键值对，不然后面遍历所有老师记录没有这条会报错
+            mapT.remove(MAX_MONTH);
+
             //为y轴数据赋值
             for (Long teacherId : teacherSet) {
                 //创建一个list存放该员工所有统计时间单位下的课消次数
                 ArrayList<Integer> classCosts = new ArrayList<>();
-                for (int i = 1; i <= maxMonthMap.get("maxMonth"); i++) {
-                    HashMap<Integer, Integer> monthAndClassCost = mapT.get(teacherId);
+                for (int i = 1; i <= maxMonth; i++) {
+                    HashMap<Integer, Integer> monthAndClassCost = (HashMap<Integer, Integer>) mapT.get(teacherId);
                     Integer classCost = monthAndClassCost.getOrDefault(i, 0);
                     classCosts.add(classCost);
                 }
@@ -504,42 +526,45 @@ public class StatisticsController {
                 yDataList.add(classCosts);
             }
             //为x轴数据赋值
-            for (int i = 1; i <= maxMonthMap.get("maxMonth"); i++) {
+            for (int i = 1; i <= maxMonth; i++) {
                 xStrList.add("第" + i + "月");
             }
-
             classCostVo.setTitle("老师课时消费月统计").setXname("月");
+
         } else if (unit == 2) {
-            //获取最大季度
-            HashMap<String, Integer> maxQuarterMap = new HashMap<>();
-            for (Long teacherId : teacherSet) {
-                HashMap<Integer, Integer> quarterAndClassCost = mapT.get(teacherId);
-                maxQuarterMap.put("maxQuarter", quarterAndClassCost.isEmpty() ? 0 : quarterAndClassCost.keySet().iterator().next());
-            }
+
+            //取出最大的月份
+            Integer maxQuarter = (Integer) mapT.get(MAX_QUARTER);
+            log.debug("\n==>最大的季度时：==>{}", maxQuarter);
+            //取出存放最大季度的映射后需要删除掉这个键，不然后面在遍历老师id时，没有这个key的老师会报错   //思路二：用另一个map单独存放最大的月份或季度  //不要有魔法值
+            mapT.remove(MAX_QUARTER);
 
             //为y轴数据赋值
             teacherSet.forEach(teacherId -> {
                 //创建一个list存放该员工所有统计时间单位下的课消次数
                 ArrayList<Integer> classCosts = new ArrayList<>();
-                for (int i = 1; i <= maxQuarterMap.get("maxQuarter"); i++) {
-                    HashMap<Integer, Integer> monthAndClassCost = mapT.get(teacherId);
+                for (int i = 1; i <= maxQuarter; i++) {
+                    //todo instanceof
+                    HashMap<Integer, Integer> monthAndClassCost = (HashMap<Integer, Integer>) mapT.get(teacherId);
+
                     Integer classCost = monthAndClassCost.getOrDefault(i, 0);
                     classCosts.add(classCost);
                 }
                 yDataList.add(classCosts);
             });
             //为x轴数据赋值
-            for (int i = 1; i <= maxQuarterMap.get("maxQuarter"); i++) {
+            for (int i = 1; i <= maxQuarter; i++) {
                 xStrList.add("第" + i + "季度");
             }
             classCostVo.setTitle("老师课时消费季度统计").setXname("季度");
+
         } else {
             //为y轴数据赋值
             teacherSet.forEach(teacherId -> {
                 //创建一个list存放该员工所有统计时间单位下的课消次数
                 ArrayList<Integer> classCosts = new ArrayList<>();
                 for (int i = beginYear; i <= endYear; i++) {
-                    HashMap<Integer, Integer> monthAndClassCost = mapT.get(teacherId);
+                    HashMap<Integer, Integer> monthAndClassCost = (HashMap<Integer, Integer>) mapT.get(teacherId);
                     Integer classCost = monthAndClassCost.getOrDefault(i, 0);
                     classCosts.add(classCost);
                 }
@@ -753,14 +778,14 @@ public class StatisticsController {
         //创建返回vo的y轴list
         List<Integer> yDataList2 = new ArrayList<>();
 
-        if(null == yearOfSelect) {
+        if (null == yearOfSelect) {
             yearOfSelect = -1;
         }
 
         if (unit == 1) {
 
             //所有还存活的会员  //.eq("is_deleted", 0) mp会默认加上
-            List<MemberEntity> memberSurviveForMonthList = memberService.list(new QueryWrapper<MemberEntity>().select("create_time").likeRight(null != yearOfSelect,"create_time", yearOfSelect).orderByDesc("create_time"));
+            List<MemberEntity> memberSurviveForMonthList = memberService.list(new QueryWrapper<MemberEntity>().select("create_time").likeRight(null != yearOfSelect, "create_time", yearOfSelect).orderByDesc("create_time"));
             log.debug("\n==>打印指定年份里所有还存活的会员信息==>{}", memberSurviveForMonthList);
 
             //所有注销的员工   //注意逻辑删除后的数据mp查不出来

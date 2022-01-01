@@ -12,6 +12,7 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
@@ -26,6 +27,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Data
 @EqualsAndHashCode(callSuper=false)
 @TableName("t_global_reservation_set")
+@Accessors(chain = true)
 public class GlobalReservationSetEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -34,36 +36,40 @@ public class GlobalReservationSetEntity implements Serializable {
 	 */
 	@TableId
 	private Long id;
+
 	/**
-	 * 可提前预约的天数
+	 * 预约开始时间:可提前预约的天数
 	 */
 	private Integer startDay;
+
 	/**
-	 * 模式1：提前预约截止天数，上课前
-	 */
-	private Integer endDay;
-	/**
-	 * 模式1：提前预约截止时间(24小时内)，上课前
-	 */
-	@DateTimeFormat(pattern = "HH:mm")
-	private LocalTime endTime;
-	/**
-	 * 模式2：提前预约截止小时数，离上课前
+	 * 预约截止时间：模式2：提前预约截止小时数，离上课前
 	 */
 	private Integer endHour;
 	/**
-	 * 模式1：提前预约取消的距离天数
+	 * 预约截止时间：模式3：提前预约截止天数，上课前
+	 */
+	private Integer endDay;
+	/**
+	 * 预约截止时间：模式3：提前预约截止时间(24小时内)，上课前
+	 */
+	@DateTimeFormat(pattern = "HH:mm")
+	private LocalTime endTime;
+
+	/**
+	 * 预约取消时间：模式2：提前预约取消的距离小时数
+	 */
+	private Integer cancelHour;
+	/**
+	 * 预约取消时间：模式3：提前预约取消的距离天数
 	 */
 	private Integer cancelDay;
 	/**
-	 * 模式1：提前预约取消的时间限制（24小时内）
+	 * 预约取消时间：模式3：提前预约取消的时间限制（24小时内）
 	 */
 	@DateTimeFormat(pattern = "HH:mm")
 	private LocalTime cancelTime;
-	/**
-	 * 模式2：提前预约取消的距离小时数
-	 */
-	private Integer cancelHour;
+
 	/**
 	 * 创建时间
 	 */

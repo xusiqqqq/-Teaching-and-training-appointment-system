@@ -22,6 +22,8 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -349,5 +351,49 @@ public class EmployeeController {
 
         return mv;
     }
+
+    /**
+     * 用户点击忘记密码跳转到充值页面
+     * @return
+     */
+    @GetMapping("/toEnsureUser")
+    public String toEnsureUser() {
+        return "x_ensure_user";
+    }
+
+
+    /**
+     *
+     * @return
+     */
+    @GetMapping("/toResetPwd")
+    public String toResetPwd(String userPhoneOrEmail, Model model) {
+        //
+        log.debug("\n==>打印用户要充值的用户手机号或者邮箱==>{}", userPhoneOrEmail);
+        String emailRegex = "^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$";
+        String phoneRegex = "^1[0-9]{10}$";
+
+        boolean isAEmail = Pattern.compile(emailRegex).matcher(userPhoneOrEmail).matches();
+        boolean isAPhone = Pattern.compile(phoneRegex).matcher(userPhoneOrEmail).matches();
+        if (isAEmail || isAPhone) {
+            //根据邮箱查询该用户     //由于保存的时候没有设置邮箱去重检查，所以假设可以存在相同邮箱【相容用户】
+            List<EmployeeEntity> userOne = employeeService.list(new QueryWrapper<EmployeeEntity>().eq("role_email", userPhoneOrEmail).or().eq("phone", userPhoneOrEmail));
+            //由于可能会用到该用户的信息，故不用count查个数
+            if (userOne.isEmpty()) {
+                //没查到该用户信息,返回提示到前台
+                model.addAttribute("CHECK_USER_ERROR", true);
+                return "x_ensure_user";
+            }
+            //查到信息，跳转页面
+            return "send_mail_ok";
+        } else {
+            //格式不正确，返回提示到前台
+            model.addAttribute("CHECK_INPUT_FORMAT", true);
+            return "x_ensure_user";
+        }
+
+
+    }
+
 
 }

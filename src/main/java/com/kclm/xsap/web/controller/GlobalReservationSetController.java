@@ -1,5 +1,6 @@
 package com.kclm.xsap.web.controller;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -58,12 +59,14 @@ public class GlobalReservationSetController {
     @ResponseBody
     public R globalSetUpdate(GlobalReservationSetEntity entity) {
         log.debug("\n==>前端传入的表单封装实体信息为==>{}", entity);
-        while (entity.getAppointmentStartMode() == 2 && entity.getAppointmentDeadlineMode() == 3) {
+        //当管理员选中的预约开始时间模式是2，并且预约结束时间模式是3时：
+        if (entity.getAppointmentStartMode() == 2 && entity.getAppointmentDeadlineMode() == 3) {
             if (entity.getEndDay() > entity.getStartDay()) {
+                //如果
                 return R.error("预约时间与截止时间设置冲突");
             }
         }
-        entity.setVersion(entity.getVersion() + 1);
+        entity.setVersion(entity.getVersion() + 1).setLastModifyTime(LocalDateTime.now());
 
         boolean isUpdate = globalReservationSetService.updateById(entity);
         log.debug("\n==>更新全局预约设置是否成功==>{}", isUpdate);
@@ -72,6 +75,7 @@ public class GlobalReservationSetController {
             log.debug("\n==>ok==>{}", ok);
             return ok;
         } else {
+            log.debug("\n==>更新失败。。  ");
             return R.error("更新失败！！");
         }
         //todo 考虑时间是否合理

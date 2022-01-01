@@ -36,7 +36,8 @@
             <form class="m-t" role="form" action="x_reset_passward.html" th:action="@{/user/toResetPwd}">
                 <div class="form-group">
                 	<span th:if="${CHECK_USER_ERROR}" class="text-danger">用户不存在！</span>
-                    <input type="text" class="form-control" name="userName" placeholder="输入用户名/邮箱" required="">
+                	<span th:if="${CHECK_INPUT_FORMAT}" class="text-danger">输入格式不正确！</span>
+                    <input type="text" class="form-control" name="userPhoneOrEmail" placeholder="输入用户手机号/邮箱" required="">
                 </div>
                 <button type="submit" class="btn btn-primary block full-width m-b">发送邮件</button>
 
