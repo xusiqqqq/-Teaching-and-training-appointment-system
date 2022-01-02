@@ -218,11 +218,11 @@ public class ReservationRecordController {
         //查看是否已经预约过
         ReservationRecordEntity existOne = reservationRecordService.getOne(new QueryWrapper<ReservationRecordEntity>()
                 .eq("member_id", entity.getMemberId())
-                .eq("card_name", entity.getCardName())
+                //.eq("card_name", entity.getCardName())    //只要是同一个会员同一节课就应该不可预约了，不需要判断是否同一张卡！
                 .eq("schedule_id", entity.getScheduleId()));
         log.debug("\n==>根据表单提交信息查看是否已经预约过");
         if (null != existOne && null != existOne.getId()) {
-            log.debug("\n==>该会员已经使用这张会员卡预约过这节课");
+            log.debug("\n==>该会员已经预约过这节课");
             //判断预约是否有效
             if (existOne.getStatus() == 1) {
                 return R.error("您已预约过本节课程");
