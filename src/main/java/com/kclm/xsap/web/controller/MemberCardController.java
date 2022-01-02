@@ -12,7 +12,6 @@ import com.kclm.xsap.vo.ReserveFormCountVo;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -21,6 +20,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -41,28 +41,28 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/card")
 public class MemberCardController {
-    @Autowired
+    @Resource
     private MemberCardService memberCardService;
 
-    @Autowired
+    @Resource
     private CourseCardService courseCardService;
 
-    @Autowired
+    @Resource
     private MemberBindRecordService memberBindRecordService;
 
-    @Autowired
+    @Resource
     private ScheduleRecordService scheduleRecordService;
 
-    @Autowired
+    @Resource
     private CourseService courseService;
 
-    @Autowired
+    @Resource
     private RechargeRecordService rechargeRecordService;
 
-    @Autowired
+    @Resource
     private MemberLogService memberLogService;
 
-    @Autowired
+    @Resource
     private ConsumeRecordService consumeRecordService;
 
 
@@ -154,7 +154,7 @@ public class MemberCardController {
         /* 
         courseCardEntity表是复合主键，不能简单使用mp进行crud
         复合主键更新  思路：：1.先全删掉再添加（暂时采用这个）
-                          2.引入mybatisplus-plus（主键添加注解）
+                          2.引入MyBatisPlus-plus（主键添加注解）
          */
 
         //todo 下面这一段...优化！！！！
@@ -306,10 +306,9 @@ public class MemberCardController {
         List<BindCardInfoVo> bindCardInfoVos = list.stream().map(bind -> {
             MemberCardEntity cardById = memberCardService.getById(bind.getCardId());
             String cardName = cardById.getName();
-            BindCardInfoVo vo = new BindCardInfoVo()
+            return new BindCardInfoVo()
                     .setId(bind.getId())
                     .setName(cardName);
-            return vo;
         }).collect(Collectors.toList());
         log.debug("\n==>用于suggest提供搜索建议的可用会员卡列表==>{}", bindCardInfoVos);
         return R.ok().put("value", bindCardInfoVos);
@@ -388,8 +387,7 @@ public class MemberCardController {
     @Transactional
     public R rechargeOpt(@Valid RechargeRecordEntity entity,
                          BindingResult bindingResult,
-                         @RequestParam("memberId") Long memberId
-            /*@RequestParam("cardId") Long bindId*/) {
+                         @RequestParam("memberId") Long memberId) {
         log.debug("\n==>前端传入的会员id和==>{}\n会员绑定id是==>{}\n前端传入的充值信息封装为==>{}", memberId, entity.getMemberBindId(), entity);
 
         if (bindingResult.hasErrors()) {

@@ -9,7 +9,6 @@ import com.kclm.xsap.utils.R;
 import com.kclm.xsap.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -18,6 +17,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDate;
@@ -46,34 +46,34 @@ public class ScheduleRecordController {
     private static final String SQLSTATE_23000 = "23000";
 
 
-    @Autowired
+    @Resource
     private ScheduleRecordService scheduleRecordService;
 
-    @Autowired
+    @Resource
     private CourseService courseService;
 
-    @Autowired
+    @Resource
     private EmployeeService employeeService;
 
-    @Autowired
+    @Resource
     private CourseCardService courseCardService;
 
-    @Autowired
+    @Resource
     private MemberCardService memberCardService;
 
-    @Autowired
+    @Resource
     private ReservationRecordService reservationRecordService;
 
-    @Autowired
+    @Resource
     private ClassRecordService classRecordService;
 
-    @Autowired
+    @Resource
     private ConsumeRecordService consumeRecordService;
 
-    @Autowired
+    @Resource
     private MemberBindRecordService memberBindRecordService;
 
-    @Autowired
+    @Resource
     private MemberLogService memberLogService;
 
 
@@ -88,6 +88,21 @@ public class ScheduleRecordController {
         return "course/x_course_schedule";
     }
 
+
+    /**
+     * 根据id跳转详细排课信息
+     *
+     * @param id    需要查看详细信息的id
+     * @param model 保存传递"id"
+     * @return x_course_schedule_detail.html
+     */
+    @GetMapping("/x_course_schedule_detail.do")
+    public String courseScheduleDetail(@RequestParam("id") Long id, Model model) {
+        log.debug("\n==>前端传入的要查看详细排课记录的id==>{}", id);
+        model.addAttribute("ID", id);
+
+        return "course/x_course_schedule_detail";
+    }
 
     /**
      * 查询所有排课记录信息并封装成CourseScheduleVo【前端需要的json格式用于日程显示】
@@ -121,21 +136,6 @@ public class ScheduleRecordController {
         return courseScheduleVoList;
     }
 
-
-    /**
-     * 根据id跳转详细排课信息
-     *
-     * @param id    需要查看详细信息的id
-     * @param model 保存传递"id"
-     * @return x_course_schedule_detail.html
-     */
-    @GetMapping("/x_course_schedule_detail.do")
-    public String courseScheduleDetail(@RequestParam("id") Long id, Model model) {
-        log.debug("\n==>前端传入的要查看详细排课记录的id==>{}", id);
-        model.addAttribute("ID", id);
-
-        return "course/x_course_schedule_detail";
-    }
 
 
     /**
@@ -401,6 +401,8 @@ public class ScheduleRecordController {
                 if (SQLSTATE_23000.equals(sqlState)) {
                     return R.error("删除失败!此课程已经生成了预约、上课、排课等记录，不可被删除！");
                 }
+            } else {
+                e.printStackTrace();
             }
         }
         if (isRemoveSchedule) {
@@ -617,7 +619,7 @@ public class ScheduleRecordController {
 
     /**
      * 导出预约数据
-     *
+     * todo :...
      * @return 导出
      */
     @PostMapping("/exportReserve.do")

@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.kclm.xsap.utils.R;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import com.kclm.xsap.entity.GlobalReservationSetEntity;
 import com.kclm.xsap.service.GlobalReservationSetService;
 import org.springframework.web.servlet.ModelAndView;
+
+import javax.annotation.Resource;
 
 
 /**
@@ -27,7 +28,7 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 @RequestMapping("/globalSet")
 public class GlobalReservationSetController {
-    @Autowired
+    @Resource
     private GlobalReservationSetService globalReservationSetService;
 
 

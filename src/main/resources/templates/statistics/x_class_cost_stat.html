@@ -4,20 +4,23 @@
 <head>
 
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
 
-    <title>X+ 约课系统 - 个人资料</title>
-    <meta name="keywords" content="H+后台主题,后台bootstrap框架,会员中心主题,后台HTML,响应式后台">
-    <meta name="description" content="H+是一个完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术">
+    <title>课消统计页面</title>
+    <meta content="H+后台主题,后台bootstrap框架,会员中心主题,后台HTML,响应式后台" name="keywords">
+    <meta content="H+是一个完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术" name="description">
 
-    <link rel="shortcut icon" href="../../static/favicon.ico" th:href="@{/static/favicon.ico}">
-    <link href="../../static/css/bootstrap.min.css?v=3.3.6" th:href="@{/static/css/bootstrap.min.css(v='3.3.6')}" rel="stylesheet">
-    <link href="../../static/css/font-awesome.css?v=4.4.0" th:href="@{/static/css/font-awesome.css(v='4.4.0')}" rel="stylesheet">
-    <link href="../../static/css/animate.css" th:href="@{/static/css/animate.css}" rel="stylesheet">
-    <link href="../../static/css/style.css?v=4.1.0" th:href="@{/static/css/style.css(v='4.1.0')}" rel="stylesheet">
+    <link href="../../static/favicon.ico" rel="shortcut icon" th:href="@{/static/favicon.ico}">
+    <link href="../../static/css/bootstrap.min.css?v=3.3.6" rel="stylesheet"
+          th:href="@{/static/css/bootstrap.min.css(v='3.3.6')}">
+    <link href="../../static/css/font-awesome.css?v=4.4.0" rel="stylesheet"
+          th:href="@{/static/css/font-awesome.css(v='4.4.0')}">
+    <link href="../../static/css/animate.css" rel="stylesheet" th:href="@{/static/css/animate.css}">
+    <link href="../../static/css/style.css?v=4.1.0" rel="stylesheet" th:href="@{/static/css/style.css(v='4.1.0')}">
     <!-- bootstrap-datepicker -->
-    <link href="../../static/css/plugins/datapicker/datepicker3.css" th:href="@{/static/css/plugins/datapicker/datepicker3.css}" rel="stylesheet">
+    <link href="../../static/css/plugins/datapicker/datepicker3.css"
+          rel="stylesheet" th:href="@{/static/css/plugins/datapicker/datepicker3.css}">
 
     <!--sweetalert.css-->
     <link href="../../static/css/plugins/sweetalert/sweetalert.css" rel="stylesheet"
@@ -41,25 +44,25 @@
                         </div>
                     </div>
                     <div class="ibox-content">
-                        <form id="addForm"  name="addForm" method="post" class="form-horizontal">
+                        <form class="form-horizontal" id="addForm" method="post" name="addForm">
                             <div class="form-group">
                                 <label class="col-sm-2 control-label">统计时段</label>
                                 <div class="col-sm-10">
                                     <label class="radio-inline">
-                                        <input type="radio" name="unit" value="1" checked > 月
+                                        <input checked name="unit" type="radio" value="1"> 月
                                     </label>
                                     <label class="radio-inline">
-                                        <input type="radio" name="unit" value="2" > 季
+                                        <input name="unit" type="radio" value="2"> 季
                                     </label>
                                     <label class="radio-inline">
-                                        <input type="radio" name="unit" value="3" > 年
+                                        <input name="unit" type="radio" value="3"> 年
                                     </label>
                                 </div>
                             </div>
-                            <div class="form-group"  id="div_month">
+                            <div class="form-group" id="div_month">
                                 <label class="col-sm-2 control-label">查询年份</label>
                                 <div class="col-sm-2">
-                                    <select class="single-line form-control" name="yearOfSelect" >
+                                    <select class="single-line form-control" name="yearOfSelect">
                                     </select>
                                 </div>
                             </div>
@@ -67,25 +70,28 @@
                             <div class="form-group" id="div_year" style="display: none">
                                 <label class="col-sm-2 control-label">开始年份</label>
                                 <div class="col-sm-2">
-                                    <select class="single-line form-control" name="beginYear" >
+                                    <select class="single-line form-control" name="beginYear">
                                     </select>
                                 </div>
                                 <label class="col-sm-2 control-label">结束年份</label>
                                 <div class="col-sm-2">
-                                    <select class="single-line form-control" name="endYear" >
+                                    <select class="single-line form-control" name="endYear">
                                     </select>
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 <div class="col-sm-2 col-sm-offset-2">
-                                    <button type="submit" class="btn btn-success">统计</button>
-                                    <button type="reset" class="btn btn-white">取消</button>
+                                    <button class="btn btn-success" type="submit">统计</button>
+                                    <button class="btn btn-white" type="reset">取消</button>
+                                </div>
+                                <div class="col-sm-1 col-sm-offset-7">
+                                    <a class="btn btn-warning center-block" onclick="window.location.reload()">刷新数据</a>
                                 </div>
                             </div>
                         </form>
                     </div>
-                    <div id="main" style="width: 1000px;height: 400px;" class="col-sm-offset-2"></div>
+                    <div class="col-sm-offset-2" id="main" style="width: 1000px;height: 400px;"></div>
                 </div>
             </div>
         </div>
@@ -100,16 +106,20 @@
 <script src="../../static/js/content.js?v=1.0.0" th:src="@{/static/js/content.js(v='1.0.0')}"></script>
 
 <!-- Peity -->
-<script src="../../static/js/plugins/peity/jquery.peity.min.js" th:src="@{/static/js/plugins/peity/jquery.peity.min.js}"></script>
+<script src="../../static/js/plugins/peity/jquery.peity.min.js"
+        th:src="@{/static/js/plugins/peity/jquery.peity.min.js}"></script>
 
 <!-- Peity -->
 <!-- <script src="../../static/js/demo/peity-demo.js" th:src="@{/static/js/demo/peity-demo.js}"></script> -->
 
 
 <!-- Data picker -->
-<script src="../../static/js/plugins/datapicker/bootstrap-datepicker.js" th:src="@{/static/js/plugins/datapicker/bootstrap-datepicker.js}"></script>
-<script src="../../static/js/plugins/datapicker/bootstrap-datepicker.zh-CN.min.js" th:src="@{/static/js/plugins/datapicker/bootstrap-datepicker.zh-CN.min.js}"></script>
-<script src="../../static/js/plugins/echarts/echarts-all.js" th:src="@{/static/js/plugins/echarts/echarts-all.js}"></script>
+<script src="../../static/js/plugins/datapicker/bootstrap-datepicker.js"
+        th:src="@{/static/js/plugins/datapicker/bootstrap-datepicker.js}"></script>
+<script src="../../static/js/plugins/datapicker/bootstrap-datepicker.zh-CN.min.js"
+        th:src="@{/static/js/plugins/datapicker/bootstrap-datepicker.zh-CN.min.js}"></script>
+<script src="../../static/js/plugins/echarts/echarts-all.js"
+        th:src="@{/static/js/plugins/echarts/echarts-all.js}"></script>
 
 <!--sweetalert-->
 <script src="../../static/js/plugins/sweetalert/sweetalert.min.js"
@@ -144,26 +154,26 @@
             },
             tooltip: {},
             legend: {
-                data:['消费']
+                data: ['消费']
             },
             xAxis: {
-                name:"",
+                name: "",
                 data: []  //["1月","2月","3月","4月","5月","6月"]
             },
             yAxis: {
-                name:"消费"
+                name: "消费"
             },
             series: []
         };
 
         //console.log(option);
         $("#addForm").submit(function () {
-            var form=document.forms["addForm"];
+            var form = document.forms["addForm"];
             $.ajax({
-                type:'POST',
-                url:"/statistics/classCostMonthOrSeasonOrYear",
-                data:$(form).serialize(),
-                success:function (data) {
+                type: 'POST',
+                url: "/statistics/classCostMonthOrSeasonOrYear",
+                data: $(form).serialize(),
+                success: function (data) {
                     if (data.code === 0) {
                         var info = data.data;
                         console.log(info);
@@ -172,31 +182,32 @@
                         option.xAxis.data = info.time;
                         option.xAxis.name = info.xname;
                         option.legend.data = info.tname;
-                        option.series=[];   //清空
-                        $.each(info.tname,function (index,name) {
+                        option.series = [];   //清空
+                        $.each(info.tname, function (index, name) {
                             var obj = {};
                             obj.type = "bar";
                             obj.data = info.data[index];
                             obj.name = name;
                             option.series.push(obj);
                         })
-                        chart.setOption(option,true);
+                        chart.setOption(option, true);
                     } else {
-                        swal(data.msg,"","info");
+                        swal("统计错误！", data.msg, "info");
                     }
                 }
             });
             return false;
         });
         // 选择不现统计单位时，改变选择框
-        $(":radio[name=unit]").click(function(){
-            if(this.value==3) {
+        $(":radio[name=unit]").click(function () {
+            if (this.value == 3) {
                 $("#div_month").hide();
                 $("#div_year").show();
-            }else {
+            } else {
                 $("#div_month").show();
                 $("#div_year").hide();
-            };
+            }
+
         });
 
         var yearListSave = "";

@@ -7,7 +7,7 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
 
-    <title>X+ 约课系统 - 个人资料</title>
+    <title>总课次统计page</title>
     <meta content="H+后台主题,后台bootstrap框架,会员中心主题,后台HTML,响应式后台" name="keywords">
     <meta content="H+是一个完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术" name="description">
 
@@ -85,6 +85,9 @@
                                 <div class="col-sm-2 col-sm-offset-2">
                                     <button class="btn btn-success" type="submit">统计</button>
                                     <button class="btn btn-white" type="reset">取消</button>
+                                </div>
+                                <div class="col-sm-1 col-sm-offset-7">
+                                    <a class="btn btn-warning center-block" onclick="window.location.reload()">刷新数据</a>
                                 </div>
                             </div>
                         </form>
@@ -188,7 +191,7 @@
                         option.series[1].data = info.data;
                         chart.setOption(option, true);
                     } else {
-                        swal(data.msg, "","info");
+                        swal("统计错误！", data.msg,"info");
                     }
                 }
             });

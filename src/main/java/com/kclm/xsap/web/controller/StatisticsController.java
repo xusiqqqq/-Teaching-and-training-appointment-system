@@ -10,13 +10,13 @@ import com.kclm.xsap.vo.statistics.CardCostVo;
 import com.kclm.xsap.vo.statistics.ClassCostVo;
 import com.kclm.xsap.vo.statistics.StatisticsOfCardCostVo;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -42,29 +42,28 @@ public class StatisticsController {
     //代表老师上的课的时间的可能的最大季度
     private static final Long MAX_QUARTER = -22222L;
 
-    int i = 0;
+    //遍历次数记数,用于当所有老师都遍历完后如果还没有老师的排课信息时的标记
+    int TRAVERSE_COUNT = 0;
 
-
-
-    @Autowired
+    @Resource
     private MemberBindRecordService memberBindRecordService;
 
-    @Autowired
+    @Resource(name = "memberService")
     private MemberService memberService;
 
-    @Autowired
+    @Resource
     private RechargeRecordService rechargeRecordService;
 
-    @Autowired
+    @Resource
     private ConsumeRecordService consumeRecordService;
 
-    @Autowired
+    @Resource
     private ScheduleRecordService scheduleRecordService;
 
-    @Autowired
+    @Resource
     private EmployeeService employeeService;
 
-    @Autowired
+    @Resource
     private CourseService courseService;
 
     /**
@@ -135,11 +134,12 @@ public class StatisticsController {
         已用课次：消费记录中消费次数加起来          医用金额
         剩余：相减或者查bind表                   剩余金额
          */
+        //todo 重写这个方法！！！太慢了！！用map缓存？
 
-        List<MemberBindRecordEntity> allMemberWithCard = memberBindRecordService.list(new QueryWrapper<MemberBindRecordEntity>().eq("active_status", 1));
+        long start = System.currentTimeMillis();
 
-        log.debug("\n==>empth==>{}", allMemberWithCard.isEmpty());
-        log.debug("\n==>all==>{}", allMemberWithCard);
+        //查出所有可以使用的会员卡
+        List<MemberBindRecordEntity> allMemberWithCard = memberBindRecordService.list(new QueryWrapper<MemberBindRecordEntity>().select("id","member_id","valid_count").eq("active_status", 1));
 
         if (allMemberWithCard.isEmpty()) {
             return R.error("还没有会员绑卡信息");
@@ -149,7 +149,7 @@ public class StatisticsController {
             Long memberId = entity.getMemberId();
             log.debug("\n==>会员id==>{}", memberId);
             //获取会员名
-            String memberName = memberService.getById(memberId).getName();
+            String memberName = memberService.getOne(new QueryWrapper<MemberEntity>().select("name").eq("id", memberId)).getName();
             //获取会员所持有的会员卡号【即绑定id】
             Long bindCardId = entity.getId();
             //获取该会员卡下的所有充值记录
@@ -157,13 +157,13 @@ public class StatisticsController {
             //获取该会员卡下的所有消费记录
             List<ConsumeRecordEntity> allConsumeRecordOfCurrentCard = consumeRecordService.list(new QueryWrapper<ConsumeRecordEntity>().eq("member_bind_id", bindCardId));
 
-            //获取总课次：    1.获取该会员卡下的所有充值记录,2.获取每次充值次数,3.相加求总次数
+            //获取总课次：    1.获取该会员卡下的所有充值记录,2.获取每次充值次数,3.相加求总次数(卡自带的次数已经添加到充值记录了)
             int totalClassTimes = allRechargeRecordOfCurrentCard.stream().mapToInt(RechargeRecordEntity::getAddCount).sum();
 //            List<Integer> allAddClassTimes = allRechargeRecordOfCurrentCard.stream().map(RechargeRecordEntity::getAddCount).collect(Collectors.toList());
             //获取已用课次    1.获取该会员卡下的所有消费记录,2.获取每次消费的次数,3.相加求已用次数
             int usedClassTimes = allConsumeRecordOfCurrentCard.stream().mapToInt(ConsumeRecordEntity::getCardCountChange).sum();
             //获取剩余课次
-            Integer remainingClassTimes = memberBindRecordService.getById(bindCardId).getValidCount();
+            Integer remainingClassTimes = entity.getValidCount();
             //获取总额      1.获取该会员卡下的所有充值记录,2.获取每次充值金额, 3.相加求总金额
             BigDecimal lumpSum = allRechargeRecordOfCurrentCard.stream().map(RechargeRecordEntity::getReceivedMoney).reduce(BigDecimal.ZERO, BigDecimal::add);
             //获取已用金额    1.获取该会员卡下的所有消费记录, 2.获取每次消费的金额, 3.相加求已用金额
@@ -183,7 +183,58 @@ public class StatisticsController {
                     .setBalance(balance);
         }).collect(Collectors.toList());
         log.debug("\n==>后台封装的用于数据统计页面的会员卡统计表单的list==>{}", memberCardStatisticsVos);
+        long middle = System.currentTimeMillis();
+        log.debug("\n==>middle==>{}", middle-start);
         //继续处理获取饼图数据
+
+        //总课时
+        int totalCourseTimeAll = 0;
+        //总已用课时
+        int usedCourseTimeAll = 0;
+        //总剩余课时
+        int remainCourseTimeAll = 0;
+        //总额
+        BigDecimal totalMoneyAll = BigDecimal.ZERO;
+        //总已用金额
+        BigDecimal usedMoneyAll = BigDecimal.ZERO;
+        //总剩余金额
+        BigDecimal remainMoneyAll = BigDecimal.ZERO;
+
+        /*memberCardStatisticsVos.forEach(entity -> {
+            int totalClassTimes = entity.getTotalClassTimes();
+            totalCourseTimeAll += totalClassTimes;
+            int usedClassTimes = entity.getUsedClassTimes();
+            usedCourseTimeAll += usedClassTimes;
+            int remainingClassTimes = entity.getRemainingClassTimes();
+            remainCourseTimeAll += remainingClassTimes;
+            BigDecimal lumpSum = entity.getLumpSum();
+            totalMoneyAll = totalMoneyAll.add(lumpSum);
+            BigDecimal amountUsed = entity.getAmountUsed();
+            usedMoneyAll = usedMoneyAll.add(amountUsed);
+            BigDecimal balance = entity.getBalance();
+            remainMoneyAll = remainMoneyAll.add(balance);
+        });*/
+
+        for (MemberCardStatisticsVo memberCardStatisticsVo : memberCardStatisticsVos) {
+            int totalClassTimes = memberCardStatisticsVo.getTotalClassTimes();
+            totalCourseTimeAll += totalClassTimes;
+            int usedClassTimes = memberCardStatisticsVo.getUsedClassTimes();
+            usedCourseTimeAll += usedClassTimes;
+            int remainingClassTimes = memberCardStatisticsVo.getRemainingClassTimes();
+            remainCourseTimeAll += remainingClassTimes;
+            BigDecimal lumpSum = memberCardStatisticsVo.getLumpSum();
+            totalMoneyAll = totalMoneyAll.add(lumpSum);
+            BigDecimal amountUsed = memberCardStatisticsVo.getAmountUsed();
+            usedMoneyAll = usedMoneyAll.add(amountUsed);
+            BigDecimal balance = memberCardStatisticsVo.getBalance();
+            remainMoneyAll = remainMoneyAll.add(balance);
+        }
+
+
+
+
+       /*
+        //---------------
         //总课时
         int totalCourseTimeAll = memberCardStatisticsVos.stream().mapToInt(MemberCardStatisticsVo::getTotalClassTimes).sum();
         //总已用课时
@@ -196,6 +247,7 @@ public class StatisticsController {
         BigDecimal usedMoneyAll = memberCardStatisticsVos.stream().map(MemberCardStatisticsVo::getAmountUsed).reduce(BigDecimal.ZERO, BigDecimal::add);
         //总剩余金额
         BigDecimal remainMoneyAll = memberCardStatisticsVos.stream().map(MemberCardStatisticsVo::getBalance).reduce(BigDecimal.ZERO, BigDecimal::add);
+*/
 
         MemberCardStatisticsWithTotalDataInfoVo memberCardStatisticsWithTotalDataInfoVo = new MemberCardStatisticsWithTotalDataInfoVo()
                 .setMemberCardStatisticsVos(memberCardStatisticsVos)
@@ -207,6 +259,8 @@ public class StatisticsController {
                 .setRemainMoneyAll(remainMoneyAll);
 
         log.info("\n==>后台封装的用于数据统计页面的完整信息==>{}", memberCardStatisticsWithTotalDataInfoVo);
+        long end = System.currentTimeMillis();
+        log.debug("\n==>end==>{}", (end-start));
 
         return R.ok().put("data", memberCardStatisticsWithTotalDataInfoVo);
     }
@@ -315,6 +369,10 @@ public class StatisticsController {
             log.debug("\n==>打印收费统计页面按季度统计图表的x轴数据==>{}\n==>打印统计收费页面按月统计图表的Y轴数据==>{}", xStrList, yDataList);
         } else {
 
+            if (endYear < beginYear) {
+                return R.error("起始时间与结束时间冲突！请修改后再查看统计结果");
+            }
+
             //过滤出年度统计模式---根据指定范围年份查出所有消费记录的时间和消费金额
             List<ConsumeRecordEntity> consumeInfoWithTimeAndMoneyForYear = consumeInfoWithTimeAndMoney.stream().filter(consume -> consume.getCreateTime().getYear() >= beginYear && consume.getCreateTime().getYear() <= endYear)
                     .collect(Collectors.toList());
@@ -345,8 +403,6 @@ public class StatisticsController {
         return R.ok().put("data", cardCostVo);
     }
 
-
-    //todo 又臭又长！！！！！！！
 
     /**
      * 数据统计--课消统计的返回信息
@@ -457,7 +513,13 @@ public class StatisticsController {
             } else {
                 //按起始和结束年份统计        //todo 要不要将流合并
 
-                if (i > allClassAlreadyTaken.size()) {
+                //当表单输入的时间冲突时
+                if (endYear < beginYear) {
+                    return R.error("起始时间与结束时间冲突！请修改后再查看统计结果");
+                }
+
+                //如果遍历完所有老师后依然没有排课记录
+                if (TRAVERSE_COUNT > allClassAlreadyTaken.size()) {
                     return R.error("指定时间内没有排课记录");
                 }
 
@@ -466,7 +528,7 @@ public class StatisticsController {
 
 
                 if (classAlreadyTakenForCurrentTeacherForYear.isEmpty()) {
-                    i++;
+                    TRAVERSE_COUNT++;
                     break;
                 }
 
@@ -488,6 +550,14 @@ public class StatisticsController {
                 mapT.put(teacher.getId(), mapTeacherCurrent);
 
             }
+        }
+
+        /*
+        创建一个类继承HashMap<Integer,Integer> 可用于强制类型转化时的instanceof，因为instanceof无法直接判断是否是泛型，此时我们的关于这个hashmap的一些逻辑就需要
+        写在创建的这个类类里面了；
+        todo：...
+         */
+        class TestClass01 extends HashMap<Integer, Integer> {
         }
 
         log.debug("\n==>打印保存【mapT={key=teacherId, value=mapTeacherCurrent(key=统计时间单位,value=课消次数)】==>{}", mapT);
@@ -518,10 +588,15 @@ public class StatisticsController {
                 //创建一个list存放该员工所有统计时间单位下的课消次数
                 ArrayList<Integer> classCosts = new ArrayList<>();
                 for (int i = 1; i <= maxMonth; i++) {
+                    //应当使用instanceof判断再强制类型转化
+                    //if (mapT.get(teacherId) instanceof TestClass01) {
+
                     HashMap<Integer, Integer> monthAndClassCost = (HashMap<Integer, Integer>) mapT.get(teacherId);
+                    //HashMap<Integer, Integer> monthAndClassCost = (TestClass01) mapT.get(teacherId);
                     Integer classCost = monthAndClassCost.getOrDefault(i, 0);
                     classCosts.add(classCost);
                 }
+                log.debug("\n==>classCostsTest==>{}", classCosts);
                 //将这个list放进vo的y轴数据（查看示例json)
                 yDataList.add(classCosts);
             }
@@ -584,8 +659,6 @@ public class StatisticsController {
 
         log.debug("\n==> 打印课消统计页面按月统计图表的老师名list==>{}\n==>x轴时间数据==> {},\n==>y轴课消次数数据==>{}", teacherNames, xStrList, yDataList);
 
-
-        //todo 补充一下注释！
         return R.ok().put("data", classCostVo);
     }
 
@@ -671,7 +744,7 @@ public class StatisticsController {
                 return R.error("指定时间内没有排课记录");
             }
 
-            scheduleRecordForSpecifyYear.forEach(System.out::println);
+            //scheduleRecordForSpecifyYear.forEach(System.out::println);
             scheduleRecordForSpecifyYear.forEach(schedule -> {
                 //获取当前流中记录的上课时间所在的季度
                 int quarter = (schedule.getStartDate().getMonthValue() - 1) / 3 + 1;
@@ -685,7 +758,7 @@ public class StatisticsController {
             });
             log.debug("\n==>打印季度和当前季度一共课次数的map：quarterClassHourMap==>{}", quarterClassHourMap);
 
-            //取出选中年份中的记录的最大记录
+            //取出选中年份中的记录的最大季度
             int maxQuarter = (scheduleRecordForSpecifyYear.get(0).getStartDate().getMonthValue() - 1) / 3 + 1;
             //赋值
             for (int i = 1; i <= maxQuarter; i++) {
@@ -700,6 +773,12 @@ public class StatisticsController {
                     setData(yDataList);
             log.debug("\n==>打印总课时统计页面按季度统计图表的x轴数据==>{}\n==>打印统计总课时页面按季度统计图表的Y轴数据==>{}", xStrList, yDataList);
         } else {
+
+            //当统计时间冲突时
+            if (endYear < beginYear) {
+                return R.error("起始时间与结束时间冲突！请修改后再查看统计结果");
+            }
+
             //创建返回vo的x轴list
             List<String> xStrList = new ArrayList<>();
             //创建返回vo的y轴list
@@ -778,14 +857,18 @@ public class StatisticsController {
         //创建返回vo的y轴list
         List<Integer> yDataList2 = new ArrayList<>();
 
+        //让你不打备注！想不起来了吧！！大概是避免前端传入数据错误避免报错？
         if (null == yearOfSelect) {
             yearOfSelect = -1;
         }
 
+        //创建要给map用于表示最大的统计时间单位
+        HashMap<Long, Integer> maxStatisticalTime = new HashMap<>();
+
         if (unit == 1) {
 
             //所有还存活的会员  //.eq("is_deleted", 0) mp会默认加上
-            List<MemberEntity> memberSurviveForMonthList = memberService.list(new QueryWrapper<MemberEntity>().select("create_time").likeRight(null != yearOfSelect, "create_time", yearOfSelect).orderByDesc("create_time"));
+            List<MemberEntity> memberSurviveForMonthList = memberService.list(new QueryWrapper<MemberEntity>().select("create_time").likeRight("create_time", yearOfSelect).orderByDesc("create_time"));
             log.debug("\n==>打印指定年份里所有还存活的会员信息==>{}", memberSurviveForMonthList);
 
             //所有注销的员工   //注意逻辑删除后的数据mp查不出来
@@ -807,23 +890,25 @@ public class StatisticsController {
                 //获取该会员的入会时间的月份
                 int monthValue = member.getCreateTime().getMonthValue();
                 memberSurviveMonthMap.put(monthValue, memberSurviveMonthMap.getOrDefault(monthValue, 0) + 1);
+                //将最大的月份放进map
+                maxStatisticalTime.put(MAX_MONTH, monthValue > maxStatisticalTime.getOrDefault(MAX_MONTH, 1) ? monthValue : maxStatisticalTime.get(MAX_MONTH));
             });
             //注销的会员信息
             memberLogOutForMonthList.forEach(member -> {
                 //获取该会员的注销时间的月份
                 int monthValue = member.getLastModifyTime().getMonthValue();
-                memberLogOutMonthMap.put(monthValue, memberLogOutMonthMap.getOrDefault(monthValue, 0) + 1);
+                memberLogOutMonthMap.put(monthValue, memberLogOutMonthMap.getOrDefault(monthValue, 0) - 1);
+                //将最大的月份放进map
+                maxStatisticalTime.put(MAX_MONTH, monthValue > maxStatisticalTime.getOrDefault(MAX_MONTH, 1) ? monthValue : maxStatisticalTime.get(MAX_MONTH));
             });
 
-            //获取存活的会员在选中年度内的最新入会时间的月份
-            int maxAddMonth = memberSurviveForMonthList.isEmpty() ? 0 : memberSurviveForMonthList.get(0).getCreateTime().getMonthValue();
-            //获取注销的会员在选中年度内的最新退会时间的月份
-            int maxLogOutMonth = memberLogOutForMonthList.isEmpty() ? 0 : memberLogOutForMonthList.get(0).getLastModifyTime().getMonthValue();
-            //获取最大月份
-            int maxMonth = Math.max(maxAddMonth, maxLogOutMonth);
+            //得出最大的月份
+            Integer maxMonth = maxStatisticalTime.get(MAX_MONTH);
+            log.debug("\n==>打印最大月份==>{}", maxMonth);
+
 
             for (int i = 1; i <= maxMonth; i++) {
-                xStrList.add("第" + i + "月份");
+                xStrList.add(i + "月");
                 Integer data = memberSurviveMonthMap.getOrDefault(i, 0);
                 Integer data2 = memberLogOutMonthMap.getOrDefault(i, 0);
                 yDataList.add(data);
@@ -851,26 +936,30 @@ public class StatisticsController {
             //创建一个盛放季度和当前季度注销会员数量的map
             HashMap<Integer, Integer> memberLogOutQuarterMap = new HashMap<>();
 
+            //获取存活的会员在选中年度内的最新入会时间的月份
             memberSurviveForQuarterList.forEach(member -> {
                 //获取季度
                 int quarter = (member.getCreateTime().getMonthValue() - 1) / 3 + 1;
                 memberSurviveQuarterMap.put(quarter, memberSurviveQuarterMap.getOrDefault(quarter, 0) + 1);
+                //将最大的季度放进map
+                maxStatisticalTime.put(MAX_QUARTER, quarter > maxStatisticalTime.getOrDefault(MAX_QUARTER, 1) ? quarter : maxStatisticalTime.get(MAX_QUARTER));
+
             });
 
+            //获取注销的会员在选中年度内的最新退会时间的月份
             memberLogOutForQuarterList.forEach(member -> {
                 int quarter = (member.getLastModifyTime().getMonthValue() - 1) / 3 + 1;
-                memberLogOutQuarterMap.put(quarter, memberLogOutQuarterMap.getOrDefault(quarter, 0) + 1);
+                memberLogOutQuarterMap.put(quarter, memberLogOutQuarterMap.getOrDefault(quarter, 0) - 1);
+                //将最大的季度放进map
+                maxStatisticalTime.put(MAX_QUARTER, quarter > maxStatisticalTime.getOrDefault(MAX_QUARTER, 1) ? quarter : maxStatisticalTime.get(MAX_QUARTER));
             });
 
-            //获取存活的会员在选中年度内的最新入会时间的月份
-            int maxAddQuarter = memberSurviveForQuarterList.isEmpty() ? 0 : (memberSurviveForQuarterList.get(0).getCreateTime().getMonthValue() - 1) / 3 + 1;
-            //获取注销的会员在选中年度内的最新退会时间的月份
-            int maxLogOutQuarter = memberLogOutForQuarterList.isEmpty() ? 0 : (memberLogOutForQuarterList.get(0).getLastModifyTime().getMonthValue() + 1) / 3 + 1;
-            //获取最大月份
-            int maxQuarter = Math.max(maxAddQuarter, maxLogOutQuarter);
+            //获取最大季度
+            Integer maxQuarter = maxStatisticalTime.get(MAX_QUARTER);
+            log.debug("\n==>打印最大季度==>{}", maxQuarter);
 
             for (int i = 1; i <= maxQuarter; i++) {
-                xStrList.add("第" + i + "季度");
+                xStrList.add(i + "季度");
                 Integer data = memberSurviveQuarterMap.getOrDefault(i, 0);
                 Integer data2 = memberLogOutQuarterMap.getOrDefault(i, 0);
                 yDataList.add(data);
@@ -884,6 +973,12 @@ public class StatisticsController {
                     .setData2(yDataList2);
             log.debug("\n==>新增与流失人数统计页面按季度统计图表的x轴数据==>{}\n==>打印新增与流失人数统计页面按季度统计图表的Y轴数据==>{}\n==>打印新增与流失人数统计页面按季度统计图表的Y轴数据2==>{}", xStrList, yDataList, yDataList2);
         } else {
+
+            //当统计时间冲突时
+            if (endYear < beginYear) {
+                return R.error("起始时间与结束时间冲突！请修改后再查看统计结果");
+            }
+
             List<MemberEntity> memberSurviveForYearList = memberService.list(new QueryWrapper<MemberEntity>().select("create_time")
                     .ge("create_time", LocalDateTime.of(beginYear, 1, 1, 0, 0, 0))
                     .le("create_time", LocalDateTime.of(endYear, 12, 31, 23, 59, 59))
@@ -911,13 +1006,13 @@ public class StatisticsController {
             //遍历beginYear和endYear之间注销的会员信息
             memberLogOutForYearList.forEach(member -> {
                 int year = member.getLastModifyTime().getYear();
-                memberLogOutYearMap.put(year, memberLogOutYearMap.getOrDefault(year, 0) + 1);
+                memberLogOutYearMap.put(year, memberLogOutYearMap.getOrDefault(year, 0) - 1);
             });
 
             log.debug("\n==>年度和当前年度新增会员数量的map==>{}\n==>年度和当前年度注销会员数量的map==>{}", memberSurviveYearMap, memberLogOutYearMap);
 
             for (int i = beginYear; i <= endYear; i++) {
-                xStrList.add("第" + i + "年度");
+                xStrList.add(i + "年");
                 Integer data = memberSurviveYearMap.getOrDefault(i, 0);
                 Integer data2 = memberLogOutYearMap.getOrDefault(i, 0);
                 yDataList.add(data);

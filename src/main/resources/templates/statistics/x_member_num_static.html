@@ -7,7 +7,7 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
 
-    <title>X+ 约课系统 - 个人资料</title>
+    <title>新增与流失统计page</title>
     <meta content="H+后台主题,后台bootstrap框架,会员中心主题,后台HTML,响应式后台" name="keywords">
     <meta content="H+是一个完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术" name="description">
 
@@ -87,6 +87,9 @@
                                     <button class="btn btn-success" type="submit">统计</button>
                                     <button class="btn btn-white" type="reset">取消</button>
                                 </div>
+                                <div class="col-sm-1 col-sm-offset-7">
+                                    <a class="btn btn-warning center-block" onclick="window.location.reload()">刷新数据</a>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -142,7 +145,7 @@
         // 图表初始化
         var chart = echarts.init(document.getElementById('main'));
         // 指定图表的配置项和数据
-        var option = {
+        /*var option = {
             title: {
                 text: ''
             },
@@ -167,9 +170,105 @@
                 data: []     //data: [5, 20, 36, 10, 10, 20]
             }
             ]
+        };*/
+
+        option = {
+            title: {
+                text: ''
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            legend: {
+                data: ['流失', '新增']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: [
+                {
+                name: "人数"
+            }
+
+                // {
+                //     type: 'value'
+                // }
+            ],
+            yAxis: [
+                {
+                    name: "",
+                    type: 'category',
+                    axisTick: {
+                        show: false
+                    },
+                    data: []
+                }
+            ]
+            ,
+            series: [
+                {
+                    name: '新增',
+                    type: 'bar',
+                    color: 'Coral',
+                    stack: 'Total',
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: []
+                },
+                {
+                    name: '流失',
+                    color: 'Olive',
+                    type: 'bar',
+                    stack: 'Total',
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: []
+                }
+            ]
         };
 
         $("#addForm").submit(function () {
+            var form = document.forms["addForm"];
+            $.ajax({
+                type: 'POST',
+                url: "/statistics/addAndStreamCountMonthOrSeasonOrYear",
+                data: $(form).serialize(),
+                success: function (data) {
+
+                    if (data.code === 0) {
+
+                        var info = data.data;
+                        console.log(info);
+
+                        //标题
+                        option.title.text = info.title;
+                        //时间list
+                        option.yAxis[0].data = info.time;
+                        //时间轴单位
+                        option.yAxis[0].name = info.xname;
+                        //新增list
+                        option.series[0].data = info.data;
+                        //流失list
+                        option.series[1].data = info.data2;
+                        chart.setOption(option, true);
+                    } else {
+                        swal("统计错误！", data.msg, "info");
+                    }
+                }
+            });
+            return false;
+        });
+
+
+        /*$("#addForm").submit(function () {
             var form = document.forms["addForm"];
             $.ajax({
                 type: 'POST',
@@ -189,12 +288,12 @@
                         option.series[1].data = info.data2;
                         chart.setOption(option, true);
                     } else {
-                        swal(data.msg, "", "info");
+                        swal("统计错误！", data.msg, "info");
                     }
                 }
             });
             return false;
-        });
+        });*/
 
         // 选择不现统计单位时，改变选择框
         $(":radio[name=unit]").click(function () {
