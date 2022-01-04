@@ -44,14 +44,14 @@ public class GlobalExceptionControllerAdvice {
     /**
      * 自定义异常处理器
      */
-    @ControllerAdvice//用于不返回json数据
+//    @ControllerAdvice//用于不返回json数据
     public class CustomExtHandler {
 
         @ExceptionHandler(value=Exception.class)//处理哪一类异常
         Object handlerException(Exception e,  HttpServletRequest request){
             ModelAndView modelAndView = new ModelAndView();
             //跳转异常页面路径
-            modelAndView.setViewName("error.html");
+            modelAndView.setViewName("error/404");
             //页面显示错误信息  页面只需要使用对应的取值方式取值就可以取到msg了
             modelAndView.addObject("msg",e.getMessage());
             return modelAndView;

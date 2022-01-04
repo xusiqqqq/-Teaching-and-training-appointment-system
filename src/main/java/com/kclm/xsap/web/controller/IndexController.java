@@ -137,7 +137,7 @@ public class IndexController {
     /**
      * 当月新增与流失人数统计
      *
-     * @return 返回首页eCharts数据 折线图数据
+     * @return 返回首页eCharts数据 新增流失数据
      */
     @GetMapping("/index/homePageInfo/statisticsOfNewAndLostPeople.do")
     @ResponseBody
@@ -192,7 +192,7 @@ public class IndexController {
         }
 
         infoVo.setTitle("当月新增与流失人数统计")
-                .setXname("日")
+                .setXname("/日")
                 .setTime(xStrList)
                 .setData(yDataList)
                 .setData2(yDataList2);

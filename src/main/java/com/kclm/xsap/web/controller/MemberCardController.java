@@ -1,14 +1,13 @@
 package com.kclm.xsap.web.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.kclm.xsap.consts.KeyNameOfCache;
 import com.kclm.xsap.consts.OperateType;
 import com.kclm.xsap.entity.*;
 import com.kclm.xsap.service.*;
 import com.kclm.xsap.utils.R;
-import com.kclm.xsap.vo.BindCardInfoVo;
-import com.kclm.xsap.vo.CardInfoVo;
-import com.kclm.xsap.vo.OperateRecordVo;
-import com.kclm.xsap.vo.ReserveFormCountVo;
+import com.kclm.xsap.vo.*;
+import com.kclm.xsap.web.cache.MapCache;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -22,6 +21,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -64,6 +64,9 @@ public class MemberCardController {
 
     @Resource
     private ConsumeRecordService consumeRecordService;
+
+    @Resource
+    private MapCache mapCache;
 
 
     /**
@@ -240,7 +243,6 @@ public class MemberCardController {
     @PostMapping("/cardAdd.do")
     @ResponseBody
     @Transactional
-    //todo 表单提交应该加jsr303 使用@Validation
     public R cardAdd(@Valid MemberCardEntity memberCardEntity, BindingResult bindingResult, String courseListStr) {
         //保存会员卡信息
         log.debug("\n 前端传入的memberCardEntity：{}", memberCardEntity);
@@ -348,7 +350,7 @@ public class MemberCardController {
     //todo ！！
 
     /**
-     * 会员详情页的激活状态的改变
+     * 会员详情页的激活状态的改变 //todo
      *
      * @param memberId   会员id
      * @param bindCardId 绑定记录id
@@ -367,6 +369,11 @@ public class MemberCardController {
             List<CardInfoVo> cardInfoVos = memberBindRecordService.getCardInfo(memberId);
             log.debug("\n==>更新status后返回的会员卡信息==>{}", cardInfoVos);
             MemberBindRecordEntity bindRecordById = memberBindRecordService.getById(bindCardId);
+
+            //停用会员卡后删除缓存中原数据
+            mapCache.getCacheInfo().remove(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO);
+            log.debug("\n==>充值后删除map缓存中原数据");
+
             return new R().put("data", bindRecordById);
         } else {
             return R.error("更新失败");
@@ -446,6 +453,10 @@ public class MemberCardController {
             return R.error("更新绑定表失败");
         }
 
+        //充值后删除缓存中原数据
+        mapCache.getCacheInfo().remove(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO);
+        log.debug("\n==>充值后删除map缓存中原数据");
+
         return R.ok("充值成功！");
     }
 
@@ -453,32 +464,34 @@ public class MemberCardController {
     /**
      * 会员详情页扣费操作
      *
-     * @param entity   扣费表单提交的信息
-     * @param memberId 会员id
-     * @param bindId   会员卡实体信息
-     * @return r -> 扣费结果
+     * @param vo   扣费表单提交的信息
+     * @return r -> 扣费结果    ConsumeRecordEntity
      */
     @PostMapping("/consumeOpt.do")
     @ResponseBody
     @Transactional
-    public R consumeOpt(ConsumeRecordEntity entity,
-                        @RequestParam("memberId") Long memberId,
-                        @RequestParam("cardId") Long bindId) {
-        log.debug("\n==>打印扣费表单提交的消费记录==>{}", entity);
-        MemberBindRecordEntity bindById = memberBindRecordService.getById(bindId);
-        if (bindById.getValidCount() < entity.getCardCountChange()) {
-            return R.error("剩余次数不足,请充值后扣费");
+    public R consumeOpt( ConsumeFormVo vo) {
+        log.debug("\n==>打印扣费表单提交的消费记录==>{}", vo);
+        //获取会员卡绑定id
+        Long cardBindId = vo.getCardBindId();
+        MemberBindRecordEntity bindById = memberBindRecordService.getById(cardBindId);
+        if (bindById.getValidCount() < vo.getCardCountChange()) {
+            return R.error("剩余次数不足以完成此次扣费,请充值后扣费");
+        }
+        if (bindById.getReceivedMoney().compareTo(vo.getAmountOfConsumption()) < 0) {
+            return R.error("剩余金额不足以完成此次消费,请充值后扣费");
         }
 
         //扣费1、添加操作记录
         MemberLogEntity logEntity = new MemberLogEntity()
                 .setType(OperateType.CLASS_DEDUCTION.getMsg())
-                .setOperator(entity.getOperator())
-                .setMemberBindId(bindId)
+                .setInvolveMoney(vo.getAmountOfConsumption())
+                .setOperator(vo.getOperator())
+                .setMemberBindId(cardBindId)
                 .setCreateTime(LocalDateTime.now())
-                .setCardCountChange(entity.getCardCountChange())
-                .setCardDayChange(entity.getCardDayChange())
-                .setNote(entity.getNote());
+                .setCardCountChange(vo.getCardCountChange())
+                //.setCardDayChange(vo.getCardDayChange())  //有效期暂时无意义
+                .setNote(vo.getNote());
         boolean isSaveLog = memberLogService.save(logEntity);
         log.debug("\n==>添加操作记录日志是否成功==>{}", isSaveLog);
         if (!isSaveLog) {
@@ -486,10 +499,19 @@ public class MemberCardController {
             return R.error("添加操作记录日志失败！");
         }
 
-        entity.setMemberBindId(bindId).setOperateType(OperateType.CLASS_DEDUCTION.getMsg()).setCreateTime(LocalDateTime.now()).setLogId(logEntity.getId());
         //扣费2、添加消费记录
-        log.debug("\n==>打印要添加的消费记录==>{}", entity);
-        boolean isSaveConsumeRecord = consumeRecordService.save(entity);
+        //添加消费记录的实体
+        ConsumeRecordEntity consumeRecordEntity = new ConsumeRecordEntity()
+                .setOperateType(OperateType.CLASS_DEDUCTION.getMsg())
+                .setCardCountChange(vo.getCardCountChange())
+                .setMoneyCost(vo.getAmountOfConsumption())
+                .setOperator(vo.getOperator())
+                .setNote(vo.getNote())
+                .setMemberBindId(cardBindId)
+                .setCreateTime(LocalDateTime.now())
+                .setLogId(logEntity.getId());
+        log.debug("\n==>打印要添加的消费记录==>{}", consumeRecordEntity);
+        boolean isSaveConsumeRecord = consumeRecordService.save(consumeRecordEntity);
         log.debug("\n==>添加消费记录是否成功==>{}", isSaveConsumeRecord);
         if (!isSaveConsumeRecord) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -497,8 +519,9 @@ public class MemberCardController {
         }
 
         //扣费3、更新实体会员卡的信息
-        bindById.setValidCount(bindById.getValidCount() - entity.getCardCountChange())
-                .setValidDay(bindById.getValidDay() - entity.getCardDayChange())
+        bindById.setValidCount(bindById.getValidCount() - vo.getCardCountChange())
+                //.setValidDay(bindById.getValidDay() - vo.getCardDayChange())
+                .setReceivedMoney(bindById.getReceivedMoney().subtract(vo.getAmountOfConsumption()))
                 .setLastModifyTime(LocalDateTime.now())
                 .setVersion(bindById.getVersion() + 1);
         boolean isUpdateBindRecord = memberBindRecordService.updateById(bindById);
@@ -507,12 +530,16 @@ public class MemberCardController {
             return R.error("更新会员卡信息失败");
         }
 
+        //扣费后删除缓存中数据
+        mapCache.getCacheInfo().remove(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO);
+        log.debug("\n==>扣费后删除map缓存中的会员卡信息");
+
         return R.ok("扣费成功!");
     }
 
 
     /**
-     * 返回操作记录//todo 还有问题,关联的表有误
+     * 返回操作记录
      *
      * @param memberId 前台提交的会员id
      * @param bindId   实际存在的会员卡的id
@@ -526,9 +553,9 @@ public class MemberCardController {
         List<OperateRecordVo> operateRecordVos = rechargeRecordService.getOperateRecord(memberId, bindId);
         //给到期时间赋值
         for (OperateRecordVo vo : operateRecordVos) {
-//            vo.setEndToDate(vo.getLastModifyTime() == null ? vo.getCreateTime().plusDays(vo.getValidDay()) : vo.getLastModifyTime().plusDays(vo.getValidDay()));
-            vo.setChangeCount(vo.getCardCountChange() == null ? vo.getAddCount() : vo.getCardCountChange());
-            vo.setChangeMoney(vo.getReceivedMoney() == null ? vo.getMoneyCost() : vo.getReceivedMoney());
+            DecimalFormat format = new DecimalFormat("¤00.00");
+            vo.setChangeCount(vo.getCardCountChange() == null ? vo.getAddCount() : -vo.getCardCountChange());
+            vo.setChangeMoney(vo.getReceivedMoney() == null ? format.format(vo.getMoneyCost().negate()) : format.format(vo.getReceivedMoney()));
         }
 
         log.debug("\n==>打印查出来的操作记录的vo信息==>{}", operateRecordVos);

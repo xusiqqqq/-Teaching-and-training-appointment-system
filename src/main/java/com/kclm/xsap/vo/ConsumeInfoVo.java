@@ -16,16 +16,6 @@ import java.time.LocalDateTime;
 @Data
 @Accessors
 public class ConsumeInfoVo {
-    /*
-    "cardName"},
-"operateTime"},
-"cardCountChange"
-"timesRemainder"}
-"moneyCost"},
-"operateType"},
-"operator"},
-"note"}
-     */
 
 
     /**
@@ -52,7 +42,11 @@ public class ConsumeInfoVo {
     /**
      * 本次消费的金额
      */
-    private BigDecimal moneyCost;
+    private BigDecimal moneyCostBigD;
+    /**
+     * 本次消费金额的格式化字符串
+     */
+    private String moneyCost;
     /**
      * 本次消费操作的类型
      */

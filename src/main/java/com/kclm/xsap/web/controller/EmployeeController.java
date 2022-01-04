@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kclm.xsap.entity.*;
 import com.kclm.xsap.service.*;
 import com.kclm.xsap.utils.R;
+import com.kclm.xsap.utils.exception.RRException;
 import com.kclm.xsap.utils.file.UploadImg;
+import com.kclm.xsap.vo.ModifyPassword;
 import com.kclm.xsap.vo.TeacherClassRecordVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -19,6 +21,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +60,10 @@ public class EmployeeController {
 
     @Resource
     private MemberCardService memberCardService;
+
+    @Resource ClassRecordService classRecordService;
+
+    @Resource private MemberService memberService;
 
 
     /**
@@ -217,6 +224,71 @@ public class EmployeeController {
 
     }
 
+
+    /**
+     * 菜单栏点击管理员类型跳转修改密码页面
+     * @return x_modify_password.html
+     */
+    @GetMapping("/x_modify_password.do")
+    public String modifyPassword() {
+        return "x_modify_password";
+    }
+
+
+    /**
+     * 修改密码操作
+     * @param entity 修改密码页面传入的表单数据
+     * @param model 跳转页面携带数据
+     * @return 跳转页面
+     */
+    @PostMapping("/modifyPwd.do")
+    public String modifyPwd(ModifyPassword entity, Model model) {
+        log.debug("\n==>打印前台传入的修改密码表单数据==>{}", entity);
+
+        if(null == entity) {
+            throw new RRException("修改数据表单为空", 22404);
+        }
+        if (entity.getOldPwd().isEmpty()) {
+            model.addAttribute("CHECK_PWD_ERROR", 0);
+            log.debug("\n==>原密码为空");
+            return "x_modify_password";
+        } else {
+            if (!entity.getNewPwd().equals(entity.getPwd2())) {
+                model.addAttribute("CHECK_PWD_ERROR", 2);
+                log.debug("\n==>新密码两次不一样");
+                return "x_modify_password";
+            }
+            EmployeeEntity employeeEntity = employeeService.getById(entity.getId());
+            if (!employeeEntity.getRolePassword().equals(entity.getOldPwd())) {
+                model.addAttribute("CHECK_PWD_ERROR", 1);
+                log.debug("\n==>原密码不正确");
+                return "x_modify_password";
+            } else {
+                employeeEntity.setRolePassword(entity.getNewPwd()).setVersion(employeeEntity.getVersion() + 1).setLastModifyTime(LocalDateTime.now());
+                boolean isUpdatePwd = employeeService.updateById(employeeEntity);
+                if (isUpdatePwd) {
+                    log.debug("\n==>修改成功！");
+                    return "redirect:/index/logout";
+                } else {
+                    throw new RRException("修改密码失败", 22405);
+                }
+            }
+        }
+    }
+
+
+    /**
+     * 菜单栏点击管理员类型跳转个人资料页面
+     * @return x_profile.html
+     */
+    @GetMapping("/x_profile.do")
+    public String profile(Long id, Model model) {
+        EmployeeEntity employeeServiceById = employeeService.getById(id);
+        model.addAttribute("userInfo", employeeServiceById);
+        return "x_profile";
+    }
+
+
     /**
      * 返回所有老师信息给suggest提供搜索建议
      *
@@ -291,26 +363,58 @@ public class EmployeeController {
     @PostMapping("/teacherClassRecord.do")
     @ResponseBody
     public R teacherClassRecord(@RequestParam("tid") Long id) {
-        log.debug("\n==>传入的teacherId==>{}", id);
+        log.debug("\n==>打印传入的teacherId==>{}", id);
 
         List<ScheduleRecordEntity> scheduleForTeacher = scheduleRecordService.list(new QueryWrapper<ScheduleRecordEntity>().eq("teacher_id", id));
-        log.debug("\n==>该老师的所有排课计划==>{}", scheduleForTeacher);
+        log.debug("\n==>打印该老师的所有排课计划==>{}", scheduleForTeacher);
         List<TeacherClassRecordVo> teacherClassRecordVos = scheduleForTeacher.stream().map(entity -> {
+            //获取当前排课记录的id
+            Long scheduleId = entity.getId();
+            //获取当前排课的课程id
             Long courseId = entity.getCourseId();
+            //根据课程id获取当前课程信息
             CourseEntity courseById = courseService.getById(courseId);
+            //从课程信息里获取课程名
             String courseName = courseById.getName();
+            //获取上课日期+时间
             LocalDateTime classTime = LocalDateTime.of(entity.getStartDate(), entity.getClassTime());
-            List<Long> cardIdList = courseCardService.list(new QueryWrapper<CourseCardEntity>().eq("course_id", courseId)).stream().map(CourseCardEntity::getCardId).collect(Collectors.toList());
-            Stream<String> cardNameList = memberCardService.listByIds(cardIdList).stream().map(MemberCardEntity::getName);
-            String[] cardName = cardNameList.toArray(String[]::new);
+            //获取课程单位消耗次数
             Integer timesCost = courseById.getTimesCost();
+            //在上课记录中查询所有上了当前课程的会员的id的list
+            List<Long> memberIdList = classRecordService.list(new QueryWrapper<ClassRecordEntity>().select("member_id").eq("schedule_id", scheduleId).eq("check_status", 1)).stream().map(ClassRecordEntity::getMemberId).collect(Collectors.toList());
 
-            return new TeacherClassRecordVo().setCourseName(courseName).setClassTime(classTime).setCardName(Arrays.toString(cardName)).setTimesCost(timesCost);
+            //初始化创建一个用于存放会员名的list，当会员id为空时
+            List<String> memberNames = new ArrayList<>();
+
+            //只有当查到的会员id不为空时，才进行查询
+            if (!memberIdList.isEmpty()) {
+                memberNames = memberService.list(new QueryWrapper<MemberEntity>().select("name").in("id", memberIdList)).stream().map(MemberEntity::getName).collect(Collectors.toList());
+            }
+            //创建一个存放会员名的builder
+            StringBuilder memberNameBuilder = new StringBuilder();
+            if (!memberNames.isEmpty()) {
+                memberNameBuilder.append("【");
+                //将所有会员名添加进去，补上','
+                memberNames.forEach(name -> memberNameBuilder.append(name).append(","));
+                //将最后一个','删掉
+                memberNameBuilder.deleteCharAt(memberNameBuilder.lastIndexOf(","));
+                memberNameBuilder.append("】");
+            } else {
+                memberNameBuilder.append("  --");
+            }
+
+            //赋值vo并收集成list
+            return new TeacherClassRecordVo()
+                    .setCourseName(courseName)
+                    .setClassTime(classTime)
+//                    .setCardName(Arrays.toString(cardName))
+                    .setCardName(memberNameBuilder.toString())
+                    .setTimesCost(timesCost);
         }).collect(Collectors.toList());
 
         log.debug("\n==>打印返回到前台的老师上课记录信息是：==>{}", teacherClassRecordVos);
 
-        return new R().put("data", teacherClassRecordVos);
+        return R.ok().put("data", teacherClassRecordVos);
     }
 
 

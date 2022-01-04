@@ -39,12 +39,15 @@ public class MemberCardStatisticsVo {
     private  Integer remainingClassTimes;
 
     //总金额
-    private BigDecimal lumpSum;
+    private BigDecimal lumpSumBigD;
+    private String lumpSum;
 
     //已用金额
-    private BigDecimal amountUsed;
+    private BigDecimal amountUsedBigD;
+    private String amountUsed;
 
     //剩余金额
-    private BigDecimal balance;
+    private BigDecimal balanceBigD;
+    private String balance;
 
 }

@@ -2,12 +2,14 @@ package com.kclm.xsap.web.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.kclm.xsap.consts.KeyNameOfCache;
 import com.kclm.xsap.entity.*;
 import com.kclm.xsap.service.*;
 import com.kclm.xsap.utils.R;
 import com.kclm.xsap.utils.exception.RRException;
 import com.kclm.xsap.utils.file.UploadImg;
 import com.kclm.xsap.vo.*;
+import com.kclm.xsap.web.cache.MapCache;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
@@ -20,6 +22,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -55,6 +58,9 @@ public class MemberController {
 
     @Resource
     private ConsumeRecordService consumeRecordService;
+
+    @Resource
+    private MapCache mapCache;
 
 
     /**
@@ -111,7 +117,8 @@ public class MemberController {
     @ResponseBody
     public List<MemberVo> memberList() {
         //is_deleted会自动加上
-        List<MemberEntity> memberEntityList = memberService.list();
+        List<MemberEntity> memberEntityList = memberService.list(new QueryWrapper<MemberEntity>().orderByDesc("create_time"));
+        log.debug("\n==>打印数据库查出来的所有的会员信息==>{}", memberEntityList);
         //todo 重写这个方法
 
 
@@ -205,7 +212,7 @@ public class MemberController {
 
     /**
      * 删除选中会员（逻辑删除）
-     *
+     * todo ：修改！！！！修改激活
      * @param id 要删除的会员id
      */
     @PostMapping("/deleteOne.do")
@@ -215,6 +222,11 @@ public class MemberController {
         boolean isDeleteMember = memberService.update(new UpdateWrapper<MemberEntity>().set("is_deleted", 1).set("last_modify_time", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)).setSql("version = version + 1").eq("id", id));
         log.debug("\n==>注销会员是否成功==>{}", isDeleteMember);
         if (isDeleteMember) {
+
+            //充值后删除缓存中原数据
+            mapCache.getCacheInfo().remove(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO);
+            log.debug("\n==>充值后删除map缓存中原数据");
+
             log.debug("\n==>注销会员id={}成功！！",id);
 
             //找出该会员持有的所有会员卡
@@ -224,6 +236,7 @@ public class MemberController {
                 if (i < 0) {
                     log.debug("\n==>更新该会员持有的会员卡为非激活是否成功==>{}", i);
                 } else {
+                    //回滚
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 }
             });
@@ -421,6 +434,10 @@ public class MemberController {
         List<ConsumeInfoVo> consumeInfoVoList = consumeRecordService.getConsumeInfo(id);
         for (ConsumeInfoVo vo : consumeInfoVoList) {
             vo.setOperateTime(vo.getLastModifyTime() == null ? vo.getCreateTime() : vo.getLastModifyTime());
+
+            DecimalFormat format = new DecimalFormat("¤00.00");
+            vo.setMoneyCost(format.format(vo.getMoneyCostBigD().negate()));
+
         }
 
         log.debug("\n==>后台封装的会员详情页的【消费记录】信息的vo-list==>{}", consumeInfoVoList);

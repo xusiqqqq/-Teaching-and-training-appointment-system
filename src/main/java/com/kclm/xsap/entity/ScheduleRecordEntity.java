@@ -17,6 +17,8 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * 中间表：排课计划表
  * 
@@ -39,6 +41,7 @@ public class ScheduleRecordEntity implements Serializable {
 	/**
 	 * 课程号
 	 */
+	@NotNull(message = "请选择课程")
 	private Long courseId;
 	/**
 	 * 课程时长
@@ -48,6 +51,7 @@ public class ScheduleRecordEntity implements Serializable {
 	/**
 	 * 教师号
 	 */
+	@NotNull(message = "请选择上课老师")
 	private Long teacherId;
 	/**
 	 * 此项排课的预约人数
@@ -56,6 +60,7 @@ public class ScheduleRecordEntity implements Serializable {
 	/**
 	 * 上课日期
 	 */
+	@NotNull(message = "请确定上课日期")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate startDate;
 	/**

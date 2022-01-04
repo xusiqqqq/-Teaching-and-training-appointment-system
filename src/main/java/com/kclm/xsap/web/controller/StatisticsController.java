@@ -1,14 +1,17 @@
 package com.kclm.xsap.web.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.kclm.xsap.consts.KeyNameOfCache;
 import com.kclm.xsap.entity.*;
 import com.kclm.xsap.service.*;
+import com.kclm.xsap.utils.ExpiryMap;
 import com.kclm.xsap.utils.R;
 import com.kclm.xsap.vo.MemberCardStatisticsVo;
 import com.kclm.xsap.vo.MemberCardStatisticsWithTotalDataInfoVo;
 import com.kclm.xsap.vo.statistics.CardCostVo;
 import com.kclm.xsap.vo.statistics.ClassCostVo;
 import com.kclm.xsap.vo.statistics.StatisticsOfCardCostVo;
+import com.kclm.xsap.web.cache.MapCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,10 +36,14 @@ import java.util.stream.Collectors;
  * @create 2021-12-15 13:01
  */
 
-@Controller
+@Controller("statisticsController")
 @Slf4j
 @RequestMapping("/statistics")
 public class StatisticsController {
+
+    //会员卡统计数据缓存的key
+    private static final String CACHE_OF_MEMBER_CARD_INFO = "MEMBER_CARD_INFO";
+
 
     //代表老师上的课的时间的可能的最大月份
     private static final Long MAX_MONTH = -11111L;
@@ -65,6 +73,9 @@ public class StatisticsController {
 
     @Resource
     private CourseService courseService;
+
+    @Resource
+    private MapCache mapCache;
 
     /**
      * 跳转到会员卡统计页面
@@ -128,13 +139,28 @@ public class StatisticsController {
      */
     @PostMapping("/cardInfo.do")
     @ResponseBody
-    public R memberInfo() {
+    public R memberCardInfo() {
         /* 会员卡统计
         总课次：将所有充值记录中的充值次数加起来，   总金额：
         已用课次：消费记录中消费次数加起来          医用金额
         剩余：相减或者查bind表                   剩余金额
          */
         //todo 重写这个方法！！！太慢了！！用map缓存？
+
+        //使用map做本地缓存
+//        HashMap<KeyNameOfCache, MemberCardStatisticsWithTotalDataInfoVo> CACHE_MEMBER_CARD_INFO_MAP = mapCache.getMemberCardInfoMap();
+        ExpiryMap<KeyNameOfCache, Object> CACHE_MEMBER_CARD_INFO_MAP = mapCache.getCacheInfo();
+//        MemberCardStatisticsWithTotalDataInfoVo cacheMemberCardInfo = CACHE_MEMBER_CARD_INFO_MAP.get(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO);
+        Object cacheValueOfMapForMemberCardInfo = CACHE_MEMBER_CARD_INFO_MAP.get(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO);
+        MemberCardStatisticsWithTotalDataInfoVo cacheMemberCardInfo = null;
+        if(cacheValueOfMapForMemberCardInfo instanceof MemberCardStatisticsWithTotalDataInfoVo)  {
+            log.debug("会员卡数据vo类型instanceof匹配-->强转成MemberCardStatisticsWithTotalDataInfoVo返回到前台");
+            cacheMemberCardInfo = (MemberCardStatisticsWithTotalDataInfoVo) cacheValueOfMapForMemberCardInfo;
+        }
+        if (null != cacheMemberCardInfo) {
+            log.debug("\n==>返回map的值==>{}", cacheMemberCardInfo);
+            return R.ok().put("data", cacheMemberCardInfo);
+        }
 
         long start = System.currentTimeMillis();
 
@@ -153,9 +179,9 @@ public class StatisticsController {
             //获取会员所持有的会员卡号【即绑定id】
             Long bindCardId = entity.getId();
             //获取该会员卡下的所有充值记录
-            List<RechargeRecordEntity> allRechargeRecordOfCurrentCard = rechargeRecordService.list(new QueryWrapper<RechargeRecordEntity>().eq("member_bind_id", bindCardId));
+            List<RechargeRecordEntity> allRechargeRecordOfCurrentCard = rechargeRecordService.list(new QueryWrapper<RechargeRecordEntity>().select("add_count","received_money").eq("member_bind_id", bindCardId));
             //获取该会员卡下的所有消费记录
-            List<ConsumeRecordEntity> allConsumeRecordOfCurrentCard = consumeRecordService.list(new QueryWrapper<ConsumeRecordEntity>().eq("member_bind_id", bindCardId));
+            List<ConsumeRecordEntity> allConsumeRecordOfCurrentCard = consumeRecordService.list(new QueryWrapper<ConsumeRecordEntity>().select("card_count_change","money_cost").eq("member_bind_id", bindCardId));
 
             //获取总课次：    1.获取该会员卡下的所有充值记录,2.获取每次充值次数,3.相加求总次数(卡自带的次数已经添加到充值记录了)
             int totalClassTimes = allRechargeRecordOfCurrentCard.stream().mapToInt(RechargeRecordEntity::getAddCount).sum();
@@ -165,11 +191,13 @@ public class StatisticsController {
             //获取剩余课次
             Integer remainingClassTimes = entity.getValidCount();
             //获取总额      1.获取该会员卡下的所有充值记录,2.获取每次充值金额, 3.相加求总金额
-            BigDecimal lumpSum = allRechargeRecordOfCurrentCard.stream().map(RechargeRecordEntity::getReceivedMoney).reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal lumpSumBigD = allRechargeRecordOfCurrentCard.stream().map(RechargeRecordEntity::getReceivedMoney).reduce(BigDecimal.ZERO, BigDecimal::add);
             //获取已用金额    1.获取该会员卡下的所有消费记录, 2.获取每次消费的金额, 3.相加求已用金额
-            BigDecimal amountUsed = allConsumeRecordOfCurrentCard.stream().map(ConsumeRecordEntity::getMoneyCost).reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal amountUsedBigD = allConsumeRecordOfCurrentCard.stream().map(ConsumeRecordEntity::getMoneyCost).reduce(BigDecimal.ZERO, BigDecimal::add);
             //获取剩余金额
-            BigDecimal balance = memberBindRecordService.getById(bindCardId).getReceivedMoney();
+            BigDecimal balanceBigD = memberBindRecordService.getById(bindCardId).getReceivedMoney();
+
+            DecimalFormat format = new DecimalFormat("¤00.00");
 
             return new MemberCardStatisticsVo()
                     .setMemberId(memberId)
@@ -178,9 +206,12 @@ public class StatisticsController {
                     .setTotalClassTimes(totalClassTimes)
                     .setUsedClassTimes(usedClassTimes)
                     .setRemainingClassTimes(remainingClassTimes)
-                    .setLumpSum(lumpSum)
-                    .setAmountUsed(amountUsed)
-                    .setBalance(balance);
+                    .setLumpSumBigD(lumpSumBigD)
+                    .setAmountUsedBigD(amountUsedBigD)
+                    .setBalanceBigD(balanceBigD)
+                    .setLumpSum(format.format(lumpSumBigD))
+                    .setAmountUsed(format.format(amountUsedBigD))
+                    .setBalance(format.format(balanceBigD));
         }).collect(Collectors.toList());
         log.debug("\n==>后台封装的用于数据统计页面的会员卡统计表单的list==>{}", memberCardStatisticsVos);
         long middle = System.currentTimeMillis();
@@ -200,20 +231,6 @@ public class StatisticsController {
         //总剩余金额
         BigDecimal remainMoneyAll = BigDecimal.ZERO;
 
-        /*memberCardStatisticsVos.forEach(entity -> {
-            int totalClassTimes = entity.getTotalClassTimes();
-            totalCourseTimeAll += totalClassTimes;
-            int usedClassTimes = entity.getUsedClassTimes();
-            usedCourseTimeAll += usedClassTimes;
-            int remainingClassTimes = entity.getRemainingClassTimes();
-            remainCourseTimeAll += remainingClassTimes;
-            BigDecimal lumpSum = entity.getLumpSum();
-            totalMoneyAll = totalMoneyAll.add(lumpSum);
-            BigDecimal amountUsed = entity.getAmountUsed();
-            usedMoneyAll = usedMoneyAll.add(amountUsed);
-            BigDecimal balance = entity.getBalance();
-            remainMoneyAll = remainMoneyAll.add(balance);
-        });*/
 
         for (MemberCardStatisticsVo memberCardStatisticsVo : memberCardStatisticsVos) {
             int totalClassTimes = memberCardStatisticsVo.getTotalClassTimes();
@@ -222,15 +239,13 @@ public class StatisticsController {
             usedCourseTimeAll += usedClassTimes;
             int remainingClassTimes = memberCardStatisticsVo.getRemainingClassTimes();
             remainCourseTimeAll += remainingClassTimes;
-            BigDecimal lumpSum = memberCardStatisticsVo.getLumpSum();
-            totalMoneyAll = totalMoneyAll.add(lumpSum);
-            BigDecimal amountUsed = memberCardStatisticsVo.getAmountUsed();
-            usedMoneyAll = usedMoneyAll.add(amountUsed);
-            BigDecimal balance = memberCardStatisticsVo.getBalance();
-            remainMoneyAll = remainMoneyAll.add(balance);
+            BigDecimal lumpSumBigD = memberCardStatisticsVo.getLumpSumBigD();
+            totalMoneyAll = totalMoneyAll.add(lumpSumBigD);
+            BigDecimal amountUsedBigD = memberCardStatisticsVo.getAmountUsedBigD();
+            usedMoneyAll = usedMoneyAll.add(amountUsedBigD);
+            BigDecimal balanceBigD = memberCardStatisticsVo.getBalanceBigD();
+            remainMoneyAll = remainMoneyAll.add(balanceBigD);
         }
-
-
 
 
        /*
@@ -261,6 +276,9 @@ public class StatisticsController {
         log.info("\n==>后台封装的用于数据统计页面的完整信息==>{}", memberCardStatisticsWithTotalDataInfoVo);
         long end = System.currentTimeMillis();
         log.debug("\n==>end==>{}", (end-start));
+
+        //添加本地缓存        10分钟后自动过期
+        CACHE_MEMBER_CARD_INFO_MAP.put(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO, memberCardStatisticsWithTotalDataInfoVo,1000*60*10);
 
         return R.ok().put("data", memberCardStatisticsWithTotalDataInfoVo);
     }

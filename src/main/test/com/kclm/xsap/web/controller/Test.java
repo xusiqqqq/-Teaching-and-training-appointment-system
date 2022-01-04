@@ -1,20 +1,20 @@
 package com.kclm.xsap.web.controller;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.kclm.xsap.entity.CourseEntity;
 import com.kclm.xsap.entity.GlobalReservationSetEntity;
 import com.kclm.xsap.entity.ReservationRecordEntity;
+import com.kclm.xsap.utils.ExpiryMap;
 import com.kclm.xsap.utils.R;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.net.SocketTimeoutException;
+import java.text.DecimalFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -24,6 +24,44 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public class Test {
+
+
+
+    @org.junit.jupiter.api.Test
+    void test18() throws InterruptedException {
+
+
+        ExpiryMap<String, String> map = new ExpiryMap<>(10);
+        map.put("test", "ankang");
+        map.put("test1", "ankang");
+        map.put("test2", "ankang", 3000);
+        System.out.println("test1" + map.get("test"));
+        Thread.sleep(1000);
+        System.out.println("isInvalid:" + map.isInvalid("test"));
+        System.out.println("size:" + map.size());
+        System.out.println("size:" + ((HashMap<String, String>)map).size());
+        for (Map.Entry<String, String> m : map.entrySet()) {
+            System.out.println("isInvalid:" + map.isInvalid(m.getKey()));
+            map.containsKey(m.getKey());
+            System.out.println("key:" + m.getKey() + "     value:" + m.getValue());
+        }
+        System.out.println("test1" + map.get("test"));
+    }
+
+    @JsonFormat(pattern = "¤00.00")
+    private BigDecimal changeMoney;
+
+
+    @org.junit.jupiter.api.Test
+    void test17() {
+        changeMoney = new BigDecimal("13");
+        System.out.println(changeMoney);
+
+        System.out.println("************");
+        BigDecimal decimal = new BigDecimal("11");
+        DecimalFormat format = new DecimalFormat("¤00.00");
+        System.out.println(format.format(decimal));
+    }
 
 
     @org.junit.jupiter.api.Test

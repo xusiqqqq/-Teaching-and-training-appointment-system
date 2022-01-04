@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kclm.xsap.consts.OperateType;
 import com.kclm.xsap.entity.*;
 import com.kclm.xsap.service.*;
+import com.kclm.xsap.web.cache.MapCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Controller;
@@ -18,6 +19,8 @@ import com.kclm.xsap.utils.R;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+
+import static com.kclm.xsap.consts.KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO;
 
 
 /**
@@ -45,6 +48,9 @@ public class MemberBindRecordController {
 
     @Resource
     private RechargeRecordService rechargeRecordService;
+
+    @Resource
+    private MapCache mapCache;
 
     /**
      * 跳转会员卡绑定页面
@@ -197,6 +203,10 @@ public class MemberBindRecordController {
                 log.debug("添加会员绑定时的充值记录失败！");
                 return R.error("会员绑卡失败");
             }
+
+            //会员绑卡即修改了会员卡统计的数据，需要删除原数据
+            mapCache.getCacheInfo().remove(CACHE_OF_MEMBER_CARD_INFO);
+            log.debug("\n==>会员绑卡后删除map中的会员卡信息");
 
             return R.ok("会员绑定成功");
         }

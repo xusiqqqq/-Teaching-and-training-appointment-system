@@ -76,7 +76,7 @@
         <p class="left">预约总数</p>
     </div>
 
-    <div class="box " style="margin-left: 230px; height: 10px; width: 80px">
+    <div class="box " style="margin-left: 50px; height: 10px; width: 80px">
         <a href="javascript:void(0)" onclick="location.reload()" class="btn btn-primary block full-width m-b">刷新数据</a>
     </div>
 
@@ -85,6 +85,7 @@
         <button  class="btn btn-primary">刷新数据</button>
     </div>-->
     <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <!--第一幅图，堆叠柱状图 当前月每天新增与流失人数-->
     <div style="background-color: white;width: 1050px;margin-top: 130px;text-align: center;margin-left: 18px">
         <div id="broken_line" style="width: 1000px;height:400px;"></div>
         <script type="text/javascript">
@@ -102,51 +103,42 @@
                     if (data.code === 0 && infoVo != null) {
 
                         option = {
-                            title: {
-                                text: infoVo.title
-                            },
-                            tooltip: {
-                                trigger: 'axis'
-                            },
                             legend: {
-                                data: ['新增', '流失']
+                                data: ['流失', '新增'],
+                                left: '10%'
                             },
-                            grid: {
-                                left: '3%',
-                                right: '4%',
-                                bottom: '3%',
-                                containLabel: true
-                            },
-                            toolbox: {
-                                feature: {
-                                    saveAsImage: {}
-                                }
-                            },
+                            tooltip: {},
                             xAxis: {
+                                data: infoVo.time,
                                 name: infoVo.xname,
-                                type: 'category',
-                                data: infoVo.time
+                                axisLine: { onZero: true },
+                                splitLine: { show: false },
+                                splitArea: { show: false }
                             },
                             yAxis: {
-                                type: 'value'
+                                name: '/人次'
+                            },
+                            grid: {
+                                bottom: 100
                             },
                             series: [
                                 {
-                                    name: '新增',
-                                    type: 'line',
-                                    step: 'start',
-                                    color: 'purple',
-                                    data: infoVo.data
+                                    name: '流失',
+                                    color:'DarkGray',
+                                    type: 'bar',
+                                    stack: 'one',
+                                    data: infoVo.data2
                                 },
                                 {
-                                    name: '流失',
-                                    type: 'line',
-                                    step: 'middle',
-                                    color: 'red',
-                                    data: infoVo.data2
+                                    name: '新增',
+                                    color: 'PaleGreen',
+                                    type: 'bar',
+                                    stack: 'one',
+                                    data: infoVo.data
                                 }
                             ]
                         };
+
                     } else {
                         swal(data.msg, "", "info");
                         // setTimeout(function () {
@@ -162,7 +154,7 @@
         </script>
     </div>
 
-    <!--        第二幅图，填充颜色的折线图  每日收费统计statisticsOfDailyCharge-->
+    <!--        第二幅图，填充颜色的折线图  当前月每日收费统计statisticsOfDailyCharge-->
     <div style="background-color: white;width: 1050px;margin-top: 30px;text-align: center;margin-left: 18px">
         <div id="ChartLine2" style="width: 1000px;height:400px;"></div>
         <script type="text/javascript">
@@ -214,7 +206,11 @@
                                     name: '收费',
                                     type: 'line',
                                     stack: 'Total',
-                                    data: info.data
+                                    data: info.data,
+
+                                    areaStyle: {
+                                        color: 'LightPink'
+                                    }
                                 }
                             ]
                         };
@@ -233,7 +229,7 @@
     </div>
 
 
-    <!--        第三幅图,饼状图 会员卡统计Membership card statistics-->
+    <!--        第三幅图,南丁格尔玫瑰图【饼图】 会员卡统计Membership card statistics-->
     <div style="background-color: white;width: 1050px;text-align: center;margin-left: 18px;margin-top: 30px">
         <div id="pie" style="width: 1000px;height:600px;"></div>
         <script type="text/javascript">

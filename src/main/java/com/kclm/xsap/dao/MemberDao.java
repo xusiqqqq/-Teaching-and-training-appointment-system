@@ -23,13 +23,13 @@ public interface MemberDao extends BaseMapper<MemberEntity> {
 
     List<MemberVo> selectMemberVoList();
 
-    @Select("select last_modify_time from t_member where is_deleted = 1 and last_modify_time rlike ${yearOfSelect} order by last_modify_time desc")
+    @Select("select last_modify_time from t_member where is_deleted = 1 and last_modify_time rlike #{yearOfSelect} order by last_modify_time desc")
     List<MemberEntity> selectMemberLogOutSpecifyYear(@Param("yearOfSelect") Integer endYear);
 
 
     @Select("select last_modify_time from t_member where is_deleted = 1 order by last_modify_time desc")
     List<MemberEntity> getMemberLogOutFromBeginYearToEndYear();
 
-    @Select("select last_modify_time from t_member where is_deleted = 1 and year(last_modify_time)=2021 and month(last_modify_time)=12 order by last_modify_time")
+    @Select("select last_modify_time from t_member where is_deleted = 1 and year(last_modify_time)=#{year} and month(last_modify_time)=#{month} order by last_modify_time")
     List<MemberEntity> selectCurrentMonthLogoutMemberInfo(@Param("year") Integer currentYear,@Param("month") Integer currentMonth);
 }
