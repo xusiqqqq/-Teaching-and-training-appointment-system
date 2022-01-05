@@ -22,12 +22,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -197,7 +195,10 @@ public class StatisticsController {
             //获取剩余金额
             BigDecimal balanceBigD = memberBindRecordService.getById(bindCardId).getReceivedMoney();
 
-            DecimalFormat format = new DecimalFormat("¤00.00");
+            //获取中文货币符号
+            DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(Locale.CHINA);
+            //构造器创建中文货币符号的format
+            DecimalFormat format = new DecimalFormat("¤00.00", symbols);
 
             return new MemberCardStatisticsVo()
                     .setMemberId(memberId)
