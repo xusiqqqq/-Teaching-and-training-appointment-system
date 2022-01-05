@@ -5,15 +5,12 @@
 Mybatis-plus写法： queryWrapper.ge("create_time", localDateTime); Mybatis写法： where create_time >= #{localDateTime}
 
 
-### 会员卡编辑中的课程修改后信息也要提交，考虑单独提交并加事务
-
 ### 复合主键更新
 
-### member_list page:321
+
 
 ### 在CourseCardServiceImpl.java中对插入成功的返回判断？？？？
 
-### 会员卡编辑的价格整数校验
 
 传入为null ==> db也是空-----什么都不做
 传入为null ==>db有数据-----删除数据
@@ -26,7 +23,7 @@ else if(null,some) {delete}
 else if(some ,null) {insert}
 else if (some ,some) {
 ## -------------------------------------------------------------------
-会员绑定后的跳转怎么改变上面的头
+会员绑定后的跳转怎么改变头部标签
 
 ### 添加预约  新增排课的时间冲入判断和复制排课的时间冲突判断 已完成
 ### 课程表预约和取消预约与全局预约设置的时间冲突  已完成
@@ -37,31 +34,26 @@ else if (some ,some) {
                                value="2">
 
 详见x_course_reservation.html
+```
 
-
-###----
-会员，员工头像上传问题
 ### 没有确认上课的也要超时自动扣次数
 
-###会员详情都没做。。
 
-##预约页面的搜索   
-
-### 预约课程增加和减少的次数要改到绑定记录表上       todo 预约课程应该不扣次数------
 
 ### 添加预约时 的卡次提醒错误       √
 
-
+@Valid的错误回显和清楚重复错误提示
 ```java
-for (var k in errors) {
+                    for (var k in errors) {
                         //移除重复提示 - 会员添加
                         $("[tip="+k+"]").html("");
 	        	        //错误提示回显
                         $("<span class='text-danger'>"+ errors[k] +"</span>").appendTo($("[tip="+k+"]"));
                     }
+```
 
-
-### @NotNull：不能为null，但可以为empty，用在基本类型上
+### 
+>@NotNull：不能为null，但可以为empty，用在基本类型上
 @NotEmpty：不能为null，而且长度必须大于0，用在集合类上面
 @NotBlank：只能作用在String上，不能为null，而且调用trim()后，长度必须大于0
 
@@ -76,11 +68,10 @@ for (var k in errors) {
 
 ##避免重复绑卡        √
 
-###注册会员考虑添加操作记录
 ##预约和取消预约的操作记录？？应该是以上课做记录
 
 =================================
-添加课程中如果全选会员卡的str会多个on
+###添加课程中如果全选会员卡的str会多个on √
 
 ##添加课程和更新课程的jsr303  添加会员预约表单
 
@@ -88,5 +79,5 @@ for (var k in errors) {
 
 ##添加预约人数加到该课程的预约人数
 
-## 注销会员和添加会员添加到操作记录
+## 注销会员和添加会员添加到操作记录 操作记录应该聚焦在会员卡！
 

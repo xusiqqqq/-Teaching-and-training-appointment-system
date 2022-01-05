@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kclm.xsap.consts.OperateType;
 import com.kclm.xsap.entity.*;
 import com.kclm.xsap.service.*;
-import com.kclm.xsap.web.cache.MapCache;
+import com.kclm.xsap.web.cache.MapCacheService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Controller;
@@ -50,7 +50,7 @@ public class MemberBindRecordController {
     private RechargeRecordService rechargeRecordService;
 
     @Resource
-    private MapCache mapCache;
+    private MapCacheService mapCacheService;
 
     /**
      * 跳转会员卡绑定页面
@@ -205,7 +205,7 @@ public class MemberBindRecordController {
             }
 
             //会员绑卡即修改了会员卡统计的数据，需要删除原数据
-            mapCache.getCacheInfo().remove(CACHE_OF_MEMBER_CARD_INFO);
+            mapCacheService.getCacheInfo().remove(CACHE_OF_MEMBER_CARD_INFO);
             log.debug("\n==>会员绑卡后删除map中的会员卡信息");
 
             return R.ok("会员绑定成功");

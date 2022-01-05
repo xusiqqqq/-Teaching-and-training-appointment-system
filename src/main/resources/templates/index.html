@@ -382,4 +382,15 @@
 
 </body>
 
+<script type="text/javascript">
+    $(function () {
+        $("body").bind("keydown", function (event) {
+            if (event.keyCode == 116) {
+                event.preventDefault(); //阻止默认刷新
+                $("#wrapper").attr("src", window.frames["wrapper"].src);
+            }
+        })
+    });
+</script>
+
 </html>

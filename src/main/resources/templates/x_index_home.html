@@ -77,7 +77,7 @@
     </div>
 
     <div class="box " style="margin-left: 50px; height: 10px; width: 80px">
-        <a href="javascript:void(0)" onclick="location.reload()" class="btn btn-primary block full-width m-b">刷新数据</a>
+        <a class="btn btn-primary block full-width m-b" href="javascript:void(0)" onclick="location.reload()">刷新数据</a>
     </div>
 
 
@@ -111,9 +111,9 @@
                             xAxis: {
                                 data: infoVo.time,
                                 name: infoVo.xname,
-                                axisLine: { onZero: true },
-                                splitLine: { show: false },
-                                splitArea: { show: false }
+                                axisLine: {onZero: true},
+                                splitLine: {show: false},
+                                splitArea: {show: false}
                             },
                             yAxis: {
                                 name: '/人次'
@@ -124,7 +124,7 @@
                             series: [
                                 {
                                     name: '流失',
-                                    color:'DarkGray',
+                                    color: 'DarkGray',
                                     type: 'bar',
                                     stack: 'one',
                                     data: infoVo.data2
@@ -252,52 +252,6 @@
 
                     if (data.code === 0) {
 
-                        /*option = {
-
-                            title: {
-                                text: '会员卡统计',
-                                subtext: '绑定会员卡数量',
-                                left: 'center'
-                            },
-
-                            tooltip: {
-                                trigger: 'item'
-                            },
-                            legend: {
-                                top: '100%',
-                                left: 'center',
-                                data: nameList
-                            },
-                            series: [
-                                {
-                                    name: 'Access From',
-                                    type: 'pie',
-                                    radius: ['50%', '80%'],
-                                    avoidLabelOverlap: false,
-                                    itemStyle: {
-                                        borderRadius: 30,
-                                        borderColor: '#fff',
-                                        borderWidth: 5
-                                    },
-                                    label: {
-                                        show: false,
-                                        position: 'center'
-                                    },
-                                    emphasis: {
-                                        label: {
-                                            show: true,
-                                            fontSize: '40',
-                                            fontWeight: 'bold'
-                                        }
-                                    },
-                                    labelLine: {
-                                        show: false
-                                    },
-                                    data: info
-                                }
-                            ]
-                        };*/
-
 
                         option = {
                             title: {
@@ -305,16 +259,20 @@
                                 subtext: '绑定会员卡数量',
                                 left: 'center'
                             },
+                            tooltip: {
+                                trigger: 'item',
+                                formatter: '{a} <br/>{b} : {c} ({d}%)'
+                            },
                             legend: {
                                 top: 'bottom'
                             },
                             toolbox: {
                                 show: true,
                                 feature: {
-                                    mark: { show: true },
-                                    dataView: { show: true, readOnly: false },
-                                    restore: { show: true },
-                                    saveAsImage: { show: true }
+                                    mark: {show: true},
+                                    dataView: {show: true, readOnly: false},
+                                    restore: {show: true},
+                                    saveAsImage: {show: true}
                                 }
                             },
                             series: [
@@ -326,6 +284,13 @@
                                     roseType: 'area',
                                     itemStyle: {
                                         borderRadius: 10
+                                    },
+                                    emphasis: {
+                                        label: {
+                                            show: true,
+                                            fontSize: '20',
+                                            fontWeight: 'bold'
+                                        }
                                     },
                                     data: info
                                 }

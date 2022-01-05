@@ -55,12 +55,6 @@ public class EmployeeController {
     @Resource
     private CourseService courseService;
 
-    @Resource
-    private CourseCardService courseCardService;
-
-    @Resource
-    private MemberCardService memberCardService;
-
     @Resource ClassRecordService classRecordService;
 
     @Resource private MemberService memberService;

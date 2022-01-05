@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.kclm.xsap.config.CustomConfig;
 import com.kclm.xsap.consts.KeyNameOfCache;
 import com.kclm.xsap.consts.OperateType;
 import com.kclm.xsap.entity.*;
@@ -11,7 +12,7 @@ import com.kclm.xsap.service.*;
 import com.kclm.xsap.utils.ExpiryMap;
 import com.kclm.xsap.vo.ClassRecordVo;
 import com.kclm.xsap.vo.indexStatistics.IndexPieChartVo;
-import com.kclm.xsap.web.cache.MapCache;
+import com.kclm.xsap.web.cache.MapCacheService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,11 +76,37 @@ class MemberControllerTest {
     private MemberCardController memberCardController;
 
     @Autowired
-    private MapCache mapCache;
+    private MapCacheService mapCacheService;
+
+    @Autowired
+    private CustomConfig customConfig;
+
+
+//    @Value(value = "${user.userName}")
+//    private String userName;
+//    @Value("${user.sex}")
+//    private String sex;
+//    @Value("${user.age}")
+//    private String age;
+//
+//    @Test
+//    void test25() {
+//        System.out.println(userName);
+//        System.out.println(sex);
+//        System.out.println(age);
+//    }
+
+    @Test
+    void test24() {
+        Long gap_minute = customConfig.getGap_minute();
+        Long cache_time = customConfig.getCache_time();
+        System.out.println(cache_time);
+        System.out.println(gap_minute);
+    }
 
     @Test
     void test23() throws Exception  {
-        ExpiryMap<KeyNameOfCache, Object> map = mapCache.getCacheInfo();
+        ExpiryMap<KeyNameOfCache, Object> map = mapCacheService.getCacheInfo();
         map.put(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO, "test", 1000);
         System.out.println(map.get(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO));
         Thread.sleep(1500);

@@ -9,7 +9,7 @@ import com.kclm.xsap.utils.R;
 import com.kclm.xsap.utils.exception.RRException;
 import com.kclm.xsap.utils.file.UploadImg;
 import com.kclm.xsap.vo.*;
-import com.kclm.xsap.web.cache.MapCache;
+import com.kclm.xsap.web.cache.MapCacheService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
@@ -60,7 +60,7 @@ public class MemberController {
     private ConsumeRecordService consumeRecordService;
 
     @Resource
-    private MapCache mapCache;
+    private MapCacheService mapCacheService;
 
 
     /**
@@ -224,7 +224,7 @@ public class MemberController {
         if (isDeleteMember) {
 
             //充值后删除缓存中原数据
-            mapCache.getCacheInfo().remove(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO);
+            mapCacheService.getCacheInfo().remove(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO);
             log.debug("\n==>充值后删除map缓存中原数据");
 
             log.debug("\n==>注销会员id={}成功！！",id);

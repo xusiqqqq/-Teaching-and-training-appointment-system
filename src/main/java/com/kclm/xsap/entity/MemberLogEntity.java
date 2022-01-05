@@ -77,7 +77,10 @@ public class MemberLogEntity implements Serializable {
 	 * 备注
 	 */
 	private String note;
-
+	/**
+	 * 单次操作时卡的状态，默认是1，表示已激活
+	 */
+	private Integer cardActiveStatus;
 
 	/**
 	 *  封装会员绑定实体数据

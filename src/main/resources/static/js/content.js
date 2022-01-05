@@ -4,6 +4,17 @@ function $childNode(name) {
     return window.frames[name]
 }
 
+
+/*监听所有页面的F5,阻止默认刷新,改为刷新iFrame*/
+$("body").bind("keydown", function (event) {
+    if (event.keyCode == 116) {
+        event.preventDefault(); //阻止默认刷新
+        //location.reload();
+        //采用location.reload()在火狐下可能会有问题，火狐会保留上一次链接
+        location = location;
+    }
+})
+
 // tooltips
 $('.tooltip-demo').tooltip({
     selector: "[data-toggle=tooltip]",

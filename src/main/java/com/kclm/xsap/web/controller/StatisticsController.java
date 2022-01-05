@@ -1,6 +1,7 @@
 package com.kclm.xsap.web.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.kclm.xsap.config.CustomConfig;
 import com.kclm.xsap.consts.KeyNameOfCache;
 import com.kclm.xsap.entity.*;
 import com.kclm.xsap.service.*;
@@ -11,7 +12,7 @@ import com.kclm.xsap.vo.MemberCardStatisticsWithTotalDataInfoVo;
 import com.kclm.xsap.vo.statistics.CardCostVo;
 import com.kclm.xsap.vo.statistics.ClassCostVo;
 import com.kclm.xsap.vo.statistics.StatisticsOfCardCostVo;
-import com.kclm.xsap.web.cache.MapCache;
+import com.kclm.xsap.web.cache.MapCacheService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,22 +35,16 @@ import java.util.stream.Collectors;
  * @create 2021-12-15 13:01
  */
 
-@Controller("statisticsController")
+@Controller
 @Slf4j
 @RequestMapping("/statistics")
 public class StatisticsController {
 
-    //会员卡统计数据缓存的key
-    private static final String CACHE_OF_MEMBER_CARD_INFO = "MEMBER_CARD_INFO";
 
-
-    //代表老师上的课的时间的可能的最大月份
+    //代表老师上的课的时间的可能的最大月份 的key
     private static final Long MAX_MONTH = -11111L;
-    //代表老师上的课的时间的可能的最大季度
+    //代表老师上的课的时间的可能的最大季度 的key
     private static final Long MAX_QUARTER = -22222L;
-
-    //遍历次数记数,用于当所有老师都遍历完后如果还没有老师的排课信息时的标记
-    int TRAVERSE_COUNT = 0;
 
     @Resource
     private MemberBindRecordService memberBindRecordService;
@@ -73,7 +68,11 @@ public class StatisticsController {
     private CourseService courseService;
 
     @Resource
-    private MapCache mapCache;
+    private MapCacheService mapCacheService;
+
+    @Resource
+    private CustomConfig customConfig;
+
 
     /**
      * 跳转到会员卡统计页面
@@ -146,9 +145,7 @@ public class StatisticsController {
         //todo 重写这个方法！！！太慢了！！用map缓存？
 
         //使用map做本地缓存
-//        HashMap<KeyNameOfCache, MemberCardStatisticsWithTotalDataInfoVo> CACHE_MEMBER_CARD_INFO_MAP = mapCache.getMemberCardInfoMap();
-        ExpiryMap<KeyNameOfCache, Object> CACHE_MEMBER_CARD_INFO_MAP = mapCache.getCacheInfo();
-//        MemberCardStatisticsWithTotalDataInfoVo cacheMemberCardInfo = CACHE_MEMBER_CARD_INFO_MAP.get(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO);
+        ExpiryMap<KeyNameOfCache, Object> CACHE_MEMBER_CARD_INFO_MAP = mapCacheService.getCacheInfo();
         Object cacheValueOfMapForMemberCardInfo = CACHE_MEMBER_CARD_INFO_MAP.get(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO);
         MemberCardStatisticsWithTotalDataInfoVo cacheMemberCardInfo = null;
         if(cacheValueOfMapForMemberCardInfo instanceof MemberCardStatisticsWithTotalDataInfoVo)  {
@@ -278,8 +275,11 @@ public class StatisticsController {
         long end = System.currentTimeMillis();
         log.debug("\n==>end==>{}", (end-start));
 
-        //添加本地缓存        10分钟后自动过期
-        CACHE_MEMBER_CARD_INFO_MAP.put(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO, memberCardStatisticsWithTotalDataInfoVo,1000*60*10);
+        //获取配置文件自定义的缓存时间
+        Long cache_time = customConfig.getCache_time();
+
+        //添加本地缓存
+        CACHE_MEMBER_CARD_INFO_MAP.put(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO, memberCardStatisticsWithTotalDataInfoVo,cache_time);
 
         return R.ok().put("data", memberCardStatisticsWithTotalDataInfoVo);
     }
@@ -505,7 +505,8 @@ public class StatisticsController {
 
                     log.debug("\n==>打印当前的老师id=> {}==>及其对应的mapTeacherCurrent【key=月份,value=课消次数】=>{}", scheduleRecordEntity.getTeacherId(), mapTeacherCurrent);
                     //将上课时间的月份最大的月份放进去,以MAX_MONTH存放//避免魔法值
-                    mapT.put(MAX_MONTH, monthValue > (int) mapT.getOrDefault(MAX_MONTH, 1) ? monthValue : mapT.get(MAX_MONTH));
+                    //三目最后一个get依然要用getOrDefault，因为当某一个统计结束后，会删掉MAX_QUARTER,此时可能会get到null
+                    mapT.put(MAX_MONTH, monthValue > (int) mapT.getOrDefault(MAX_MONTH, 1) ? monthValue : mapT.getOrDefault(MAX_MONTH, monthValue));
                 });
                 //以老师id作为key, 以另一个map(以月份作为key,对应课消次数作为value)做为value放进mapT
                 mapT.put(teacher.getId(), mapTeacherCurrent);
@@ -522,8 +523,9 @@ public class StatisticsController {
                     log.debug("\n==>打印当前课程单位人数所需次数==>{}\n 打印当前课程的预约人数==>{}", timesCost, orderNums);
 
                     mapTeacherCurrent.put(quarter, mapTeacherCurrent.getOrDefault(quarter, 0) + timesCost * orderNums);
-                    //将所有上过的课程的时间的最大季度放进map,并以MAX_QUARTER存放
-                    mapT.put(MAX_QUARTER, quarter > (int) mapT.getOrDefault(MAX_QUARTER, 1) ? quarter : mapT.get(MAX_QUARTER));
+                    //将所有上过的课程的时间的最大季度放进map,并以MAX_QUARTER存放/默认从一月开始/
+                    //三目最后一个get依然要用getOrDefault，因为当某一个统计结束后，会删掉MAX_QUARTER,此时可能会get到null
+                    mapT.put(MAX_QUARTER, quarter > (int) mapT.getOrDefault(MAX_QUARTER, 1) ? quarter : mapT.getOrDefault(MAX_QUARTER, quarter));
 
                     log.debug("\n==>打印当前的老师id=> {}及其对应的mapTeacherCurrent【key=季度,value=课消次数】=>{}", scheduleRecordEntity.getTeacherId(), mapTeacherCurrent);
                 });
@@ -538,18 +540,19 @@ public class StatisticsController {
                 }
 
                 //如果遍历完所有老师后依然没有排课记录
-                if (TRAVERSE_COUNT > allClassAlreadyTaken.size()) {
+               /* if (TRAVERSE_COUNT > allClassAlreadyTaken.size()) {
+                    log.debug("\n==>指定时间内没有排课记录");
                     return R.error("指定时间内没有排课记录");
-                }
+                }*/
 
                 List<ScheduleRecordEntity> classAlreadyTakenForCurrentTeacherForYear = allClassAlreadyTaken.stream().filter(schedule -> schedule.getTeacherId().equals(teacher.getId()) && schedule.getStartDate().getYear() >= beginYear && schedule.getStartDate().getYear() <= endYear).collect(Collectors.toList());
                 log.debug("\n==>d打印测试起始结束年份的所有当前老师的上课记录==>{}", classAlreadyTakenForCurrentTeacherForYear);
 
 
-                if (classAlreadyTakenForCurrentTeacherForYear.isEmpty()) {
+                /*if (classAlreadyTakenForCurrentTeacherForYear.isEmpty()) {
                     TRAVERSE_COUNT++;
                     break;
-                }
+                }*/
 
                 classAlreadyTakenForCurrentTeacherForYear.forEach(scheduleRecordEntity -> {
                     //取得当前上课记录的上课时间的年份
@@ -909,16 +912,16 @@ public class StatisticsController {
                 //获取该会员的入会时间的月份
                 int monthValue = member.getCreateTime().getMonthValue();
                 memberSurviveMonthMap.put(monthValue, memberSurviveMonthMap.getOrDefault(monthValue, 0) + 1);
-                //将最大的月份放进map
-                maxStatisticalTime.put(MAX_MONTH, monthValue > maxStatisticalTime.getOrDefault(MAX_MONTH, 1) ? monthValue : maxStatisticalTime.get(MAX_MONTH));
+                //将最大的月份放进map三目的最后一个get依然要使用getOrDefault，因为当别的统计时间下的数据完成后会删除掉MAX_QUARTER这个key，此时直接获取可能会null
+                maxStatisticalTime.put(MAX_MONTH, monthValue > maxStatisticalTime.getOrDefault(MAX_MONTH, 1) ? monthValue : maxStatisticalTime.getOrDefault(MAX_MONTH, monthValue));
             });
             //注销的会员信息
             memberLogOutForMonthList.forEach(member -> {
                 //获取该会员的注销时间的月份
                 int monthValue = member.getLastModifyTime().getMonthValue();
                 memberLogOutMonthMap.put(monthValue, memberLogOutMonthMap.getOrDefault(monthValue, 0) - 1);
-                //将最大的月份放进map
-                maxStatisticalTime.put(MAX_MONTH, monthValue > maxStatisticalTime.getOrDefault(MAX_MONTH, 1) ? monthValue : maxStatisticalTime.get(MAX_MONTH));
+                //将最大的月份放进map三目的最后一个get依然要使用getOrDefault，因为当别的统计时间下的数据完成后会删除掉MAX_QUARTER这个key，此时直接获取可能会null
+                maxStatisticalTime.put(MAX_MONTH, monthValue > maxStatisticalTime.getOrDefault(MAX_MONTH, 1) ? monthValue : maxStatisticalTime.getOrDefault(MAX_MONTH, monthValue));
             });
 
             //得出最大的月份
@@ -960,8 +963,8 @@ public class StatisticsController {
                 //获取季度
                 int quarter = (member.getCreateTime().getMonthValue() - 1) / 3 + 1;
                 memberSurviveQuarterMap.put(quarter, memberSurviveQuarterMap.getOrDefault(quarter, 0) + 1);
-                //将最大的季度放进map
-                maxStatisticalTime.put(MAX_QUARTER, quarter > maxStatisticalTime.getOrDefault(MAX_QUARTER, 1) ? quarter : maxStatisticalTime.get(MAX_QUARTER));
+                //将最大的季度放进map，三目的最后一个get依然要使用getOrDefault，因为当别的统计时间下的数据完成后会删除掉MAX_QUARTER这个key，此时直接获取可能会null
+                maxStatisticalTime.put(MAX_QUARTER, quarter > maxStatisticalTime.getOrDefault(MAX_QUARTER, 1) ? quarter : maxStatisticalTime.getOrDefault(MAX_QUARTER, quarter));
 
             });
 
@@ -970,7 +973,8 @@ public class StatisticsController {
                 int quarter = (member.getLastModifyTime().getMonthValue() - 1) / 3 + 1;
                 memberLogOutQuarterMap.put(quarter, memberLogOutQuarterMap.getOrDefault(quarter, 0) - 1);
                 //将最大的季度放进map
-                maxStatisticalTime.put(MAX_QUARTER, quarter > maxStatisticalTime.getOrDefault(MAX_QUARTER, 1) ? quarter : maxStatisticalTime.get(MAX_QUARTER));
+                //将最大的季度放进map，三目的最后一个get依然要使用getOrDefault，因为当别的统计时间下的数据完成后会删除掉MAX_QUARTER这个key，此时直接获取可能会null
+                maxStatisticalTime.put(MAX_QUARTER, quarter > maxStatisticalTime.getOrDefault(MAX_QUARTER, 1) ? quarter : maxStatisticalTime.getOrDefault(MAX_QUARTER, quarter));
             });
 
             //获取最大季度

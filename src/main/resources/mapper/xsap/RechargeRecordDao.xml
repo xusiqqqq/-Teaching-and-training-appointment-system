@@ -28,7 +28,7 @@
         <result property="receivedMoney" column="received_money"/>
         <result property="operator" column="operator"/>
         <result property="cardNote" column="note"/>
-        <result property="status" column="active_status"/>
+        <result property="status" column="card_active_status"/>
     </resultMap>
 
     <!--todo 还要加上充值记录表和消费记录表-->
@@ -42,7 +42,8 @@
                trr.received_money,
                tml.operator,
                tml.note,
-               tmbr.active_status
+              # tmbr.active_status
+               tml.card_active_status
         from t_member_log tml
                  left join t_member_bind_record tmbr on tml.member_bind_id = tmbr.id
                  left join t_consume_record tcr on tml.id = tcr.log_Id and tmbr.id = tcr.member_bind_id

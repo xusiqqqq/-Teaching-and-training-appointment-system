@@ -2,6 +2,7 @@ package com.kclm.xsap.web.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.kclm.xsap.config.CustomConfig;
 import com.kclm.xsap.consts.KeyNameOfCache;
 import com.kclm.xsap.consts.OperateType;
 import com.kclm.xsap.entity.*;
@@ -9,7 +10,7 @@ import com.kclm.xsap.service.*;
 import com.kclm.xsap.utils.ExpiryMap;
 import com.kclm.xsap.utils.R;
 import com.kclm.xsap.vo.*;
-import com.kclm.xsap.web.cache.MapCache;
+import com.kclm.xsap.web.cache.MapCacheService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Controller;
@@ -80,7 +81,10 @@ public class ScheduleRecordController {
     private MemberLogService memberLogService;
 
     @Resource
-    private MapCache mapCache;
+    private MapCacheService mapCacheService;
+
+    @Resource
+    private CustomConfig customConfig;
 
 
     /**
@@ -122,10 +126,8 @@ public class ScheduleRecordController {
         //todo 要不要做个map缓存？
 
         //本地缓存
-//        HashMap<KeyNameOfCache, List<CourseScheduleVo>> CACHE_SCHEDULE_LIST_INFO_MAP = mapCache.getCacheInfo();
-        ExpiryMap<KeyNameOfCache, Object> CACHE_SCHEDULE_LIST_INFO_MAP = mapCache.getCacheInfo();
+        ExpiryMap<KeyNameOfCache, Object> CACHE_SCHEDULE_LIST_INFO_MAP = mapCacheService.getCacheInfo();
 
-//        List<CourseScheduleVo> cacheOfSchedule = CACHE_SCHEDULE_LIST_INFO_MAP.get(KeyNameOfCache.CACHE_SCHEDULE_INFO);
         Object cacheValueOfMapForSchedule = CACHE_SCHEDULE_LIST_INFO_MAP.get(KeyNameOfCache.CACHE_SCHEDULE_INFO);
         //todo
         List<CourseScheduleVo> cacheOfSchedule = null;
@@ -156,8 +158,12 @@ public class ScheduleRecordController {
         }).collect(Collectors.toList());
 
         log.debug("\n==>后台根据排课记录封装的用于前端日程展示的list：courseScheduleVoList==>{}", courseScheduleVoList);
-        //添加本地缓存    设置为12分钟后自动过期
-        CACHE_SCHEDULE_LIST_INFO_MAP.put(KeyNameOfCache.CACHE_SCHEDULE_INFO, courseScheduleVoList, 1000*60*12);
+
+        //获取配置文件中设置的缓存时间
+        Long cache_time = customConfig.getCache_time();
+
+        //添加本地缓存
+        CACHE_SCHEDULE_LIST_INFO_MAP.put(KeyNameOfCache.CACHE_SCHEDULE_INFO, courseScheduleVoList, cache_time);
         //return R.ok().put("data", courseScheduleVoList);
         return courseScheduleVoList;
     }
@@ -205,12 +211,16 @@ public class ScheduleRecordController {
             List<ScheduleRecordEntity> sameDateScheduleList = scheduleRecordService.getSameDateSchedule(startDate);
             if (!sameDateScheduleList.isEmpty()) {
                 log.debug("\n==>打印当天的所有课程【此日志用于排查排课时间冲突】==>{}", sameDateScheduleList);
+
+                //获取配置文件中设置的添加排课的间隙时间
+                Long gap_minute = customConfig.getGap_minute();
+
                 //查询新增课程开始时间
                 for (ScheduleRecordEntity sameDateSchedule : sameDateScheduleList) {
                     LocalTime sameDateClassStartTime = sameDateSchedule.getClassTime();
                     LocalTime sameDateClassEndTime = sameDateClassStartTime.plusMinutes(sameDateSchedule.getCourseEntity().getDuration());
-                    //加上10分钟：表示可以在10下课十分钟之后继续添加课程
-                    if ((startTime.isAfter(sameDateClassStartTime) && startTime.isBefore(sameDateClassEndTime.plusMinutes(10))) || (endTime.isAfter(sameDateClassStartTime) && endTime.isBefore(sameDateClassEndTime.plusMinutes(10)))) {
+                    //加上10分钟：表示可以在下课之后至少经过gap_minute才能继续添加课程
+                    if ((startTime.isAfter(sameDateClassStartTime) && startTime.isBefore(sameDateClassEndTime.plusMinutes(gap_minute))) || (endTime.isAfter(sameDateClassStartTime) && endTime.isBefore(sameDateClassEndTime.plusMinutes(gap_minute)))) {
                         log.debug("\n==>添加课程->添加时间冲突【我们默认设置下课十分钟后可以继续添加新的课程】");
                         return R.error("排课时间冲突");
                     }
@@ -221,7 +231,7 @@ public class ScheduleRecordController {
             log.debug("\n==>保存排课信息是否成功isSaveSchedule:==>{}", isSaveSchedule);
 
             //添加排课信息之前删除缓存中的排课信息
-            mapCache.getCacheInfo().remove(KeyNameOfCache.CACHE_SCHEDULE_INFO);
+            mapCacheService.getCacheInfo().remove(KeyNameOfCache.CACHE_SCHEDULE_INFO);
             log.debug("添加排课信息之前删除缓存中的排课信息");
 
             return R.ok("排课信息提交成功");
@@ -276,7 +286,7 @@ public class ScheduleRecordController {
         scheduleRecordService.saveBatch(newTargetRecordList);
 
         //添加排课信息之前删除缓存中的排课信息
-        mapCache.getCacheInfo().remove(KeyNameOfCache.CACHE_SCHEDULE_INFO);
+        mapCacheService.getCacheInfo().remove(KeyNameOfCache.CACHE_SCHEDULE_INFO);
         log.debug("添加排课信息之前删除缓存中的排课信息");
 
         return R.ok("复制成功！");
@@ -455,7 +465,7 @@ public class ScheduleRecordController {
         if (isRemoveSchedule) {
 
             //添加排课信息之前删除缓存中的排课信息
-            mapCache.getCacheInfo().remove(KeyNameOfCache.CACHE_SCHEDULE_INFO);
+            mapCacheService.getCacheInfo().remove(KeyNameOfCache.CACHE_SCHEDULE_INFO);
             log.debug("添加排课信息之前删除缓存中的排课信息");
 
             return R.ok("删除成功！即将跳转..");
@@ -514,7 +524,7 @@ public class ScheduleRecordController {
         log.debug("\n==>打印这节课的消耗次数==>{}", timesCost);
 
         //删除会员卡统计缓存
-        mapCache.getCacheInfo().remove(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO);
+        mapCacheService.getCacheInfo().remove(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO);
         log.debug("\n==>一键扣费后删除map中的会员卡信息缓存");
 
 
@@ -531,7 +541,7 @@ public class ScheduleRecordController {
 
             //1.添加操作记录
             MemberLogEntity logEntity = new MemberLogEntity()
-                    .setType(OperateType.CLASS_DEDUCTION.getMsg())
+                    .setType(OperateType.CLASS_DEDUCTION_OPERATION.getMsg())
                     .setMemberBindId(bindId)
                     .setOperator(operator)
                     .setCreateTime(LocalDateTime.now())
@@ -545,7 +555,7 @@ public class ScheduleRecordController {
 
             //2.添加消费记录
             ConsumeRecordEntity consume = new ConsumeRecordEntity()
-                    .setOperateType(OperateType.CLASS_DEDUCTION.getMsg())
+                    .setOperateType(OperateType.CLASS_DEDUCTION_OPERATION.getMsg())
                     .setCardCountChange(reserveNums * timesCost)
                     .setOperator(operator)
                     .setMemberBindId(bindId)
@@ -618,12 +628,12 @@ public class ScheduleRecordController {
         }
 
         //删除会员卡统计信息的缓存
-        mapCache.getCacheInfo().remove(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO);
+        mapCacheService.getCacheInfo().remove(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO);
         log.debug("\n==>确认扣费后删除map中的会员卡信息缓存");
 
         //1.添加操作记录
         MemberLogEntity memberLogEntity = new MemberLogEntity()
-                .setType(OperateType.CLASS_DEDUCTION.getMsg())
+                .setType(OperateType.CLASS_DEDUCTION_OPERATION.getMsg())
                 .setOperator(consumeFormVo.getOperator())
                 .setMemberBindId(consumeFormVo.getCardBindId())
                 .setCreateTime(LocalDateTime.now())
@@ -640,7 +650,7 @@ public class ScheduleRecordController {
 
         //2.添加消费记录
         ConsumeRecordEntity consumeRecordEntity = new ConsumeRecordEntity()
-                .setOperateType(OperateType.CLASS_DEDUCTION.getMsg())
+                .setOperateType(OperateType.CLASS_DEDUCTION_OPERATION.getMsg())
                 .setCardCountChange(consumeFormVo.getCardCountChange())
                 .setCardDayChange(consumeFormVo.getCardDayChange())
                 .setOperator(consumeFormVo.getOperator())
