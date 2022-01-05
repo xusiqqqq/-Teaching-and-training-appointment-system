@@ -59,7 +59,8 @@
                             <th>会员姓名(手机号)</th>
                             <th>性别</th>
                             <th>会员卡</th>
-                             <!--<th>备注</th>-->
+                            <th>入会日期</th>
+                             <th>备注</th>
                             <th>操作</th>
                         </tr>
                         </thead>
@@ -182,12 +183,12 @@
                 "data": memberList,
                 //行的定义
                 "columns": [
-                    //todo 少了电话
                     // {"data": "namePhone",bAutoWidth: "false", sWidth: "20%"},
-                    {"data": "memberName", bAutoWidth: "false", sWidth: "20%"},
+                    {"data": "memberName", bAutoWidth: "false", sWidth: "15%"},
                     {"data": "gender", sWidth: "10%"},
-                    {"data": "cardHold", sWidth: "20%"},
-                    // {"data": "note", sWidth: "20%"},
+                    {"data": "cardHold", sWidth: "15%"},
+                    {"data": "joiningDate", sWidth: "15%"},
+                    {"data": "note", sWidth: "20%"},
                     {
                         "data": null, "orderable": false, "render": function (data, type, row) {
                             var id = row.id;

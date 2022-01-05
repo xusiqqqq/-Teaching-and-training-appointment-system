@@ -136,7 +136,7 @@
                         <button class="btn btn-primary" data-target="#addReservation" data-toggle="modal">添加会员预约</button>
                         <button class="btn btn-success" id="exportData">导出预约数据</button>
                         <button class="btn btn-danger  demo3" id="delCourse">删除课程</button>
-                        <button class="btn btn-default  demo3" onclick="window.history.go(-1)" id="cancel">返回</button>
+                        <button class="btn btn-default " onclick="window.history.go(-1)" id="cancel">返回</button>
                     </div>
                 </div>
             </div>
@@ -172,7 +172,7 @@
                                             <th>使用次数</th>
                                             <th>操作时间</th>
                                             <th>操作人</th>
-                                            <th>预约来源</th>
+                                            <!--<th>预约来源</th>-->
                                             <th>预约备注</th>
                                             <th>操作</th>
                                         </tr>
@@ -194,7 +194,7 @@
                                             <th>使用次数</th>
                                             <th>操作时间</th>
                                             <th>操作人</th>
-                                            <th>预约来源</th>
+                                            <!--<th>预约来源</th>-->
                                             <th>预约结果</th>
                                         </tr>
                                         </thead>
@@ -734,7 +734,7 @@
                     {"data": "timesCost"},
                     {"data": "operateTime"},
                     {"data": "operator"},
-                    {"data": "comment"},
+                    /*{"data": "comment"},*/
                     {"data": "reserveNote"},
                     {
                         "data": "reserveId", "render": function (data, type, row) {
@@ -772,7 +772,7 @@
                     {"data": "timesCost"},
                     {"data": "operateTime"},
                     {"data": "operator"},
-                    {"data": "comment"},
+                   /* {"data": "comment"},*/
                     {
                         "data": "reserveStatus",
                         "orderable": false,

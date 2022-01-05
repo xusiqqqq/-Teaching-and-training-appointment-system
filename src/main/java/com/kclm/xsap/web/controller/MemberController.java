@@ -133,7 +133,9 @@ public class MemberController {
                     .setId(memberEntity.getId())
                     .setMemberName(memberEntity.getName() + "(" + memberEntity.getPhone() + ")")
                     .setGender(memberEntity.getSex())
-                    .setCardHold(cardName);
+                    .setCardHold(cardName)
+                    .setJoiningDate(memberEntity.getCreateTime().toLocalDate())
+                    .setNote(memberEntity.getNote());
             log.debug("每一次的memberVo{}", memberVo);
             return memberVo;
         }).collect(Collectors.toList());
