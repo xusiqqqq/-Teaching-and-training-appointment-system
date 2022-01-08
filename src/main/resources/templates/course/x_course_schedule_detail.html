@@ -363,6 +363,8 @@
                         <input id="classId" name="classId" type="hidden"/>
                         <input id="consume_memberId" name="memberId" type="hidden"/>
                         <input id="consume_cardId" name="cardBindId" type="hidden"/>
+                        <!--<input id="scheduleId" name="scheduleId" type="hidden"/>-->
+                        <input id="scheduleId" name="scheduleId" th:value="${ID}" type="hidden"/>
                         <!-- 隐藏域，管理员名 -->
                         <input name="operator" th:value="${session.LOGIN_USER.name}" type="hidden" value="admin"/>
 
@@ -376,6 +378,13 @@
                             <label class="control-label" tip="cardCountChange"></label>
                         </div>
 
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">
+                            应扣金额</label>
+                        <div class="col-sm-6">
+                            <input class="form-control" id="amountOfConsumption" name="amountOfConsumption" placeholder="0" type="number" step="0.01">
+                        </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">
@@ -433,10 +442,30 @@
     });
 
     function toConsume(member_id, card_id, class_id, timesCost, reserveNums, schedule_id) {
-        $("#consume_memberId").val(member_id);
-        $("#consume_cardId").val(card_id);
-        $("#classId").val(class_id);
-        $("#cardCountChange").val(timesCost * reserveNums);
+
+        let amounts_payable
+        /*获取单次所使用的会员卡默认单人单节课单次消耗金额*/
+        $.post("/schedule/queryAmountsPayable.do", {bindCardId: card_id}, function (data) {
+            if (data.code === 0) {
+                amounts_payable = data.data;
+                console.log('后台传入的金金额=' + amounts_payable);
+
+                $("#consume_memberId").val(member_id);
+                $("#consume_cardId").val(card_id);
+                $("#classId").val(class_id);
+                $("#cardCountChange").val(timesCost * reserveNums);
+
+                let money = amounts_payable * timesCost * reserveNums;
+                console.log('money=' + money);
+                $("#amountOfConsumption").val(money);
+
+            } else {
+                //打印失败信息
+                swal("无法扣费" , data.msg, info);
+            }
+        });
+
+
 
         var reserve_id = "";
         $("#consume_btn").on("mouseenter", function () {

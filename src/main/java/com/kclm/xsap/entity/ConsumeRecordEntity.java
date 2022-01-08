@@ -68,6 +68,11 @@ public class ConsumeRecordEntity implements Serializable {
 	 * 操记录id
 	 */
 	private Long logId;
+
+	/**
+	 * 消费的对应课程【排课】的id
+	 */
+	private Long scheduleId;
 	/**
 	 * 创建时间
 	 */

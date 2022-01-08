@@ -23,7 +23,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -539,13 +541,22 @@ public class ScheduleRecordController {
             //获取此卡单次预约的人数（用于和一节课消耗次数相乘求此卡减去的次数）
             Integer reserveNums = entity.getReserveNums();
 
+            //获取当前预约记录的所有消耗次数
+            int allTimeCostForCurrentReserve = reserveNums * timesCost;
+
+            //获取当前会员卡的应扣金额【余额/剩余次数*该卡消耗所有次数】
+            BigDecimal amountsPayable = BigDecimal.valueOf(currentCardBindRecord.getReceivedMoney().doubleValue() / currentCardBindRecord.getValidCount() * allTimeCostForCurrentReserve);
+
+
+
             //1.添加操作记录
             MemberLogEntity logEntity = new MemberLogEntity()
                     .setType(OperateType.CLASS_DEDUCTION_OPERATION.getMsg())
                     .setMemberBindId(bindId)
                     .setOperator(operator)
                     .setCreateTime(LocalDateTime.now())
-                    .setCardCountChange(reserveNums * timesCost);
+                    .setInvolveMoney(amountsPayable)
+                    .setCardCountChange(allTimeCostForCurrentReserve);
             boolean isSaveLog = memberLogService.save(logEntity);
             log.debug("\n==>添加操作记录是否成功==>{}", isSaveLog);
             if (!isSaveLog) {
@@ -556,7 +567,8 @@ public class ScheduleRecordController {
             //2.添加消费记录
             ConsumeRecordEntity consume = new ConsumeRecordEntity()
                     .setOperateType(OperateType.CLASS_DEDUCTION_OPERATION.getMsg())
-                    .setCardCountChange(reserveNums * timesCost)
+                    .setMoneyCost(amountsPayable)
+                    .setCardCountChange(allTimeCostForCurrentReserve)
                     .setOperator(operator)
                     .setMemberBindId(bindId)
                     .setCreateTime(LocalDateTime.now())
@@ -570,7 +582,8 @@ public class ScheduleRecordController {
 
 
             //3.更新会员卡信息
-            currentCardBindRecord.setValidCount(currentCardBindRecord.getValidCount() - reserveNums * timesCost)
+            currentCardBindRecord.setValidCount(currentCardBindRecord.getValidCount() - allTimeCostForCurrentReserve)
+                    .setReceivedMoney(currentCardBindRecord.getReceivedMoney().subtract(amountsPayable))
                     .setLastModifyTime(LocalDateTime.now())
                     .setVersion(currentCardBindRecord.getVersion() + 1);
             boolean isUpdateBind = memberBindRecordService.updateById(currentCardBindRecord);
@@ -591,15 +604,37 @@ public class ScheduleRecordController {
                     return R.error("一键确认扣费失败！");
                 }
             }
-           /* boolean isUpdateClassRecord = classRecordService.update(new UpdateWrapper<ClassRecordEntity>().eq("member_id", memberId)
-                    .eq("schedule_id", scheduleId)
-                    .set("check_status", 1)
-                    .set("last_modify_time", LocalDateTime.now()));*/
-
         }
 
         return R.ok("扣费成功！");
 
+
+    }
+
+
+    /**
+     * 根据前台传入的会员卡id计算此卡 amountPayablePerPerson
+     * @param bindCardId 传入的会员实体卡的id
+     * @return 单次应付金额
+     */
+    @PostMapping("/queryAmountsPayable.do")
+    @ResponseBody
+    public R queryAmountsPayable(Long bindCardId) {
+        log.debug("\n==>打印传入的绑定卡id==>{}", bindCardId);
+        MemberBindRecordEntity bindRecordEntity = memberBindRecordService.getOne(new QueryWrapper<MemberBindRecordEntity>().select("received_money", "valid_count").eq("id", bindCardId));
+        if (null != bindRecordEntity) {
+            if (bindRecordEntity.getReceivedMoney().compareTo(BigDecimal.ZERO) <= 0 || bindRecordEntity.getValidCount() <= 0) {
+                return R.error("卡余额或剩余次数不足,请检查卡余量或充值后再扣费");
+            }
+            BigDecimal amountPayablePerPerson = BigDecimal.valueOf(bindRecordEntity.getReceivedMoney().doubleValue() / bindRecordEntity.getValidCount());
+            DecimalFormat format = new DecimalFormat(".00");
+            Float amountPayablePerPersonFloat = Float.valueOf(format.format(amountPayablePerPerson));
+//            float amountPayablePerPerson = bindRecordEntity.getReceivedMoney().floatValue() / bindRecordEntity.getValidCount();
+            log.debug("\n==>打印课程详情页中单独确认扣费表单的应扣次数==>{}", amountPayablePerPersonFloat);
+            return R.ok().put("data", amountPayablePerPersonFloat);
+        } else {
+            return R.error("无此卡");
+        }
 
     }
 
@@ -627,9 +662,12 @@ public class ScheduleRecordController {
             }
         }
 
-        //删除会员卡统计信息的缓存
-        mapCacheService.getCacheInfo().remove(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO);
-        log.debug("\n==>确认扣费后删除map中的会员卡信息缓存");
+        //获取当前用户所使用的会员卡信息
+        MemberBindRecordEntity bindRecordById = memberBindRecordService.getById(consumeFormVo.getCardBindId());
+
+        //获取应付金额
+        //BigDecimal amountsPayable = BigDecimal.valueOf(bindRecordById.getReceivedMoney().doubleValue() / bindRecordById.getValidCount());
+
 
         //1.添加操作记录
         MemberLogEntity memberLogEntity = new MemberLogEntity()
@@ -638,9 +676,11 @@ public class ScheduleRecordController {
                 .setMemberBindId(consumeFormVo.getCardBindId())
                 .setCreateTime(LocalDateTime.now())
                 .setCardCountChange(consumeFormVo.getCardCountChange())
+                .setInvolveMoney(consumeFormVo.getAmountOfConsumption())
                 .setCardDayChange(consumeFormVo.getCardDayChange())
                 .setNote(consumeFormVo.getNote());
         boolean isSaveLog = memberLogService.save(memberLogEntity);
+
         log.debug("\n==>添加操作记录是否成功==>{}", isSaveLog);
         if (!isSaveLog) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -652,12 +692,14 @@ public class ScheduleRecordController {
         ConsumeRecordEntity consumeRecordEntity = new ConsumeRecordEntity()
                 .setOperateType(OperateType.CLASS_DEDUCTION_OPERATION.getMsg())
                 .setCardCountChange(consumeFormVo.getCardCountChange())
+                .setMoneyCost(consumeFormVo.getAmountOfConsumption())
                 .setCardDayChange(consumeFormVo.getCardDayChange())
                 .setOperator(consumeFormVo.getOperator())
                 .setNote(consumeFormVo.getNote())
                 .setMemberBindId(consumeFormVo.getCardBindId())
                 .setCreateTime(LocalDateTime.now())
-                .setLogId(memberLogEntity.getId());
+                .setLogId(memberLogEntity.getId())
+                .setScheduleId(consumeFormVo.getScheduleId());
         boolean isSaveConsumeRecord = consumeRecordService.save(consumeRecordEntity);
         log.debug("\n==>添加消费记录是否成功==>{}", isSaveConsumeRecord);
         if(!isSaveConsumeRecord) {
@@ -667,9 +709,10 @@ public class ScheduleRecordController {
         }
 
         //3.修改会员卡剩余次数信息
-        MemberBindRecordEntity bindRecordById = memberBindRecordService.getById(consumeFormVo.getCardBindId());
+
         bindRecordById.setValidCount(bindRecordById.getValidCount() - consumeFormVo.getCardCountChange())
                 .setValidDay(bindRecordById.getValidDay() - consumeFormVo.getCardDayChange())
+                .setReceivedMoney(bindRecordById.getReceivedMoney().subtract(consumeFormVo.getAmountOfConsumption()))
                 .setLastModifyTime(LocalDateTime.now())
                 .setVersion(bindRecordById.getVersion() + 1);
         boolean isUpdateBind = memberBindRecordService.updateById(bindRecordById);
@@ -688,9 +731,49 @@ public class ScheduleRecordController {
             return R.error("确认上课失败");
         }
 
+        //删除会员卡统计信息的缓存
+        mapCacheService.getCacheInfo().remove(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO);
+        log.debug("\n==>确认扣费后删除map中的会员卡信息缓存");
 
         return R.ok("确认上课成功");
     }
+
+
+    /**
+     * 返回会员详情页扣费中课程suggest所需的数据
+     * @return r -> for suggest
+     */
+    @GetMapping("/toSearch.do")
+    @ResponseBody
+    public R toSearch() {
+
+        //获取当前日期
+        LocalDate now = LocalDate.now();
+
+        //查询最近三天的所有排课记录
+        List<ScheduleRecordEntity> scheduleWith_id_courseId_teacherId_time = scheduleRecordService.list(new QueryWrapper<ScheduleRecordEntity>()
+                .select("id", "course_id", "teacher_id", "start_date", "class_time").le("start_date", now).ge("start_date", now.minusDays(3)));
+
+        //使用流获取前端的suggest需要的vo的list
+        List<ScheduleForConsumeSearchVo> scheduleForSearchVos = scheduleWith_id_courseId_teacherId_time.stream().map(schedule -> {
+            //获取课程名字
+            String courseName = courseService.getById(schedule.getCourseId()).getName();
+            //获取老师名字
+            String teacherName = employeeService.getById(schedule.getTeacherId()).getName();
+            //创建vo并复制
+            return new ScheduleForConsumeSearchVo()
+                    .setScheduleId(schedule.getId())
+                    .setCourseName(courseName)
+                    .setTeacherName(teacherName)
+                    .setClassDateTime(LocalDateTime.of(schedule.getStartDate(), schedule.getClassTime()));
+        }).collect(Collectors.toList());
+        log.debug("\n==>会员扣费中课程的搜索建议：suggest所需的数据==>{}", scheduleForSearchVos);
+
+        return R.ok().put("value", scheduleForSearchVos);
+
+    }
+
+
 
     /**
      * 导出预约数据
