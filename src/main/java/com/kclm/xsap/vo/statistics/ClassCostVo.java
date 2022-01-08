@@ -24,4 +24,7 @@ public class ClassCostVo {
     //y轴数据
     private List<List<Integer>> data;
 
+    private List<List<Float>> data2;
+
+
 }

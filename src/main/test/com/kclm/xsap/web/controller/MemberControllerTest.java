@@ -82,19 +82,39 @@ class MemberControllerTest {
     private CustomConfig customConfig;
 
 
-//    @Value(value = "${user.userName}")
-//    private String userName;
-//    @Value("${user.sex}")
-//    private String sex;
-//    @Value("${user.age}")
-//    private String age;
-//
-//    @Test
-//    void test25() {
-//        System.out.println(userName);
-//        System.out.println(sex);
-//        System.out.println(age);
-//    }
+    @Test
+    void test27() {
+        LocalDate today = LocalDate.now();
+        List<ScheduleRecordEntity> list = scheduleRecordService.list(new QueryWrapper<ScheduleRecordEntity>().select("id", "course_id", "teacher_id", "order_nums", "start_date", "class_time").likeRight("start_date", 2022)/*le("start_date", today).ge()*/);
+        list.forEach(System.out::println);
+    }
+
+    @Test
+    void test26() {
+        int countOfAlreadyConfirm = classRecordService.count(new QueryWrapper<ClassRecordEntity>().eq("schedule_id", 90).eq("check_status", 1));
+        System.out.println(countOfAlreadyConfirm);
+
+    }
+
+    @Test
+    void test25() {
+        LocalDate now = LocalDate.now();
+        //查询所有最近一个月的排课记录
+        List<ScheduleRecordEntity> scheduleFromLastMonth = scheduleRecordService.list(new QueryWrapper<ScheduleRecordEntity>().select("id").le("start_date", now).ge("start_date", now.minusDays(30)));
+        //取出最近一个月的所有排课记录的id
+        List<Long> scheduleIdList = scheduleFromLastMonth.stream().map(ScheduleRecordEntity::getId).collect(Collectors.toList());
+
+
+        List<Long> list = classRecordService.list(new QueryWrapper<ClassRecordEntity>().eq("check_status", 1).in("schedule_id", scheduleIdList)).stream().map(ClassRecordEntity::getMemberId).collect(Collectors.toList());
+
+        System.out.println("打印");
+        list.forEach(System.out::println);
+
+        System.out.println();
+        List<Long> list1 = list.stream().distinct().collect(Collectors.toList());
+        list1.forEach(System.out::println);
+
+    }
 
     @Test
     void test24() {
@@ -105,7 +125,7 @@ class MemberControllerTest {
     }
 
     @Test
-    void test23() throws Exception  {
+    void test23() throws Exception {
         ExpiryMap<KeyNameOfCache, Object> map = mapCacheService.getCacheInfo();
         map.put(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO, "test", 1000);
         System.out.println(map.get(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO));
@@ -128,12 +148,12 @@ class MemberControllerTest {
 
     @Test
     void test21() {
-        List<MemberCardEntity> cardEntityList = memberCardService.list(new QueryWrapper<MemberCardEntity>().select("id","name"));
+        List<MemberCardEntity> cardEntityList = memberCardService.list(new QueryWrapper<MemberCardEntity>().select("id", "name"));
         List<Long> cardIds = cardEntityList.stream().map(MemberCardEntity::getId).collect(Collectors.toList());
 
         List<IndexPieChartVo> collect = cardEntityList.stream().map(cardEntity -> {
 //            List<MemberBindRecordEntity> card_id = memberBindRecordService.list(new QueryWrapper<MemberBindRecordEntity>().eq("card_id", cardEntity.getId()));
-            log.debug("\n==>打印ka==>{}",cardEntity);
+            log.debug("\n==>打印ka==>{}", cardEntity);
 
             int nums = memberBindRecordService.count(new QueryWrapper<MemberBindRecordEntity>().eq("card_id", cardEntity.getId()));
 //            HashMap<String, Integer> tempMap = new HashMap<>();
@@ -147,13 +167,12 @@ class MemberControllerTest {
         }).collect(Collectors.toList());
 
 
-
-        collect .forEach(System.out::println);
+        collect.forEach(System.out::println);
     }
 
     @Test
     void test20() {
-        List<MemberEntity> currentMonthLogoutMemberInfo = memberService.getCurrentMonthLogoutMemberInfo(LocalDate.now().getYear(),LocalDate.now().getMonthValue());
+        List<MemberEntity> currentMonthLogoutMemberInfo = memberService.getCurrentMonthLogoutMemberInfo(LocalDate.now().getYear(), LocalDate.now().getMonthValue());
         currentMonthLogoutMemberInfo.forEach(System.out::println);
     }
 

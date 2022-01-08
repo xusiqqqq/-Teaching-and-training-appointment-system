@@ -1,5 +1,6 @@
 package com.kclm.xsap.web.controller;
 
+import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.kclm.xsap.entity.CourseEntity;
 import com.kclm.xsap.entity.ReservationRecordEntity;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -23,6 +25,61 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public class Test {
+
+    @org.junit.jupiter.api.Test
+    void test26() {
+        String s = "我是谁！！";
+        char[] chars = s.toCharArray();
+        StringBuilder builder = new StringBuilder();
+        for (char aChar : chars) {
+            builder.append((int)aChar);
+            System.out.println(aChar);
+            System.out.println((int)aChar);
+        }
+        System.out.println(builder);
+        String str;
+        System.out.println(builder.substring(builder.length() -3));
+        str = builder.substring(0, 2) + builder.substring(builder.length() - 2);
+        System.out.println(str);
+
+    }
+
+
+    public static void t2(){//字符串转换为ASCII码
+
+        String s="新年快乐！";//字符串
+
+        char[]chars=s.toCharArray(); //把字符中转换为字符数组
+
+        System.out.println("\n\n汉字 ASCII\n----------------------");
+        for(int i=0;i<chars.length;i++){//输出结果
+
+            System.out.println(" "+chars[i]+" "+(int)chars[i]);
+        }
+    }
+
+    @org.junit.jupiter.api.Test
+    void test25() {
+
+        t2();
+        String test = "我是谁！";
+        String str = StrUtil.str(test);
+        System.out.println(str);
+        byte[] bytes = StrUtil.bytes(test);
+        for (byte aByte : bytes) {
+            System.out.print(aByte);
+        }
+        byte[] bytes1 = test.getBytes(StandardCharsets.UTF_8);
+        String s = null;
+        for (byte b : bytes1) {
+            System.out.println(b);
+            System.out.println();
+            s += String.valueOf(b);
+
+        }
+        System.out.println(s);
+
+    }
 
     @org.junit.jupiter.api.Test
     void test24() {

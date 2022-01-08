@@ -75,6 +75,9 @@ public class MemberCardController {
     @Resource
     private MapCacheService mapCacheService;
 
+    @Resource
+    private ClassRecordService classRecordService;
+
 
     /**
      * 返回会员卡列表
@@ -406,21 +409,6 @@ public class MemberCardController {
             return R.error("更新失败");
         }
 
-        /*int result = memberBindRecordService.updateStatus(bindCardId, status);
-        if (result > 0) {
-            List<CardInfoVo> cardInfoVos = memberBindRecordService.getCardInfo(memberId);
-            log.debug("\n==>更新status后返回的会员卡信息==>{}", cardInfoVos);
-            MemberBindRecordEntity bindRecordById = memberBindRecordService.getById(bindCardId);
-
-            //停用会员卡后删除缓存中原数据
-            mapCacheService.getCacheInfo().remove(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO);
-            log.debug("\n==>充值后删除map缓存中原数据");
-            //激活状态
-//            return new R().put("data", bindRecordById);
-            return R.ok().put("data", "激活。");
-        } else {
-            return R.error("更新失败");
-        }*/
     }
 
 
@@ -552,7 +540,9 @@ public class MemberCardController {
                 .setNote(vo.getNote())
                 .setMemberBindId(cardBindId)
                 .setCreateTime(LocalDateTime.now())
-                .setLogId(logEntity.getId());
+                .setLogId(logEntity.getId())
+                .setScheduleId(vo.getScheduleId());
+
         log.debug("\n==>打印要添加的消费记录==>{}", consumeRecordEntity);
         boolean isSaveConsumeRecord = consumeRecordService.save(consumeRecordEntity);
         log.debug("\n==>添加消费记录是否成功==>{}", isSaveConsumeRecord);
@@ -572,6 +562,25 @@ public class MemberCardController {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return R.error("更新会员卡信息失败");
         }
+
+        //扣费4： 添加上课记录表
+        //获取会员卡名：
+        String cardName = memberCardService.getOne(new QueryWrapper<MemberCardEntity>().select("name").eq("id", bindById.getCardId())).getName();
+        ClassRecordEntity classRecordEntity = new ClassRecordEntity()
+                .setMemberId(vo.getMemberId())
+                .setCardName(cardName)
+                .setScheduleId(vo.getScheduleId())
+                .setNote("手动添加扣费用户")
+                .setCheckStatus(1)
+                .setReserveCheck(1)
+                .setCreateTime(LocalDateTime.now())
+                .setBindCardId(cardBindId);
+        boolean isAddClassRecord = classRecordService.save(classRecordEntity);
+        if (!isAddClassRecord) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return R.error("更新会员卡信息失败");
+        }
+        log.debug("\n==>会员扣费手动添加的上课记录==>{}", classRecordEntity);
 
         //扣费后删除缓存中数据
         mapCacheService.getCacheInfo().remove(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO);
@@ -597,7 +606,7 @@ public class MemberCardController {
         //给到期时间赋值
         for (OperateRecordVo vo : operateRecordVos) {
             DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(Locale.CHINA);
-            DecimalFormat format = new DecimalFormat("¤00.00", symbols);
+            DecimalFormat format = new DecimalFormat("¤0.00", symbols);
             //当没有充值或扣费时，添加默认值
             if (vo.getCardCountChange() == null && vo.getAddCount() == null) {
                 vo.setChangeCount(0);
@@ -606,7 +615,7 @@ public class MemberCardController {
             }
             //当没有充值或扣费时，添加默认值
             if (vo.getReceivedMoney() == null && vo.getMoneyCost() == null) {
-                vo.setChangeMoney("$0.00");
+                vo.setChangeMoney("$.00");
             } else {
                 vo.setChangeMoney(vo.getReceivedMoney() == null ? format.format(vo.getMoneyCost().negate()) : format.format(vo.getReceivedMoney()));
             }

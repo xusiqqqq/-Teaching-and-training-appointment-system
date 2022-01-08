@@ -53,6 +53,12 @@ public class IndexController {
     @Resource
     private EmployeeService employeeService;
 
+    @Resource
+    private ClassRecordService classRecordService;
+
+    @Resource
+    private ScheduleRecordService scheduleRecordService;
+
     /**
      * @author fangkai
      * @date 2021/12/5 0005 12:37
@@ -81,8 +87,9 @@ public class IndexController {
 
     /**
      * 用户注册
+     *
      * @param registerVo 注册表单
-     * @param model 返回信息
+     * @param model      返回信息
      * @return 前往登录page或者返回注册
      */
     @PostMapping("/index/register")
@@ -305,13 +312,22 @@ public class IndexController {
         Integer memberCount = memberService.count();
         log.debug("会员总数count:{}", memberCount);
         //获取最近一月有约课的用户（活跃用户）
-        Integer activeUserCount = reservationRecordService.getActiveUserCount();
+        //获取当前时间
+        LocalDate now = LocalDate.now();
+        //查询所有最近一个月的排课记录
+        List<ScheduleRecordEntity> scheduleFromLastMonth = scheduleRecordService.list(new QueryWrapper<ScheduleRecordEntity>().select("id").le("start_date", now).ge("start_date", now.minusDays(30)));
+        //取出最近一个月的所有排课记录的id
+        List<Long> scheduleIdList = scheduleFromLastMonth.stream().map(ScheduleRecordEntity::getId).collect(Collectors.toList());
+
+        //查询所有已经确认上课并且上课时间在最近一个月内的所有上课记录,最后取出这些上课记录的会员id并去重, 取去重后的id个数表示最近一个月活跃会员数
+        long activeUserCount = classRecordService.list(new QueryWrapper<ClassRecordEntity>().eq("check_status", 1).in("schedule_id", scheduleIdList)).stream().map(ClassRecordEntity::getMemberId).distinct().count();
+
         //获取预约总数
         Integer reserveCount = reservationRecordService.count(new QueryWrapper<ReservationRecordEntity>().eq("status", 1));
 
         IndexHomeDateVo indexHomeDateVo = new IndexHomeDateVo()
                 .setTotalMembers(memberCount)
-                .setActiveMembers(activeUserCount)
+                .setActiveMembers((int) activeUserCount)
                 .setTotalReservations(reserveCount);
 
         log.debug("返回的VO：indexHomeDateVo：{}", indexHomeDateVo);
@@ -321,7 +337,6 @@ public class IndexController {
 
 
     }
-
 
 
     /**
