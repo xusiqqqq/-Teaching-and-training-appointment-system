@@ -26,7 +26,7 @@ public interface MemberService extends IService<MemberEntity> {
 
     /**
      * 查询指定年份的所有注销用户，按注销时间倒序
-     * @param endYear 指定年份
+     * @param yearOfSelect 指定年份
      * @return 所有注销用户
      */
     List<MemberEntity> getMemberLogOutInSpecifyYear(Integer yearOfSelect);

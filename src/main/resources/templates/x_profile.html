@@ -104,7 +104,7 @@
                                 </div>
                                 <div class="col-lg-offset-4 col-md-4 input_margin_top" style="text-align: center">
                                     <button type="submit" class="btn btn-primary" id="update_teacher_btn" style="margin-right: 10px">保存</button>
-                                    <button type="button" class="btn btn-primary pull-right" data-dismiss="modal">取消</button>
+                                    <button type="button" class="btn btn-primary pull-right" onclick="window.history.go(-1)" data-dismiss="modal">取消</button>
                                 </div>
                             
                         </div>
@@ -147,29 +147,29 @@
 		var formData = new FormData();
 		formData.append('avatarFile',file); 
 		console.log(formData);
-		
-		$.ajax({
-			url: "/xsap/user/modifyUserImg.do",
-			method: "post",
-			data:formData,
-			dataType:"json",	//接收服务器传输的数据格式
-			contentType:false,	//必需使用 false,  这样才能使用form表单采用 multipart/form-data 传输
-			processData: false,
-			success:function(userData){
-				console.log(userData);
-				if(userData != null){
-					// 读取的URL结果：this.result	@{/static/img/{avatar}(avatar=${userInfo.avatarUrl})}
-					console.log("之后的图片信息："+userData.avatarUrl);
-					$("#avatar_img").attr("src", "../static/img/"+ userData.avatarUrl);
-					//刷新界面
-					// window.location.reload();
-				}
-			},
-			error: function (jqXHR) {
-				alert("更新失败, 请重新再试!");
-			}
-		}); 
-                
+
+        $.ajax({
+            url: "/user/modifyUserImg.do",
+            method: "post",
+            data: formData,
+            dataType: "json",	//接收服务器传输的数据格式
+            contentType: false,	//必需使用 false,  这样才能使用form表单采用 multipart/form-data 传输
+            processData: false,
+            success: function (data) {
+                const userData = data.data;
+                console.log(userData);
+                if (userData != null) {
+                    // 读取的URL结果：this.result	@{/static/img/{avatar}(avatar=${userInfo.avatarUrl})}
+                    console.log("之后的图片信息：" + userData.avatarUrl);
+
+                    $("#avatar_img").attr("src", "/images/teacher_img/" + userData.avatarUrl);
+                }
+            },
+            error: function (jqXHR) {
+                alert("更新失败, 请重新再试!");
+            }
+        });
+
     });
 </script>
 

@@ -1,18 +1,15 @@
 package com.kclm.xsap.web.controller;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kclm.xsap.consts.OperateType;
 import com.kclm.xsap.entity.*;
 import com.kclm.xsap.service.*;
-import com.kclm.xsap.utils.PageUtils;
+import com.kclm.xsap.web.cache.MapCacheService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -20,7 +17,10 @@ import org.springframework.web.bind.annotation.*;
 
 import com.kclm.xsap.utils.R;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
+
+import static com.kclm.xsap.consts.KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO;
 
 
 /**
@@ -34,20 +34,23 @@ import javax.validation.Valid;
 @Controller
 @RequestMapping("/cardBind")
 public class MemberBindRecordController {
-    @Autowired
+    @Resource
     private MemberBindRecordService memberBindRecordService;
 
-    @Autowired
+    @Resource
     private ConsumeRecordService consumeRecordService;
 
-    @Autowired
+    @Resource
     private MemberLogService memberLogService;
 
-    @Autowired
+    @Resource
     private MemberCardService memberCardService;
 
-    @Autowired
+    @Resource
     private RechargeRecordService rechargeRecordService;
+
+    @Resource
+    private MapCacheService mapCacheService;
 
     /**
      * 跳转会员卡绑定页面
@@ -56,6 +59,15 @@ public class MemberBindRecordController {
     @GetMapping("/x_member_card_bind.do")
     public String memberCardBind() {
         return "member/x_member_card_bind";
+    }
+
+    /**
+     * 跳转会员批量绑定page
+     * @return x_member_bind.html
+     */
+    @GetMapping("/x_member_bind.do")
+    public String memberBatchBinding() {
+        return "member/x_member_bind";
     }
 
     /**
@@ -191,6 +203,10 @@ public class MemberBindRecordController {
                 log.debug("添加会员绑定时的充值记录失败！");
                 return R.error("会员绑卡失败");
             }
+
+            //会员绑卡即修改了会员卡统计的数据，需要删除原数据
+            mapCacheService.getCacheInfo().remove(CACHE_OF_MEMBER_CARD_INFO);
+            log.debug("\n==>会员绑卡后删除map中的会员卡信息");
 
             return R.ok("会员绑定成功");
         }

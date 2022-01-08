@@ -62,8 +62,8 @@
                 <div class="ibox-title">
                     <button class="btn btn-info" data-target="#addCourse" data-toggle="modal">新增排课</button>
                     <button class="btn btn-info" data-target="#copyCourse" data-toggle="modal">复制排课</button>
-                    <button class="btn btn-warning pull-right" data-target="#upCourse" data-toggle="modal">批量导出预约数据
-                    </button>
+                    <button class="btn btn-success " onclick="window.location.reload()" data-target="#refresh" data-toggle="modal">刷新课程表</button>
+                    <button class="btn btn-warning pull-right" data-target="#upCourse" data-toggle="modal">批量导出预约数据</button>
 
                 </div>
                 <div class="ibox-content">
@@ -91,7 +91,7 @@
 
                     <!--隐藏域--课程id-->
                     <div class="form-group">
-                        <label class="col-sm-3 control-label right">课程：</label>
+                        <label class="col-sm-2 control-label right">课程：</label>
                         <div class="col-sm-7">
                             <div class="input-group">
                                 <!-- 隐藏域，courseId -->
@@ -108,11 +108,16 @@
                                 <!-- /btn-group -->
                             </div>
                         </div>
+
+                        <div class="col-sm-3" >
+                                <label class="control-label" tip="courseId"></label>
+                        </div>
+
                     </div>
 
                     <!--隐藏域--老师id-->
                     <div class="form-group">
-                        <label class="col-sm-3 control-label right">老师：</label>
+                        <label class="col-sm-2 control-label right">老师：</label>
                         <div class="col-sm-7">
                             <div class="input-group" style="z-index:99998!important;">
                                 <!-- 隐藏域，courseId -->
@@ -129,19 +134,28 @@
                                 <!-- /btn-group -->
                             </div>
                         </div>
+
+                        <div class="col-sm-3" >
+                            <label class="control-label" tip="teacherId"></label>
+                        </div>
                     </div>
 
                     <!--日期-->
                     <div class="form-group">
-                        <label class="col-sm-3 control-label right">日期：</label>
+                        <label class="col-sm-2 control-label right">日期：</label>
                         <div class="col-sm-7" style="z-index:99997!important; margin: 0 auto">
                             <input class="form-control data-temple" name="startDate" placeholder="选择具体上课日期" type="date">
                         </div>
+
+                        <div class="col-sm-3" >
+                            <label class="control-label" tip="startDate"></label>
+                        </div>
+
                     </div>
 
                     <!--上课时间-->
                     <div class="form-group" id="data_4">
-                        <label class="col-sm-3 control-label right">上课时间</label>
+                        <label class="col-sm-2 control-label right">上课时间</label>
                         <div class="col-sm-7 input-group clockpicker" data-autoclose="true" style="padding-left: 15px">
                             <input class="form-control" name="classTime" placeholder="选择上课具体时间" type="text"
                                    value="09:30">
@@ -154,7 +168,7 @@
 
                     <!--学生性别-->
                     <div class="form-group">
-                        <label class="col-sm-3 control-label right">学生性别：</label>
+                        <label class="col-sm-2 control-label right">学生性别：</label>
                         <div class="col-sm-7">
                             <input class="form-control" disabled="disabled" name="limitSex" type="text" value="男"/>
                         </div>
@@ -162,7 +176,7 @@
 
                     <!--学生年龄-->
                     <div class="form-group">
-                        <label class="col-sm-3 control-label right">学生年龄：</label>
+                        <label class="col-sm-2 control-label right">学生年龄：</label>
                         <div class="col-sm-7">
                             <input class="form-control" disabled="disabled" name="limitAge" type="text" value="不限制"/>
                         </div>
@@ -353,8 +367,17 @@
 <script type="text/javascript">
     /* ---------排课详情-------- */
     $(function () {
+
+        $(document).keydown(function (event) {
+            if (event.keyCode === 116) {
+                console.log('按f5刷新...')
+                window.location.reload();
+            }
+        });
+
+
         //设置字体样式
-        $("span .fc-event-title").css("color", "white");
+        $("span .fc-event-title").css("color", "black");
 
         //基本信息 - 加载
         $.post("/schedule/scheduleList.do", function (baseInfo) {
@@ -440,16 +463,25 @@
                 showCancelButton: true,
                 confirmButtonColor: "#55dd6c",
                 confirmButtonText: "添加",
-                closeOnConfirm: false
+                closeOnConfirm: true
             }, function () {
-                $.post("/schedule/scheduleAdd.do", addScheduleForm, function (result) {
-                    if (result.code === 0) {
+                $.post("/schedule/scheduleAdd.do", addScheduleForm, function (data) {
+                    if (data.code === 0) {
                         swal("添加成功！", "", "success");
                         setTimeout(function () {
                             window.location.reload();
                         }, 1500);
+                    } else if (data.code === 400) {
+
+                        let errors = data.errorMap;
+                        console.log(errors)
+                        for (var key in errors) {
+                            $(`[tip=${key}]`).html("");
+                            //错误提示回显
+                            $("<span class='text-danger'>" + errors[key] + "</span>").appendTo($("[tip=" + key + "]"));
+                        }
                     } else {
-                        swal("添加失败！", result.msg, "info");
+                        swal("添加失败！", data.msg, "info");
                     }
                 });
 

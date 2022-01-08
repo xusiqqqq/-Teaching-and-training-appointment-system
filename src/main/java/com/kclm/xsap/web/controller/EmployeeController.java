@@ -4,11 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kclm.xsap.entity.*;
 import com.kclm.xsap.service.*;
 import com.kclm.xsap.utils.R;
+import com.kclm.xsap.utils.exception.RRException;
 import com.kclm.xsap.utils.file.UploadImg;
+import com.kclm.xsap.vo.ModifyPassword;
 import com.kclm.xsap.vo.TeacherClassRecordVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,12 +17,15 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,20 +46,18 @@ public class EmployeeController {
     private static final String UPLOAD_IMAGES_TEACHER_IMG = "upload/images/teacher_img/";
 
 
-    @Autowired
+    @Resource
     private EmployeeService employeeService;
 
-    @Autowired
+    @Resource
     private ScheduleRecordService scheduleRecordService;
 
-    @Autowired
+    @Resource
     private CourseService courseService;
 
-    @Autowired
-    private CourseCardService courseCardService;
+    @Resource ClassRecordService classRecordService;
 
-    @Autowired
-    private MemberCardService memberCardService;
+    @Resource private MemberService memberService;
 
 
     /**
@@ -71,10 +73,11 @@ public class EmployeeController {
     }
 
     /**
-     * @param username
-     * @param password
-     * @param session
-     * @param model
+     * 登录表单
+     * @param username 登录表单用户名
+     * @param password 登录表单密码
+     * @param session 登录成功保存session
+     * @param model 登录失败返回页面携带数据
      * @return java.lang.String
      * @author fangkai
      * @date 2021/12/4 0004 16:45
@@ -97,21 +100,6 @@ public class EmployeeController {
 
     }
 
-
-    /**
-     * 返回所有老师信息给suggest提供搜索建议
-     *
-     * @return 所有老师信息
-     */
-    @GetMapping("/toSearch.do")
-    @ResponseBody
-    public R toSearch() {
-        List<EmployeeEntity> allEmployeeList = employeeService.list();
-        log.debug("\n==>返回到前端的所有老师信息allEmployeeList==>{}", allEmployeeList);
-        return new R().put("value", allEmployeeList);
-    }
-
-
     /**
      * 跳转到老师员工管理页面
      *
@@ -122,17 +110,13 @@ public class EmployeeController {
         return "employee/x_teacher_list";
     }
 
-
     /**
-     * 获取所有员工信息并返回给前端
-     *
-     * @return R ->员工数据【json】
+     * 跳转添加老师页面
+     * @return x_teacher_add.html
      */
-    @PostMapping("/teacherList.do")
-    @ResponseBody
-    public R teacherList() {
-        List<EmployeeEntity> teachers = employeeService.list();
-        return new R().put("data", teachers);
+    @GetMapping("/x_teacher_add.do")
+    public String togoTeacherAdd(){
+        return "employee/x_teacher_add";
     }
 
     /**
@@ -159,6 +143,173 @@ public class EmployeeController {
         return mv;
     }
 
+    /**
+     * 跳转老师详情页
+     *
+     * @param id    老师id
+     * @param model 携带老师id
+     * @return x_teacher_list_data.html
+     */
+    @GetMapping("/x_teacher_list_data.do")
+    public String togoTeacherListData(@RequestParam("id") Long id, Model model) {
+        log.debug("\n==>前台传入的id：==>{}", id);
+        model.addAttribute("ID", id);
+
+        return "employee/x_teacher_list_data";
+    }
+
+    /**
+     * 用户点击忘记密码跳转到充值页面
+     * @return x_ensure_user.html
+     */
+    @GetMapping("/toEnsureUser")
+    public String toEnsureUser() {
+        return "x_ensure_user";
+    }
+
+    /**
+     * 携带数据跳转老师更新页面
+     * @param id 老师id
+     * @return x_teacher_update.html（携带老师信息）
+     */
+    @GetMapping("/x_teacher_update")
+    public ModelAndView updateTeacher(@RequestParam("id") Long id) {
+        EmployeeEntity teacherById = employeeService.getById(id);
+
+        ModelAndView mv = new ModelAndView();
+        mv.addObject("teacherMsg",teacherById);
+        mv.setViewName("employee/x_teacher_update");
+
+        return mv;
+    }
+
+    /**
+     * 跳转页面
+     * @param userPhoneOrEmail 表单提交的要重置密码的用户的手机号或者邮箱，注意电话和邮箱都没有做重复检查
+     * @param model 页面携带数据
+     * @return 返回页面
+     */
+    @GetMapping("/toResetPwd")
+    public String toResetPwd(String userPhoneOrEmail, Model model) {
+        //
+        log.debug("\n==>打印用户要充值的用户手机号或者邮箱==>{}", userPhoneOrEmail);
+        String emailRegex = "^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$";
+        String phoneRegex = "^1[0-9]{10}$";
+
+        boolean isAEmail = Pattern.compile(emailRegex).matcher(userPhoneOrEmail).matches();
+        boolean isAPhone = Pattern.compile(phoneRegex).matcher(userPhoneOrEmail).matches();
+        if (isAEmail || isAPhone) {
+            //根据邮箱查询该用户     //由于保存的时候没有设置邮箱去重检查，所以假设可以存在相同邮箱【相容用户】
+            List<EmployeeEntity> userOne = employeeService.list(new QueryWrapper<EmployeeEntity>().eq("role_email", userPhoneOrEmail).or().eq("phone", userPhoneOrEmail));
+            //由于可能会用到该用户的信息，故不用count查个数
+            if (userOne.isEmpty()) {
+                //没查到该用户信息,返回提示到前台
+                model.addAttribute("CHECK_USER_ERROR", true);
+                return "x_ensure_user";
+            }
+            //查到信息，跳转页面
+            return "send_mail_ok";
+        } else {
+            //格式不正确，返回提示到前台
+            model.addAttribute("CHECK_INPUT_FORMAT", true);
+            return "x_ensure_user";
+        }
+
+
+    }
+
+
+    /**
+     * 菜单栏点击管理员类型跳转修改密码页面
+     * @return x_modify_password.html
+     */
+    @GetMapping("/x_modify_password.do")
+    public String modifyPassword() {
+        return "x_modify_password";
+    }
+
+
+    /**
+     * 修改密码操作
+     * @param entity 修改密码页面传入的表单数据
+     * @param model 跳转页面携带数据
+     * @return 跳转页面
+     */
+    @PostMapping("/modifyPwd.do")
+    public String modifyPwd(ModifyPassword entity, Model model) {
+        log.debug("\n==>打印前台传入的修改密码表单数据==>{}", entity);
+
+        if(null == entity) {
+            throw new RRException("修改数据表单为空", 22404);
+        }
+        if (entity.getOldPwd().isEmpty()) {
+            model.addAttribute("CHECK_PWD_ERROR", 0);
+            log.debug("\n==>原密码为空");
+            return "x_modify_password";
+        } else {
+            if (!entity.getNewPwd().equals(entity.getPwd2())) {
+                model.addAttribute("CHECK_PWD_ERROR", 2);
+                log.debug("\n==>新密码两次不一样");
+                return "x_modify_password";
+            }
+            EmployeeEntity employeeEntity = employeeService.getById(entity.getId());
+            if (!employeeEntity.getRolePassword().equals(entity.getOldPwd())) {
+                model.addAttribute("CHECK_PWD_ERROR", 1);
+                log.debug("\n==>原密码不正确");
+                return "x_modify_password";
+            } else {
+                employeeEntity.setRolePassword(entity.getNewPwd()).setVersion(employeeEntity.getVersion() + 1).setLastModifyTime(LocalDateTime.now());
+                boolean isUpdatePwd = employeeService.updateById(employeeEntity);
+                if (isUpdatePwd) {
+                    log.debug("\n==>修改成功！");
+                    return "redirect:/index/logout";
+                } else {
+                    throw new RRException("修改密码失败", 22405);
+                }
+            }
+        }
+    }
+
+
+    /**
+     * 菜单栏点击管理员类型跳转个人资料页面
+     * @return x_profile.html
+     */
+    @GetMapping("/x_profile.do")
+    public String profile(Long id, Model model) {
+        EmployeeEntity employeeServiceById = employeeService.getById(id);
+        model.addAttribute("userInfo", employeeServiceById);
+        return "x_profile";
+    }
+
+
+    /**
+     * 返回所有老师信息给suggest提供搜索建议
+     *
+     * @return 所有老师信息
+     */
+    @GetMapping("/toSearch.do")
+    @ResponseBody
+    public R toSearch() {
+        List<EmployeeEntity> allEmployeeList = employeeService.list();
+        log.debug("\n==>返回到前端的所有老师信息allEmployeeList==>{}", allEmployeeList);
+        return new R().put("value", allEmployeeList);
+    }
+
+
+
+    /**
+     * 获取所有员工信息并返回给前端
+     *
+     * @return R ->员工数据【json】
+     */
+    @PostMapping("/teacherList.do")
+    @ResponseBody
+    public R teacherList() {
+        List<EmployeeEntity> teachers = employeeService.list();
+        return new R().put("data", teachers);
+    }
+
 
     /**
      * 更新保存员工信息
@@ -183,26 +334,11 @@ public class EmployeeController {
     }
 
 
-    /**
-     * 跳转老师详情页
-     *
-     * @param id    老师id
-     * @param model 携带老师id
-     * @return x_teacher_list_data.html
-     */
-    @GetMapping("/x_teacher_list_data.do")
-    public String togoTeacherListData(@RequestParam("id") Long id, Model model) {
-        log.debug("\n==>前台传入的id：==>{}", id);
-        model.addAttribute("ID", id);
-
-        return "employee/x_teacher_list_data";
-    }
-
 
     /**
      * 返回老师详情信息
-     * @param id
-     * @return
+     * @param id 老师id
+     * @return r-> teacherInfo
      */
     @PostMapping("/teacherDetail.do")
     @ResponseBody
@@ -216,41 +352,72 @@ public class EmployeeController {
     /**
      * 封装老师管理中的上课记录信息
      * @param id 老师id
-     * @return
+     * @return r-> 上课记录
      */
     @PostMapping("/teacherClassRecord.do")
     @ResponseBody
     public R teacherClassRecord(@RequestParam("tid") Long id) {
-        log.debug("\n==>传入的teacherId==>{}", id);
+        log.debug("\n==>打印传入的teacherId==>{}", id);
 
         List<ScheduleRecordEntity> scheduleForTeacher = scheduleRecordService.list(new QueryWrapper<ScheduleRecordEntity>().eq("teacher_id", id));
-        log.debug("\n==>该老师的所有排课计划==>{}", scheduleForTeacher);
+        log.debug("\n==>打印该老师的所有排课计划==>{}", scheduleForTeacher);
         List<TeacherClassRecordVo> teacherClassRecordVos = scheduleForTeacher.stream().map(entity -> {
+            //获取当前排课记录的id
+            Long scheduleId = entity.getId();
+            //获取当前排课的课程id
             Long courseId = entity.getCourseId();
+            //根据课程id获取当前课程信息
             CourseEntity courseById = courseService.getById(courseId);
+            //从课程信息里获取课程名
             String courseName = courseById.getName();
+            //获取上课日期+时间
             LocalDateTime classTime = LocalDateTime.of(entity.getStartDate(), entity.getClassTime());
-            List<Long> cardIdList = courseCardService.list(new QueryWrapper<CourseCardEntity>().eq("course_id", courseId)).stream().map(CourseCardEntity::getCardId).collect(Collectors.toList());
-            Stream<String> cardNameList = memberCardService.listByIds(cardIdList).stream().map(MemberCardEntity::getName);
-            String[] cardName = cardNameList.toArray(String[]::new);
+            //获取课程单位消耗次数
             Integer timesCost = courseById.getTimesCost();
+            //在上课记录中查询所有上了当前课程的会员的id的list
+            List<Long> memberIdList = classRecordService.list(new QueryWrapper<ClassRecordEntity>().select("member_id").eq("schedule_id", scheduleId).eq("check_status", 1)).stream().map(ClassRecordEntity::getMemberId).collect(Collectors.toList());
 
-            TeacherClassRecordVo vo = new TeacherClassRecordVo().setCourseName(courseName).setClassTime(classTime).setCardName(Arrays.toString(cardName)).setTimesCost(timesCost);
-            return vo;
+            //初始化创建一个用于存放会员名的list，当会员id为空时
+            List<String> memberNames = new ArrayList<>();
+
+            //只有当查到的会员id不为空时，才进行查询
+            if (!memberIdList.isEmpty()) {
+                memberNames = memberService.list(new QueryWrapper<MemberEntity>().select("name").in("id", memberIdList)).stream().map(MemberEntity::getName).collect(Collectors.toList());
+            }
+            //创建一个存放会员名的builder
+            StringBuilder memberNameBuilder = new StringBuilder();
+            if (!memberNames.isEmpty()) {
+                memberNameBuilder.append("【");
+                //将所有会员名添加进去，补上','
+                memberNames.forEach(name -> memberNameBuilder.append(name).append(","));
+                //将最后一个','删掉
+                memberNameBuilder.deleteCharAt(memberNameBuilder.lastIndexOf(","));
+                memberNameBuilder.append("】");
+            } else {
+                memberNameBuilder.append("  --");
+            }
+
+            //赋值vo并收集成list
+            return new TeacherClassRecordVo()
+                    .setCourseName(courseName)
+                    .setClassTime(classTime)
+//                    .setCardName(Arrays.toString(cardName))
+                    .setCardName(memberNameBuilder.toString())
+                    .setTimesCost(timesCost);
         }).collect(Collectors.toList());
 
         log.debug("\n==>打印返回到前台的老师上课记录信息是：==>{}", teacherClassRecordVos);
 
-        return new R().put("data", teacherClassRecordVos);
+        return R.ok().put("data", teacherClassRecordVos);
     }
 
 
     /**
      * 头像更新
      * todo 回显。。
-     * @param id
-     * @param file
-     * @return
+     * @param id 要更新头像的老师的id
+     * @param file 要更新的头像图片文件
+     * @return r -> 更新结果
      */
     @PostMapping("/modifyUserImg.do")
     @ResponseBody
@@ -259,7 +426,6 @@ public class EmployeeController {
 
         if (!file.isEmpty()) {
             log.debug("\n==>文件上传...");
-//            String fileName = uploadImg(file);
             String fileName = UploadImg.uploadImg(file, UPLOAD_IMAGES_TEACHER_IMG);
             if (StringUtils.isNotBlank(fileName)) {
                 EmployeeEntity entity = new EmployeeEntity().setId(id).setAvatarUrl(fileName).setVersion(+1);
@@ -267,23 +433,14 @@ public class EmployeeController {
                 log.debug("\n==>更新头像是否成功==>{}", isUpdateAvatarUrl);
                 return  new R().put("data", entity);
             } else {
-                return R.error("文件上传失败");
+                return R.error("头像上传失败");
             }
 
         }
-        return R.error("文件未上传");
+        return R.error("头像未上传");
 
     }
 
-
-    /**
-     * 跳转添加老师页面
-     * @return x_teacher_add.html
-     */
-    @GetMapping("/x_teacher_add.do")
-    public String togoTeacherAdd(){
-        return "employee/x_teacher_add";
-    }
 
 
     /**
@@ -334,20 +491,6 @@ public class EmployeeController {
     }
 
 
-    /**
-     * 携带数据跳转老师更新页面
-     * @param id 老师id
-     * @return x_teacher_update.html（携带老师信息）
-     */
-    @GetMapping("/x_teacher_update")
-    public ModelAndView updateTeacher(@RequestParam("id") Long id) {
-        EmployeeEntity teacherById = employeeService.getById(id);
 
-        ModelAndView mv = new ModelAndView();
-        mv.addObject("teacherMsg",teacherById);
-        mv.setViewName("employee/x_teacher_update");
-
-        return mv;
-    }
 
 }

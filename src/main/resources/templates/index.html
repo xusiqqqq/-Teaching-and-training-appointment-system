@@ -35,7 +35,7 @@
                     <li class="nav-header">
                         <div class="dropdown profile-element">
                             <span>
-                            <img alt="image" width="80px" height="80px" name="avatarUrl" class="img-circle" src="../static/img/profile_small.jpg"  th:src="@{/static/img/{avatar}(avatar=${session.LOGIN_USER.avatarUrl})}"/>
+                            <img alt="image" width="80px" height="80px" name="avatarUrl" class="img-circle" src="../static/img/profile_small.jpg"  th:src="@{/images/teacher_img/{avatar}(avatar=${session.LOGIN_USER.avatarUrl})}"/>
                             </span>
                             <a data-toggle="dropdown" class="dropdown-toggle" href="#">
                                 <span class="clear">
@@ -46,7 +46,7 @@
                             <ul class="dropdown-menu animated fadeInRight m-t-xs">
                                 <li><a class="J_menuItem" href="x_modify_password.html" th:href="@{/user/x_modify_password.do}" target="_self">修改密码</a>
                                 </li>
-                                <li><a class="J_menuItem" href="x_profile.html" th:href="@{/user/x_profile.do}">个人资料</a>
+                                <li><a class="J_menuItem" href="x_profile.html" th:href="@{/user/x_profile.do?id={id}(id=${session.LOGIN_USER.id})}">个人资料</a>
                                 </li>
                                 <li class="divider"></li>
                                 <li><a href="x_login.html" th:href="@{/index/logout}">安全退出</a>
@@ -381,5 +381,16 @@
     <script type="text/javascript" src="../static/js/contabs.js" th:src="@{/static/js/contabs.js}"></script>
 
 </body>
+
+<script type="text/javascript">
+    $(function () {
+        $("body").bind("keydown", function (event) {
+            if (event.keyCode == 116) {
+                event.preventDefault(); //阻止默认刷新
+                $("#wrapper").attr("src", window.frames["wrapper"].src);
+            }
+        })
+    });
+</script>
 
 </html>

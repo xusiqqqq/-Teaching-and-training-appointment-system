@@ -10,13 +10,13 @@ import com.kclm.xsap.vo.indexStatistics.IndexPieChartVo;
 import com.kclm.xsap.vo.register.RegisterVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -35,22 +35,22 @@ import java.util.stream.Collectors;
 @Controller
 public class IndexController {
 
-    @Autowired
+    @Resource
     private MemberService memberService;
 
-    @Autowired
+    @Resource
     private ReservationRecordService reservationRecordService;
 
-    @Autowired
-    private ConsumeRecordService consumeRecordService;
+    @Resource(name = "rechargeRecordService")
+    private RechargeRecordService rechargeRecordService;
 
-    @Autowired
+    @Resource
     private MemberCardService memberCardService;
 
-    @Autowired
+    @Resource
     private MemberBindRecordService memberBindRecordService;
 
-    @Autowired
+    @Resource
     private EmployeeService employeeService;
 
     /**
@@ -71,7 +71,7 @@ public class IndexController {
     /**
      * 跳转 首页数据页
      *
-     * @return
+     * @return 跳转
      */
     @GetMapping("/index/x_index_home.do")
     public String x_index_home() {
@@ -80,9 +80,64 @@ public class IndexController {
 
 
     /**
+     * 用户注册
+     * @param registerVo 注册表单
+     * @param model 返回信息
+     * @return 前往登录page或者返回注册
+     */
+    @PostMapping("/index/register")
+    public String register(RegisterVo registerVo, Model model) {
+        log.debug("\n==>用户注册：打印前台传入的注册信息==>{}", registerVo);
+        if (StringUtils.isNotBlank(registerVo.getUserName()) && StringUtils.isNotBlank(registerVo.getPassword())) {
+            if (!registerVo.getPassword().equals(registerVo.getPwd2())) {
+                model.addAttribute("CHECK_TYPE_ERROR", 1);
+                return "x_register";
+            } else {
+                int isExistSameNameEmp = employeeService.count(new QueryWrapper<EmployeeEntity>().eq("name", registerVo.getUserName()));
+                if (isExistSameNameEmp > 0) {
+                    model.addAttribute("CHECK_TYPE_ERROR", 0);
+                    return "x_register";
+                } else {
+                    EmployeeEntity employeeEntity = new EmployeeEntity()
+                            .setName(registerVo.getUserName())
+                            .setRolePassword(registerVo.getPassword())
+                            .setCreateTime(LocalDateTime.now());
+                    boolean isRegister = employeeService.save(employeeEntity);
+                    log.debug("\n==>注册账户是否成功？==>{}", isRegister);
+                    if (isRegister) {
+                        return "redirect:/user/toLogin";
+                    } else {
+                        log.error("用户注册失败！");
+                        return "x_register";
+                    }
+                }
+            }
+        } else {
+            //改成validation //todo
+            log.debug("\n==>注册表单输入不正确！null");
+//            return null;
+            throw new RuntimeException("注册不正确");
+        }
+    }
+
+    /**
+     * 注销登录
+     *
+     * @param session 删除登录保存的session
+     * @return 登录页面
+     */
+    @GetMapping("/index/logout")
+    public String logout(HttpSession session) {
+        log.debug("\n==>用户点击销户退出...");
+        session.invalidate();
+//        return "redirect:/user/toLogin";
+        return "x_login";
+    }
+
+    /**
      * 当月新增与流失人数统计
      *
-     * @return 返回首页eCharts数据 折线图数据
+     * @return 返回首页eCharts数据 新增流失数据
      */
     @GetMapping("/index/homePageInfo/statisticsOfNewAndLostPeople.do")
     @ResponseBody
@@ -137,7 +192,7 @@ public class IndexController {
         }
 
         infoVo.setTitle("当月新增与流失人数统计")
-                .setXname("日")
+                .setXname("/日")
                 .setTime(xStrList)
                 .setData(yDataList)
                 .setData2(yDataList2);
@@ -163,37 +218,42 @@ public class IndexController {
         //创建返回vo的y轴list
         List<Integer> yDataList = new ArrayList<>();
 
-        //查询当月所有消费记录
-        List<ConsumeRecordEntity> allConsumeRecordInfoCurrent = consumeRecordService.list(new QueryWrapper<ConsumeRecordEntity>()
-                .select("money_cost", "create_time")
+        //查询当前月的所有充值记录【对商家来说即为收费记录】
+        List<RechargeRecordEntity> allChargeRecordListForCurrentMonth = rechargeRecordService.list(new QueryWrapper<RechargeRecordEntity>()
+                .select("received_money", "create_time")
                 .likeRight("create_time", LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM")))
                 .orderByDesc("create_time"));
 
-        if (allConsumeRecordInfoCurrent.isEmpty()) {
-            return R.error("本月还没有消费记录");
+        log.debug("\n==>打印查出来的当前月份的所有充值记录【收费记录】==>{}", allChargeRecordListForCurrentMonth);
+
+        if (allChargeRecordListForCurrentMonth.isEmpty()) {
+            return R.error("当前月份还没有收费记录");
         }
 
-        //创建一个 '日期' --> '当日消费金额' 的map
-        HashMap<Integer, Integer> currentAmountOfConsumptionMap = new HashMap<>();
+        //创建一个 '日期' --> '当日收费金额' 的map
+        HashMap<Integer, Integer> currentAmountOfChargeMap = new HashMap<>();
 
-        allConsumeRecordInfoCurrent.forEach(consume -> {
-            //取出每次消费的金额//todo double?
-            int moneyCost = consume.getMoneyCost().intValue();
+        allChargeRecordListForCurrentMonth.forEach(recharge -> {
+            //取出每次收费的金额//todo double?
+            int rechargeOfOnce = recharge.getReceivedMoney().intValue();
             //取出每次消费的日期的日
-            int dayOfMonth = consume.getCreateTime().getDayOfMonth();
+            int dayOfMonth = recharge.getCreateTime().getDayOfMonth();
 
-            currentAmountOfConsumptionMap.put(dayOfMonth, currentAmountOfConsumptionMap.getOrDefault(dayOfMonth, 0) + moneyCost);
+            currentAmountOfChargeMap.put(dayOfMonth, currentAmountOfChargeMap.getOrDefault(dayOfMonth, 0) + rechargeOfOnce);
         });
+
 
         //今天
         int today = LocalDate.now().getDayOfMonth();
-        for (int i = 1; i < today; i++) {
+        for (int i = 1; i <= today; i++) {
             xStrList.add(String.valueOf(i));
-            yDataList.add(currentAmountOfConsumptionMap.getOrDefault(i, 0));
+            yDataList.add(currentAmountOfChargeMap.getOrDefault(i, 0));
         }
 
+        log.debug("\n==>返回第二幅图echarts的x轴数据时==>{}\n ==>返回e第二幅图charts的y轴数据是==>{}", xStrList, yDataList);
+
         //给返回的vo赋值
-        infoVo.setTitle("当月每日消费统计")
+        infoVo.setTitle("当月每日收费统计")
                 .setXname("日")
                 .setTime(xStrList)
                 .setData(yDataList);
@@ -223,8 +283,7 @@ public class IndexController {
             log.debug("\n==>打印当前会员卡模板名字==>{},==>打印当前会员卡被持有的数量==>{}", cardEntity.getName(), countOfBingCard);
 
             //创建eCharts所需数据格式的vo并赋值     -->  { value: 28, name: 'spring' }
-            IndexPieChartVo vo = new IndexPieChartVo().setName(cardEntity.getName()).setValue(countOfBingCard);
-            return vo;
+            return new IndexPieChartVo().setName(cardEntity.getName()).setValue(countOfBingCard);
         }).collect(Collectors.toList());
         log.debug("\n打印返饼图数据");
         pieChartVos.forEach(System.out::println);
@@ -235,7 +294,7 @@ public class IndexController {
     /**
      * 获取首页数据
      *
-     * @return
+     * @return r -> 首页数据
      */
     @PostMapping("/index/homePageInfo.do")
     @ResponseBody
@@ -264,64 +323,9 @@ public class IndexController {
     }
 
 
-    /**
-     * 注销登录
-     *
-     * @param session
-     * @return
-     */
-    @GetMapping("/index/logout")
-    public String logout(HttpSession session) {
-        log.debug("\n==>用户点击销户退出...");
-        session.invalidate();
-//        return "redirect:/user/toLogin";
-        return "x_login";
-    }
-
 
     /**
-     * 用户注册
-     * @param registerVo 注册表单
-     * @param model 返回信息
-     * @return 前往登录page或者返回注册
-     */
-    @PostMapping("/index/register")
-    public String register(RegisterVo registerVo, Model model) {
-        log.debug("\n==>用户注册：打印前台传入的注册信息==>{}", registerVo);
-        if (StringUtils.isNotBlank(registerVo.getUserName()) && StringUtils.isNotBlank(registerVo.getPassword())) {
-            if (!registerVo.getPassword().equals(registerVo.getPwd2())) {
-                model.addAttribute("CHECK_TYPE_ERROR", 1);
-                return "x_register";
-            } else {
-                int isExistSameNameEmp = employeeService.count(new QueryWrapper<EmployeeEntity>().eq("name", registerVo.getUserName()));
-                if (isExistSameNameEmp > 0) {
-                    model.addAttribute("CHECK_TYPE_ERROR", 0);
-                    return "x_register";
-                } else {
-                    EmployeeEntity employeeEntity = new EmployeeEntity()
-                            .setName(registerVo.getUserName())
-                            .setRolePassword(registerVo.getPassword())
-                            .setCreateTime(LocalDateTime.now());
-                    boolean isRegister = employeeService.save(employeeEntity);
-                    log.debug("\n==>注册账户是否成功？==>{}", isRegister);
-                    if (isRegister) {
-                        return "redirect:/user/toLogin";
-                    } else {
-                        log.error("用户注册失败！");
-                        return "x_register";
-                    }
-                }
-            }
-        } else {
-            //改成validation //todo
-            log.debug("\n==>注册表单输入不正确！null");
-//            return null;
-            throw new RuntimeException("注册不正确");
-        }
-    }
-
-    /**
-     * @return
+     * @return ...
      */
     @PostMapping("/index/report.do")
     @ResponseBody

@@ -15,13 +15,17 @@ public class OtherController {
 
     /**
      * 跳转到微信设置页面
-     * @return
+     * @return x_wechat.html
      */
     @GetMapping("/wechat/x_wechat.do")
     public String togoWechat() {
         return "x_wechat";
     }
 
+    /**
+     * 跳转应用商店
+     * @return x_app_store.html
+     */
     @GetMapping("/app/x_app_store.do")
     public String togoAppStore() {
         return "x_app_store";

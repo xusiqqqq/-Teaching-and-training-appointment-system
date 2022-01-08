@@ -25,7 +25,7 @@
         <result property="lastModifyTime" column="last_modify_time"/>
         <result property="cardCountChange" column="card_count_change"/>
         <result property="timesRemainder" column="valid_count"/>
-        <result property="moneyCost" column="money_cost"/>
+        <result property="moneyCostBigD" column="money_cost"/>
         <result property="operateType" column="operate_type"/>
         <result property="operator" column="operator"/>
         <result property="note" column="note"/>

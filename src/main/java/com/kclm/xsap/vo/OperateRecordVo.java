@@ -1,5 +1,6 @@
 package com.kclm.xsap.vo;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -54,15 +55,19 @@ public class OperateRecordVo {
     /**
      * 消费金额
      */
+//    @JSONField(format = "¤00.00")
+//    @JsonFormat(pattern = "¤00.00")
     private BigDecimal moneyCost;
     /**
      * 充值金额
      */
+//    @JsonFormat(pattern = "¤00.00")
+//    @JSONField(format = "¤00.00")
     private BigDecimal receivedMoney;
     /**
      * 变化的金额
      */
-    private BigDecimal changeMoney;
+    private String changeMoney;
 
     /**
      * 操作人

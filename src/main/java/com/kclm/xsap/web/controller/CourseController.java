@@ -10,7 +10,6 @@ import com.kclm.xsap.vo.CourseLimitVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
@@ -18,6 +17,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDateTime;
@@ -42,27 +42,12 @@ public class CourseController {
 
     private static final String SQLSTATE_23000 = "23000";
 
-    @Autowired
+    @Resource
     private CourseService courseService;
 
 
-    @Autowired
+    @Resource
     private CourseCardService courseCardService;
-
-
-    /**
-     * 前端通过ajax请求所有课程列表
-     *
-     * @return 返回所有课程列表-json
-     */
-    @PostMapping("/courseList.do")
-    @ResponseBody
-    public List<CourseEntity> getAllCourse() {
-        List<CourseEntity> courseEntityList = courseService.list();
-        log.debug("\n 返回所有课程列表courseEntityList==>>{}", courseEntityList);
-
-        return courseEntityList;
-    }
 
     /**
      * 跳转课程添加页面
@@ -75,7 +60,6 @@ public class CourseController {
         return "course/x_course_list_add";
     }
 
-
     /**
      * 跳转课程列表页面
      *
@@ -85,6 +69,7 @@ public class CourseController {
     public String courseList() {
         return "course/x_course_list";
     }
+
 
     /**
      * 跳转某课程编辑页面
@@ -112,6 +97,20 @@ public class CourseController {
         ModelAndView mv = new ModelAndView("course/x_course_list_edit", map);
         log.debug("\n==>跳转课程编辑页面==>x_course_list_edit.html");
         return mv;
+    }
+
+    /**
+     * 前端通过ajax请求所有课程列表
+     *
+     * @return 返回所有课程列表-json
+     */
+    @PostMapping("/courseList.do")
+    @ResponseBody
+    public List<CourseEntity> getAllCourse() {
+        List<CourseEntity> courseEntityList = courseService.list();
+        log.debug("\n 返回所有课程列表courseEntityList==>>{}", courseEntityList);
+
+        return courseEntityList;
     }
 
 

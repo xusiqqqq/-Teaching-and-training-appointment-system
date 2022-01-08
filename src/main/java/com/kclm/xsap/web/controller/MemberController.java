@@ -2,16 +2,16 @@ package com.kclm.xsap.web.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.kclm.xsap.consts.KeyNameOfCache;
 import com.kclm.xsap.entity.*;
 import com.kclm.xsap.service.*;
 import com.kclm.xsap.utils.R;
 import com.kclm.xsap.utils.exception.RRException;
 import com.kclm.xsap.utils.file.UploadImg;
 import com.kclm.xsap.vo.*;
+import com.kclm.xsap.web.cache.MapCacheService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.validator.cfg.defs.LengthDef;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -42,26 +44,24 @@ public class MemberController {
     private static final String UPLOAD_IMAGES_MEMBER_IMG = "upload/images/member_img/";
 
 
-    @Autowired
+    @Resource
     private MemberService memberService;
 
-    @Autowired
+    @Resource
     private MemberBindRecordService memberBindRecordService;
 
-    @Autowired
-    private MemberCardService memberCardService;
-
-    @Autowired
+    @Resource
     private ReservationRecordService reservationRecordService;
 
-    @Autowired
+    @Resource
     private ClassRecordService classRecordService;
 
-    @Autowired
+    @Resource
     private ConsumeRecordService consumeRecordService;
 
-    @Autowired
-    private RechargeRecordService rechargeRecordService;
+    @Resource
+    private MapCacheService mapCacheService;
+
 
     /**
      * 跳转会员列表页面
@@ -74,6 +74,41 @@ public class MemberController {
     }
 
     /**
+     * 跳转会员批量导入page
+     * @return x_member_import.html
+     */
+    @GetMapping("/x_member_import.do")
+    public String memberBatchImport() {
+        return "member/x_member_import";
+    }
+
+    /**
+     * 跳转添加会员页面
+     *
+     * @return 添加会员页面
+     */
+    @GetMapping("/x_member_add.do")
+    public String memberAdd() {
+        return "member/x_member_add";
+    }
+
+    /**
+     * todo 会员详情页没有做完
+     * 使用mva跳转查看详情
+     *
+     * @param id 要查看的id
+     * @return 详情页面
+     */
+    @GetMapping("/x_member_list_details.do")
+    public ModelAndView memberListDetails(@RequestParam("id") Integer id) {
+        log.debug("id:{}", id);
+        ModelAndView mv = new ModelAndView();
+        mv.addObject("ID", id);
+        mv.setViewName("member/x_member_list_details");
+        return mv;
+    }
+
+    /**
      * 返回会员列表数据
      *
      * @return data
@@ -82,7 +117,8 @@ public class MemberController {
     @ResponseBody
     public List<MemberVo> memberList() {
         //is_deleted会自动加上
-        List<MemberEntity> memberEntityList = memberService.list();
+        List<MemberEntity> memberEntityList = memberService.list(new QueryWrapper<MemberEntity>().orderByDesc("create_time"));
+        log.debug("\n==>打印数据库查出来的所有的会员信息==>{}", memberEntityList);
         //todo 重写这个方法
 
 
@@ -97,7 +133,9 @@ public class MemberController {
                     .setId(memberEntity.getId())
                     .setMemberName(memberEntity.getName() + "(" + memberEntity.getPhone() + ")")
                     .setGender(memberEntity.getSex())
-                    .setCardHold(cardName);
+                    .setCardHold(cardName)
+                    .setJoiningDate(memberEntity.getCreateTime().toLocalDate())
+                    .setNote(memberEntity.getNote());
             log.debug("每一次的memberVo{}", memberVo);
             return memberVo;
         }).collect(Collectors.toList());
@@ -173,26 +211,10 @@ public class MemberController {
     }
 
 
-    /**
-     * todo 会员详情页没有做完
-     * 使用mva跳转查看详情
-     *
-     * @param id 要查看的id
-     * @return 详情页面
-     */
-    @GetMapping("/x_member_list_details.do")
-    public ModelAndView memberListDetails(@RequestParam("id") Integer id) {
-        log.debug("id:{}", id);
-        ModelAndView mv = new ModelAndView();
-        mv.addObject("ID", id);
-        mv.setViewName("member/x_member_list_details");
-        return mv;
-    }
-
 
     /**
      * 删除选中会员（逻辑删除）
-     *
+     * todo ：修改！！！！修改激活
      * @param id 要删除的会员id
      */
     @PostMapping("/deleteOne.do")
@@ -202,6 +224,11 @@ public class MemberController {
         boolean isDeleteMember = memberService.update(new UpdateWrapper<MemberEntity>().set("is_deleted", 1).set("last_modify_time", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)).setSql("version = version + 1").eq("id", id));
         log.debug("\n==>注销会员是否成功==>{}", isDeleteMember);
         if (isDeleteMember) {
+
+            //充值后删除缓存中原数据
+            mapCacheService.getCacheInfo().remove(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO);
+            log.debug("\n==>充值后删除map缓存中原数据");
+
             log.debug("\n==>注销会员id={}成功！！",id);
 
             //找出该会员持有的所有会员卡
@@ -211,6 +238,7 @@ public class MemberController {
                 if (i < 0) {
                     log.debug("\n==>更新该会员持有的会员卡为非激活是否成功==>{}", i);
                 } else {
+                    //回滚
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 }
             });
@@ -221,16 +249,6 @@ public class MemberController {
         }
     }
 
-
-    /**
-     * 跳转添加会员页面
-     *
-     * @return 添加会员页面
-     */
-    @GetMapping("/x_member_add.do")
-    public String memberAdd() {
-        return "member/x_member_add";
-    }
 
 
     /**
@@ -324,8 +342,8 @@ public class MemberController {
     /**
      * 会员详情页的会员详情的预加载
      *
-     * @param id
-     * @return
+     * @param id 会员id
+     * @return r -> 会员详情信息
      */
     @PostMapping("/memberDetail.do")
     @ResponseBody
@@ -341,7 +359,6 @@ public class MemberController {
      * 绑定记录才是真正的会员卡
      * @param id 前台传入的会员id
      * @return r -> 该会员的所有会员卡list
-     * todo 到期时间！ // 不用管
      */
     @PostMapping("/cardInfo.do")
     @ResponseBody
@@ -419,6 +436,10 @@ public class MemberController {
         List<ConsumeInfoVo> consumeInfoVoList = consumeRecordService.getConsumeInfo(id);
         for (ConsumeInfoVo vo : consumeInfoVoList) {
             vo.setOperateTime(vo.getLastModifyTime() == null ? vo.getCreateTime() : vo.getLastModifyTime());
+
+            DecimalFormat format = new DecimalFormat("¤00.00");
+            vo.setMoneyCost(format.format(vo.getMoneyCostBigD().negate()));
+
         }
 
         log.debug("\n==>后台封装的会员详情页的【消费记录】信息的vo-list==>{}", consumeInfoVoList);

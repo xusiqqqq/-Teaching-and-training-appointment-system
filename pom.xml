@@ -14,6 +14,8 @@
     <name>xsap</name>
     <description>X+ Student Appointment Platform</description>
 
+<!--    <packaging>war</packaging>-->
+
     <properties>
         <java.version>11</java.version>
         <mybatisplus.version>3.3.2</mybatisplus.version>
@@ -83,7 +85,6 @@
         </dependency>
 
 
-
         <!--Dev-->
         <!--<dependency>
             <groupId>org.springframework.boot</groupId>
@@ -91,11 +92,11 @@
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>-->
-       <!-- <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid-spring-boot-starter</artifactId>
-            <version>${druid.version}</version>
-        </dependency>-->
+        <!-- <dependency>
+             <groupId>com.alibaba</groupId>
+             <artifactId>druid-spring-boot-starter</artifactId>
+             <version>${druid.version}</version>
+         </dependency>-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
@@ -120,16 +121,16 @@
         </dependency>
 
         <dependency>
-        	<groupId>org.projectlombok</groupId>
-        	<artifactId>lombok</artifactId>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
-        
+
         <!-- javaMail依赖 -->
-		<dependency>
-		    <groupId>javax.mail</groupId>
-		    <artifactId>mail</artifactId>
-		    <version>1.4.7</version>
-		</dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.7</version>
+        </dependency>
 
         <!-- 用来在DO和DTO之间进行类型转换的组件 -->
         <dependency>
@@ -138,17 +139,17 @@
             <version>${mapstruct.version}</version>
         </dependency>
         <!-- 用来在DO和DTO之间进行类型转换的组件 -->
-         <dependency>
+        <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>
             <version>${mapstruct.version}</version>
         </dependency>
 
-         <dependency>
-         	<groupId>com.alibaba</groupId>
-         	<artifactId>fastjson</artifactId>
-         	<version>${fastjson.version}</version>
-         </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
+        </dependency>
 
         <!--###################以下为新增引入的###################-->
 
@@ -169,7 +170,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
-
 
 
     </dependencies>

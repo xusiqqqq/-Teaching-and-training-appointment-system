@@ -50,11 +50,11 @@
                                type="file"/>
                         <div style="float: left; padding-left: 15px">
                             <label>
-                                <h2><strong>测试宝宝</strong></h2>
-                                <p><span style="margin-right: 15px;">性别:</span>男</p>
-                                <p><span style="margin-right: 5px;">手机号:</span>18549959978</p>
-                                <p><span style="margin-right: 5px;">出生日期:</span>2000-10-1</p>
-                                <p><span style="margin-right: 5px;">备注:</span>xxxxxxx</p>
+                                <h2><strong>原始数据</strong></h2>
+                                <p><span style="margin-right: 15px;">性别:</span>原始数据</p>
+                                <p><span style="margin-right: 5px;">手机号:</span>原始数据</p>
+                                <p><span style="margin-right: 5px;">出生日期:</span>原始数据</p>
+                                <p><span style="margin-right: 5px;">备注:</span>'原始数据'</p>
                             </label>
                         </div>
                     </div>
@@ -430,7 +430,7 @@
                         <!-- 隐藏域，会员id，卡id 扣除次数-->
                         <div class="form-group">
                             <input id="consume_memberId" name="memberId" type="hidden"/>
-                            <input id="consume_cardId" name="cardId" type="hidden"/>
+                            <input id="consume_cardId" name="cardBindId" type="hidden"/>
 
                             <label class="col-sm-2 control-label">
                                 扣除次数</label>
@@ -440,11 +440,19 @@
                             </div>
                         </div>
                         <!--扣除有效期-->
-                        <div class="form-group">
+                        <!--<div class="form-group">
                             <label class="col-sm-2 control-label">
                                 扣除有效期</label>
                             <div class="col-sm-8">
                                 <input class="form-control" min=0 name="cardDayChange" placeholder="必须大于0"
+                                       type="number">
+                            </div>
+                        </div>-->
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">
+                                消费金额</label>
+                            <div class="col-sm-8">
+                                <input class="form-control" min=0 name="amountOfConsumption" placeholder="必须大于0"
                                        type="number">
                             </div>
                         </div>
@@ -829,6 +837,8 @@
                             statusVal = 1;
                         }
 
+                        // var operator = [[${session.LOGIN_USER.name}]]
+                        // console.log('operator' + operator)
 
                         //发送AJAX请求到服务端
                         $.ajax({
@@ -838,22 +848,32 @@
                             data: {memberId: [[${ID}]], bindId: cardInfo[index].bindId, status: statusVal},
                             // data: {memberId: [[${ID}]], cardId: cardInfo[index].id, status:statusVal},
                             success: function (data) {
-                                var result = data.data;
+                                var activeStatus = data.data;
+                                console.log('修改status=>' + activeStatus)
                                 //1. 更新 状态列的 文字信息, 这个 data 是由服务端传递回来的，如果改为 true, 则 data为 激活，否则为 停用
-                                $(html).parent("td").prev().text(result.type);
-                                if (result.type === "未激活") {
-                                    // $(html).parent("td").prev().text(result.type);
-                                    // if(result.type === "未激活"){
+                                // $(html).parent("td").prev().text(result.type);
+                                // if (result.type === "未激活") {
+                                if (activeStatus === 0) {
+                                    $(html).parent("td").prev().text("未激活");
                                     /*未激活时充值和扣费无法点击*/
-                                    $("button[name='recharge'][value='" + cardInfo[index].bindCardId + "']")
+                                    $("#recharge_btn_of_operation")
+                                        .removeClass("btn-primary").addClass("btn-default").attr("disabled", true);
+                                    $("#consume_btn_of_operation")
+                                        .removeClass("btn-info").addClass("btn-default").attr("disabled", true);
+                                    /*$("button[name='recharge'][value='" + cardInfo[index].bindCardId + "']")
                                         .removeClass("btn-primary").addClass("btn-default").attr("disabled", true);
                                     $("button[name='consume'][value='" + cardInfo[index].bindCardId + "']")
-                                        .removeClass("btn-info").addClass("btn-default").attr("disabled", true);
+                                        .removeClass("btn-info").addClass("btn-default").attr("disabled", true);*/
                                 } else {
-                                    $("button[name='recharge'][value='" + cardInfo[index].bindCardId + "']")
+                                    $(html).parent("td").prev().text("激活");
+                                    $("#recharge_btn_of_operation")
+                                        .removeClass("btn-default").addClass("btn-primary").attr("disabled", false);
+                                    $("#consume_btn_of_operation")
+                                        .removeClass("btn-default").addClass("btn-info").attr("disabled", false);
+                                    /*$("button[name='recharge'][value='" + cardInfo[index].bindCardId + "']")
                                         .removeClass("btn-default").addClass("btn-primary").attr("disabled", false);
                                     $("button[name='consume'][value='" + cardInfo[index].bindCardId + "']")
-                                        .removeClass("btn-default").addClass("btn-info").attr("disabled", false);
+                                        .removeClass("btn-default").addClass("btn-info").attr("disabled", false);*/
                                 }
                             },
                             error: function (jqXHR) {
@@ -869,8 +889,6 @@
                 //注： 后面开发时，url的位置写 服务端控制器的 mapping值,服务端返回的将是json数据
                 "data": cardInfo,
                 "fnCreatedRow": function (nRow, aData, iDataIndex) {
-                    // Bold the grade for all 'A' grade browsers
-                    // put the data-index attr into nRow
                     $(nRow).attr("data-index", iDataIndex);
                 },
                 //行的定义
@@ -910,9 +928,10 @@
                         "render": function (data, type, row) {
                             // var id =  row.bindCardId ;//
                             var id = row.bindId;//
+                            // var operator = ${session.LOGIN_USER.name}
 
-                            var html = "<button name='recharge' value='" + id + "' onclick='toRecharge(" + [[${ID}]] + "," + id + ")' class='btn btn-primary btn-xs' data-toggle='modal' data-target='#details_recharge'>充值<i class='fa fa-re'></i></button>&nbsp &nbsp"
-                            html += "<button name='consume' value='" + id + "' onclick='toConsume(" + [[${ID}]] + "," + id + ")' class='btn btn-info btn-xs' data-toggle='modal' data-target='#details_deduction'> 扣费</button>&nbsp &nbsp"
+                            var html = "<button name='recharge' value='" + id + "' onclick='toRecharge(" + [[${ID}]] + "," + id + ")' id='recharge_btn_of_operation' class='btn btn-primary btn-xs' data-toggle='modal' data-target='#details_recharge'>充值<i class='fa fa-re'></i></button>&nbsp &nbsp"
+                            html += "<button name='consume' value='" + id + "' onclick='toConsume(" + [[${ID}]] + "," + id + ")' id='consume_btn_of_operation' class='btn btn-info btn-xs' data-toggle='modal' data-target='#details_deduction'> 扣费</button>&nbsp &nbsp"
                             html += "<a href='#?id=" + id + "' onclick='operateShow(" + [[${ID}]] + "," + id + ")' class='delete btn btn-danger btn-xs' data-toggle='modal' data-target='#details_operating'> 操作记录</i></a>"
                             return html;
                         }
@@ -1154,7 +1173,7 @@
                         "render": function (data, type, row) {
                             var status = data;
                             if (status === 0) {
-                                status = "未激活";
+                                status = "停用";
                             } else {
                                 status = "已激活";
                             }
@@ -1164,10 +1183,12 @@
                     }
                 ],
                 //去掉搜索
-                searching: false,
+                searching: true,
                 lengthChange: false,
-                paging: false,
+                paging: true,
+                'iDisplayLength':5,
                 destroy: true,
+                // "PaginationType" : "full_numbers",
 
                 language: {
                     "decimal": "",//小数的小数位符号  比如“，”作为数字的小数位符号

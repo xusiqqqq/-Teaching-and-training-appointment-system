@@ -6,7 +6,6 @@ import com.kclm.xsap.entity.*;
 import com.kclm.xsap.service.*;
 import com.kclm.xsap.utils.R;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -32,34 +32,33 @@ import java.time.temporal.ChronoUnit;
 @RequestMapping("/reserve")
 @Slf4j
 public class ReservationRecordController {
-    @Autowired
+    @Resource
     private ReservationRecordService reservationRecordService;
 
-    @Autowired
+    @Resource
     private GlobalReservationSetService globalReservationSetService;
 
-    @Autowired
+    @Resource
     private ScheduleRecordService scheduleRecordService;
 
-    @Autowired
+    @Resource
     private MemberService memberService;
 
-    @Autowired
+    @Resource
     private CourseService courseService;
 
-    @Autowired
+    @Resource
     private ClassRecordService classRecordService;
 
 
     /**
      * 预约数据批量导出
-     *
+     * todo:...
      * @return 导出
      */
     @PostMapping("/exportReserveList.do")
     @ResponseBody
     public R exportReserveList() {
-
         return null;
     }
 
@@ -219,11 +218,11 @@ public class ReservationRecordController {
         //查看是否已经预约过
         ReservationRecordEntity existOne = reservationRecordService.getOne(new QueryWrapper<ReservationRecordEntity>()
                 .eq("member_id", entity.getMemberId())
-                .eq("card_name", entity.getCardName())
+                //.eq("card_name", entity.getCardName())    //只要是同一个会员同一节课就应该不可预约了，不需要判断是否同一张卡！
                 .eq("schedule_id", entity.getScheduleId()));
         log.debug("\n==>根据表单提交信息查看是否已经预约过");
         if (null != existOne && null != existOne.getId()) {
-            log.debug("\n==>该会员已经使用这张会员卡预约过这节课");
+            log.debug("\n==>该会员已经预约过这节课");
             //判断预约是否有效
             if (existOne.getStatus() == 1) {
                 return R.error("您已预约过本节课程");
@@ -480,9 +479,10 @@ public class ReservationRecordController {
     /**
      * 用于获取预约id  【上课确认扣费--鼠标离开按钮事件】
      *
-     * @param memberId
-     * @param scheduleId
-     * @return
+     * @param memberId 会员id
+     * @param scheduleId 排课记录id
+     * @return r -> 返回预约id
+     * todo： 没用上
      */
     @PostMapping("/getReserveId.do")
     @ResponseBody

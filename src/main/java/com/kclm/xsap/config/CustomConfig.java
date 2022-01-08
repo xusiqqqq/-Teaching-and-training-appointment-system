@@ -1,27 +1,35 @@
 package com.kclm.xsap.config;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 @Component
 @PropertySource("classpath:xsap-config.properties")
-@ConfigurationProperties(prefix = "page.reservation")
-public class XsapConfig {
+public class CustomConfig {
 
+	@Value("${reservation.gap_minute}")
 	private Long gap_minute;
 
-	public XsapConfig() {
+	@Value("${custom.cache_time}")
+	private Long cache_time;
+
+	public CustomConfig() {
 		super();
-		System.out.println("分钟--------------");
 	}
 
 	public Long getGap_minute() {
 		return gap_minute;
 	}
+	public Long getCache_time() {
+		return cache_time;
+	}
 
 	public void setGap_minute(Long gap_minute) {
 		this.gap_minute = gap_minute;
+	}
+
+	public void setCache_time(Long cache_time) {
+		this.cache_time = cache_time;
 	}
 }

@@ -2,14 +2,17 @@ package com.kclm.xsap.web.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.kclm.xsap.config.CustomConfig;
+import com.kclm.xsap.consts.KeyNameOfCache;
 import com.kclm.xsap.consts.OperateType;
 import com.kclm.xsap.entity.*;
 import com.kclm.xsap.service.*;
+import com.kclm.xsap.utils.ExpiryMap;
 import com.kclm.xsap.utils.R;
 import com.kclm.xsap.vo.*;
+import com.kclm.xsap.web.cache.MapCacheService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -18,6 +21,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDate;
@@ -46,35 +50,41 @@ public class ScheduleRecordController {
     private static final String SQLSTATE_23000 = "23000";
 
 
-    @Autowired
+    @Resource
     private ScheduleRecordService scheduleRecordService;
 
-    @Autowired
+    @Resource
     private CourseService courseService;
 
-    @Autowired
+    @Resource
     private EmployeeService employeeService;
 
-    @Autowired
+    @Resource
     private CourseCardService courseCardService;
 
-    @Autowired
+    @Resource
     private MemberCardService memberCardService;
 
-    @Autowired
+    @Resource
     private ReservationRecordService reservationRecordService;
 
-    @Autowired
+    @Resource
     private ClassRecordService classRecordService;
 
-    @Autowired
+    @Resource
     private ConsumeRecordService consumeRecordService;
 
-    @Autowired
+    @Resource
     private MemberBindRecordService memberBindRecordService;
 
-    @Autowired
+    @Resource
     private MemberLogService memberLogService;
+
+    @Resource
+    private MapCacheService mapCacheService;
+
+    @Resource
+    private CustomConfig customConfig;
 
 
     /**
@@ -86,39 +96,6 @@ public class ScheduleRecordController {
     public String courseSchedule() {
         log.debug("\n==>跳转到排课课程表==>");
         return "course/x_course_schedule";
-    }
-
-
-    /**
-     * 查询所有排课记录信息并封装成CourseScheduleVo【前端需要的json格式用于日程显示】
-     * 优化：在stream中做查询显然极不合理，考虑在bean中封装需要查询的属性，做冗余保存
-     *
-     * @return vo数据
-     */
-    //todo 重写方法 用R统一返回
-    @PostMapping("/scheduleList.do")
-    @ResponseBody
-    public List<CourseScheduleVo> scheduleList() {
-        //todo 要不要做个map缓存？
-        List<ScheduleRecordEntity> scheduleRecordEntityList = scheduleRecordService.list();
-        log.debug("\n==>查出的所有的排课记录==>{}", scheduleRecordEntityList);
-
-        List<CourseScheduleVo> courseScheduleVoList = scheduleRecordEntityList.stream().map(entity -> {
-            CourseEntity courseById = courseService.getById(entity.getCourseId());
-            log.debug("\n==>stream中由当前课程记录对应的课程的详细数据==>{}", courseById);
-
-            LocalDateTime startTime = LocalDateTime.of(entity.getStartDate(), entity.getClassTime());
-
-            return new CourseScheduleVo()
-                    .setTitle(courseById.getName() + "【" + employeeService.getById(entity.getTeacherId()).getName() + "】")
-                    .setStart(startTime)
-                    .setEnd(startTime.plusMinutes(courseById.getDuration()))
-                    .setColor(courseById.getColor())
-                    .setUrl("x_course_schedule_detail.do?id=" + entity.getId());
-        }).collect(Collectors.toList());
-
-        log.debug("\n==>后台根据排课记录封装的用于前端日程展示的list：courseScheduleVoList==>{}", courseScheduleVoList);
-        return courseScheduleVoList;
     }
 
 
@@ -137,6 +114,61 @@ public class ScheduleRecordController {
         return "course/x_course_schedule_detail";
     }
 
+    /**
+     * 查询所有排课记录信息并封装成CourseScheduleVo【前端需要的json格式用于日程显示】
+     * 优化：在stream中做查询显然极不合理，考虑在bean中封装需要查询的属性，做冗余保存
+     *
+     * @return vo数据
+     */
+    @PostMapping("/scheduleList.do")
+    @ResponseBody
+    public List<CourseScheduleVo> scheduleList() {
+        //todo 要不要做个map缓存？
+
+        //本地缓存
+        ExpiryMap<KeyNameOfCache, Object> CACHE_SCHEDULE_LIST_INFO_MAP = mapCacheService.getCacheInfo();
+
+        Object cacheValueOfMapForSchedule = CACHE_SCHEDULE_LIST_INFO_MAP.get(KeyNameOfCache.CACHE_SCHEDULE_INFO);
+        //todo
+        List<CourseScheduleVo> cacheOfSchedule = null;
+        if (cacheValueOfMapForSchedule instanceof List) {
+            log.debug("类型匹配，强制转化");
+            cacheOfSchedule = (List<CourseScheduleVo>) cacheValueOfMapForSchedule;
+        }
+        if (null != cacheOfSchedule) {
+            log.debug("直接返回了缓存中的数据");
+            return  cacheOfSchedule;
+        }
+
+        List<ScheduleRecordEntity> scheduleRecordEntityList = scheduleRecordService.list();
+        log.debug("\n==>查出的所有的排课记录==>{}", scheduleRecordEntityList);
+
+        List<CourseScheduleVo> courseScheduleVoList = scheduleRecordEntityList.stream().map(entity -> {
+            CourseEntity courseById = courseService.getById(entity.getCourseId());
+            log.debug("\n==>stream中由当前课程记录对应的课程的详细数据==>{}", courseById);
+
+            LocalDateTime startTime = LocalDateTime.of(entity.getStartDate(), entity.getClassTime());
+
+            return new CourseScheduleVo()
+                    .setTitle(courseById.getName() + "【" + employeeService.getById(entity.getTeacherId()).getName() + "】")
+                    .setStart(startTime)
+                    .setEnd(startTime.plusMinutes(courseById.getDuration()))
+                    .setColor(courseById.getColor())
+                    .setUrl("x_course_schedule_detail.do?id=" + entity.getId());
+        }).collect(Collectors.toList());
+
+        log.debug("\n==>后台根据排课记录封装的用于前端日程展示的list：courseScheduleVoList==>{}", courseScheduleVoList);
+
+        //获取配置文件中设置的缓存时间
+        Long cache_time = customConfig.getCache_time();
+
+        //添加本地缓存
+        CACHE_SCHEDULE_LIST_INFO_MAP.put(KeyNameOfCache.CACHE_SCHEDULE_INFO, courseScheduleVoList, cache_time);
+        //return R.ok().put("data", courseScheduleVoList);
+        return courseScheduleVoList;
+    }
+
+
 
     /**
      * 保存前端提交的新增排课信息
@@ -147,10 +179,22 @@ public class ScheduleRecordController {
      */
     @PostMapping("/scheduleAdd.do")
     @ResponseBody
-    public R scheduleAdd(ScheduleRecordEntity entity) {
-        if (null != entity.getCourseId() && null != entity.getTeacherId()) {
+    public R scheduleAdd(@Valid ScheduleRecordEntity entity,BindingResult bindingResult) {
+        log.debug("\n==>前端表单提交的排课信息entity==>{}", entity);
+
+        if (bindingResult.hasErrors()) {
+            HashMap<String, String> map = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(item -> {
+                String message = item.getDefaultMessage();
+                String field = item.getField();
+                map.put(field, message);
+            });
+            log.debug("\n==>errorMap==>{}", map);
+            return R.error(400, "非法参数").put("errorMap", map);
+        }
+
+        if (null != entity.getCourseId() && null != entity.getTeacherId() && null != entity.getStartDate()) {
             entity.setCreateTime(LocalDateTime.now());
-            log.debug("\n==>前端表单提交的排课信息entity==>{}", entity);
 
             //判断冲突
             //获取前端提交的课程开始日期
@@ -167,12 +211,16 @@ public class ScheduleRecordController {
             List<ScheduleRecordEntity> sameDateScheduleList = scheduleRecordService.getSameDateSchedule(startDate);
             if (!sameDateScheduleList.isEmpty()) {
                 log.debug("\n==>打印当天的所有课程【此日志用于排查排课时间冲突】==>{}", sameDateScheduleList);
+
+                //获取配置文件中设置的添加排课的间隙时间
+                Long gap_minute = customConfig.getGap_minute();
+
                 //查询新增课程开始时间
                 for (ScheduleRecordEntity sameDateSchedule : sameDateScheduleList) {
                     LocalTime sameDateClassStartTime = sameDateSchedule.getClassTime();
                     LocalTime sameDateClassEndTime = sameDateClassStartTime.plusMinutes(sameDateSchedule.getCourseEntity().getDuration());
-                    //加上10分钟：表示可以在10下课十分钟之后继续添加课程
-                    if ((startTime.isAfter(sameDateClassStartTime) && startTime.isBefore(sameDateClassEndTime.plusMinutes(10))) || (endTime.isAfter(sameDateClassStartTime) && endTime.isBefore(sameDateClassEndTime.plusMinutes(10)))) {
+                    //加上10分钟：表示可以在下课之后至少经过gap_minute才能继续添加课程
+                    if ((startTime.isAfter(sameDateClassStartTime) && startTime.isBefore(sameDateClassEndTime.plusMinutes(gap_minute))) || (endTime.isAfter(sameDateClassStartTime) && endTime.isBefore(sameDateClassEndTime.plusMinutes(gap_minute)))) {
                         log.debug("\n==>添加课程->添加时间冲突【我们默认设置下课十分钟后可以继续添加新的课程】");
                         return R.error("排课时间冲突");
                     }
@@ -181,6 +229,11 @@ public class ScheduleRecordController {
 
             boolean isSaveSchedule = scheduleRecordService.save(entity);
             log.debug("\n==>保存排课信息是否成功isSaveSchedule:==>{}", isSaveSchedule);
+
+            //添加排课信息之前删除缓存中的排课信息
+            mapCacheService.getCacheInfo().remove(KeyNameOfCache.CACHE_SCHEDULE_INFO);
+            log.debug("添加排课信息之前删除缓存中的排课信息");
+
             return R.ok("排课信息提交成功");
         } else {
             return R.error("请正确输入排课信息");
@@ -231,6 +284,10 @@ public class ScheduleRecordController {
                 }
         ).collect(Collectors.toList());
         scheduleRecordService.saveBatch(newTargetRecordList);
+
+        //添加排课信息之前删除缓存中的排课信息
+        mapCacheService.getCacheInfo().remove(KeyNameOfCache.CACHE_SCHEDULE_INFO);
+        log.debug("添加排课信息之前删除缓存中的排课信息");
 
         return R.ok("复制成功！");
 
@@ -401,9 +458,16 @@ public class ScheduleRecordController {
                 if (SQLSTATE_23000.equals(sqlState)) {
                     return R.error("删除失败!此课程已经生成了预约、上课、排课等记录，不可被删除！");
                 }
+            } else {
+                e.printStackTrace();
             }
         }
         if (isRemoveSchedule) {
+
+            //添加排课信息之前删除缓存中的排课信息
+            mapCacheService.getCacheInfo().remove(KeyNameOfCache.CACHE_SCHEDULE_INFO);
+            log.debug("添加排课信息之前删除缓存中的排课信息");
+
             return R.ok("删除成功！即将跳转..");
         } else {
             return R.error("删除失败！");
@@ -432,6 +496,13 @@ public class ScheduleRecordController {
             return R.error("还没有人预约这节课哦！");
         }
 
+        //当所有会员都已经确认上课时，一键确认无效
+        List<Integer> checkStatusList = classRecordService.list(new QueryWrapper<ClassRecordEntity>().select("check_status").eq("schedule_id", scheduleId)).stream().map(ClassRecordEntity::getCheckStatus).distinct().collect(Collectors.toList());
+        if (checkStatusList.size() == 1 && checkStatusList.get(0) == 1) {
+            log.debug("\n==>没有需要确认的会员");
+            return R.error("所有会员均已确认");
+        }
+
         //这节课的排课记录信息
         ScheduleRecordEntity scheduleById = scheduleRecordService.getById(scheduleId);
 
@@ -452,15 +523,12 @@ public class ScheduleRecordController {
         Integer timesCost = courseById.getTimesCost();
         log.debug("\n==>打印这节课的消耗次数==>{}", timesCost);
 
+        //删除会员卡统计缓存
+        mapCacheService.getCacheInfo().remove(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO);
+        log.debug("\n==>一键扣费后删除map中的会员卡信息缓存");
+
 
         for (ReservationRecordEntity entity : reservationListByScheduleId) {
-            /*//获取当前会员id
-            Long memberId = entity.getMemberId();
-            //获取当前会员使用的会员卡
-            Long cardId = entity.getCardId();
-            //获取会员卡实体的id
-            MemberBindRecordEntity currentCardBindRecord = memberBindRecordService.getOne(new QueryWrapper<MemberBindRecordEntity>().eq("member_id", memberId).eq("card_id", cardId));
-            Long bindId = currentCardBindRecord.getId();*/
 
             //获取当前会员id
             Long memberId = entity.getMemberId();
@@ -473,7 +541,7 @@ public class ScheduleRecordController {
 
             //1.添加操作记录
             MemberLogEntity logEntity = new MemberLogEntity()
-                    .setType(OperateType.CLASS_DEDUCTION.getMsg())
+                    .setType(OperateType.CLASS_DEDUCTION_OPERATION.getMsg())
                     .setMemberBindId(bindId)
                     .setOperator(operator)
                     .setCreateTime(LocalDateTime.now())
@@ -487,7 +555,7 @@ public class ScheduleRecordController {
 
             //2.添加消费记录
             ConsumeRecordEntity consume = new ConsumeRecordEntity()
-                    .setOperateType(OperateType.CLASS_DEDUCTION.getMsg())
+                    .setOperateType(OperateType.CLASS_DEDUCTION_OPERATION.getMsg())
                     .setCardCountChange(reserveNums * timesCost)
                     .setOperator(operator)
                     .setMemberBindId(bindId)
@@ -513,15 +581,20 @@ public class ScheduleRecordController {
             }
 
             //4.更新上课记录信息
-            boolean isUpdateClassRecord = classRecordService.update(new UpdateWrapper<ClassRecordEntity>().eq("member_id", memberId)
+            ClassRecordEntity one = classRecordService.getOne(new QueryWrapper<ClassRecordEntity>().eq("member_id", memberId).eq("schedule_id", scheduleId));
+            if (one.getCheckStatus() == 0) {
+                one.setCheckStatus(1).setLastModifyTime(LocalDateTime.now()).setVersion(one.getVersion() + 1);
+                boolean isUpdateClassRecord = classRecordService.updateById(one);
+                log.debug("\n==>更新上课记录是否成功==>{}", isUpdateClassRecord);
+                if (!isUpdateClassRecord) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return R.error("一键确认扣费失败！");
+                }
+            }
+           /* boolean isUpdateClassRecord = classRecordService.update(new UpdateWrapper<ClassRecordEntity>().eq("member_id", memberId)
                     .eq("schedule_id", scheduleId)
                     .set("check_status", 1)
-                    .set("last_modify_time", LocalDateTime.now()));
-            log.debug("\n==>更新上课记录是否成功==>{}", isUpdateClassRecord);
-            if (!isUpdateClassRecord) {
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                return R.error("一键确认扣费失败！");
-            }
+                    .set("last_modify_time", LocalDateTime.now()));*/
 
         }
 
@@ -554,9 +627,13 @@ public class ScheduleRecordController {
             }
         }
 
+        //删除会员卡统计信息的缓存
+        mapCacheService.getCacheInfo().remove(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO);
+        log.debug("\n==>确认扣费后删除map中的会员卡信息缓存");
+
         //1.添加操作记录
         MemberLogEntity memberLogEntity = new MemberLogEntity()
-                .setType(OperateType.CLASS_DEDUCTION.getMsg())
+                .setType(OperateType.CLASS_DEDUCTION_OPERATION.getMsg())
                 .setOperator(consumeFormVo.getOperator())
                 .setMemberBindId(consumeFormVo.getCardBindId())
                 .setCreateTime(LocalDateTime.now())
@@ -573,7 +650,7 @@ public class ScheduleRecordController {
 
         //2.添加消费记录
         ConsumeRecordEntity consumeRecordEntity = new ConsumeRecordEntity()
-                .setOperateType(OperateType.CLASS_DEDUCTION.getMsg())
+                .setOperateType(OperateType.CLASS_DEDUCTION_OPERATION.getMsg())
                 .setCardCountChange(consumeFormVo.getCardCountChange())
                 .setCardDayChange(consumeFormVo.getCardDayChange())
                 .setOperator(consumeFormVo.getOperator())
@@ -617,7 +694,7 @@ public class ScheduleRecordController {
 
     /**
      * 导出预约数据
-     *
+     * todo :...
      * @return 导出
      */
     @PostMapping("/exportReserve.do")
