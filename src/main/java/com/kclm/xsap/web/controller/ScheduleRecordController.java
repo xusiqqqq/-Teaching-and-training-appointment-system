@@ -9,6 +9,7 @@ import com.kclm.xsap.entity.*;
 import com.kclm.xsap.service.*;
 import com.kclm.xsap.utils.ExpiryMap;
 import com.kclm.xsap.utils.R;
+import com.kclm.xsap.utils.exception.RRException;
 import com.kclm.xsap.vo.*;
 import com.kclm.xsap.web.cache.MapCacheService;
 import lombok.extern.slf4j.Slf4j;
@@ -135,10 +136,11 @@ public class ScheduleRecordController {
         List<CourseScheduleVo> cacheOfSchedule = null;
         if (cacheValueOfMapForSchedule instanceof List) {
             log.debug("类型匹配，强制转化");
+            //todo 这里的强转检查其实无效，，，但要怎么instanceof判断泛型呢？
             cacheOfSchedule = (List<CourseScheduleVo>) cacheValueOfMapForSchedule;
         }
         if (null != cacheOfSchedule) {
-            log.debug("直接返回了缓存中的数据");
+            log.debug("缓存命中！返回缓存中的数据");
             return  cacheOfSchedule;
         }
 
@@ -149,10 +151,16 @@ public class ScheduleRecordController {
             CourseEntity courseById = courseService.getById(entity.getCourseId());
             log.debug("\n==>stream中由当前课程记录对应的课程的详细数据==>{}", courseById);
 
+            //上课完整时间
             LocalDateTime startTime = LocalDateTime.of(entity.getStartDate(), entity.getClassTime());
 
+            //获取老师名字【mp自动加上逻辑删除=1，删掉的老师查不到，需要手动查询】
+            //String teacherName = employeeService.getById(entity.getTeacherId()).getName();
+            String teacherName = employeeService.getTeacherNameById(entity.getTeacherId());
+
+
             return new CourseScheduleVo()
-                    .setTitle(courseById.getName() + "【" + employeeService.getById(entity.getTeacherId()).getName() + "】")
+                    .setTitle(courseById.getName() + "【" + teacherName + "】")
                     .setStart(startTime)
                     .setEnd(startTime.plusMinutes(courseById.getDuration()))
                     .setColor(courseById.getColor())
@@ -316,10 +324,16 @@ public class ScheduleRecordController {
         log.debug("\n==>根据课程id查到的课程信息:courseById==>{}", courseById);
 
         //没事看看jdk8日期类
-        LocalDateTime startTimeFormat = LocalDateTime.of(scheduleById.getStartDate(), scheduleById.getClassTime());
+        /*LocalDateTime startTimeFormat = LocalDateTime.of(scheduleById.getStartDate(), scheduleById.getClassTime());
         String startTime = formatter.format(startTimeFormat);
         Long duration = courseById.getDuration();
-        String endTime = formatter.format(startTimeFormat.plusMinutes(duration));
+        String endTime = formatter.format(startTimeFormat.plusMinutes(duration));*/
+
+        //获取上课时间
+        LocalDateTime startTimeFormat = LocalDateTime.of(scheduleById.getStartDate(), scheduleById.getClassTime());
+        //获取课程时长用于求结束时间
+        Long duration = courseById.getDuration();
+
 
         //根据关联表查询所有支持该课程的关联信息
         List<CourseCardEntity> courseCardEntityList = courseCardService.list(new QueryWrapper<CourseCardEntity>().eq("course_id", courseId));
@@ -332,14 +346,14 @@ public class ScheduleRecordController {
         ).collect(Collectors.toList());
         log.debug("\n==>支持的会员卡列表==>{}", supportCards);
 
-        //查出上课老师名字
-        String teacherName = employeeService.getById(scheduleById.getTeacherId()).getName();
+        //查出上课老师名字【mp查询会自动加上逻辑查询】
+        String teacherName = employeeService.getTeacherNameById(scheduleById.getTeacherId());
 
         //封装
         ScheduleDetailsVo details = new ScheduleDetailsVo()
                 .setCourseName(courseById.getName())
-                .setStartTime(startTime)
-                .setEndTime(endTime)
+                .setStartTime(startTimeFormat)
+                .setEndTime(startTimeFormat.plusMinutes(duration))
                 .setDuration(duration)
                 .setLimitSex(scheduleById.getLimitSex() == null ? "无限制" : scheduleById.getLimitSex())
                 .setLimitAge(scheduleById.getLimitAge() == null ? -1 : scheduleById.getLimitAge())
@@ -441,15 +455,39 @@ public class ScheduleRecordController {
 
     /**
      * 根据id删除排课记录
-     *
+     * todo 通过捕获外键约束判断是否可以删除有局限，比如在预约后取消理应可以被删除，但外键无法删除，暂时不做修改，额外处理一下吧
      * @param id 前台传入的要删除的scheduleId
      * @return r -> 删除结果
      */
     @PostMapping("/deleteOne.do")
     @ResponseBody
+    @Transactional
     public R deleteOne(@RequestParam("id") Long id) {
 
-        boolean isRemoveSchedule = false;
+        ScheduleRecordEntity currentSchedule = scheduleRecordService.getById(id);
+        //当预约人数为零即可删除排课记录【只要考虑这一点就够了，上课记录必须要有人才能上课】
+        if (currentSchedule.getOrderNums() >= 0) {
+            //删除预约后取消的预约记录
+            boolean isRemoveReserveOfCancel = reservationRecordService.remove(new QueryWrapper<ReservationRecordEntity>().eq("schedule_id", id));
+            if (isRemoveReserveOfCancel) {
+                log.debug("\n==>删除了预约该课程后取消的用户");
+            }
+            //再删除排课记录
+            boolean isRemoveSchedule = scheduleRecordService.removeById(id);
+            if (isRemoveSchedule) {
+                log.debug("\n==>删除排课记录成功");
+                return R.ok("删除成功！即将跳转..");
+            } else {
+                log.debug("\n==>删除排课记录失败!爆出runtimeException并回滚");
+                throw new RRException("删除排课记录失败");
+            }
+        } else {
+            log.debug("\n==>预约人数不为0,排课已经生成了预约、上课等记录，不可被删chu");
+            return R.error("删除失败!此排课已经生成了预约、上课等记录，不可被删除！");
+        }
+
+        //这段是通过捕获外键约束异常处理的
+        /*boolean isRemoveSchedule = false;
         try {
             isRemoveSchedule = scheduleRecordService.removeById(id);
 
@@ -458,7 +496,7 @@ public class ScheduleRecordController {
             if (cause instanceof SQLIntegrityConstraintViolationException) {
                 String sqlState = ((SQLIntegrityConstraintViolationException) cause).getSQLState();
                 if (SQLSTATE_23000.equals(sqlState)) {
-                    return R.error("删除失败!此课程已经生成了预约、上课、排课等记录，不可被删除！");
+                    return R.error("删除失败!此排课已经生成了预约、上课等记录，不可被删除！");
                 }
             } else {
                 e.printStackTrace();
@@ -473,7 +511,7 @@ public class ScheduleRecordController {
             return R.ok("删除成功！即将跳转..");
         } else {
             return R.error("删除失败！");
-        }
+        }*/
     }
 
 
@@ -771,6 +809,26 @@ public class ScheduleRecordController {
 
         return R.ok().put("value", scheduleForSearchVos);
 
+    }
+
+
+    /**
+     * 课程表手动清缓存刷新
+     * @return
+     */
+    @GetMapping("/refreshCache.do")
+    @ResponseBody
+    public R refreshCache() {
+        //获取缓存map
+        ExpiryMap<KeyNameOfCache, Object> CACHE_SCHEDULE_LIST_INFO_MAP = mapCacheService.getCacheInfo();
+        //删除缓存
+        CACHE_SCHEDULE_LIST_INFO_MAP.remove(KeyNameOfCache.CACHE_SCHEDULE_INFO);
+        if (CACHE_SCHEDULE_LIST_INFO_MAP.containsKey(KeyNameOfCache.CACHE_SCHEDULE_INFO)) {
+            log.debug("\n==>清楚缓存信息失败！");
+            return R.error();
+        }
+        log.debug("\n==>清楚缓存信息成功！");
+        return R.ok();
     }
 
 

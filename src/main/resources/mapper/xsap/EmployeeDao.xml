@@ -3,7 +3,7 @@
 
 <mapper namespace="com.kclm.xsap.dao.EmployeeDao">
 
-	<!-- 可根据自己的需求，是否要使用 -->
+    <!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="com.kclm.xsap.entity.EmployeeEntity" id="employeeMap">
         <result property="id" column="id"/>
         <result property="name" column="name"/>
@@ -22,6 +22,15 @@
         <result property="lastModifyTime" column="last_modify_time"/>
         <result property="version" column="version"/>
     </resultMap>
+    <select id="selectTeacherNameListByIds" resultType="com.kclm.xsap.entity.EmployeeEntity">
+        select `name`, `is_deleted`
+        from t_employee
+        where `id`
+        in
+        <foreach collection="teacherIdList" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
 
 
 </mapper>

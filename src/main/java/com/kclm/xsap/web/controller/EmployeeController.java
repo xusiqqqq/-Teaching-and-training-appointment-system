@@ -11,6 +11,7 @@ import com.kclm.xsap.vo.TeacherClassRecordVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,9 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -55,9 +58,14 @@ public class EmployeeController {
     @Resource
     private CourseService courseService;
 
-    @Resource ClassRecordService classRecordService;
+    @Resource
+    private ClassRecordService classRecordService;
 
-    @Resource private MemberService memberService;
+    @Resource
+    private MemberService memberService;
+
+    @Resource
+    private ReservationRecordService reservationRecordService;
 
 
     /**
@@ -74,10 +82,11 @@ public class EmployeeController {
 
     /**
      * 登录表单
+     *
      * @param username 登录表单用户名
      * @param password 登录表单密码
-     * @param session 登录成功保存session
-     * @param model 登录失败返回页面携带数据
+     * @param session  登录成功保存session
+     * @param model    登录失败返回页面携带数据
      * @return java.lang.String
      * @author fangkai
      * @date 2021/12/4 0004 16:45
@@ -112,10 +121,11 @@ public class EmployeeController {
 
     /**
      * 跳转添加老师页面
+     *
      * @return x_teacher_add.html
      */
     @GetMapping("/x_teacher_add.do")
-    public String togoTeacherAdd(){
+    public String togoTeacherAdd() {
         return "employee/x_teacher_add";
     }
 
@@ -160,6 +170,7 @@ public class EmployeeController {
 
     /**
      * 用户点击忘记密码跳转到充值页面
+     *
      * @return x_ensure_user.html
      */
     @GetMapping("/toEnsureUser")
@@ -169,6 +180,7 @@ public class EmployeeController {
 
     /**
      * 携带数据跳转老师更新页面
+     *
      * @param id 老师id
      * @return x_teacher_update.html（携带老师信息）
      */
@@ -177,7 +189,7 @@ public class EmployeeController {
         EmployeeEntity teacherById = employeeService.getById(id);
 
         ModelAndView mv = new ModelAndView();
-        mv.addObject("teacherMsg",teacherById);
+        mv.addObject("teacherMsg", teacherById);
         mv.setViewName("employee/x_teacher_update");
 
         return mv;
@@ -185,8 +197,9 @@ public class EmployeeController {
 
     /**
      * 跳转页面
+     *
      * @param userPhoneOrEmail 表单提交的要重置密码的用户的手机号或者邮箱，注意电话和邮箱都没有做重复检查
-     * @param model 页面携带数据
+     * @param model            页面携带数据
      * @return 返回页面
      */
     @GetMapping("/toResetPwd")
@@ -221,6 +234,7 @@ public class EmployeeController {
 
     /**
      * 菜单栏点击管理员类型跳转修改密码页面
+     *
      * @return x_modify_password.html
      */
     @GetMapping("/x_modify_password.do")
@@ -231,15 +245,16 @@ public class EmployeeController {
 
     /**
      * 修改密码操作
+     *
      * @param entity 修改密码页面传入的表单数据
-     * @param model 跳转页面携带数据
+     * @param model  跳转页面携带数据
      * @return 跳转页面
      */
     @PostMapping("/modifyPwd.do")
     public String modifyPwd(ModifyPassword entity, Model model) {
         log.debug("\n==>打印前台传入的修改密码表单数据==>{}", entity);
 
-        if(null == entity) {
+        if (null == entity) {
             throw new RRException("修改数据表单为空", 22404);
         }
         if (entity.getOldPwd().isEmpty()) {
@@ -273,6 +288,7 @@ public class EmployeeController {
 
     /**
      * 菜单栏点击管理员类型跳转个人资料页面
+     *
      * @return x_profile.html
      */
     @GetMapping("/x_profile.do")
@@ -295,7 +311,6 @@ public class EmployeeController {
         log.debug("\n==>返回到前端的所有老师信息allEmployeeList==>{}", allEmployeeList);
         return new R().put("value", allEmployeeList);
     }
-
 
 
     /**
@@ -334,9 +349,9 @@ public class EmployeeController {
     }
 
 
-
     /**
      * 返回老师详情信息
+     *
      * @param id 老师id
      * @return r-> teacherInfo
      */
@@ -351,6 +366,7 @@ public class EmployeeController {
 
     /**
      * 封装老师管理中的上课记录信息
+     *
      * @param id 老师id
      * @return r-> 上课记录
      */
@@ -415,13 +431,14 @@ public class EmployeeController {
     /**
      * 头像更新
      * todo 回显。。
-     * @param id 要更新头像的老师的id
+     *
+     * @param id   要更新头像的老师的id
      * @param file 要更新的头像图片文件
      * @return r -> 更新结果
      */
     @PostMapping("/modifyUserImg.do")
     @ResponseBody
-    public R modifyUserImg(@RequestParam("id")Long id,
+    public R modifyUserImg(@RequestParam("id") Long id,
                            @RequestParam("avatarFile") MultipartFile file) {
 
         if (!file.isEmpty()) {
@@ -431,7 +448,7 @@ public class EmployeeController {
                 EmployeeEntity entity = new EmployeeEntity().setId(id).setAvatarUrl(fileName).setVersion(+1);
                 boolean isUpdateAvatarUrl = employeeService.updateById(entity);
                 log.debug("\n==>更新头像是否成功==>{}", isUpdateAvatarUrl);
-                return  new R().put("data", entity);
+                return new R().put("data", entity);
             } else {
                 return R.error("头像上传失败");
             }
@@ -442,9 +459,9 @@ public class EmployeeController {
     }
 
 
-
     /**
      * 异步添加老师
+     *
      * @param entity 前端封装的老师信息
      * @return r->添加是否成功
      */
@@ -468,29 +485,121 @@ public class EmployeeController {
         log.debug("\n==>保存老师是否成功==>{}", isSave);
         if (isSave) {
             return R.ok("添加成功!");
-        }else {
+        } else {
             return R.error("添加失败");
         }
     }
 
 
-
+    /**
+     * 删除老师
+     * 1.删除成功。该老师已没有排课记录和计划）
+     * 2.删除成功。该老师存在未完成的排课计划，但尚没有预约记录，
+     * 2.1该老师没有已完成的排课记录，删除该老师信息后未完成的排课计划也会被删除
+     * 2.2该老师存在已完成的排课记录，删除该老师信息后未完成的排课计划也会被删除，但已完成的排课记录会被保留
+     * 3.删除失败。该老师存在未完成的排课记录且有预约，无法删除该老师
+     * 4.删除成功。该老师没有未完成的排课计划，仅删除该老师信息后保留已有的排课记录
+     *
+     * @param id 老师id
+     * @return r -> 删除结果和信息
+     */
+    //全在控制层异常都不好抛！！！找时间改回来！todo
     @PostMapping("/deleteOne.do")
     @ResponseBody
+    @Transactional
     public R deleteOne(@RequestParam("id") Long id) {
         log.debug("\n==>前端传入的要删除的老师id：==>{}", id);
-        boolean isRemove = employeeService.removeById(id);
-        log.debug("\n==>删除老师是否成功==>{}", isRemove);
-
-        if (isRemove) {
-            return R.ok();
+        //检查该老师的排课计划表
+        List<ScheduleRecordEntity> allScheduleForCurrentTeacher = scheduleRecordService.list(new QueryWrapper<ScheduleRecordEntity>()
+                .select("id","order_nums", "start_date", "class_time").eq("teacher_id", id));
+        log.debug("\n==>打印该老师的所有排课计划表==>{}", allScheduleForCurrentTeacher);
+        //当该老师没有排课记录和计划时,直接删除老师信息
+        if (allScheduleForCurrentTeacher.isEmpty()) {
+            log.debug("\n==>该老师已没有排课记录和计划,删除成功！！");
+            boolean isRemove = employeeService.removeById(id);
+            if (isRemove) {
+                log.debug("\n==>删除成功@！");
+                return R.ok("该老师已没有排课记录和计划");
+            } else {
+                log.debug("\n==>删除老师失败");
+                throw new RuntimeException("删除失败！");
+            }
         } else {
-            log.debug("\n==>删除老师失败");
-            throw new RuntimeException("删除失败！");
+            //该老师有排课记录
+            //取出该老师所有还未完成的排课计划
+            List<ScheduleRecordEntity> allScheduleAfterThisMoment = allScheduleForCurrentTeacher.stream().filter(schedule -> {
+                //获取上课精确完整日期
+                LocalDateTime classStartDateTime = LocalDateTime.of(schedule.getStartDate(), schedule.getClassTime());
+                //过滤留下该老师所有还未完成的排课计划【即此时此刻之后的排课计划】
+                return classStartDateTime.isAfter(LocalDateTime.now());
+            }).collect(Collectors.toList());
+
+            if (allScheduleAfterThisMoment.isEmpty()) {
+                //该老师没有未完成的排课计划，删除该老师信息后保留已有的排课记录
+                boolean isRemove = employeeService.removeById(id);
+                log.debug("\n==>该老师没有未完成的排课计划，仅删除该老师信息后保留已有的排课记录");
+                if (isRemove) {
+                    log.debug("\n==>删除老师信息成功!");
+                    return R.ok("该老师存在排课记录但没有未完成的排课计划，仅删除该老师信息后保留已有的排课记录");
+                } else {
+                    log.debug("\n==>删除老师失败");
+                    throw new RuntimeException("删除失败！");
+                }
+            } else {
+                //该老师存在未完成的排课记录
+                //获取所有未完成的排课计划的预约人数的和
+                int sum = allScheduleAfterThisMoment.stream().mapToInt(ScheduleRecordEntity::getOrderNums).sum();
+                log.debug("\n==>打印未完成的排课计划的预约人数之和==>{}", sum);
+                if (sum > 0) {
+                    //未完成的计划中已有会员进行预约，无法删除
+                    log.debug("\n==>该老师未完成的排课计划中已有预约，预约总数：==>{}", sum);
+                    return R.error("该老师存在未完成的排课记录且有预约，无法删除该老师");
+                } else {
+                    //获取未开始的全部排课的id-list
+                    List<Long> scheduleIds = allScheduleAfterThisMoment.stream().map(ScheduleRecordEntity::getId).collect(Collectors.toList());
+                    if (allScheduleAfterThisMoment.size() == allScheduleForCurrentTeacher.size()) {
+                        //该老师只有未完成的排课记录，删除该老师信息后未完成的排课计划也会被删除，且没有预约记录
+                        //删除老师
+                        boolean isRemoveTeacher = employeeService.removeById(id);
+                        //删除预约后取消预约导致预约人数显示0 的预约记录
+                        reservationRecordService.remove(new QueryWrapper<ReservationRecordEntity>().in("schedule_id", scheduleIds));
+                        //最后删除该老师的全部排课记录【因为没有已完成的记录】
+                        boolean isRemoveSchedule = scheduleRecordService.remove(new QueryWrapper<ScheduleRecordEntity>().eq("teacher_id", id));
+                        if (isRemoveSchedule && isRemoveTeacher) {
+                            log.debug("\n==>删除成功");
+                            return R.ok("该老师只有未完成的排课记录，删除该老师信息后未完成的排课计划也会被删除");
+                        } else {
+                            log.debug("\n==>删除老师信息或该老师排课记录失败");
+                            //抛出异常回滚
+                            throw new RRException("删除老师信息或该老师排课记录失败", 22405);
+                        }
+                    } else {
+
+                        //该老师有已完成和未完成的排课记录，但未完成的排课计划没有预约记录 ，删除该老师信息后未完成的排课计划也会被删除，但已完成的排课记录会被保留
+                        //首先通过老师id删除该老师
+                        boolean isRemoveTeacher = employeeService.removeById(id);
+                        //再通过该老师的所有未开始的全部排课计划的排课id删除所有未开始的排课的预约记录【目的是删除有预约但取消了的记录，此时预约人数未0，不用担心删错预约记录；而先删预约记录为了避免外键冲突】
+                        boolean isRemoveReserveOfCancel = reservationRecordService.remove(new QueryWrapper<ReservationRecordEntity>().in("schedule_id", scheduleIds));
+                        if (isRemoveReserveOfCancel) {
+                            log.debug("\n==>删除了这些预约id==>{}在预约该课程后取消的用户", scheduleIds);
+                        }
+                        //最后删除这些未完成的排课记录【此时已经没有了外键约束】
+                        boolean isRemoveSchedule = scheduleRecordService.removeByIds(scheduleIds);
+
+                        if (isRemoveSchedule && isRemoveTeacher) {
+                            log.debug("\n==>删除成功！");
+                            return R.ok("该老师存在未完成的排课计划，删除该老师信息后未完成的排课计划也会被删除，但已完成的排课记录会被保留");
+                        } else {
+                            log.debug("\n==>删除老师信息或该老师排课记录失败");
+                            //抛出异常 回滚
+                            throw new RRException("删除老师信息或该老师排课记录失败", 22406);
+                        }
+                    }
+                }
+            }
+
+
         }
+
     }
-
-
-
-
 }
