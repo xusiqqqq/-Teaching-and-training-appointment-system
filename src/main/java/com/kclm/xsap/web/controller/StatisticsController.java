@@ -291,6 +291,20 @@ public class StatisticsController {
     }
 
 
+    @GetMapping("/refreshCache.do")
+    @ResponseBody
+    public R refreshCache() {
+        ExpiryMap<KeyNameOfCache, Object> CACHE_MEMBER_CARD_INFO_MAP = mapCacheService.getCacheInfo();
+        CACHE_MEMBER_CARD_INFO_MAP.remove(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO);
+        if (CACHE_MEMBER_CARD_INFO_MAP.containsKey(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO)) {
+            log.debug("\n==>清楚会员卡信息缓存失败！");
+            return R.error();
+        }
+        log.debug("\n==>会员卡信息缓存清楚成功");
+        return R.ok("会员卡信息缓存成功！");
+    }
+
+
     /**
      * 查找所有消费记录的所在年份并去重
      *
@@ -1107,7 +1121,7 @@ public class StatisticsController {
             int maxMonth = scheduleRecordForSpecifyYear.get(0).getStartDate().getMonthValue();
             for (int i = 1; i <= maxMonth; i++) {
                 Integer data = monthClassHourMap.getOrDefault(i, 0);
-                xStrList.add("第" + 1 + "月");
+                xStrList.add(i + "月");
                 yDataList.add(data);
             }
             //设置属性
@@ -1150,7 +1164,7 @@ public class StatisticsController {
             int maxQuarter = (scheduleRecordForSpecifyYear.get(0).getStartDate().getMonthValue() - 1) / 3 + 1;
             //赋值
             for (int i = 1; i <= maxQuarter; i++) {
-                xStrList.add("第" + i + "季度");
+                xStrList.add(i + "季度");
                 Integer data = quarterClassHourMap.getOrDefault(i, 0);
                 yDataList.add(data);
             }
@@ -1200,7 +1214,7 @@ public class StatisticsController {
             });
             //赋值
             for (int i = beginYear; i <= endYear; i++) {
-                xStrList.add("第" + i + "年度");
+                xStrList.add(i + "年度");
                 Integer data = yearClassHourMap.getOrDefault(i, 0);
                 yDataList.add(data);
             }

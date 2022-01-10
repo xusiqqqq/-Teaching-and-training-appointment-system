@@ -372,7 +372,7 @@
     function refreshCache() {
         $.get('/schedule/refreshCache.do', function (data) {
             if (data.code === 0) {
-                swal("清楚缓存成功！","即将刷新信息","info");
+                swal("清楚缓存成功！","即将刷新信息","success");
                 setTimeout(function (){
                     window.location.reload();
                 }, 1200);
