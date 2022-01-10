@@ -316,6 +316,11 @@ public class IndexController {
         LocalDate now = LocalDate.now();
         //查询所有最近一个月的排课记录
         List<ScheduleRecordEntity> scheduleFromLastMonth = scheduleRecordService.list(new QueryWrapper<ScheduleRecordEntity>().select("id").le("start_date", now).ge("start_date", now.minusDays(30)));
+        //如果没有排课记录
+        if (scheduleFromLastMonth.isEmpty()) {
+            log.debug("==\n 没有排课记录");
+            return R.error("No data");
+        }
         //取出最近一个月的所有排课记录的id
         List<Long> scheduleIdList = scheduleFromLastMonth.stream().map(ScheduleRecordEntity::getId).collect(Collectors.toList());
 
