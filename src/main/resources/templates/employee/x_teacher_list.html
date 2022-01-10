@@ -146,7 +146,7 @@ $(document).ready(function () {
 		console.log(tid);
         swal({
             title: "删除确认",
-            text: "确认删除此老师信息吗? 删除后将无法恢复，请谨慎操作！",
+            text: "确认删除此老师信息吗? 删除成功后将无法恢复，请谨慎操作！",
             type: "warning",
             showCancelButton: true,
             confirmButtonColor: "#DD6B55",
@@ -157,15 +157,20 @@ $(document).ready(function () {
             	url: "[[${#request.getContextPath()}]]/user/deleteOne.do",
             	type: "post",
             	data: {id:tid},
-            	success:function(){
-            		swal("删除成功！", "您已经永久删除了这条信息。", "success");
-            		//刷新界面
-            		setTimeout(function(){
-	            		window.location.href="[[${#request.getContextPath()}]]/user/x_teacher_list.do";
-            		},1*1000);
+            	success:function(data){
+            	    if (data.code === 0) {
+                        swal("删除成功！", data.msg, "success");
+                        //刷新界面
+                        setTimeout(function(){
+                            window.location.href="[[${#request.getContextPath()}]]/user/x_teacher_list.do";
+                        },2000);
+                    } else {
+            	        swal("删除失败",data.msg, "info")
+                    }
+
             	},
             	error:function(){
-            		swal("删除失败！", "未知错误。。。", "info");
+            		swal("删除失败！", "未知错误！请联系管理员！", "info");
             	}
             });
         });

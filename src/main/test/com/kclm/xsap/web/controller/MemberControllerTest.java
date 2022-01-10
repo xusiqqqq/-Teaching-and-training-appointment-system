@@ -83,6 +83,19 @@ class MemberControllerTest {
 
 
     @Test
+    void test28() {
+        List<ScheduleRecordEntity> allScheduleBeforeToday = scheduleRecordService.list(new QueryWrapper<ScheduleRecordEntity>().select("id", "course_id", "teacher_id", "order_nums", "start_date", "class_time").le("start_date", LocalDate.now()).orderByDesc("start_date"));
+
+        List<ScheduleRecordEntity> scheduleQueryByMonth = allScheduleBeforeToday.stream().filter(schedule -> schedule.getStartDate().getYear() == 2022).collect(Collectors.toList());
+
+        List<Long> teacherIdList = scheduleQueryByMonth.stream().map(ScheduleRecordEntity::getTeacherId).distinct().sorted().collect(Collectors.toList());
+
+        List<String> teacherNameListByIds = employeeService.getTeacherNameListByIds(teacherIdList);
+        teacherNameListByIds.forEach(System.out::println);
+    }
+
+
+    @Test
     void test27() {
         LocalDate today = LocalDate.now();
         List<ScheduleRecordEntity> list = scheduleRecordService.list(new QueryWrapper<ScheduleRecordEntity>().select("id", "course_id", "teacher_id", "order_nums", "start_date", "class_time").likeRight("start_date", 2022)/*le("start_date", today).ge()*/);

@@ -291,6 +291,20 @@ public class StatisticsController {
     }
 
 
+    @GetMapping("/refreshCache.do")
+    @ResponseBody
+    public R refreshCache() {
+        ExpiryMap<KeyNameOfCache, Object> CACHE_MEMBER_CARD_INFO_MAP = mapCacheService.getCacheInfo();
+        CACHE_MEMBER_CARD_INFO_MAP.remove(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO);
+        if (CACHE_MEMBER_CARD_INFO_MAP.containsKey(KeyNameOfCache.CACHE_OF_MEMBER_CARD_INFO)) {
+            log.debug("\n==>清楚会员卡信息缓存失败！");
+            return R.error();
+        }
+        log.debug("\n==>会员卡信息缓存清楚成功");
+        return R.ok("会员卡信息缓存成功！");
+    }
+
+
     /**
      * 查找所有消费记录的所在年份并去重
      *
@@ -579,7 +593,9 @@ public class StatisticsController {
             for (int i = 1; i <= maxMonth; i++) {
                 xStrList.add(i + "月");
             }
-            teacherNames = employeeService.listByIds(teacherIdList).stream().map(EmployeeEntity::getName).collect(Collectors.toList());
+            //mp的查询会自动提添加逻辑删除判断
+            //teacherNames = employeeService.listByIds(teacherIdList).stream().map(EmployeeEntity::getName).collect(Collectors.toList());
+            teacherNames = employeeService.getTeacherNameListByIds(teacherIdList);
         } else if (unit == 2) {
             //按季度查询；查出指定年份的所有有记录的季度的排课数据
             List<ScheduleRecordEntity> scheduleQueryByQuarter = allScheduleBeforeToday.stream().filter(schedule -> schedule.getStartDate().getYear() == yearOfSelect).collect(Collectors.toList());
@@ -648,7 +664,9 @@ public class StatisticsController {
             for (int i = 1; i <= maxQuarter; i++) {
                 xStrList.add(i + "季度");
             }
-            teacherNames = employeeService.listByIds(teacherIdList).stream().map(EmployeeEntity::getName).collect(Collectors.toList());
+            //mp的查询会自动提添加逻辑删除判断
+            //teacherNames = employeeService.listByIds(teacherIdList).stream().map(EmployeeEntity::getName).collect(Collectors.toList());
+            teacherNames = employeeService.getTeacherNameListByIds(teacherIdList);
         } else {
             if (endYear < beginYear) {
                 log.debug("\n==>起始时间与结束时间冲突！请修改后再查看统计结果");
@@ -722,9 +740,9 @@ public class StatisticsController {
             for (int i = beginYear; i <= endYear; i++) {
                 xStrList.add(i + "年");
             }
-            teacherNames = employeeService.listByIds(teacherIdList).stream().map(EmployeeEntity::getName).collect(Collectors.toList());
-
-
+            //mp的查询会自动提添加逻辑删除判断
+            //teacherNames = employeeService.listByIds(teacherIdList).stream().map(EmployeeEntity::getName).collect(Collectors.toList());
+            teacherNames = employeeService.getTeacherNameListByIds(teacherIdList);
         }
 
         //------------------
@@ -1079,7 +1097,6 @@ public class StatisticsController {
 
             //查出所有指定年份的所有排课记录【包含id，课程id，预约人数，上课日期】,按日期倒序
             List<ScheduleRecordEntity> scheduleRecordForSpecifyYear = scheduleRecordService.list(new QueryWrapper<ScheduleRecordEntity>().select("id", "course_id", "order_nums", "start_date").likeRight("start_date", yearOfSelect).orderByDesc("start_date"));
-            log.debug("\n==>打印指定年份的排课信息【包含id，课程id，预约人数，上课日期】==>");
 
             if (scheduleRecordForSpecifyYear.isEmpty()) {
                 return R.error("指定时间内没有排课记录");
@@ -1104,7 +1121,7 @@ public class StatisticsController {
             int maxMonth = scheduleRecordForSpecifyYear.get(0).getStartDate().getMonthValue();
             for (int i = 1; i <= maxMonth; i++) {
                 Integer data = monthClassHourMap.getOrDefault(i, 0);
-                xStrList.add("第" + 1 + "月");
+                xStrList.add(i + "月");
                 yDataList.add(data);
             }
             //设置属性
@@ -1124,7 +1141,6 @@ public class StatisticsController {
             HashMap<Integer, Integer> quarterClassHourMap = new HashMap<>();
             //查出所有指定年份的所有排课记录【包含id，课程id，预约人数，上课日期】,按日期倒序
             List<ScheduleRecordEntity> scheduleRecordForSpecifyYear = scheduleRecordService.list(new QueryWrapper<ScheduleRecordEntity>().select("id", "course_id", "order_nums", "start_date").likeRight("start_date", yearOfSelect).orderByDesc("start_date"));
-            log.debug("\n==>打印指定年份的排课信息【包含id，课程id，预约人数，上课日期==>");
 
             if (scheduleRecordForSpecifyYear.isEmpty()) {
                 return R.error("指定时间内没有排课记录");
@@ -1148,7 +1164,7 @@ public class StatisticsController {
             int maxQuarter = (scheduleRecordForSpecifyYear.get(0).getStartDate().getMonthValue() - 1) / 3 + 1;
             //赋值
             for (int i = 1; i <= maxQuarter; i++) {
-                xStrList.add("第" + i + "季度");
+                xStrList.add(i + "季度");
                 Integer data = quarterClassHourMap.getOrDefault(i, 0);
                 yDataList.add(data);
             }
@@ -1178,8 +1194,6 @@ public class StatisticsController {
                     .orderByDesc("start_date")
                     .ge("start_date", LocalDate.of(beginYear, 1, 1))
                     .le("start_date", LocalDate.of(endYear, 12, 31)));
-            log.debug("\n==>打印指定年份的排课信息【包含id，课程id，预约人数，上课日期==>");
-            scheduleRecordForBeginYearAndEndYear.forEach(System.out::println);
 
             if (scheduleRecordForBeginYearAndEndYear.isEmpty()) {
                 return R.error("指定时间内没有排课记录");
@@ -1200,7 +1214,7 @@ public class StatisticsController {
             });
             //赋值
             for (int i = beginYear; i <= endYear; i++) {
-                xStrList.add("第" + i + "年度");
+                xStrList.add(i + "年度");
                 Integer data = yearClassHourMap.getOrDefault(i, 0);
                 yDataList.add(data);
             }

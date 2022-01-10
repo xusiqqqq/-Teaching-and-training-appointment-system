@@ -44,6 +44,7 @@
                     </div>
                 </div>
                 <div class="ibox-tools">
+                    <button class="btn btn-default pull-right" onclick="refreshCache()"  ><i aria-hidden="true" class="fa fa-refresh fa-lx" >refresh cache</i></button>
                     <button class="btn btn-primary pull-right" onclick="window.location.reload()" ><i aria-hidden="true" class="fa fa-refresh fa-lx" >刷新数据</i></button>
                 </div>
                 <div class="ibox-content">
@@ -125,11 +126,13 @@
             // 指定图表的配置项和数据--【课时】
             var option = {
                 title: {
-                    text: ''
+                    text: '课时统计图',
+                    subtext: '总课时:' + infoList.totalCourseTimeAll
                 },
                 tooltip: {},
                 legend: {
-                    data: ['总课时:' + infoList.totalCourseTimeAll]       //总课时 = 已用课时+剩余课时
+                    orient: 'vertical',
+                    left: 'right'
                 },
                 series: [
                     {
@@ -157,11 +160,13 @@
             // 指定图表的配置项和数据--【金额】
             var option2 = {
                 title: {
-                    text: ''
+                    text: '课消金额统计图',
+                    subtext: '总金额:' + infoList.totalMoneyAll
                 },
                 tooltip: {},
                 legend: {
-                    data: ['总金额:' + infoList.totalMoneyAll]      //   总金额=已用金额 +  剩余金额
+                    orient: 'vertical',
+                    left: 'right'
                 },
                 series: [
                     {
@@ -205,6 +210,20 @@
 
     })
 
+</script>
+<script >
+    function refreshCache() {
+        $.get('/statistics/refreshCache.do', function (data) {
+            if (data.code === 0) {
+                swal("清除缓存成功", "", "success");
+                setTimeout(function () {
+                    window.location.reload();
+                }, 1200);
+            } else {
+                swal("清楚失败！","请联系管理员", "info")
+            }
+        });
+    }
 </script>
 
 </body>

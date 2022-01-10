@@ -63,6 +63,7 @@
                     <button class="btn btn-info" data-target="#addCourse" data-toggle="modal">新增排课</button>
                     <button class="btn btn-info" data-target="#copyCourse" data-toggle="modal">复制排课</button>
                     <button class="btn btn-success " onclick="window.location.reload()" data-target="#refresh" data-toggle="modal">刷新课程表</button>
+                    <button class="btn btn-default " onclick="refreshCache()" data-target="#refresh_cache" data-toggle="modal">refresh cache</button>
                     <button class="btn btn-warning pull-right" data-target="#upCourse" data-toggle="modal">批量导出预约数据</button>
 
                 </div>
@@ -307,6 +308,8 @@
 <script src="../../static/js/plugins/sweetalert/sweetalert.min.js" th:src="@{/static/js/plugins/sweetalert/sweetalert.min.js}"></script>
 
 
+
+
 <script type="text/javascript">
     $(document).ready(function () {
 
@@ -365,16 +368,22 @@
     });
 </script>
 <script type="text/javascript">
+
+    function refreshCache() {
+        $.get('/schedule/refreshCache.do', function (data) {
+            if (data.code === 0) {
+                swal("清楚缓存成功！","即将刷新信息","success");
+                setTimeout(function (){
+                    window.location.reload();
+                }, 1200);
+            } else {
+                swal("清楚缓存失败", "请联系管理员", "info")
+            }
+        })
+    }
+
     /* ---------排课详情-------- */
     $(function () {
-
-        /*$(document).keydown(function (event) {
-            if (event.keyCode === 116) {
-                console.log('按f5刷新...')
-                window.location.reload();
-            }
-        });*/
-
 
         //设置字体样式
         $("span .fc-event-title").css("color", "black");
