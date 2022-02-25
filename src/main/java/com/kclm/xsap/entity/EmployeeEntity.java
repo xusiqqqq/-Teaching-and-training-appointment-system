@@ -1,6 +1,5 @@
 package com.kclm.xsap.entity;
 
-import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -20,7 +19,7 @@ import javax.validation.constraints.Past;
 
 /**
  * 员工表
- * 
+ *
  * @author fangkai
  * @email fk_qing@163.com
  * @date 2021-12-04 16:18:21
@@ -33,12 +32,12 @@ public class EmployeeEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * 
+	 *
 	 */
 	@TableId
 	private Long id;
 	/**
-	 * 
+	 *
 	 */
 	@NotBlank
 	private String name;
@@ -48,11 +47,11 @@ public class EmployeeEntity implements Serializable {
 	@NotBlank
 	private String phone;
 	/**
-	 * 
+	 *
 	 */
 	private String sex;
 	/**
-	 * 
+	 *
 	 */
 	@Past(message = "至少在今天之前")
 	@DateTimeFormat(pattern="yyyy-MM-dd")
@@ -66,7 +65,7 @@ public class EmployeeEntity implements Serializable {
 	 */
 	private String avatarUrl;
 	/**
-	 * 
+	 *
 	 */
 	private String note;
 	/**

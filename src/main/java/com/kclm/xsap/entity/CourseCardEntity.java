@@ -4,13 +4,12 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
-import java.util.Date;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 /**
  * 中间表：课程-会员卡
- * 
+ *
  * @author fangkai
  * @email ing@163.com
  * @date 2021-12-04 16:18:21

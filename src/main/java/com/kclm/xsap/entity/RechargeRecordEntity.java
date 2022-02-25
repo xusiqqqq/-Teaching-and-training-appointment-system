@@ -1,6 +1,5 @@
 package com.kclm.xsap.entity;
 
-import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -20,7 +19,7 @@ import javax.validation.constraints.NotNull;
 
 /**
  * 充值记录
- * 
+ *
  * @author fangkai
  * @email fk_qing@163.com
  * @date 2021-12-04 16:18:20
@@ -33,7 +32,7 @@ public class RechargeRecordEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * 
+	 *
 	 */
 	@TableId
 	private Long id;
@@ -70,7 +69,7 @@ public class RechargeRecordEntity implements Serializable {
 	 */
 	private Long memberBindId;
 	/**创建时间
-	 * 
+	 *
 	 */
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private LocalDateTime createTime;

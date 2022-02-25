@@ -1,6 +1,5 @@
 package com.kclm.xsap.entity;
 
-import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -8,7 +7,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.math.BigDecimal;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
@@ -18,7 +16,7 @@ import lombok.experimental.Accessors;
 
 /**
  * 消费记录
- * 
+ *
  * @author fangkai
  * @email fk_qing@163.com
  * @date 2021-12-04 16:18:21
@@ -31,7 +29,7 @@ public class ConsumeRecordEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * 
+	 *
 	 */
 	@TableId
 	private Long id;
@@ -56,7 +54,7 @@ public class ConsumeRecordEntity implements Serializable {
 	 */
 	private String operator;
 	/**
-	 * 
+	 *
 	 */
 	private String note;
 	/**

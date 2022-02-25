@@ -1,13 +1,11 @@
 package com.kclm.xsap.entity;
 
-import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
@@ -18,7 +16,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 /**
  * 全局预约设置表	此类用来描述了全局预约条件的设置
  * 全局预约设置在数据库的记录永远只有第一条，后续的更改操作，都是对第一条的更新
- * 
+ *
  * @author fangkai
  * @email fk_qing@163.com
  * @date 2021-12-04 16:18:20
@@ -32,7 +30,7 @@ public class GlobalReservationSetEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * 
+	 *
 	 */
 	@TableId
 	private Long id;

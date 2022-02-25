@@ -1,13 +1,11 @@
 package com.kclm.xsap.entity;
 
-import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
@@ -17,7 +15,7 @@ import lombok.experimental.Accessors;
 
 /**
  * 班级记录？
- * 
+ *
  * @author fangkai
  * @email fk_qing@163.com
  * @date 2021-12-04 16:18:21
@@ -30,7 +28,7 @@ public class ClassRecordEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * 
+	 *
 	 */
 	@TableId
 	private Long id;
@@ -47,7 +45,7 @@ public class ClassRecordEntity implements Serializable {
 	 */
 	private Long scheduleId;
 	/**
-	 * 
+	 *
 	 */
 	private String note;
 	/**
@@ -72,12 +70,12 @@ public class ClassRecordEntity implements Serializable {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private LocalDateTime createTime;
 	/**
-	 * 
+	 *
 	 */
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private LocalDateTime lastModifyTime;
 	/**
-	 * 
+	 *
 	 */
 	private Integer version = 1;
 

@@ -1,6 +1,5 @@
 package com.kclm.xsap.entity;
 
-import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -21,7 +20,7 @@ import javax.validation.constraints.NotNull;
 
 /**
  * 会员卡表
- * 
+ *
  * @author fangkai
  * @email fk_qing@163.com
  * @date 2021-12-04 16:18:20
@@ -34,17 +33,17 @@ public class MemberCardEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * 
+	 *
 	 */
 	@TableId
 	private Long id;
 	/**
-	 * 
+	 *
 	 */
 	@NotBlank(message = "会员卡名不能为空")
 	private String name;
 	/**
-	 * 
+	 *
 	 */
 	@NotNull(message = "卡价格不能为空")
 	private BigDecimal price;

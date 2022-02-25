@@ -2,7 +2,6 @@ package com.kclm.xsap.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.kclm.xsap.entity.EmployeeEntity;
-import com.kclm.xsap.utils.PageUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -16,7 +15,7 @@ import java.util.Map;
  */
 public interface EmployeeService extends IService<EmployeeEntity> {
 
-    PageUtils queryPage(Map<String, Object> params);
+    //PageUtils queryPage(Map<String, Object> params);
 
     EmployeeEntity isExistEmp(String username, String password);
 

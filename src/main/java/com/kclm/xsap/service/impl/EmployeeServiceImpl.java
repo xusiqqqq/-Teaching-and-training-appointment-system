@@ -1,7 +1,6 @@
 package com.kclm.xsap.service.impl;
 
-import com.kclm.xsap.utils.PageUtils;
-import com.kclm.xsap.utils.Query;
+import com.baomidou.mybatisplus.core.conditions.query.Query;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +21,7 @@ import com.kclm.xsap.service.EmployeeService;
 @Service("employeeService")
 public class EmployeeServiceImpl extends ServiceImpl<EmployeeDao, EmployeeEntity> implements EmployeeService {
 
+    /*
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<EmployeeEntity> page = this.page(
@@ -31,7 +31,7 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeDao, EmployeeEntity
 
         return new PageUtils(page);
     }
-
+    */
     @Override
     public EmployeeEntity isExistEmp(String username, String password) {
         EmployeeEntity selectOneForLogin = this.baseMapper.selectOne(new QueryWrapper<EmployeeEntity>().eq("name", username).eq("role_password", password));
