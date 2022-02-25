@@ -675,9 +675,9 @@
     $("#payList").change(function () {
         var selectOne = $(this).val();
         for (var i = 0; i < payListSave.length; i++) {
-            $("option[value='" + payListSave[i].name + "']").attr("selected", "");
-            if (selectOne === payListSave[i].name) {
-                $("option[value='" + selectOne + "']").attr("selected", "selected");
+            $("option[value='" + payListSave[i].name + "']").prop("selected", false);
+            if (selectOne == payListSave[i].name) {
+                $("option[value='" + selectOne + "']").prop("selected", true);
             }
         }
         console.log("pay: " + selectOne);

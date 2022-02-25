@@ -243,9 +243,10 @@
         $("#selectList").change(function () {
             var selectOne = $(this).val();
             for (var i = 0; i < cardListSave.length; i++) {
-                $("option[value='" + cardListSave[i].id + "']").attr("selected", "");
-                if (selectOne === cardListSave[i].id) {
-                    $("option[value='" + selectOne + "']").attr("selected", "selected");
+                $("option[value='" + cardListSave[i].id + "']").prop("selected", false);
+                if (selectOne == cardListSave[i].id) {
+                    //$("option[value='" + selectOne + "']").attr("selected", "selected");
+                    $("option[value='" + selectOne + "']").prop("selected", true);
                 }
             }
         });
@@ -265,9 +266,9 @@
         $("#payList").change(function () {
             var selectOne = $(this).val();
             for (var i = 0; i < payListSave.length; i++) {
-                $("option[value='" + payListSave[i].name + "']").attr("selected", "");
-                if (selectOne === payListSave[i].name) {
-                    $("option[value='" + selectOne + "']").attr("selected", "selected");
+                $("option[value='" + payListSave[i].name + "']").prop("selected", false);
+                if (selectOne == payListSave[i].name) {
+                    $("option[value='" + selectOne + "']").prop("selected", true);
                 }
             }
             console.log("pay: " + selectOne);
