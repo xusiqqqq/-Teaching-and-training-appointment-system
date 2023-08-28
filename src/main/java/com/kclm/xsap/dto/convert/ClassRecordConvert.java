@@ -8,11 +8,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
-//import com.kclm.xsap.entity.TClassRecord;
-//import com.kclm.xsap.entity.TCourse;
-//import com.kclm.xsap.entity.TMember;
-//import com.kclm.xsap.entity.TMemberCard;
-//import com.kclm.xsap.entity.TScheduleRecord;
 import com.kclm.xsap.entity.ClassRecordEntity;
 import com.kclm.xsap.entity.CourseEntity;
 import com.kclm.xsap.entity.MemberEntity;
@@ -54,7 +49,6 @@ public interface ClassRecordConvert {
     ClassRecordDTO entity2Dto(ClassRecordEntity classRecord, MemberEntity member, CourseEntity course, ScheduleRecordEntity schedule, String cardName, String teacherName, BigDecimal involveMoney);
 
 	default LocalDateTime scheduleToClassTime(ScheduleRecordEntity schedule) {
-		System.out.println("------- 调用了 scheduleToClassTime方法...");
 		return LocalDateTime.of(schedule.getStartDate(), schedule.getClassTime());
 	}
 }

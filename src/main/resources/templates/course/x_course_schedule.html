@@ -11,6 +11,7 @@
     <meta content="后台bootstrap框架,会员中心主题,后台HTML,响应式后台" name="keywords">
     <meta content="完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术" name="description">
 
+
     <link href="../../static/favicon.ico" rel="shortcut icon" th:href="@{/static/favicon.ico}">
     <link href="../../static/css/bootstrap.min.css?v=3.3.6" rel="stylesheet" th:href="@{/static/css/bootstrap.min.css}">
     <link href="../../static/css/font-awesome.css?v=4.4.0" rel="stylesheet" th:href="@{/static/css/font-awesome.css}">
@@ -60,7 +61,7 @@
         <div class="col-sm-12">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-                    <button class="btn btn-info" data-target="#addCourse" data-toggle="modal">新增排课</button>
+                    <button class="btn btn-info" type="button" data-target="#addCourse" data-toggle="modal">新增排课</button>
                     <button class="btn btn-info" data-target="#copyCourse" data-toggle="modal">复制排课</button>
                     <button class="btn btn-success " onclick="window.location.reload()" data-target="#refresh" data-toggle="modal">刷新课程表</button>
                     <button class="btn btn-default " onclick="refreshCache()" data-target="#refresh_cache" data-toggle="modal">refresh cache</button>
@@ -151,7 +152,6 @@
                         <div class="col-sm-3" >
                             <label class="control-label" tip="startDate"></label>
                         </div>
-
                     </div>
 
                     <!--上课时间-->
@@ -369,7 +369,6 @@
     });
 </script>
 <script type="text/javascript">
-
     function refreshCache() {
         $.get('/schedule/refreshCache.do', function (data) {
             if (data.code === 0) {
@@ -477,10 +476,13 @@
             }, function () {
                 $.post("/schedule/scheduleAdd.do", addScheduleForm, function (data) {
                     if (data.code === 0) {
-                        swal("添加成功！", "", "success");
                         setTimeout(function () {
+                            swal("添加成功！", "", "success");
+                        },200);
+                        setTimeout(function () {
+
                             window.location.reload();
-                        }, 1500);
+                        },1300 );
                     } else if (data.code === 400) {
 
                         let errors = data.errorMap;
@@ -490,8 +492,19 @@
                             //错误提示回显
                             $("<span class='text-danger'>" + errors[key] + "</span>").appendTo($("[tip=" + key + "]"));
                         }
+                    }else if(data.code===500){
+                        setTimeout(function(){
+                            swal("添加失败！",data.msg,"info");
+                        },300);
+                        // setTimeout(function () {
+                        //     window.location.reload();
+                        // }, 1000);
                     } else {
-                        swal("添加失败！", data.msg, "info");
+                        setTimeout(function () {
+                            swal("添加失败！", data.msg, "info");
+                        },300)
+
+
                     }
                 });
 
@@ -521,7 +534,7 @@
                 $.post("/schedule/scheduleCopy.do", copyScheduleForm, function (result) {
                     if (result.code === 0) {
                         //刷新页面
-                        swal("复制成功！", "", "success");
+                        swal("复制成功！",result.msg, "success");
                         setTimeout(function () {
                             window.location.reload();
                         }, 1500);
@@ -543,14 +556,43 @@
 
         //提交表单
         $("#reserveList_btn").click(function () {
-            $.post("/reserve/exportReserveList.do", exportReserveListForm, function (result) {
-                if (result == "yes") {
-                    alert("导出成功");
-                    window.location.reload();
-                } else {
-                    alert("尚无此功能")
-                }
-            });
+            var startDateStr=$('[name="startDateStr"]').val();
+            var endDateStr=$('[name="endDateStr"]').val();
+            window.location='/reserve/exportReserveList.do?startDateStr='+startDateStr+'&endDateStr='+endDateStr;
+            // $.ajax({
+            //     type: 'POST',
+            //     url: "/reserve/exportReserveList.do",
+            //     responseType: 'blob',
+            //     data: exportReserveListForm,
+            //     success: function (res) {
+            //         var fileName="预约记录.xlsx"
+            //         if ("msSaveOrOpenBlob" in navigator) {
+            //             let blob = new Blob([data]);
+            //             window.navigator.msSaveOrOpenBlob(blob, fileName);
+            //         } else {
+            //             let blob = new Blob([data], {type: "application/vnd.ms-excel"});
+            //             let fileUrl = URL.createObjectURL(blob);
+            //             let a = document.createElement("a");
+            //             a.setAttribute("href", fileUrl);
+            //             a.setAttribute("download", fileName);
+            //             a.click();
+            //         }
+            //         window.open(res.msg);
+            //     },
+            //     error: function (res){
+            //         swal("导出失败","","info")
+            //     }
+            // })
+
+            // $.post("/reserve/exportReserveList.do", exportReserveListForm, function (data) {
+            //     if (data.code ==0) {
+            //         window.open(data.msg,);
+            //         // alert("导出成功");
+            //         // window.location.reload();
+            //     } else {
+            //         alert("尚无此功能")
+            //     }
+            // });
         });
 
         //时间控件

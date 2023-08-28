@@ -434,6 +434,7 @@
     /*-------------确认扣费------------*/
     //后台传来的id
     var schedule_id = [[${ID}]]
+    var courseLimitCounts=[[${cancelLimitCounts}]]
 
     var consumeForm = "";
     $("#consume_btn").on("mouseenter", function () {
@@ -449,7 +450,6 @@
             if (data.code === 0) {
                 amounts_payable = data.data;
                 console.log('后台传入的金金额=' + amounts_payable);
-
                 $("#consume_memberId").val(member_id);
                 $("#consume_cardId").val(card_id);
                 $("#classId").val(class_id);
@@ -550,7 +550,7 @@
     function cancel_btn(reserve_id) {
         swal({
             title: "您确定要取消本次预约吗？",
-            text: "注意:如果对这堂课取消预约超过3次，则不能再次预约了",
+            text: "注意:如果对这堂课取消预约超过"+courseLimitCounts+"次，则不能再次预约了",
             type: "warning",
             showCancelButton: true,
             confirmButtonColor: "#DD6B55",
@@ -672,7 +672,7 @@
                 var member_id = $("#member").val();
                 /*---------会员卡搜索，根据选择的会员----------*/
                 var cardListSave = "";
-                $.post("/card/toSearchByMemberId.do", {memberId: member_id}, function (data) {
+                $.post("/card/toSearchByMemberId.do", {memberId: member_id,scheduleId: [[${ID}]]}, function (data) {
                     //移除重复
                     var cardList = data.value;
                     $("#default").nextAll().remove();
@@ -682,7 +682,6 @@
                         $("#default").nextAll().remove();
                         $("#remained").html(0);
                     }
-
                     for (var i = 0; i < cardList.length; i++) {
                         if (cardList[i] != null) {
                             $("#cardList").append("<option  value='" + cardList[i].name + "'>" + cardList[i].name + "</option>");
@@ -701,7 +700,7 @@
                                 console.log(id);
                                 $("option[value='" + selectOne + "']").attr("selected", "selected");
                                 //---------显示某会员的某会员卡的提示信息---------
-                                $.post("/card/cardTip.do", {cardId: id, scheduleId: schedule_id}, function (data) {
+                                $.post("/card/cardTip.do", {cardId: id,memberId: member_id,scheduleId: schedule_id}, function (data) {
                                     //会员对应的卡剩余的次数
                                     var result = data.data;
                                     if (result.cardTotalCount > 0) {
@@ -742,7 +741,7 @@
             $("#endTime").html(baseInfo.data.endTime);
             $("#duration").html(baseInfo.data.duration + "分钟");
             $("#limitSex").html(baseInfo.data.limitSex);
-            $("#limitAge").html(baseInfo.data.limitAge === -1 ? "无限制" : baseInfo.data.limitAge);
+            $("#limitAge").html(baseInfo.data.limitAge === 0 ? "无限制" : baseInfo.data.limitAge);
             $("#supportCards").html(baseInfo.data.supportCards);
             $("#teacherName").html(baseInfo.data.teacherName);
             $("#classNumbers").html(baseInfo.data.orderNums + "/" + baseInfo.data.classNumbers);
@@ -763,8 +762,9 @@
                     {"data": "timesCost"},
                     {"data": "operateTime"},
                     {"data": "operator"},
-                    /*{"data": "comment"},*/
                     {"data": "reserveNote"},
+                    /*{"data": "comment"},*/
+
                     {
                         "data": "reserveId", "render": function (data, type, row) {
                             var html = "<button name='cancel_btn' onclick='cancel_btn(" + data + ")' value='" + data + "' class='btn btn-warning '>取消预约</button>&nbsp &nbsp";
@@ -807,7 +807,8 @@
                         "orderable": false,
                         "render": function (data, type, row) {
                             var status = data;
-                            if (status === 1) {
+                            console.log('预约记录的状态'+status);
+                            if (status == '1') {
                                 status = "已预约";
                             } else {
                                 status = "已取消";

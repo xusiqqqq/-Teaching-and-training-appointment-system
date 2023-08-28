@@ -1,7 +1,6 @@
 package com.kclm.xsap.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.kclm.xsap.entity.MemberEntity;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -50,7 +49,6 @@ public class ClassRecordVo {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate memberBirthday;
 
-//    private MemberEntity member;
 
     /**
      * 创建时间

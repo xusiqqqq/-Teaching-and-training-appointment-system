@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-//import com.kclm.xsap.entity.TMember;
 import com.kclm.xsap.entity.MemberEntity;
 
 import lombok.Data;

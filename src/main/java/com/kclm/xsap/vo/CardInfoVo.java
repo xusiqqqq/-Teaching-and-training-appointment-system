@@ -1,7 +1,6 @@
 package com.kclm.xsap.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.kclm.xsap.entity.MemberCardEntity;
 import lombok.Data;
 import lombok.experimental.Accessors;
 

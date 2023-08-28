@@ -124,12 +124,17 @@
             	url: "[[${#request.getContextPath()}]]/card/deleteOne.do",
             	type: "post",
             	data: {id:mcid},
-            	success:function(){
-            		swal("删除成功！", "您已经永久删除了这条信息。", "success");
-            		//刷新界面
-            		setTimeout(function(){
-	            		window.location.href="[[${#request.getContextPath()}]]/card/x_member_card.do";
-            		},1*1000);
+            	success:function(data){
+                    if(data.code===0){
+                        swal("删除成功！", "您已经永久删除了这条信息。", "success");
+                        //刷新界面
+                        setTimeout(function(){
+                            window.location.href="[[${#request.getContextPath()}]]/card/x_member_card.do";
+                        },1*1000);
+                    }else{
+                        swal("删除失败！", data.msg, "info");
+                    }
+
             	},
             	error:function(){
             		swal("删除失败！", "未知错误。。。", "info");

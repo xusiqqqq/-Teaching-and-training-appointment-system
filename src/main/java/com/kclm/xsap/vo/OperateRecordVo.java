@@ -1,6 +1,5 @@
 package com.kclm.xsap.vo;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -47,11 +46,11 @@ public class OperateRecordVo {
     /**
      * 有效期
      */
-//    private Integer validDay;
+    private Integer validDay;
     /**
      * 卡到期日
      */
-//    private LocalDateTime endToDate;
+    private LocalDateTime endToDate;
     /**
      * 消费金额
      */

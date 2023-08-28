@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.kclm.xsap.entity.EmployeeEntity;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 员工表
@@ -14,8 +13,6 @@ import java.util.Map;
  * @date 2021-12-04 16:18:21
  */
 public interface EmployeeService extends IService<EmployeeEntity> {
-
-    //PageUtils queryPage(Map<String, Object> params);
 
     EmployeeEntity isExistEmp(String username, String password);
 
@@ -27,7 +24,7 @@ public interface EmployeeService extends IService<EmployeeEntity> {
     String getTeacherNameById(Long teacherId);
 
     /**
-     * g根据批量id批量查询老师信息
+     * 根据批量id批量查询老师信息
      * @param teacherIdList
      * @return
      */

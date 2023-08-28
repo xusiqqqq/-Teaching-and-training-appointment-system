@@ -297,9 +297,9 @@ public class DataSourceConfig {
     }
 
     @Bean
-    public ServletRegistrationBean statViewServlet() {
+    public ServletRegistrationBean<StatViewServlet> statViewServlet() {
         log.debug("--注册 Druid的Servlet注册器");
-        ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(new StatViewServlet(), "/druid/*");
+        ServletRegistrationBean<StatViewServlet> servletRegistrationBean = new ServletRegistrationBean<>(new StatViewServlet(), "/druid/*");
         // 添加IP白名单
         servletRegistrationBean.addInitParameter("allow", "192.168.124.48,127.0.0.1");
         // 添加IP黑名单，当白名单和黑名单重复时，黑名单优先级更高
@@ -313,9 +313,9 @@ public class DataSourceConfig {
     }
 
     @Bean
-    public FilterRegistrationBean statFilter() {
+    public FilterRegistrationBean<WebStatFilter> statFilter() {
         log.debug("--- 注册 druid的过滤器...");
-        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean(new WebStatFilter());
+        FilterRegistrationBean<WebStatFilter> filterRegistrationBean = new FilterRegistrationBean<>(new WebStatFilter());
         // 添加过滤规则
         filterRegistrationBean.addUrlPatterns("/*");
         // 忽略过滤格式

@@ -12,20 +12,20 @@
     <meta content="完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术" name="description">
 
     <link href="../../static/favicon.ico" rel="shortcut icon" th:href="@{/static/favicon.ico}">
-    <link href="../../static/css/bootstrap.min.css?v=3.3.6" rel="stylesheet"
+    <link href="../../../static/css/bootstrap.min.css?v=3.3.6" rel="stylesheet"
           th:href="@{/static/css/bootstrap.min.css(v='3.3.6')}">
-    <link href="../../static/css/font-awesome.css?v=4.4.0" rel="stylesheet"
+    <link href="../../../static/css/font-awesome.css?v=4.4.0" rel="stylesheet"
           th:href="@{/static/css/font-awesome.css(v='4.4.0')}">
-    <link href="../../static/css/animate.css" rel="stylesheet" th:href="@{/static/css/animate.css}">
-    <link href="../../static/css/style.css?v=4.1.0" rel="stylesheet" th:href="@{/static/css/style.css(v='4.1.0')}">
+    <link href="../../../static/css/animate.css" rel="stylesheet" th:href="@{/static/css/animate.css}">
+    <link href="../../../static/css/style.css?v=4.1.0" rel="stylesheet" th:href="@{/static/css/style.css(v='4.1.0')}">
 
     <!-- Data Tables -->
-    <link href="../../static/css/plugins/dataTables/dataTables.bootstrap.css"
+    <link href="../../../static/css/plugins/dataTables/dataTables.bootstrap.css"
           rel="stylesheet" th:href="@{/static/css/plugins/dataTables/dataTables.bootstrap.css}">
 
 
     <!--sweetalert.css-->
-    <link href="../../static/css/plugins/sweetalert/sweetalert.css" rel="stylesheet"
+    <link href="../../../static/css/plugins/sweetalert/sweetalert.css" rel="stylesheet"
           th:href="@{/static/css/plugins/sweetalert/sweetalert.css}">
 
 </head>
@@ -73,23 +73,23 @@
 </div>
 
 <!-- 全局js -->
-<script src="../../static/js/jquery.min.js?v=2.1.4" th:src="@{/static/js/jquery.min.js(v='2.1.4')}"></script>
-<script src="../../static/js/bootstrap.min.js?v=3.3.6" th:src="@{/static/js/bootstrap.min.js(v='3.3.6')}"></script>
+<script src="../../../static/js/jquery.min.js?v=2.1.4" th:src="@{/static/js/jquery.min.js(v='2.1.4')}"></script>
+<script src="../../../static/js/bootstrap.min.js?v=3.3.6" th:src="@{/static/js/bootstrap.min.js(v='3.3.6')}"></script>
 
-<script src="../../static/js/plugins/jeditable/jquery.jeditable.js"
+<script src="../../../static/js/plugins/jeditable/jquery.jeditable.js"
         th:src="@{/static/js/plugins/jeditable/jquery.jeditable.js}"></script>
 <!-- 自定义js -->
-<script src="../../static/js/content.js?v=1.0.0" th:src="@{/static/js/content.js(v='1.0.0')}"></script>
+<script src="../../../static/js/content.js?v=1.0.0" th:src="@{/static/js/content.js(v='1.0.0')}"></script>
 
 <!-- Data Tables -->
-<script src="../../static/js/plugins/dataTables/jquery.dataTables.js"
+<script src="../../../static/js/plugins/dataTables/jquery.dataTables.js"
         th:src="@{/static/js/plugins/dataTables/jquery.dataTables.js}"></script>
-<script src="../../static/js/plugins/dataTables/dataTables.bootstrap.js"
+<script src="../../../static/js/plugins/dataTables/dataTables.bootstrap.js"
         th:src="@{/static/js/plugins/dataTables/dataTables.bootstrap.js}"></script>
-<script src="../../static/js/plugins/echarts/echarts-all.js"></script>
+<script src="../../../static/js/plugins/echarts/echarts-all.js"></script>
 
 <!--sweetalert-->
-<script src="../../static/js/plugins/sweetalert/sweetalert.min.js"
+<script src="../../../static/js/plugins/sweetalert/sweetalert.min.js"
         th:src="@{/static/js/plugins/sweetalert/sweetalert.min.js}"></script>
 
 
@@ -99,8 +99,6 @@
     $(function () {
 
         $.post("[[${#request.getContextPath()}]]/statistics/cardInfo.do", function (data) {
-
-
             var infoList = data.data;
             if (data.code === 400) {
                 swal(data.msg, "", "info");

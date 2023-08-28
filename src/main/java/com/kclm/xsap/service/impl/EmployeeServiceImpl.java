@@ -20,18 +20,6 @@ import com.kclm.xsap.service.EmployeeService;
 @Slf4j
 @Service("employeeService")
 public class EmployeeServiceImpl extends ServiceImpl<EmployeeDao, EmployeeEntity> implements EmployeeService {
-
-    /*
-    @Override
-    public PageUtils queryPage(Map<String, Object> params) {
-        IPage<EmployeeEntity> page = this.page(
-                new Query<EmployeeEntity>().getPage(params),
-                new QueryWrapper<EmployeeEntity>()
-        );
-
-        return new PageUtils(page);
-    }
-    */
     @Override
     public EmployeeEntity isExistEmp(String username, String password) {
         EmployeeEntity selectOneForLogin = this.baseMapper.selectOne(new QueryWrapper<EmployeeEntity>().eq("name", username).eq("role_password", password));

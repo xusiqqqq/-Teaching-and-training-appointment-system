@@ -73,7 +73,7 @@
         <!--充值次数-->
         <div class="form-group">
             <label class="col-md-2 control-label">充值次数</label>
-            <div class="col-md-6">
+            <div class="col-md-2">
                 <input class="input_style" min="0" name="validCount" type="number" value="50">
             </div>
             <div class="col-md-4">
@@ -85,7 +85,7 @@
         <!--有效期-->
         <div class="form-group">
             <label class="col-md-2 control-label">有效期</label>
-            <div class="col-md-6">
+            <div class="col-md-2">
                 <input class="input_style" min="0" name="validDay" type="number" value="30">
             </div>
             <div class="col-md-4">
@@ -236,7 +236,6 @@
             for (var i = 0; i < cardList.length; i++) {
                 $("#selectList").append("<option  value='" + cardList[i].id + "'>" + cardList[i].name + "</option>");
             }
-
         });
 
         /* 选中的列表项 - 会员卡 */

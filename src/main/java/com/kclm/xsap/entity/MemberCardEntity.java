@@ -2,6 +2,7 @@ package com.kclm.xsap.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.math.BigDecimal;
@@ -73,6 +74,7 @@ public class MemberCardEntity implements Serializable {
 	/**
 	 * 激活状态，0激活，1非激活
 	 */
+	@TableLogic
 	private Integer status;
 	/**
 	 * 创建时间
@@ -100,7 +102,5 @@ public class MemberCardEntity implements Serializable {
 
 	@TableField(exist = false)
 	private LocalDateTime dueTime;
-
-
 
 }

@@ -1,15 +1,18 @@
 package com.kclm.xsap.web.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kclm.xsap.entity.*;
 import com.kclm.xsap.service.*;
+import com.kclm.xsap.utils.ImageUploadUtils;
 import com.kclm.xsap.utils.R;
+import com.kclm.xsap.utils.exception.DeleteException;
 import com.kclm.xsap.utils.exception.RRException;
-import com.kclm.xsap.utils.file.UploadImg;
 import com.kclm.xsap.vo.ModifyPassword;
 import com.kclm.xsap.vo.TeacherClassRecordVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -19,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.time.LocalDate;
@@ -45,8 +49,16 @@ import java.util.stream.Stream;
 @Controller
 @RequestMapping("/user")
 public class EmployeeController {
+    private static final String CHECK_PWD_ERROR="CHECK_PWD_ERROR";
 
-    private static final String UPLOAD_IMAGES_TEACHER_IMG = "upload/images/teacher_img/";
+    private static final String UPLOAD_IMAGES_TEACHER_IMG = "/upload/images/teacher_img/";
+
+    private static String userInfo="userInfo";
+    private static String TEACHER_ID="teacher_id";
+    private static String SCHEDULE_ID="schedule_id";
+
+    private static String X_MODIFY_PWD="x_modify_password";
+    private static String X_ENSURE_USER="x_ensure_user";
 
 
     @Resource
@@ -102,11 +114,10 @@ public class EmployeeController {
         model.addAttribute("USER_NOT_EXIST", flag);
         if (flag) {
             session.setAttribute("LOGIN_USER", isExistEmp);
-            return "redirect:/index";
+            return "index";
         } else {
             return "x_login";
         }
-
     }
 
     /**
@@ -175,7 +186,7 @@ public class EmployeeController {
      */
     @GetMapping("/toEnsureUser")
     public String toEnsureUser() {
-        return "x_ensure_user";
+        return X_ENSURE_USER;
     }
 
     /**
@@ -218,14 +229,14 @@ public class EmployeeController {
             if (userOne.isEmpty()) {
                 //没查到该用户信息,返回提示到前台
                 model.addAttribute("CHECK_USER_ERROR", true);
-                return "x_ensure_user";
+                return X_ENSURE_USER;
             }
             //查到信息，跳转页面
             return "send_mail_ok";
         } else {
             //格式不正确，返回提示到前台
             model.addAttribute("CHECK_INPUT_FORMAT", true);
-            return "x_ensure_user";
+            return X_ENSURE_USER;
         }
 
 
@@ -239,7 +250,7 @@ public class EmployeeController {
      */
     @GetMapping("/x_modify_password.do")
     public String modifyPassword() {
-        return "x_modify_password";
+        return X_MODIFY_PWD;
     }
 
 
@@ -258,20 +269,20 @@ public class EmployeeController {
             throw new RRException("修改数据表单为空", 22404);
         }
         if (entity.getOldPwd().isEmpty()) {
-            model.addAttribute("CHECK_PWD_ERROR", 0);
+            model.addAttribute(CHECK_PWD_ERROR, 0);
             log.debug("\n==>原密码为空");
-            return "x_modify_password";
+            return X_MODIFY_PWD;
         } else {
             if (!entity.getNewPwd().equals(entity.getPwd2())) {
-                model.addAttribute("CHECK_PWD_ERROR", 2);
+                model.addAttribute(CHECK_PWD_ERROR, 2);
                 log.debug("\n==>新密码两次不一样");
-                return "x_modify_password";
+                return X_MODIFY_PWD;
             }
             EmployeeEntity employeeEntity = employeeService.getById(entity.getId());
             if (!employeeEntity.getRolePassword().equals(entity.getOldPwd())) {
-                model.addAttribute("CHECK_PWD_ERROR", 1);
+                model.addAttribute(CHECK_PWD_ERROR, 1);
                 log.debug("\n==>原密码不正确");
-                return "x_modify_password";
+                return X_MODIFY_PWD;
             } else {
                 employeeEntity.setRolePassword(entity.getNewPwd()).setVersion(employeeEntity.getVersion() + 1).setLastModifyTime(LocalDateTime.now());
                 boolean isUpdatePwd = employeeService.updateById(employeeEntity);
@@ -294,7 +305,7 @@ public class EmployeeController {
     @GetMapping("/x_profile.do")
     public String profile(Long id, Model model) {
         EmployeeEntity employeeServiceById = employeeService.getById(id);
-        model.addAttribute("userInfo", employeeServiceById);
+        model.addAttribute(userInfo, employeeServiceById);
         return "x_profile";
     }
 
@@ -363,6 +374,52 @@ public class EmployeeController {
         return R.ok().put("data", teacherInfo);
     }
 
+    /**
+     * 头像更新
+     * todo 回显。。
+     *
+     * @param id   要更新头像的老师的id
+     * @param file 要更新的头像图片文件
+     * @return r -> 更新结果
+     */
+    @PostMapping("/modifyUserImg.do")
+    @ResponseBody
+    public R modifyUserImg(@RequestParam("id") Long id,
+                           @RequestParam("avatarFile") MultipartFile file) {
+
+        if(file.isEmpty())return R.error("头像未上传");
+        String newFileName = ImageUploadUtils.uploadMemberImg(file, UPLOAD_IMAGES_TEACHER_IMG);
+        if(newFileName==null) return R.error("头像上传失败");
+        EmployeeEntity teacher = employeeService.getById(id);
+        //更新会员的头像url地址,存储会员头像
+        teacher.setAvatarUrl(newFileName);
+        employeeService.updateById(teacher);
+        return  R.ok().put("data",teacher);
+    }
+
+    @GetMapping("/statistics/x_card_list_stat.html")
+    public String toCardListStat(){
+        return "/statistics/x_card_list_stat";
+    }
+
+    @GetMapping("/statistics/x_card_cost_stat.html")
+    public String toCardCostStat(){
+        return "/statistics/x_card_cost_stat";
+    }
+
+    @GetMapping("/statistics/x_class_cost_stat.html")
+    public String toClassCost(){
+        return "/statistics/x_class_cost_stat";
+    }
+
+    @GetMapping("/statistics/x_class_hour_stat.html")
+    public String toClassHourStat(){
+        return "/statistics/x_class_hour_stat";
+    }
+
+    @GetMapping("/statistics/x_member_num_static.html")
+    public String toMemberNum(){ return "/statistics/x_member_num_static"; }
+
 
     /**
      * 封装老师管理中的上课记录信息
@@ -375,7 +432,7 @@ public class EmployeeController {
     public R teacherClassRecord(@RequestParam("tid") Long id) {
         log.debug("\n==>打印传入的teacherId==>{}", id);
 
-        List<ScheduleRecordEntity> scheduleForTeacher = scheduleRecordService.list(new QueryWrapper<ScheduleRecordEntity>().eq("teacher_id", id));
+        List<ScheduleRecordEntity> scheduleForTeacher = scheduleRecordService.list(new QueryWrapper<ScheduleRecordEntity>().eq(TEACHER_ID, id));
         log.debug("\n==>打印该老师的所有排课计划==>{}", scheduleForTeacher);
         List<TeacherClassRecordVo> teacherClassRecordVos = scheduleForTeacher.stream().map(entity -> {
             //获取当前排课记录的id
@@ -391,7 +448,7 @@ public class EmployeeController {
             //获取课程单位消耗次数
             Integer timesCost = courseById.getTimesCost();
             //在上课记录中查询所有上了当前课程的会员的id的list
-            List<Long> memberIdList = classRecordService.list(new QueryWrapper<ClassRecordEntity>().select("member_id").eq("schedule_id", scheduleId).eq("check_status", 1)).stream().map(ClassRecordEntity::getMemberId).collect(Collectors.toList());
+            List<Long> memberIdList = classRecordService.list(new QueryWrapper<ClassRecordEntity>().select("member_id").eq(SCHEDULE_ID, scheduleId).eq("check_status", 1)).stream().map(ClassRecordEntity::getMemberId).collect(Collectors.toList());
 
             //初始化创建一个用于存放会员名的list，当会员id为空时
             List<String> memberNames = new ArrayList<>();
@@ -428,35 +485,7 @@ public class EmployeeController {
     }
 
 
-    /**
-     * 头像更新
-     * todo 回显。。
-     *
-     * @param id   要更新头像的老师的id
-     * @param file 要更新的头像图片文件
-     * @return r -> 更新结果
-     */
-    @PostMapping("/modifyUserImg.do")
-    @ResponseBody
-    public R modifyUserImg(@RequestParam("id") Long id,
-                           @RequestParam("avatarFile") MultipartFile file) {
 
-        if (!file.isEmpty()) {
-            log.debug("\n==>文件上传...");
-            String fileName = UploadImg.uploadImg(file, UPLOAD_IMAGES_TEACHER_IMG);
-            if (StringUtils.isNotBlank(fileName)) {
-                EmployeeEntity entity = new EmployeeEntity().setId(id).setAvatarUrl(fileName).setVersion(+1);
-                boolean isUpdateAvatarUrl = employeeService.updateById(entity);
-                log.debug("\n==>更新头像是否成功==>{}", isUpdateAvatarUrl);
-                return new R().put("data", entity);
-            } else {
-                return R.error("头像上传失败");
-            }
-
-        }
-        return R.error("头像未上传");
-
-    }
 
 
     /**
@@ -511,7 +540,7 @@ public class EmployeeController {
         log.debug("\n==>前端传入的要删除的老师id：==>{}", id);
         //检查该老师的排课计划表
         List<ScheduleRecordEntity> allScheduleForCurrentTeacher = scheduleRecordService.list(new QueryWrapper<ScheduleRecordEntity>()
-                .select("id","order_nums", "start_date", "class_time").eq("teacher_id", id));
+                .select("id","order_nums", "start_date", "class_time").eq(TEACHER_ID, id));
         log.debug("\n==>打印该老师的所有排课计划表==>{}", allScheduleForCurrentTeacher);
         //当该老师没有排课记录和计划时,直接删除老师信息
         if (allScheduleForCurrentTeacher.isEmpty()) {
@@ -522,7 +551,7 @@ public class EmployeeController {
                 return R.ok("该老师已没有排课记录和计划");
             } else {
                 log.debug("\n==>删除老师失败");
-                throw new RuntimeException("删除失败！");
+                throw new DeleteException("删除失败！");
             }
         } else {
             //该老师有排课记录
@@ -543,7 +572,7 @@ public class EmployeeController {
                     return R.ok("该老师存在排课记录但没有未完成的排课计划，仅删除该老师信息后保留已有的排课记录");
                 } else {
                     log.debug("\n==>删除老师失败");
-                    throw new RuntimeException("删除失败！");
+                    throw new DeleteException("删除失败！");
                 }
             } else {
                 //该老师存在未完成的排课记录
@@ -562,9 +591,9 @@ public class EmployeeController {
                         //删除老师
                         boolean isRemoveTeacher = employeeService.removeById(id);
                         //删除预约后取消预约导致预约人数显示0 的预约记录
-                        reservationRecordService.remove(new QueryWrapper<ReservationRecordEntity>().in("schedule_id", scheduleIds));
+                        reservationRecordService.remove(new QueryWrapper<ReservationRecordEntity>().in(SCHEDULE_ID, scheduleIds));
                         //最后删除该老师的全部排课记录【因为没有已完成的记录】
-                        boolean isRemoveSchedule = scheduleRecordService.remove(new QueryWrapper<ScheduleRecordEntity>().eq("teacher_id", id));
+                        boolean isRemoveSchedule = scheduleRecordService.remove(new QueryWrapper<ScheduleRecordEntity>().eq(TEACHER_ID, id));
                         if (isRemoveSchedule && isRemoveTeacher) {
                             log.debug("\n==>删除成功");
                             return R.ok("该老师只有未完成的排课记录，删除该老师信息后未完成的排课计划也会被删除");
@@ -579,7 +608,7 @@ public class EmployeeController {
                         //首先通过老师id删除该老师
                         boolean isRemoveTeacher = employeeService.removeById(id);
                         //再通过该老师的所有未开始的全部排课计划的排课id删除所有未开始的排课的预约记录【目的是删除有预约但取消了的记录，此时预约人数未0，不用担心删错预约记录；而先删预约记录为了避免外键冲突】
-                        boolean isRemoveReserveOfCancel = reservationRecordService.remove(new QueryWrapper<ReservationRecordEntity>().in("schedule_id", scheduleIds));
+                        boolean isRemoveReserveOfCancel = reservationRecordService.remove(new QueryWrapper<ReservationRecordEntity>().in(SCHEDULE_ID, scheduleIds));
                         if (isRemoveReserveOfCancel) {
                             log.debug("\n==>删除了这些预约id==>{}在预约该课程后取消的用户", scheduleIds);
                         }
@@ -601,5 +630,40 @@ public class EmployeeController {
 
         }
 
+    }
+
+    @PostMapping("/modifyUser.do")
+    public String updateUser(EmployeeEntity employee, Model model){
+        //id:
+        //name: 张老师
+        //phone: 1234
+        //sex: 女
+        EmployeeEntity employeeOrigin = employeeService.getById(employee.getId());
+        employee.setCreateTime(employeeOrigin.getCreateTime());
+        employee.setLastModifyTime(employeeOrigin.getLastModifyTime());
+        employee.setAvatarUrl(employeeOrigin.getAvatarUrl());
+        model.addAttribute(userInfo,employee);
+        if(employee.getName().trim().isEmpty()){
+            model.addAttribute("NAME_NULL","用户名不能为空");
+            return "/x_profile";
+        }
+        LambdaQueryWrapper<EmployeeEntity> qw=new LambdaQueryWrapper<>();
+        qw.eq(EmployeeEntity::getPhone,employee.getPhone()).ne(EmployeeEntity::getId,employee.getId());
+        List<EmployeeEntity> list = employeeService.list(qw);
+        if(list.size()>0){
+            model.addAttribute("CHECK_PHONE_EXIST","手机号已经被其他用户使用了");
+            return "x_profile";
+        }
+
+        employeeOrigin.setName(employee.getName());
+        employeeOrigin.setPhone(employee.getPhone());
+        employeeOrigin.setSex(employee.getSex());
+        model.addAttribute(userInfo,employeeOrigin);
+        if(employeeService.updateById(employeeOrigin)){
+            model.addAttribute("UPDATE_SUCCESS","更新成功！");
+        }else{
+            model.addAttribute("UPDATE_ERROR","更新失败！");
+        }
+        return "/x_profile";
     }
 }

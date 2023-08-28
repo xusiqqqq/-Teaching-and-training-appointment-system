@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
  *
  */
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper=false)//自动生成 equals 方法和 hashCode 方法
 public class MemberDTO{
 
     private Long id;

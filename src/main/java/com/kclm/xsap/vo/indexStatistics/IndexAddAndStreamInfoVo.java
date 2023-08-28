@@ -22,7 +22,6 @@ public class IndexAddAndStreamInfoVo {
     private List<String> time;
     //y轴数据
     private List<Integer> data;
-
     private List<Integer> data2;
 
 }

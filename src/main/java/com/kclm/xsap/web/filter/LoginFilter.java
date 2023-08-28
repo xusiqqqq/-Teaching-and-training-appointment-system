@@ -2,6 +2,7 @@ package com.kclm.xsap.web.filter;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
+import org.springframework.util.AntPathMatcher;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
@@ -20,8 +21,7 @@ import java.io.IOException;
 @WebFilter(urlPatterns = {"*.do","/index.html","/index", "" ,"/"},filterName = "loginFilter", dispatcherTypes =
         {DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.INCLUDE, DispatcherType.ASYNC})
 public class LoginFilter implements Filter {
-
-
+    public static final AntPathMatcher matcher=new AntPathMatcher();
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         log.debug("LoginFilter.init()...执行...");
@@ -47,12 +47,11 @@ public class LoginFilter implements Filter {
                 chain.doFilter(req, resp);
             }
         }
-
-
     }
 
     @Override
     public void destroy() {
         log.debug("LoginFilter.destroy()...执行...");
     }
+
 }

@@ -1,11 +1,12 @@
 package com.kclm.xsap.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 /**
  * @author fangkai
@@ -15,15 +16,17 @@ import java.time.LocalDateTime;
 
 @Data
 @Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class MemberVo {
     private Long id;
+
+    private String phone;
     private String memberName;
     private String gender;
     private String[] cardHold;
-
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate joiningDate;
     private String note;
-//    private String[] clubCard;
-//    private String remark;
+
 }

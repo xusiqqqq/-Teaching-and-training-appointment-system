@@ -46,8 +46,7 @@ public class MybatisPlusConfig {
     @Profile({"dev","pro"})  //设置 dev和pro环境开启
     public PerformanceMonitorInterceptor performanceMonitorInterceptor() {
         log.debug("创建SQL执行效率监视插件...");
-        PerformanceMonitorInterceptor pmi = new PerformanceMonitorInterceptor();
-        return pmi;
+        return new PerformanceMonitorInterceptor();
     }
     
     /**
@@ -57,7 +56,6 @@ public class MybatisPlusConfig {
     @Bean
     public OptimisticLockerInterceptor optimisticLockerInterceptor() {
     	log.debug("create OptimisticLockerInterceptor....");
-    	OptimisticLockerInterceptor oli = new OptimisticLockerInterceptor();
-    	return oli;
+    	return new OptimisticLockerInterceptor();
     }
 }

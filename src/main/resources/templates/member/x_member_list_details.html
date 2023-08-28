@@ -648,6 +648,7 @@
                         setTimeout(function () {
                             $("#avatar_img").attr("src", "/images/member_img/" + userData.avatarUrl);
                         }, 1000);
+                        window.location.reload();
                     } else {
                         swal(userData.msg, "请联系管理", "info");
                     }
@@ -837,12 +838,13 @@
             type: "post",
             data: form,
             success: function (data) {
-                if (data.version == 4) {
-                    //刷新界面
-                    window.location.reload();
-                } else {
-                    $("input[name='phone']").after("<span class='text-danger'>" + data.note + "</span>");
-                }
+                window.location.reload();
+                // if (data.version == 4) {
+                //     //刷新界面
+                //
+                // } else {
+                //     $("input[name='phone']").after("<span class='text-danger'>" + data.note + "</span>");
+                // }
             },
             error: function (jqXHR) {
                 alert("更新失败, 请重新再试!");
@@ -862,7 +864,7 @@
             if (baseInfo.avatarUrl == null) {
                 baseInfo.avatarUrl = "user.png";
             }
-            $("#avatar_img").attr("src", "/images/member_img/" + baseInfo.avatarUrl);
+            $("#avatar_img").attr("src", "/upload/images/member_img/" + baseInfo.avatarUrl);
 
             $("label h2").html('<strong>' + baseInfo.name + '</strong>');
             $("label p:nth-child(2)").html('<span style="margin-right: 15px;">性别:</span>' + baseInfo.sex);
@@ -899,6 +901,9 @@
 
                         // var operator = [[${session.LOGIN_USER.name}]]
                         // console.log('operator' + operator)
+                        // console.log('memberId',[[${ID}]]);
+                        // console.log('bindId',cardInfo[index].bindId);
+                        // console.log('status',statusVal);
 
                         //发送AJAX请求到服务端
                         $.ajax({
@@ -916,24 +921,24 @@
                                 if (activeStatus === 0) {
                                     $(html).parent("td").prev().text("未激活");
                                     /*未激活时充值和扣费无法点击*/
-                                    $("#recharge_btn_of_operation")
+                                    // $("#recharge_btn_of_operation")
+                                    //     .removeClass("btn-primary").addClass("btn-default").attr("disabled", true);
+                                    // $("#consume_btn_of_operation")
+                                    //     .removeClass("btn-info").addClass("btn-default").attr("disabled", true);
+                                    $("button[name='recharge'][value='" + cardInfo[index].bindId + "']")
                                         .removeClass("btn-primary").addClass("btn-default").attr("disabled", true);
-                                    $("#consume_btn_of_operation")
+                                    $("button[name='consume'][value='" + cardInfo[index].bindId + "']")
                                         .removeClass("btn-info").addClass("btn-default").attr("disabled", true);
-                                    /*$("button[name='recharge'][value='" + cardInfo[index].bindCardId + "']")
-                                        .removeClass("btn-primary").addClass("btn-default").attr("disabled", true);
-                                    $("button[name='consume'][value='" + cardInfo[index].bindCardId + "']")
-                                        .removeClass("btn-info").addClass("btn-default").attr("disabled", true);*/
                                 } else {
                                     $(html).parent("td").prev().text("激活");
-                                    $("#recharge_btn_of_operation")
+                                    // $("#recharge_btn_of_operation")
+                                    //     .removeClass("btn-default").addClass("btn-primary").attr("disabled", false);
+                                    // $("#consume_btn_of_operation")
+                                    //     .removeClass("btn-default").addClass("btn-info").attr("disabled", false);
+                                    $("button[name='recharge'][value='" + cardInfo[index].bindId + "']")
                                         .removeClass("btn-default").addClass("btn-primary").attr("disabled", false);
-                                    $("#consume_btn_of_operation")
+                                    $("button[name='consume'][value='" + cardInfo[index].bindId + "']")
                                         .removeClass("btn-default").addClass("btn-info").attr("disabled", false);
-                                    /*$("button[name='recharge'][value='" + cardInfo[index].bindCardId + "']")
-                                        .removeClass("btn-default").addClass("btn-primary").attr("disabled", false);
-                                    $("button[name='consume'][value='" + cardInfo[index].bindCardId + "']")
-                                        .removeClass("btn-default").addClass("btn-info").attr("disabled", false);*/
                                 }
                             },
                             error: function (jqXHR) {
@@ -1048,7 +1053,7 @@
                         "orderable": false,
                         "render": function (data, type, row) {
                             var status = data;
-                            if (status === 1) {
+                            if (status === '1') {
                                 status = "已预约";
                             } else {
                                 status = "未预约";
@@ -1205,10 +1210,10 @@
 
 
     /*操作记录*/
-    function operateShow(member_id, card_id) {
-        console.log(member_id + " - " + card_id);
+    function operateShow(member_id, bind_id) {
+        console.log(member_id + " - " + bind_id);
         //操作记录
-        $.post("/card/operateRecord.do", {memberId: member_id, cardId: card_id}, function (data) {
+        $.post("/card/operateRecord.do", {memberId: member_id, bindId: bind_id}, function (data) {
             var operateInfo = data.data;
             if (operateInfo.length < 1) {
                 operateInfo = [];

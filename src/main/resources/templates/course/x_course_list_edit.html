@@ -23,6 +23,8 @@
     <link href="../../static/css/plugins/datapicker/datepicker3.css" th:href="@{/static/css/plugins/datapicker/datepicker3.css}" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="../../static/css/plugins/simditor/simditor.css" th:href="@{/static/css/plugins/simditor/simditor.css}"/>
     <link href="../../static/css/plugins/sweetalert/sweetalert.css" rel="stylesheet" th:href="@{/static/css/plugins/sweetalert/sweetalert.css}">
+<!--    <link href="../..//static/css/plugins/datapicker/bootstrap-datepicker.css.map" -->
+<!--          th:href="@{/static/css/plugins/datapicker/bootstrap-datepicker.css.map}">-->
  
      <style type="text/css">
         .input_width {
@@ -53,11 +55,14 @@
                         <!-- 隐藏域，课程 id -->
                         <div class="form-group">
                             <label class="col-sm-2 control-label"><i class="red">*</i>课程名称</label>
-                            <div class="col-sm-10">
+                            <div class="col-sm-3">
                             	<input type="hidden" name="id" value="1" th:value="${courseInfo.id}"/>
                             	
                                 <input type="text" class="form-control" id="course_name" placeholder="请输入课程名称" value="钢琴课"  th:value="${courseInfo.name}" name="name">
                            		<span class="text-danger">[[${NAME_EXIST}]]</span>
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="control-label" tip="name"></label>
                             </div>
                         </div>
                         <!--课程时长-->
@@ -65,6 +70,9 @@
                             <label class="col-sm-2 control-label">时长(分钟)</label>
                             <div class="col-sm-3 col-md-2">
                                 <input type="number" class="form-control" name="duration" value="45" min="0" th:value="${courseInfo.duration}">
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="control-label" tip="duration"></label>
                             </div>
                         </div>
 
@@ -74,6 +82,9 @@
                             <div class="col-sm-3 col-md-2">
                                 <input type="number" class="form-control" name="contains" value="1"  min="0" th:value="${courseInfo.contains}">
                             </div>
+                            <div class="col-sm-4">
+                                <label class="control-label" tip="contains"></label>
+                            </div>
                         </div>
 
                         <!--每节消耗次数-->
@@ -81,6 +92,9 @@
                             <label class="col-sm-2 control-label">消耗次数/节</label>
                             <div class="col-sm-3 col-md-2">
                                 <input type="number" class="form-control" name="timesCost" value="0" min="0" max="5"  th:value="${courseInfo.timesCost}">
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="control-label" tip="timesCost"></label>
                             </div>
                         </div>
 
@@ -103,7 +117,7 @@
                                        id="support_program">
                                     <thead>
                                     <tr>
-                                        <th><label for="check_all"></label><input type="checkbox" name="cardListStr" id="check_all" class="i-checks"></th>
+                                        <th><label for="check_all"></label><input type="checkbox" name="cardListStrSelectAll" id="check_all" class="i-checks" value="-1"></th>
                                         <th>会员卡</th>
                                         <th>会员类型</th>
                                     </tr>
@@ -267,6 +281,14 @@
  	    			$("input[name='cardListStr'][value='"+ card[i] +"']").prop("checked",true);
  	    		}
  	   		}
+            let isage=[[${courseInfo.limitAge}]]
+            if(isage>0){
+                $("input[name='limitAgeRadio'][value='0']").prop("checked",true);
+            }
+            let isCount=[[${courseInfo.limitCounts}]]
+            if(isCount>0){
+                $("input[name='limitCountsRadio'][value='0']").prop("checked",true);
+            }
         });
 
 
@@ -305,11 +327,22 @@
                         setTimeout(function () {
                             window.location.href='[[${#request.getContextPath()}]]/course/x_course_list.do';
                         }, 1000);
-                    } else {
+                    } else if (data.code === 400) {
+                        let errors = data.errorMap;
+                        for (const key in errors) {
+                            $(`[tip=${key}]`).html("");
+                            //错误提示回显
+                            $("<span class='text-danger'>" + errors[key] + "</span>").appendTo($("[tip=" + key + "]"));
+                            // // $([tip=${key}]).html("");
+                            // //错误提示回显
+                            // $("<span class='text-danger'>" + errors[key] + "</span>").appendTo($('#'+key));
+                        }
+                        // $("#selectList").after("<span class='text-danger'>"+ bindMsg.note +"</span>");
+                    }else {
                         swal("更新失败！", data.msg, "info");
-                        setTimeout(function () {
-                            window.location.reload();
-                        }, 1000);
+                        // setTimeout(function () {
+                        //     window.location.reload();
+                        // }, 1000);
                     }
                 },
                 error: function (data) {

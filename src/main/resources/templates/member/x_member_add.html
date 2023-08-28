@@ -18,6 +18,8 @@
           th:href="@{/static/css/font-awesome.css(v='4.4.0')}">
     <link href="../../static/css/animate.css" rel="stylesheet" th:href="@{/static/css/animate.css}">
     <link href="../../static/css/style.css?v=4.1.0" rel="stylesheet" th:href="@{/static/css/style.css(v='4.1.0')}">
+    <link href="../../static/css/plugins/sweetalert/sweetalert.css"
+          th:href="@{/static/css/plugins/sweetalert/sweetalert.css}" rel="stylesheet">
 
     <!-- bootstrap-datepicker -->
     <link href="../../static/css/plugins/datapicker/bootstrap-datepicker.css"
@@ -294,6 +296,9 @@
 <script src="../../static/js/plugins/peity/jquery.peity.min.js"
         th:src="@{/static/js/plugins/peity/jquery.peity.min.js}"></script>
 
+<!-- Sweet alert -->
+<script src="../../static/js/plugins/sweetalert/sweetalert.min.js"
+        th:src="@{/static/js/plugins/sweetalert/sweetalert.min.js}"></script>
 
 <!-- Data picker -->
 <script src="../../static/js/plugins/datapicker/bootstrap-datepicker.js"
@@ -405,14 +410,16 @@
                                 $('img:nth-child(6)').attr('src', '../static/img/x_member_add_4_2.png');
                                 $('img:nth-child(7)').attr('src', '../static/img/x_member_add_3_2.png');
                             } else if (data.code === 400) {
+
                                 let errors = data.errorMap;
                                 for (const key in errors) {
-                                    $('[tip=${key}]').html("");
+                                    // $(`[tip=${key}]`).html("");
+                                    $('[tip='+key+']').html("");
                                     //错误提示回显
                                     $("<span class='text-danger'>" + errors[key] + "</span>").appendTo($("[tip=" + key + "]"));
                                 }
                                 // $("#selectList").after("<span class='text-danger'>"+ bindMsg.note +"</span>");
-                            } else {
+                            }else {
                                 alert("绑定未知错误！");
                             }
                         });
@@ -427,6 +434,13 @@
                         //错误提示回显
                         $("<span class='text-danger'>" + errors[key] + "</span>").appendTo($("[tip=" + key + "]"));
                     }
+                }else if(data.code===401){
+                    swal({
+                        title:"会员注册失败",
+                        text:data.msg,
+                        icon:"error",
+                        buttons:false
+                    });
                 } else {
                     alert("注册会员未知错误！");
                 }
@@ -458,6 +472,13 @@
                             //错误提示回显
                             $("<span class='text-danger'>" + errors[key] + "</span>").appendTo($("[tip=" + key + "]"));
                         }
+                    } else if(data.code===401){
+                        swal({
+                            title:"会员注册失败",
+                            text:data.msg,
+                            icon:"error",
+                            buttons:false
+                        });
                     } else {
                         alert("注册会员未知错误！");
                     }
@@ -474,6 +495,33 @@
             });
 
         });
+
+        $("[name=phone]").change(function (){
+            // var appName = [[${#request.getContextPath()}]];
+            // console.log("appName: " + appName);
+            $.ajax({
+                //发送AJAX请求
+                url:"/member/validPhone?phone=" + $("[name=phone]").val(),
+                method: "GET",
+                async: true,
+                dataType: "json",  //拿到json
+                success: function (data) {
+                    //清空错误提示
+                    $("[tip=phone]").html("");
+                    if(data.code===0){
+                        //成功提示回显
+                        $("<span class='text-success'>" + data.msg + "</span>").appendTo($("[tip=phone]"));
+                    }else{
+                        //错误提示回显
+                        $("<span class='text-danger'>" + data.msg + "</span>").appendTo($("[tip=phone]"));
+                    }
+                },
+                error: function (jqXHR) {
+                    alert("验证手机号程序错误");
+                }
+            });
+
+        })
 
 
         $('#cancelSaveBtn').click(function () {

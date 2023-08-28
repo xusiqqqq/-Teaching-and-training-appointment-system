@@ -22,7 +22,7 @@ import java.util.Map;
  */
 @Slf4j
 @ControllerAdvice
-public class GlobalExceptionControllerAdvice {
+public class GlobalExceptionControllerAdvice{
 
     @ExceptionHandler(value= {MethodArgumentNotValidException.class , BindException.class})
     @ResponseBody
@@ -34,11 +34,20 @@ public class GlobalExceptionControllerAdvice {
             bindingResult = ((BindException)e).getBindingResult();
         }
         Map<String,String> errorMap = new HashMap<>(16);
-        bindingResult.getFieldErrors().forEach((fieldError)->
-                errorMap.put(fieldError.getField(),fieldError.getDefaultMessage())
-        );
+        if(bindingResult!=null){
+            bindingResult.getFieldErrors().forEach(fieldError->
+                    errorMap.put(fieldError.getField(),fieldError.getDefaultMessage())
+            );
+        }
+
         return R.error(444, "非法参数..").put("errorMap", errorMap);
-//        return R.(400 , "非法参数 !" , errorMap);
+    }
+
+
+    @ExceptionHandler(value= {DeleteException.class})
+    @ResponseBody
+    public R handleDeleteException(Exception e){
+        return R.error(444, e.getMessage());
     }
 
     /**
@@ -46,7 +55,6 @@ public class GlobalExceptionControllerAdvice {
      */
 //    @ControllerAdvice//用于不返回json数据
     public class CustomExtHandler {
-
         @ExceptionHandler(value=Exception.class)//处理哪一类异常
         Object handlerException(Exception e,  HttpServletRequest request){
             ModelAndView modelAndView = new ModelAndView();
@@ -57,7 +65,5 @@ public class GlobalExceptionControllerAdvice {
             return modelAndView;
         }
     }
-
-
 
 }

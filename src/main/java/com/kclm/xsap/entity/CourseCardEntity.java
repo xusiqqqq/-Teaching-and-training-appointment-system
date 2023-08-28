@@ -1,9 +1,11 @@
 package com.kclm.xsap.entity;
 
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
+
+import com.github.jeffreyning.mybatisplus.anno.MppMultiId;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -23,11 +25,14 @@ public class CourseCardEntity implements Serializable {
 	/**
 	 * 会员卡id
 	 */
-	@TableId
+	@MppMultiId
+	@TableField
 	private Long cardId;
 	/**
 	 * 课程id
 	 */
+	@MppMultiId
+	@TableField
 	private Long courseId;
 
 }

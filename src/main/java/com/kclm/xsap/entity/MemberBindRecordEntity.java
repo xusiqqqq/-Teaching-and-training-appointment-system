@@ -8,9 +8,11 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -31,6 +33,7 @@ public class MemberBindRecordEntity implements Serializable {
 	 *
 	 */
 	@TableId
+	@JsonProperty(value = "BindId")
 	private Long id;
 	/**
 	 * 会员id
@@ -45,15 +48,18 @@ public class MemberBindRecordEntity implements Serializable {
 	 * 可使用次数
 	 */
 	@NotNull(message = "请输入要充值的次数")
+	@Min(value=0,message = "次数不能小于0")
 	private Integer validCount;
 	/**
 	 * 有效期，按天算
 	 */
+	@Min(value = 0,message = "天数不能小于0")
 	@NotNull(message = "请填入有效期")
 	private Integer validDay;
 	/**
 	 * 实收金额
 	 */
+	@Min(value=0,message = "钱数不能小于0")
 	@NotNull(message = "请输入实收金额")
 	private BigDecimal receivedMoney;
 	/**
@@ -68,6 +74,7 @@ public class MemberBindRecordEntity implements Serializable {
 	/**
 	 * 激活状态，1激活，0非激活
 	 */
+	@JsonProperty(value = "status")
 	private Integer activeStatus;
 	/**
 	 * 创建时间

@@ -19,7 +19,6 @@ import com.kclm.xsap.entity.ConsumeRecordEntity;
 @Mapper(componentModel = "spring")
 public interface ConsumeRecordConvert {
 
-	//ConsumeRecordConvert INSTANCE = Mappers.getMapper(ConsumeRecordConvert.class);
 	/**
 	 * 
 	 * @param consume	对应消费记录实体类
